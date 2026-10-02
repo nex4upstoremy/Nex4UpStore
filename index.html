@@ -7620,35 +7620,48 @@ return function() {
         var pendingReceiptFileName = '';
         var paymentQRsCache = null;
 
+// ================================================================
+// REFERRAL DETECTION (safe for both GAS and GitHub)
+// ================================================================
 var referralCodeFromUrl = null;
+
 (function() {
     function setReferralCode(ref) {
         if (ref) {
             referralCodeFromUrl = ref;
-            sessionStorage.setItem('nex4up_ref', ref); // Persist across page loads
+            sessionStorage.setItem('nex4up_ref', ref);
             var banner = document.getElementById('referralBanner');
             if (banner) banner.style.display = 'block';
             showToast('🎉 You were referred by a friend! Get a welcome discount.');
         }
     }
-    
-    // 1. Check session storage first (in case they refreshed)
-    var savedRef = sessionStorage.getItem('nex4up_ref');
-    if (savedRef) {
-        setReferralCode(savedRef);
+
+    // 1. Check session storage first
+    try {
+        var savedRef = sessionStorage.getItem('nex4up_ref');
+        if (savedRef) {
+            setReferralCode(savedRef);
+        }
+    } catch (e) {
+        console.warn('Session storage unavailable:', e);
     }
 
-    // 2. Read from the URL using the Apps Script API (this fixes the iframe issue)
-if (IS_GAS) {
-    google.script.url.getLocation(function(location) {
-        var ref = location.parameters.ref ? location.parameters.ref[0] : null;
-        setReferralCode(ref);
-    });
-} else {
-    var params = new URLSearchParams(window.location.search);
-    var ref = params.get('ref');
-    setReferralCode(ref);
-}
+    // 2. Read from URL — ONLY if we are inside GAS (google.script.url is available)
+    try {
+        if (typeof google !== 'undefined' && google.script && google.script.url && typeof google.script.url.getLocation === 'function') {
+            google.script.url.getLocation(function(location) {
+                var ref = location.parameters.ref ? location.parameters.ref[0] : null;
+                setReferralCode(ref);
+            });
+        } else {
+            // Fallback for GitHub / any non‑GAS environment
+            var params = new URLSearchParams(window.location.search);
+            var ref = params.get('ref');
+            setReferralCode(ref);
+        }
+    } catch (e) {
+        console.error('Referral detection failed:', e);
+    }
 })();
 
         // ================================================================
