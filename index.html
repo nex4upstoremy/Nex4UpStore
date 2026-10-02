@@ -7478,7 +7478,8 @@ return function() {
 
     fetch(GAS_URL, {
         method: 'POST',
-        body: formData // Tidak perlu headers Content-Type
+        body: formData
+        credentials: 'omit'
     })
     .then(function(res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
