@@ -7479,7 +7479,6 @@ return function() {
     fetch(GAS_URL, {
         method: 'POST',
         body: formData
-        credentials: 'omit'
     })
     .then(function(res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
