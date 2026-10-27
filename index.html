@@ -14022,7 +14022,7 @@ function resetVariantEditor(ctx) {
             document.getElementById('chatPanelOverlay').classList.add('open');
             renderChatIdentity();
             loadChatMessages();
-            chatPollTimer = setInterval(pollChatMessages, 20000);
+            chatPollTimer = setInterval(pollChatMessages, 10000);
             updateChatBadge(0);
         }
 
@@ -14146,6 +14146,16 @@ function resetVariantEditor(ctx) {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             input.value = '';
 
+            // ✅ OPTIMISTIC UI: Show message instantly
+            var container = document.getElementById('chatMessages');
+            var tempTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            var tempHtml = '<div class="chat-bubble mine">';
+            if (text) tempHtml += '<div>' + escapeChatHtml(text) + '</div>';
+            if (imageData) tempHtml += '<img src="' + imageData + '" alt="image" />';
+            tempHtml += '<span class="chat-time">' + tempTime + '</span></div>';
+            container.innerHTML += tempHtml;
+            container.scrollTop = container.scrollHeight;
+
             google.script.run
                 .withSuccessHandler(function(res) {
                     btn.disabled = false;
@@ -14154,15 +14164,18 @@ function resetVariantEditor(ctx) {
                         chatPendingImage = null;
                         document.getElementById('chatImagePreview').style.display = 'none';
                         document.getElementById('chatPreviewImg').src = '';
+                        // Refresh to get the real timestamp/ID from server
                         loadChatMessages();
                     } else {
                         showToast((res && res.message) || 'Failed to send.');
+                        container.lastChild.remove(); // Remove the fake message on failure
                     }
                 })
                 .withFailureHandler(function(err) {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
                     showToast('Send error: ' + err.message);
+                    container.lastChild.remove(); // Remove on error
                 })
                 .sendMessage(identity.email, identity.name, text, imageData);
         }
