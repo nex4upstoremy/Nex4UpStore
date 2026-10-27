@@ -4583,169 +4583,109 @@
             .edit-form .edit-actions button { width: 100%; justify-content: center; }
         }
 
-        /* ============================================================
+         /* ============================================================
            MOBILE FIX FOR ADMIN PANEL ONLY
            ============================================================ */
         @media (max-width: 992px) {
-            /* 1. Sidebar Navigation */
+            /* 1. Change Layout from Side-by-Side to Top-to-Bottom */
+            .app-container {
+                flex-direction: column !important;
+                padding: 10px !important;
+                gap: 15px !important;
+            }
+
+            /* 2. Turn Sidebar into a Horizontal Scrollable Menu */
             .sidebar {
-                padding: 6px 8px;
-                gap: 2px;
-                border-radius: 12px;
-                scroll-behavior: smooth;
+                width: 100% !important;
+                max-width: 100% !important;
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                position: static !important;
+                padding: 8px !important;
+                border-radius: 12px !important;
                 -webkit-overflow-scrolling: touch;
             }
             .sidebar .sidebar-item {
-                padding: 8px 12px;
-                font-size: 12px;
-                min-height: 36px;
-                border-radius: 8px;
-                white-space: nowrap;
+                border-left: none !important;
+                border-bottom: 3px solid transparent !important;
+                white-space: nowrap !important;
+                padding: 8px 16px !important;
+                font-size: 13px !important;
             }
-            .sidebar .sidebar-item i {
-                font-size: 14px;
+            .sidebar .sidebar-item.active {
+                border-left: none !important;
+                border-bottom-color: #f7d875 !important;
+                background: #1a2538 !important;
+            }
+            .sidebar .sidebar-divider {
+                display: none !important; /* Hide dividers on mobile */
             }
 
-            /* 2. Tables (Orders, Payment Approval, Manage Games) */
+            /* 3. Main Content takes full width */
+            .main-content {
+                width: 100% !important;
+                padding: 0 !important;
+            }
+
+            /* 4. Fix Tables (Orders, Payment Approval, Manage Games) */
             .orders-container, .admin-list {
-                padding: 8px;
-                margin: 0;
-                border-radius: 12px;
-                overflow-x: auto;
+                padding: 10px !important;
+                margin: 0 !important;
+                border-radius: 12px !important;
+                overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch;
             }
             .orders-container table, .admin-list table {
-                font-size: 11px;
-                min-width: 750px; /* Forces scroll instead of squishing */
+                font-size: 12px !important;
+                min-width: 700px !important; /* Forces scroll instead of squishing */
             }
-            .orders-container th, .admin-list th {
-                font-size: 10px;
-                padding: 6px 4px;
-                white-space: nowrap;
-            }
-            .orders-container td, .admin-list td {
-                padding: 6px 4px;
-            }
-            .admin-list .admin-thumb {
-                width: 36px;
-                height: 24px;
-            }
-            
-            /* Payment Approval buttons & receipt thumbnails */
-            .approve-btn, .cancel-btn {
-                padding: 4px 8px;
-                font-size: 10px;
-                min-height: 28px;
-                white-space: nowrap;
-            }
-            #approvalList img {
-                width: 40px !important;
-                height: 40px !important;
-            }
-            /* Fix for the new 8-column receipt layout */
             #approvalList table {
-                min-width: 850px;
+                min-width: 800px !important;
             }
 
-            /* 3. Admin Form (Add Item) */
-            .admin-form {
-                padding: 16px;
-                gap: 12px;
-                grid-template-columns: 1fr;
+            /* 5. Fix Payment Approval Search Bar */
+            .product-toolbar {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 10px !important;
             }
-            .admin-form .field label {
-                font-size: 11px;
+            .product-toolbar .toolbar-search {
+                width: 100% !important;
+            }
+
+            /* 6. Fix Customer Inbox Layout */
+            .inbox-layout {
+                flex-direction: column !important;
+                height: auto !important;
+            }
+            .inbox-list {
+                width: 100% !important;
+                max-height: 250px !important;
+            }
+            .inbox-chat {
+                min-height: 450px !important;
+            }
+
+            /* 7. Fix Admin Forms */
+            .admin-form-grid {
+                grid-template-columns: 1fr !important;
             }
             .admin-form .field input, 
             .admin-form .field textarea, 
             .admin-form .field select {
-                padding: 10px;
-                font-size: 14px;
-                min-height: 44px;
+                padding: 12px !important;
+                font-size: 14px !important;
+                min-height: 44px !important;
             }
             .admin-form .submit-btn {
-                width: 100%;
-                padding: 12px;
-                font-size: 15px;
-                min-height: 46px;
-            }
-            .debug-toggle {
-                width: 100%;
-                margin-top: 10px;
-                padding: 12px;
-                min-height: 44px;
+                width: 100% !important;
+                justify-content: center !important;
             }
 
-            /* 4. Dashboard Stats */
+            /* 8. Dashboard Stats */
             .dashboard-stats {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-            .stat-card {
-                padding: 12px;
-            }
-            .stat-card .stat-number {
-                font-size: 18px;
-            }
-            .stat-card .stat-label {
-                font-size: 10px;
-            }
-            .extra-sections {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-            .extra-card {
-                padding: 12px;
-            }
-            .extra-card h3 {
-                font-size: 12px;
-            }
-
-            /* 5. Referral Settings Form */
-            .referral-config-form {
-                padding: 16px;
-                gap: 12px;
-                grid-template-columns: 1fr;
-            }
-            .referral-config-form .field label {
-                font-size: 11px;
-            }
-            .referral-config-form .field input {
-                min-height: 44px;
-                font-size: 14px;
-            }
-            .referral-config-form .actions button {
-                width: 100%;
-                min-height: 44px;
-                font-size: 14px;
-            }
-
-            /* 6. Genre Manager */
-            .genre-manager {
-                padding: 12px;
-            }
-            .genre-manager .genre-row {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
-                padding: 12px;
-            }
-            .genre-manager .genre-row .genre-label {
-                min-width: auto;
-                width: 100%;
-            }
-            .genre-manager .genre-row input[type="url"] {
-                width: 100%;
-                min-height: 40px;
-            }
-            .genre-manager .genre-row .save-genre-btn {
-                width: 100%;
-                min-height: 40px;
-                justify-content: center;
-            }
-            .genre-manager .genre-row .genre-preview {
-                width: 100%;
-                height: 80px;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
             }
         }
 
