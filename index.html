@@ -7817,6 +7817,12 @@ return function() {
         var genreImages = {};
 
         var CURRENCY = 'RM';
+                // ================================================================
+        // 🔀 MODE ROUTING
+        //   .../?admin=1  or  .../#admin  → admin panel
+        //   anything else                  → storefront
+        // ================================================================
+        var IS_ADMIN_MODE = /(?:[?&]admin=1|#admin\b)/.test(window.location.href);
 
                 // ✅ Shipping fee (flat rate — change here to update everywhere)
         var SHIPPING_FEE_RM = 8.00;
@@ -7982,7 +7988,9 @@ var referralCodeFromUrl = null;
         var profileDropdownContent = document.getElementById('profileDropdownContent');
         var profileDropdown = document.getElementById('profileDropdown');
         var sidebar = document.getElementById('sidebar');
-        var sidebarItems = sidebar.querySelectorAll('.sidebar-item[data-section]');
+        var sidebarItems = sidebar
+            ? sidebar.querySelectorAll('.sidebar-item[data-section]')
+            : [];
         var sidebarLogout = document.getElementById('sidebarLogout');
         var sidebarBack = document.getElementById('sidebarBack');
         var sections = {
@@ -10035,8 +10043,19 @@ if (cart.length > 0) {
             sidebar.classList.remove('visible');
             adminSections.style.display = 'none';
             for (var key in sections) { sections[key].classList.remove('active'); }
-            showStoreView();
-            renderPaginatedGrid();
+
+            if (IS_ADMIN_MODE) {
+                // Stay on the /?admin=1 URL — hide everything, re-open login
+                publicView.style.display = 'none';
+                myAccountSection.style.display = 'none';
+                wishlistSection.style.display = 'none';
+                setTimeout(function () { adminLoginOverlay.classList.add('open'); }, 150);
+            } else {
+                // Storefront mode — just go back to the shop
+                showStoreView();
+                renderPaginatedGrid();
+            }
+
             updateProfileDropdown();
             showToast('Admin mode closed.');
         }
@@ -12527,29 +12546,50 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
         }
 
         // ================================================================
-        // 40. INIT
+        // 40. INIT  (mode-aware)
         // ================================================================
         setupPaymentMethodSelector();
 
-        showStoreView();
+        if (IS_ADMIN_MODE) {
 
-        var hasSession = restoreCustomerSession();
-        if (!hasSession) {
-            updateProfileDropdown();
+            /* ---------- ADMIN MODE ---------- */
+            // Hide every customer-facing screen
+            publicView.style.display = 'none';
+            myAccountSection.style.display = 'none';
+            myAccountSection.classList.remove('visible');
+            wishlistSection.style.display = 'none';
+            wishlistSection.classList.remove('visible');
+
+            // Show the admin login immediately
+            setTimeout(function () {
+                adminLoginOverlay.classList.add('open');
+            }, 250);
+
+            // Load games into memory ONLY (so the admin table is not empty).
+            // Nothing is rendered to the storefront grid.
+            loadGamesForAdminMode();
+
         } else {
-            if (customer) {
+
+            /* ---------- STORE MODE (same behaviour as before) ---------- */
+            showStoreView();
+
+            var hasSession = restoreCustomerSession();
+            if (!hasSession) {
+                updateProfileDropdown();
+            } else if (customer) {
                 updateProfileDropdown();
                 loadMyAccount();
                 loadMyOrders();
                 loadReferralData();
             }
+
+            loadGames();
+            setTimeout(setupCarouselArrows, 800);
         }
 
-        loadGames();
-
-        setTimeout(setupCarouselArrows, 800);
-
-        console.log('🚀 Nex4UpStore initialized with payment flow.');
+        console.log('🚀 Nex4UpStore initialized in ' +
+                    (IS_ADMIN_MODE ? 'ADMIN' : 'STORE') + ' mode.');
                 // ================================================================
         // 40. BACKUP & RESTORE
         // ================================================================
@@ -14638,6 +14678,26 @@ function resetVariantEditor(ctx) {
                 `
             }
         };
+
+                // ================================================================
+        // 40b. ADMIN-MODE DATA LOADER
+        // Loads products without touching the public grid.
+        // ================================================================
+        function loadGamesForAdminMode() {
+            google.script.run
+                .withSuccessHandler(function (data) {
+                    allGames = data || [];
+                    loadPublicGenreImages(function () {
+                        renderAdminList();
+                    });
+                })
+                .withFailureHandler(function (err) {
+                    console.error('Admin games load failed:', err);
+                    allGames = [];
+                    renderAdminList();
+                })
+                .getGamesData();
+        }
 
         function openPolicy(key) {
             var data = POLICY_DATA[key];
