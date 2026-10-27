@@ -7823,6 +7823,29 @@ return function() {
         //   anything else                  → storefront
         // ================================================================
         var IS_ADMIN_MODE = /(?:[?&]admin=1|#admin\b)/.test(window.location.href);
+                // ================================================================
+        // 🛡 HARD GUARD: admin login overlay can only open in ADMIN mode
+        // ================================================================
+        (function guardAdminLoginOverlay() {
+            if (IS_ADMIN_MODE) return;   // nothing to guard in admin mode
+
+            document.addEventListener('DOMContentLoaded', function () {
+                var ov = document.getElementById('adminLoginOverlay');
+                if (!ov) return;
+
+                // Watch for class changes and remove "open" if it ever appears
+                var mo = new MutationObserver(function () {
+                    if (ov.classList.contains('open')) {
+                        ov.classList.remove('open');
+                        console.warn('🚫 Admin login is not available from the store page.');
+                    }
+                });
+                mo.observe(ov, { attributes: true, attributeFilter: ['class'] });
+
+                // Also prevent clicks inside it from doing anything
+                ov.addEventListener('click', function (e) { e.stopPropagation(); }, true);
+            });
+        })();
 
                 // ✅ Shipping fee (flat rate — change here to update everywhere)
         var SHIPPING_FEE_RM = 8.00;
@@ -9819,63 +9842,78 @@ checkoutBtn.addEventListener('click', function() {
         // ================================================================
         function updateProfileDropdown() {
             var html = '';
-            if (customer) {
-                html += '<button class="dropdown-item" id="dropdownMyAccount"><i class="fas fa-user"></i> My Account</button>';
-                html += '<button class="dropdown-item" id="dropdownWishlist"><i class="fas fa-heart"></i> Wishlist</button>';
-                html += '<button class="dropdown-item" id="dropdownLogout"><i class="fas fa-sign-out-alt"></i> Logout</button>';
-            } else {
-                html += '<button class="dropdown-item" id="dropdownLogin"><i class="fas fa-sign-in-alt"></i> Login</button>';
-                html += '<button class="dropdown-item" id="dropdownRegister"><i class="fas fa-user-plus"></i> Register</button>';
-            }
-            if (!isAdmin) {
-                html += '<div class="dropdown-divider"></div>';
-                html += '<button class="dropdown-item" id="dropdownAdminLogin"><i class="fas fa-user-cog"></i> Admin Login</button>';
-            }
-            if (isAdmin) {
-                html += '<div class="dropdown-divider"></div>';
-                html += '<button class="dropdown-item" id="dropdownAdminPanel"><i class="fas fa-user-cog"></i> Admin Panel</button>';
-                html += '<button class="dropdown-item" id="dropdownLogoutAdmin"><i class="fas fa-sign-out-alt"></i> Logout Admin</button>';
-            }
-            profileDropdownContent.innerHTML = html;
 
-            if (customer) {
-                var el1 = document.getElementById('dropdownMyAccount');
-                if (el1) el1.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showMyAccount();
+            /* ---------- STORE MODE: customer-only menu ---------- */
+            if (!IS_ADMIN_MODE) {
+                if (customer) {
+                    html += '<button class="dropdown-item" id="dropdownMyAccount"><i class="fas fa-user"></i> My Account</button>';
+                    html += '<button class="dropdown-item" id="dropdownWishlist"><i class="fas fa-heart"></i> Wishlist</button>';
+                    html += '<button class="dropdown-item" id="dropdownLogout"><i class="fas fa-sign-out-alt"></i> Logout</button>';
+                } else {
+                    html += '<button class="dropdown-item" id="dropdownLogin"><i class="fas fa-sign-in-alt"></i> Login</button>';
+                    html += '<button class="dropdown-item" id="dropdownRegister"><i class="fas fa-user-plus"></i> Register</button>';
+                }
+                profileDropdownContent.innerHTML = html;
+
+                var myAcc = document.getElementById('dropdownMyAccount');
+                if (myAcc) myAcc.addEventListener('click', function (e) {
+                    e.preventDefault(); showMyAccount(); closeProfileDropdown();
+                });
+                var wish = document.getElementById('dropdownWishlist');
+                if (wish) wish.addEventListener('click', function (e) {
+                    e.preventDefault(); showWishlist(); closeProfileDropdown();
+                });
+                var logoutCust = document.getElementById('dropdownLogout');
+                if (logoutCust) logoutCust.addEventListener('click', logoutCustomer);
+
+                var dl = document.getElementById('dropdownLogin');
+                if (dl) dl.addEventListener('click', function () {
+                    var sub = loginOverlay.querySelector('.sub');
+                    if (sub) sub.textContent = 'Welcome back! Log in to your account.';
+                    loginOverlay.classList.add('open');
                     closeProfileDropdown();
                 });
-                var el2 = document.getElementById('dropdownWishlist');
-                if (el2) el2.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showWishlist();
-                    closeProfileDropdown();
-                });
-                var el3 = document.getElementById('dropdownLogout');
-                if (el3) el3.addEventListener('click', logoutCustomer);
-            } else {
-var el4 = document.getElementById('dropdownLogin');
-if (el4) el4.addEventListener('click', function() {
-    // ✅ Reset the sub-text to the default message
-    var sub = loginOverlay.querySelector('.sub');
-    if (sub) sub.textContent = 'Welcome back! Log in to your account.';
-    loginOverlay.classList.add('open');
-    closeProfileDropdown();
-});
-                var el5 = document.getElementById('dropdownRegister');
-                if (el5) el5.addEventListener('click', function() {
+                var dr = document.getElementById('dropdownRegister');
+                if (dr) dr.addEventListener('click', function () {
                     registerOverlay.classList.add('open');
                     closeProfileDropdown();
                 });
+
+                return; // 🚫 never touch admin items in store mode
             }
 
-            var el6 = document.getElementById('dropdownAdminLogin');
-            if (el6) el6.addEventListener('click', function() {
-                closeProfileDropdown();
-                adminLoginOverlay.classList.add('open');
-                adminPassword.value = '';
-                adminLoginError.textContent = '';
-            });
+            /* ---------- ADMIN MODE: admin-only menu ---------- */
+            if (isAdmin) {
+                html += '<button class="dropdown-item" id="dropdownAdminPanel"><i class="fas fa-user-cog"></i> Admin Panel</button>';
+                html += '<div class="dropdown-divider"></div>';
+                html += '<button class="dropdown-item" id="dropdownLogoutAdmin"><i class="fas fa-sign-out-alt"></i> Logout Admin</button>';
+            } else {
+                html += '<button class="dropdown-item" id="dropdownAdminLogin"><i class="fas fa-user-cog"></i> Admin Login</button>';
+            }
+            profileDropdownContent.innerHTML = html;
+
+            if (isAdmin) {
+                var ap = document.getElementById('dropdownAdminPanel');
+                if (ap) ap.addEventListener('click', function () {
+                    sidebar.classList.add('visible');
+                    showAdminView();
+                    showAdminSection('add-item');
+                    closeProfileDropdown();
+                });
+                var lo = document.getElementById('dropdownLogoutAdmin');
+                if (lo) lo.addEventListener('click', function () {
+                    logoutAdmin(); closeProfileDropdown();
+                });
+            } else {
+                var al = document.getElementById('dropdownAdminLogin');
+                if (al) al.addEventListener('click', function () {
+                    closeProfileDropdown();
+                    adminLoginOverlay.classList.add('open');
+                    adminPassword.value = '';
+                    adminLoginError.textContent = '';
+                });
+            }
+        }
 
             if (isAdmin) {
                 var el7 = document.getElementById('dropdownAdminPanel');
@@ -12553,7 +12591,11 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
         if (IS_ADMIN_MODE) {
 
             /* ---------- ADMIN MODE ---------- */
-            // Hide every customer-facing screen
+            // Hide every customer-facing screen and the public header/footer
+            document.querySelector('header').style.display = 'none';
+            var footerEl = document.getElementById('siteFooter');
+            if (footerEl) footerEl.style.display = 'none';
+
             publicView.style.display = 'none';
             myAccountSection.style.display = 'none';
             myAccountSection.classList.remove('visible');
