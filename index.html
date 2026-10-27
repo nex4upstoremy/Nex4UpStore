@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -6097,6 +6097,216 @@
                 grid-column: 1 / -1;
             }
         }
+
+                       /* ============================================================
+   💬 CUSTOMER CHAT WIDGET
+   ============================================================ */
+.chat-fab {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, #f0b34b, #f7d875);
+  border: none; cursor: pointer; color: #0b0e14;
+  font-size: 24px; z-index: 995;
+  box-shadow: 0 8px 24px rgba(247,216,117,0.35);
+  transition: 0.25s; display: flex; align-items: center; justify-content: center;
+}
+.chat-fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(247,216,117,0.5); }
+.chat-fab.hidden { display: none; }
+.chat-fab-badge {
+  position: absolute; top: -4px; right: -4px;
+  min-width: 22px; height: 22px; padding: 0 6px;
+  background: #ff4757; color: #fff;
+  border-radius: 12px; font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #0b0e14;
+}
+
+.chat-panel-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 996; display: none; align-items: flex-end; justify-content: flex-end;
+  padding: 20px; backdrop-filter: blur(4px);
+}
+.chat-panel-overlay.open { display: flex; }
+.chat-panel {
+  width: 380px; max-width: 100%; height: 560px; max-height: 90vh;
+  background: #121821; border: 1px solid #1e2a3a; border-radius: 20px;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  animation: chatSlide 0.3s ease;
+}
+@keyframes chatSlide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.chat-header {
+  padding: 16px 18px; background: linear-gradient(135deg, #1a2538, #121821);
+  border-bottom: 1px solid #1e2a3a;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+}
+.chat-header h3 { font-size: 16px; color: #f7d875; display: flex; align-items: center; gap: 8px; }
+.chat-header p { font-size: 11.5px; color: #6a7f9e; margin-top: 3px; }
+.chat-close {
+  background: transparent; border: none; color: #8aa1c0; font-size: 22px;
+  cursor: pointer; padding: 4px; transition: 0.2s; flex-shrink: 0;
+}
+.chat-close:hover { color: #fff; transform: rotate(90deg); }
+
+.chat-identity { padding: 12px 16px; border-bottom: 1px solid #1e2a3a; background: #0b0e14; }
+.chat-identity .field { margin-bottom: 8px; }
+.chat-identity .field:last-child { margin-bottom: 0; }
+.chat-identity .field label { font-size: 11px; color: #6a7f9e; text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 4px; }
+.chat-identity .field input {
+  width: 100%; background: #121821; border: 1px solid #2a3a52;
+  border-radius: 8px; padding: 8px 12px; color: #e8edf5;
+  font-family: 'Inter', sans-serif; font-size: 13px;
+}
+.chat-identity .field input:focus { outline: none; border-color: #f7d875; }
+
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  background: #0b0e14;
+}
+.chat-empty { color: #6a7f9e; text-align: center; padding: 30px 20px; font-size: 13px; }
+
+.chat-bubble {
+  max-width: 80%; padding: 8px 12px; border-radius: 14px;
+  font-size: 13.5px; line-height: 1.5; word-wrap: break-word; white-space: pre-wrap;
+  position: relative;
+}
+.chat-bubble.mine { align-self: flex-end; background: #f7d875; color: #0b0e14; border-bottom-right-radius: 4px; }
+.chat-bubble.theirs { align-self: flex-start; background: #1a2538; color: #e8edf5; border-bottom-left-radius: 4px; }
+.chat-bubble .chat-time { font-size: 10px; opacity: 0.65; margin-top: 4px; display: block; }
+.chat-bubble img { max-width: 100%; border-radius: 8px; margin-top: 6px; display: block; cursor: pointer; }
+
+.chat-image-preview {
+  padding: 8px 14px; background: #0b0e14; border-top: 1px solid #1e2a3a;
+  display: flex; align-items: center; gap: 10px;
+}
+.chat-image-preview img {
+  width: 50px; height: 50px; object-fit: cover; border-radius: 8px;
+  border: 1px solid #2a3a52;
+}
+.chat-image-preview button {
+  background: #ff6b6b; color: #fff; border: none; width: 24px; height: 24px;
+  border-radius: 50%; cursor: pointer; font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.chat-input-area {
+  display: flex; align-items: flex-end; gap: 8px;
+  padding: 12px 14px; border-top: 1px solid #1e2a3a;
+  background: #121821;
+}
+.chat-input-area textarea {
+  flex: 1; resize: none; background: #0b0e14; border: 1px solid #2a3a52;
+  border-radius: 18px; padding: 10px 14px; color: #e8edf5;
+  font-family: 'Inter', sans-serif; font-size: 13.5px; max-height: 90px;
+  line-height: 1.4;
+}
+.chat-input-area textarea:focus { outline: none; border-color: #f7d875; }
+.chat-attach-btn, .chat-send-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: 0.2s; flex-shrink: 0;
+}
+.chat-attach-btn { background: #1a2538; color: #8aa1c0; font-size: 15px; }
+.chat-attach-btn:hover { background: #2a3a52; color: #f7d875; }
+.chat-send-btn { background: #f7d875; color: #0b0e14; font-size: 15px; }
+.chat-send-btn:hover { background: #ffe08a; transform: scale(1.05); }
+.chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ============================================================
+   💬 ADMIN INBOX
+   ============================================================ */
+.inbox-layout { display: flex; gap: 12px; height: calc(100vh - 220px); min-height: 500px; }
+.inbox-list {
+  width: 300px; flex-shrink: 0;
+  background: #121821; border: 1px solid #1e2a3a; border-radius: 16px;
+  overflow-y: auto;
+}
+.inbox-conv {
+  display: flex; gap: 10px; padding: 12px 14px;
+  border-bottom: 1px solid #1e2a3a; cursor: pointer; transition: 0.15s;
+}
+.inbox-conv:hover { background: #1a2538; }
+.inbox-conv.active { background: #1a2538; border-left: 3px solid #f7d875; }
+.inbox-conv .conv-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: #1a2538;
+  display: flex; align-items: center; justify-content: center;
+  color: #f7d875; font-weight: 800; font-size: 14px; flex-shrink: 0;
+}
+.inbox-conv .conv-body { flex: 1; min-width: 0; }
+.inbox-conv .conv-name { font-size: 13px; font-weight: 700; color: #e8edf5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inbox-conv .conv-preview { font-size: 11.5px; color: #6a7f9e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.inbox-conv .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.inbox-conv .conv-time { font-size: 10px; color: #6a7f9e; }
+.inbox-conv .conv-badge {
+  background: #ff4757; color: #fff; border-radius: 10px; padding: 1px 7px;
+  font-size: 10px; font-weight: 700;
+}
+.inbox-empty { padding: 30px 20px; text-align: center; color: #6a7f9e; font-size: 13px; }
+
+.inbox-chat {
+  flex: 1; display: flex; flex-direction: column;
+  background: #121821; border: 1px solid #1e2a3a; border-radius: 16px; overflow: hidden;
+}
+.inbox-chat-header {
+  padding: 12px 16px; border-bottom: 1px solid #1e2a3a; background: #1a2538;
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+}
+.inbox-chat-header h4 { font-size: 14px; color: #f7d875; }
+.inbox-chat-header small { color: #6a7f9e; font-size: 11px; display: block; margin-top: 2px; }
+.inbox-chat-body {
+  flex: 1; overflow-y: auto; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px; background: #0b0e14;
+}
+.inbox-chat .chat-bubble.mine { background: #2a3a52; color: #f7d875; }
+.inbox-chat .chat-bubble.theirs { background: #f7d875; color: #0b0e14; }
+.inbox-chat-input {
+  display: flex; align-items: flex-end; gap: 8px; padding: 12px 14px;
+  border-top: 1px solid #1e2a3a; background: #121821;
+}
+.inbox-chat-input textarea {
+  flex: 1; resize: none; background: #0b0e14; border: 1px solid #2a3a52;
+  border-radius: 14px; padding: 10px 14px; color: #e8edf5;
+  font-family: 'Inter', sans-serif; font-size: 13px; max-height: 90px;
+}
+.inbox-chat-input textarea:focus { outline: none; border-color: #f7d875; }
+.inbox-chat-input button {
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: 0.2s; flex-shrink: 0;
+}
+.inbox-attach-btn { background: #1a2538; color: #8aa1c0; }
+.inbox-attach-btn:hover { background: #2a3a52; color: #f7d875; }
+.inbox-send-btn { background: #f7d875; color: #0b0e14; }
+.inbox-send-btn:hover { background: #ffe08a; }
+
+.sidebar-badge {
+  background: #ff4757; color: #fff; border-radius: 10px; padding: 1px 7px;
+  font-size: 10px; font-weight: 700; margin-left: auto;
+}
+
+.inbox-preview-strip {
+  padding: 8px 14px; background: #0b0e14; border-top: 1px solid #1e2a3a;
+  display: none; align-items: center; gap: 10px;
+}
+.inbox-preview-strip.show { display: flex; }
+.inbox-preview-strip img {
+  width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #2a3a52;
+}
+.inbox-preview-strip button {
+  background: #ff6b6b; color: #fff; border: none; width: 24px; height: 24px;
+  border-radius: 50%; cursor: pointer; font-size: 11px;
+}
+
+@media (max-width: 640px) {
+  .chat-panel { width: 100%; height: 100%; max-height: 100vh; border-radius: 0; }
+  .chat-panel-overlay { padding: 0; }
+  .chat-fab { bottom: 16px; right: 16px; width: 54px; height: 54px; font-size: 22px; }
+  .inbox-layout { flex-direction: column; height: auto; }
+  .inbox-list { width: 100%; max-height: 220px; }
+  .inbox-chat { min-height: 400px; }
+}
         @media (max-width: 480px) {
             .product-toolbar {
                 grid-template-columns: 1fr;
@@ -6108,1237 +6318,7 @@
                 padding-left: 0;
             }
         }
-    </style>
-</head>
-<body>
-
-    <!-- ===== HEADER ===== -->
-    <header>
-        <div class="logo">
-            <!-- Desktop: N4 Arrow Icon + NEX4UP Text -->
-            <img src="https://lh3.googleusercontent.com/d/1ZfT9IOAc2kL7pF1dUVRdq9p7AKez3a47" alt="N4" class="logo-icon" />
-            <div class="logo-text">
-                <span class="logo-text-light">NEX</span><span class="logo-text-accent">4</span><span class="logo-text-light">UP</span>
-            </div>
-            <!-- Mobile: Emblem only -->
-            <img src="https://lh3.googleusercontent.com/d/1kmjuyfdgwMT30GV-yV1nOtwCv2FfEbSD" alt="N4P" class="mobile-emblem" />
-        </div>
-        <div class="header-controls">
-            <div class="search-wrapper">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Search games..." autocomplete="off" />
-                    <button id="searchBtn"><i class="fas fa-search"></i></button>
-                    <button class="clear-search" id="clearSearchBtn"><i class="fas fa-times-circle"></i></button>
-                </div>
-                <div id="searchDropdown"></div>
-            </div>
-            <button class="track-btn" id="trackBtn"><i class="fas fa-search"></i> Track Order</button>
-            <button class="cart-btn" id="cartToggle">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Cart</span>
-                <span class="badge" id="cartCount">0</span>
-            </button>
-            <div class="profile-dropdown" id="profileDropdown">
-                <button class="profile-toggle" id="profileToggle">
-                    <i class="fas fa-user-circle"></i>
-                </button>
-                <div class="profile-dropdown-content" id="profileDropdownContent"></div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ===== APP CONTAINER ===== -->
-    <div class="app-container">
-        <!-- ===== SIDEBAR ===== -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-item back-item" id="sidebarBack">
-                <i class="fas fa-arrow-left"></i> Back to Store
-            </div>
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-item active" data-section="add-item">
-                <i class="fas fa-plus-circle"></i> Add Item
-            </div>
-            <div class="sidebar-item" data-section="dashboard">
-                <i class="fas fa-chart-line"></i> Dashboard
-            </div>
-            <div class="sidebar-item" data-section="payment-approval">
-                <i class="fas fa-check-double"></i> Payment Approval
-            </div>
-            <div class="sidebar-item" data-section="orders">
-                <i class="fas fa-box"></i> Orders
-            </div>
-            <div class="sidebar-item" data-section="genres">
-                <i class="fas fa-images"></i> Genres
-            </div>
-            <div class="sidebar-item" data-section="referral-settings">
-                <i class="fas fa-share-alt"></i> Referral Settings
-            </div>
-            <!-- ✅ NEW: Backup Sidebar Item -->
-            <div class="sidebar-item" data-section="backup">
-                <i class="fas fa-database"></i> Backup & Restore
-            </div>
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-item" data-section="change-password">
-                <i class="fas fa-key"></i> Change Admin Password
-            </div>
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-item logout-item" id="sidebarLogout">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </div>
-        </div>
-
-        <!-- ===== MAIN CONTENT ===== -->
-        <div class="main-content">
-            <!-- PUBLIC VIEW -->
-            <div id="publicView">
-                <div class="hero">
-                    <div>
-                        <h1>Level Up <span>Your Library</span></h1>
-                        <p>Discover top‑tier games, exclusive deals, and instant digital delivery in MYR.</p>
-                    </div>
-                    <div class="stats">
-                        <div><div class="num" id="totalGames">0</div><div class="label">Games</div></div>
-                        <div><div class="num" id="totalCategories">0</div><div class="label">Categories</div></div>
-                    </div>
-                </div>
-
-                <div id="referralBanner" style="display:none; background:#1e2a3a; border:1px solid #f7d875; border-radius:16px; padding:16px 24px; margin-bottom:24px; text-align:center;">
-                    <i class="fas fa-gift" style="color:#f7d875; font-size:24px;"></i>
-                    <span style="font-weight:600; margin-left:12px;">You were referred by a friend!</span>
-                    <span style="color:#8aa1c0; margin-left:8px;">Register now and get a welcome coupon on your first order.</span>
-                </div>
-
-                <div class="genre-carousel-wrapper" id="genreCarouselWrapper">
-                    <div id="genreCardsContainer" class="genre-cards"></div>
-                    <button class="carousel-arrow left" id="carouselLeft"><i class="fas fa-chevron-left"></i></button>
-                    <button class="carousel-arrow right" id="carouselRight"><i class="fas fa-chevron-right"></i></button>
-                </div>
-
-                <div id="genreBannerContainer" style="display:none;"></div>
-
-                <div class="filters" id="filterContainer">
-                    <span class="filter-label"><i class="fas fa-tag"></i> Genre</span>
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="hotselling">🔥 Hot Selling</button>
-                </div>
-                <div class="games-grid" id="gamesGrid"></div>
-                <div class="pagination-container" id="paginationContainer"></div>
-
-                <!-- ===== PAYMENT METHODS BANNER (Customer View) ===== -->
-                <div class="payment-methods-banner" id="paymentMethodsBanner">
-                    <div class="pm-label">
-                        <i class="fas fa-credit-card"></i>
-                        We Accept
-                    </div>
-                    <div class="pm-row">
-                        <div class="pm-item" title="MAE by Maybank2u">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHOYpS3G_bIUHBJNp_xKD1_7NxSF3J66qxMX1VzWrq5g&s=10" alt="MAE" loading="lazy" />
-                            <span class="pm-name">MAE</span>
-                        </div>
-                        <div class="pm-item" title="Touch 'n Go eWallet">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPQhtet5iK5zwJYL00UIrGJUvz3_NlK4y5urak093NHg&s=10" alt="Touch 'n Go" loading="lazy" />
-                            <span class="pm-name">TNG</span>
-                        </div>
-                        <div class="pm-item" title="ShopeePay">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" loading="lazy" />
-                            <span class="pm-name">ShopeePay</span>
-                        </div>
-                    </div>
-                    <div class="pm-secure">
-                        <i class="fas fa-shield-alt"></i>
-                        100% Secure Payment
-                    </div>
-                </div>
-            </div>
-
-            <!-- ADMIN SECTIONS -->
-            <div id="adminSections">
-                <!-- Add Item -->
-                <div class="admin-section active" id="section-add-item">
-                    <h2 style="margin-bottom:20px;"><i class="fas fa-user-cog"></i> Admin – Manage Products</h2>
-                    <form class="admin-form" id="addGameForm">
-
-                        <!-- ============ SECTION 1: BASIC INFORMATION ============ -->
-                        <div class="admin-form-section">
-                            <div class="admin-form-section-header">
-                                <i class="fas fa-info-circle"></i> Basic Information
-                            </div>
-                            <div class="admin-form-grid">
-                                <div class="field">
-                                    <label for="title">Title *</label>
-                                    <input type="text" id="title" required placeholder="Game / Product title" />
-                                </div>
-                                <div class="field">
-                                    <label for="category">Category</label>
-                                    <input type="text" id="category" placeholder="e.g. RPG, Pants, Sneakers" />
-                                </div>
-                                <div class="field field-full">
-                                    <label>Product Type *</label>
-                                    <div class="product-type-toggle">
-                                        <label class="pt-option">
-                                            <input type="radio" name="addProductType" value="digital" checked />
-                                            <span class="pt-content">
-                                                <i class="fas fa-download"></i>
-                                                <span class="pt-title">Digital</span>
-                                                <span class="pt-sub">Game codes, top-ups, accounts</span>
-                                            </span>
-                                        </label>
-                                        <label class="pt-option">
-                                            <input type="radio" name="addProductType" value="physical" />
-                                            <span class="pt-content">
-                                                <i class="fas fa-box"></i>
-                                                <span class="pt-title">Physical</span>
-                                                <span class="pt-sub">Clothing, accessories, etc.</span>
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="field field-full">
-                                    <label for="gameType">Game Type (for digital products) *</label>
-                                    <select id="gameType" required>
-                                        <option value="roblox">Roblox — Username + Nickname</option>
-                                        <option value="ml">Mobile Legends — User ID + Zone ID</option>
-                                        <option value="pubg">PUBG Mobile — User ID + Nickname</option>
-                                        <option value="other">Other / Generic — Account ID</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                                                <!-- ============ SECTION 2: PRICING & STOCK (Digital only) ============ -->
-                        <div class="admin-form-section" id="addPricingStockSection">
-                            <div class="admin-form-section-header">
-                                <i class="fas fa-tag"></i> Pricing & Stock
-                            </div>
-                            <div class="admin-form-grid">
-                                <div class="field">
-                                    <label for="price">Price (RM) *</label>
-                                    <input type="number" id="price" required step="0.01" min="0" placeholder="249.90" />
-                                </div>
-                                <div class="field">
-                                    <label for="cost">Cost (RM) *</label>
-                                    <input type="number" id="cost" required step="0.01" min="0" placeholder="180.00" />
-                                </div>
-                                <div class="field">
-                                    <label for="discount">Discount (%)</label>
-                                    <input type="number" id="discount" step="1" min="0" max="100" placeholder="20" />
-                                </div>
-                                <div class="field">
-                                    <label for="quantity">Quantity (stock)</label>
-                                    <input type="number" id="quantity" step="1" min="0" placeholder="10" value="0" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ============ SECTION 3: PRODUCT VARIANTS + SHIPPING (Physical only) ============ -->
-                        <div class="admin-form-section" id="addVariantShippingSection" style="display:none;">
-                            <div class="admin-form-section-header">
-                                <i class="fas fa-layer-group"></i> Product Variants
-                            </div>
-
-                            <div class="field" style="margin-bottom:14px;">
-                                <label class="check-label">
-                                    <input type="checkbox" id="addHasVariants" checked />
-                                    <span>This product has variants (Color, Size, etc.)</span>
-                                </label>
-                            </div>
-
-                            <div id="addVariantEditorContainer">
-                                <div class="variant-editor">
-                                    <div class="variant-editor-header">
-                                        <h4><i class="fas fa-layer-group"></i> Variant Options</h4>
-                                        <p>Add options like "Color", "Size", then add values. Each combination becomes a row below with its own price, cost, and stock.</p>
-                                    </div>
-
-                                    <div class="variant-option-add-row">
-                                        <input type="text" id="addNewOptionInput" placeholder="Option name (e.g. Color)" />
-                                        <button type="button" class="variant-add-btn" id="addNewOptionBtn">
-                                            <i class="fas fa-plus"></i> Add Option
-                                        </button>
-                                    </div>
-
-                                    <div id="addVariantOptionList" class="variant-option-list"></div>
-
-                                    <div class="variant-table-wrap">
-                                        <div class="variant-table-header">
-                                            <h4><i class="fas fa-th"></i> Variant Combinations</h4>
-                                            <span id="addVariantCount" class="variant-count">0 variants</span>
-                                        </div>
-                                        <div id="addVariantTable" class="variant-table"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- ✅ Fallback base price/cost when variants disabled -->
-                            <div id="addPhysicalBaseFields" style="display:none; margin-top:14px;">
-                                <div class="admin-form-grid">
-                                    <div class="field">
-                                        <label for="physicalBasePrice">Base Price (RM) *</label>
-                                        <input type="number" id="physicalBasePrice" step="0.01" min="0" placeholder="50.00" />
-                                    </div>
-                                    <div class="field">
-                                        <label for="physicalBaseCost">Base Cost (RM) *</label>
-                                        <input type="number" id="physicalBaseCost" step="0.01" min="0" placeholder="30.00" />
-                                    </div>
-                                    <div class="field">
-                                        <label for="physicalBaseQty">Total Stock</label>
-                                        <input type="number" id="physicalBaseQty" step="1" min="0" placeholder="10" value="0" />
-                                    </div>
-                                    <div class="field">
-                                        <label for="physicalDiscount">Discount (%)</label>
-                                        <input type="number" id="physicalDiscount" step="1" min="0" max="100" placeholder="0" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Shipping toggle inside physical section -->
-                            <div class="field" style="margin-top:18px;">
-                                <label class="check-label">
-                                    <input type="checkbox" id="addRequiresShipping" checked />
-                                    <span><i class="fas fa-shipping-fast" style="color:#f7d875;margin-right:6px;"></i>Requires a shipping address from the customer</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- ============ SECTION 4: DESCRIPTION & MEDIA ============ -->
-<div class="admin-form-section">
-    <div class="admin-form-section-header">
-        <i class="fas fa-image"></i> Description & Media
-    </div>
-    <div class="admin-form-grid">
-        <div class="field field-full">
-            <label for="description">Description</label>
-            <textarea id="description" placeholder="Enter product description..." rows="3"></textarea>
-        </div>
-
-        <div class="field field-full image-upload-wrapper">
-            <label for="image">Main Image</label>
-            <div class="image-upload-row">
-                <input type="url" id="image" placeholder="Paste URL or click Upload" />
-                <input type="file" id="mainImageFileInput" accept="image/*" style="display:none;" />
-                <button type="button" class="upload-img-btn" id="uploadMainImgBtn">
-                    <i class="fas fa-upload"></i> Upload
-                </button>
-            </div>
-            <div class="image-previews" id="mainImagePreviewContainer"></div>
-        </div>
-
-        <div class="field">
-            <label for="badge">Badge</label>
-            <input type="text" id="badge" placeholder="Hot, New, Sale..." />
-        </div>
-
-        <div class="field field-full image-upload-wrapper">
-            <label for="additionalImages">Additional Images (Gallery)</label>
-            <div class="image-upload-row">
-                <input type="file" id="additionalImagesFiles" accept="image/*" multiple style="display:none;" />
-                <button type="button" class="upload-img-btn" id="uploadAdditionalImgsBtn" style="width:100%; justify-content:center;">
-                    <i class="fas fa-images"></i> Upload Additional Images
-                </button>
-            </div>
-            <div class="image-previews" id="additionalImagesPreviewContainer"></div>
-            <textarea id="additionalImages" placeholder="URLs will appear here after upload..." style="margin-top:6px;"></textarea>
-        </div>
-    </div>
-</div>
-
-                        <!-- ============ SECTION 6: ACTIONS ============ -->
-                        <div class="admin-form-actions">
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-plus-circle"></i> Add Product
-                            </button>
-                            <span id="adminStatus" style="color:#8aa1c0; font-size:14px;"></span>
-                            <button type="button" class="debug-toggle" id="debugOrdersBtn">🔍 Debug Orders</button>
-                        </div>
-
-                    </form>
-                    <h3 style="margin:30px 0 16px;">Current Products</h3>
-
-                    <!-- ===== Product Toolbar (Search / Filter / Sort) ===== -->
-                    <div class="product-toolbar">
-                        <div class="toolbar-search">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="adminProductSearch" placeholder="Search by title or ID..." autocomplete="off" />
-                            <button type="button" id="adminProductClearSearch" title="Clear"><i class="fas fa-times"></i></button>
-                        </div>
-
-                        <select id="adminProductCategory" class="toolbar-select">
-                            <option value="all">All Categories</option>
-                        </select>
-
-                        <select id="adminProductSort" class="toolbar-select">
-                            <option value="id-desc">Newest First (ID ↓)</option>
-                            <option value="id-asc">Oldest First (ID ↑)</option>
-                            <option value="title-asc">Title (A → Z)</option>
-                            <option value="title-desc">Title (Z → A)</option>
-                            <option value="price-desc">Price (High → Low)</option>
-                            <option value="price-asc">Price (Low → High)</option>
-                            <option value="stock-asc">Stock (Low → High)</option>
-                            <option value="stock-desc">Stock (High → Low)</option>
-                        </select>
-
-                        <span id="adminProductCount" class="toolbar-count">0 items</span>
-                    </div>
-
-                    <div class="admin-list"><div id="adminGameList"></div></div>
-                    <div class="admin-product-pagination" id="adminProductPagination"></div>
-                    <div class="debug-panel" id="debugPanel">
-                        <strong>Raw Orders Data:</strong>
-                        <pre id="debugContent">Click "Debug Orders" to load data.</pre>
-                    </div>
-                </div>
-
-                <!-- Dashboard -->
-                <div class="admin-section" id="section-dashboard">
-                    <h2 style="margin-bottom:20px;"><i class="fas fa-chart-line"></i> Sales Dashboard</h2>
-                    <div class="dashboard-filters">
-                        <button class="filter-btn active" data-range="today">Today</button>
-                        <button class="filter-btn" data-range="week">This Week</button>
-                        <button class="filter-btn" data-range="month">This Month</button>
-                        <button class="filter-btn" data-range="all">All Time</button>
-                    </div>
-                    <div class="dashboard-stats" id="dashboardStats">
-                        <div class="stat-card"><div class="stat-number" id="totalOrders">0</div><div class="stat-label">Total Orders</div></div>
-                        <div class="stat-card"><div class="stat-number" id="totalRevenue">RM 0.00</div><div class="stat-label">Total Revenue</div></div>
-                        <div class="stat-card"><div class="stat-number" id="totalCost">RM 0.00</div><div class="stat-label">Total Cost</div></div>
-                        <div class="stat-card"><div class="stat-number profit" id="totalProfit">RM 0.00</div><div class="stat-label">Profit</div></div>
-                        <div class="stat-card"><div class="stat-number margin" id="totalMargin">0%</div><div class="stat-label">Margin</div></div>
-                    </div>
-                    <div class="extra-sections">
-                        <div class="extra-card" id="lowStockCard">
-                            <h3><i class="fas fa-exclamation-triangle" style="color:#ff6b6b;"></i> Low Stock (≤ 5)</h3>
-                            <div id="lowStockList"><p style="color:#6a7f9e;">Loading...</p></div>
-                        </div>
-                        <div class="extra-card" id="topSellingCard">
-                            <h3><i class="fas fa-trophy" style="color:#f7d875;"></i> Top Selling</h3>
-                            <div id="topSellingList"><p style="color:#6a7f9e;">Loading...</p></div>
-                        </div>
-                    </div>
-                    <div class="status-breakdown">
-                        <h3>Orders by Status</h3>
-                        <div id="statusBreakdown">
-                            <div class="status-item"><span class="status-label"><span class="status-dot awaiting-payment"></span> Awaiting Payment</span><span id="statusAwaitingPayment">0</span></div>
-                            <div class="status-item"><span class="status-label"><span class="status-dot awaiting-verification"></span> Awaiting Verification</span><span id="statusAwaitingVerification">0</span></div>
-                            <div class="status-item"><span class="status-label"><span class="status-dot pending"></span> Pending</span><span id="statusPending">0</span></div>
-                            <div class="status-item"><span class="status-label"><span class="status-dot paid"></span> Paid</span><span id="statusPaid">0</span></div>
-                            <div class="status-item"><span class="status-label"><span class="status-dot shipped"></span> Shipped</span><span id="statusShipped">0</span></div>
-                            <div class="status-item"><span class="status-label"><span class="status-dot cancelled"></span> Cancelled</span><span id="statusCancelled">0</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payment Approval -->
-                <div class="admin-section" id="section-payment-approval">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                        <h2><i class="fas fa-check-double"></i> Payment Approval</h2>
-                        <button class="submit-btn" id="refreshApprovalBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
-                    </div>
-
-                    <!-- ✅ NEW: Receipt search bar -->
-                    <div class="product-toolbar" style="grid-template-columns: 1fr auto;">
-                        <div class="toolbar-search" id="approvalSearchWrapper">
-                            <i class="fas fa-receipt"></i>
-                            <input type="text" id="approvalSearchInput" placeholder="Search by Receipt Number or Order ID..." autocomplete="off" />
-                            <button type="button" id="approvalSearchClear" title="Clear"><i class="fas fa-times"></i></button>
-                        </div>
-                        <span id="approvalSearchCount" class="toolbar-count">0 orders</span>
-                    </div>
-
-                    <div class="orders-container">
-                        <div id="approvalList">
-                            <p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading pending orders...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Orders -->
-                <div class="admin-section" id="section-orders">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                        <h2><i class="fas fa-box"></i> Orders</h2>
-                        <button class="submit-btn" id="refreshOrdersBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
-                    </div>
-                    <div class="orders-container">
-                        <div id="ordersList"><p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading orders...</p></div>
-                    </div>
-                </div>
-
-                <!-- Genres Management -->
-                <div class="admin-section" id="section-genres">
-                    <h2 style="margin-bottom:20px;"><i class="fas fa-images"></i> Manage Genre Images</h2>
-                    <p style="color:#8aa1c0; margin-bottom:20px;">Assign a banner image URL for each genre. The image will be displayed when users select that genre.</p>
-                    <div class="genre-manager" id="genreManager">
-                        <div id="genreList"><p style="color:#6a7f9e;">Loading genres...</p></div>
-                        <div id="genreStatus" class="genre-status"></div>
-                    </div>
-                </div>
-
-                <!-- Referral Settings (Admin) -->
-                <div class="admin-section" id="section-referral-settings">
-                    <h2 style="margin-bottom:20px;"><i class="fas fa-share-alt"></i> Referral Settings</h2>
-                    <p style="color:#8aa1c0; margin-bottom:20px;">Configure referral rewards, friend coupons, and tier thresholds.</p>
-                    <div id="referralConfigContainer">
-                        <p style="color:#6a7f9e;">Loading settings...</p>
-                    </div>
-                </div>
-
-                                <!-- Backup & Restore -->
-                <div class="admin-section" id="section-backup">
-                    <h2 style="margin-bottom:20px;"><i class="fas fa-database"></i> Backup & Restore</h2>
-                    <p style="color:#8aa1c0; margin-bottom:20px;">Create manual backups of your game/product data. If something goes wrong, you can restore any backup with one click.</p>
-                    
-                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:24px; margin-bottom:24px;">
-                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                            <button type="button" class="submit-btn" id="createBackupBtn">
-                                <i class="fas fa-cloud-upload-alt"></i> Create Backup Now
-                            </button>
-                            <button type="button" class="submit-btn" id="refreshBackupBtn" style="background:#1e2a3a; color:#8aa1c0; border:1px solid #2a3a52;">
-                                <i class="fas fa-sync-alt"></i> Refresh
-                            </button>
-                            <span id="backupStatus" style="color:#8aa1c0; font-size:14px;"></span>
-                        </div>
-                    </div>
-                    
-                    <h3 style="margin-bottom:16px;"><i class="fas fa-history"></i> Backup History</h3>
-                    <div class="orders-container" id="backupList">
-                        <p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading backups...</p>
-                    </div>
-                </div>
-
-                <!-- Change Admin Password -->
-                <div class="admin-section" id="section-change-password">
-                    <h2 style="margin-bottom:20px;"><i class="fas fa-key"></i> Change Admin Password</h2>
-                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:24px; padding:30px; max-width:500px;">
-                        <form id="changePasswordForm">
-                            <div class="field" style="margin-bottom:16px;">
-                                <label for="currentPassword">Current Password *</label>
-                                <input type="password" id="currentPassword" required placeholder="Enter current password" />
-                            </div>
-                            <div class="field" style="margin-bottom:16px;">
-                                <label for="newPassword">New Password *</label>
-                                <input type="password" id="newPassword" required placeholder="Min 6 characters" />
-                            </div>
-                            <div class="field" style="margin-bottom:16px;">
-                                <label for="confirmPassword">Confirm New Password *</label>
-                                <input type="password" id="confirmPassword" required placeholder="Confirm new password" />
-                            </div>
-                            <div id="changePasswordError" style="color:#ff6b6b; margin-bottom:12px;"></div>
-                            <button type="submit" class="submit-btn"><i class="fas fa-save"></i> Update Password</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== MY ACCOUNT (Customer Dashboard) ===== -->
-            <div id="myAccountSection">
-                <div class="account-container">
-                    <div class="account-header">
-                        <h2><i class="fas fa-user-circle"></i> My Account</h2>
-                        <button class="back-btn" id="backToStoreBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
-                    </div>
-                    <div class="profile-header">
-                        <div id="profileAvatarContainer">
-                            <img id="profileAvatar" class="profile-avatar" src="" alt="Profile" style="display:none;" />
-                            <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder"><i class="fas fa-user"></i></div>
-                        </div>
-                        <div class="profile-info">
-                            <div class="profile-name" id="profileName">-</div>
-                            <div class="profile-email" id="profileEmail">-</div>
-                        </div>
-                    </div>
-<div class="profile-details">
-    <div class="detail-row"><span class="label">Phone</span><span class="value" id="profilePhone">-</span></div>
-    <div class="detail-row"><span class="label">Member Since</span><span class="value" id="profileDate">-</span></div>
-    <div class="detail-row"><span class="label"><i class="fas fa-coins" style="color:#f7d875;"></i> Points Balance</span><span class="value" id="profilePoints" style="color:#f7d875; font-weight:700;">-</span></div>
-</div>
-                    <div class="account-actions">
-                        <button class="action-btn primary" id="editProfileBtn"><i class="fas fa-edit"></i> Edit Profile</button>
-                        <button class="action-btn" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
-                    </div>
-                    <div class="edit-profile-form" id="editProfileForm">
-                        <div class="field">
-                            <label for="editName">Name</label>
-                            <input type="text" id="editName" placeholder="Your full name" />
-                        </div>
-                        <div class="field">
-                            <label for="editPhone">Phone</label>
-                            <input type="text" id="editPhone" placeholder="Phone number" />
-                        </div>
-                        <div class="field">
-                            <label for="editProfileImageUrl">Profile Image URL (or upload below)</label>
-                            <input type="text" id="editProfileImageUrl" placeholder="https://example.com/avatar.jpg" />
-                            <div class="profile-image-upload">
-                                <label class="upload-btn" for="profileImageFileInput"><i class="fas fa-cloud-upload-alt"></i> Upload from device</label>
-                                <input type="file" id="profileImageFileInput" accept="image/*" />
-                                <img id="editProfilePreview" class="preview-img" style="display:none;" alt="Preview" />
-                                <span class="hint">Choose an image from your device (will be converted to data URL).</span>
-                            </div>
-                        </div>
-                        <div class="actions">
-                            <button class="save-btn" id="saveProfileBtn"><i class="fas fa-save"></i> Save Changes</button>
-                            <button class="cancel-btn" id="cancelEditProfileBtn">Cancel</button>
-                        </div>
-                        <div id="profileUpdateMessage" class="profile-message"></div>
-                    </div>
-                </div>
-
-                <h3 style="margin-bottom:16px;">My Orders</h3>
-                <div id="myOrdersList"><p style="color:#6a7f9e;">Loading your orders...</p></div>
-
-                <!-- ===== REFERRAL SECTION (Customer) ===== -->
-                <div class="account-container" style="margin-top:20px;">
-                    <h3 style="margin-bottom:12px;"><i class="fas fa-share-alt"></i> Refer & Earn</h3>
-                    <p style="color:#8aa1c0; font-size:14px; margin-bottom:12px;">
-                        Share your referral link with friends. When they register and place their first order, you both get a coupon!
-                    </p>
-                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                        <input type="text" id="referralLink" readonly style="flex:1; background:#0b0e14; border:1px solid #2a3a52; border-radius:40px; padding:10px 20px; color:#e8edf5; font-size:14px;" />
-                        <button class="submit-btn" id="copyReferralBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-copy"></i> Copy</button>
-                    </div>
-                    <div id="referralStatus" style="margin-top:8px; font-size:14px; color:#4caf50;"></div>
-
-                    <div style="margin-top:16px; border-top:1px solid #1a2538; padding-top:16px;">
-                        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-                            <div>
-                                <span style="color:#6a7f9e; font-size:13px;">Completed Referrals</span>
-                                <span id="referralCompletedCount" style="font-size:20px; font-weight:700; color:#f7d875; display:block;">0</span>
-                            </div>
-                            <div>
-                                <span style="color:#6a7f9e; font-size:13px;">Next Reward</span>
-                                <span id="referralNextReward" style="font-size:16px; font-weight:600; color:#4caf50; display:block;">-</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top:16px;">
-                        <h4 style="color:#8aa1c0; font-size:14px; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Referral History</h4>
-                        <div id="referralHistory" style="background:#0b0e14; border-radius:12px; border:1px solid #1e2a3a; padding:8px 0;">
-                            <p style="color:#6a7f9e; text-align:center; padding:12px;">Loading referrals...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== WISHLIST SECTION ===== -->
-            <div id="wishlistSection">
-                <div class="account-container">
-                    <div class="account-header">
-                        <h2><i class="fas fa-heart" style="color:#ff6b6b;"></i> My Wishlist</h2>
-                        <button class="back-btn" id="backToStoreFromWishlistBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
-                    </div>
-                    <div id="wishlistGrid" class="games-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
-                        <p style="color:#6a7f9e; grid-column:1/-1; text-align:center; padding:40px 0;">Loading your wishlist...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== PRODUCT DETAIL MODAL ===== -->
-    <div class="product-overlay" id="productOverlay">
-        <div class="product-panel">
-            <button class="close-product" id="productClose"><i class="fas fa-times"></i></button>
-            <div class="product-gallery" id="productGallery">
-                <img class="main-img" id="productModalMainImg" src="" alt="Product image" />
-                <div class="thumbnails" id="productModalThumbnails"></div>
-            </div>
-            <div class="product-title" id="productModalTitle"></div>
-            <div class="product-category" id="productModalCategory"></div>
-            <div class="product-desc" id="productModalDesc"></div>
-            <div class="product-price" id="productModalPrice"></div>
-            <div class="product-stock" id="productModalStock"></div>
-
-            <!-- ✅ Variant Picker (auto-shown for variant products) -->
-            <div class="variant-picker" id="productVariantPicker" style="display:none;"></div>
-
-            <div class="product-actions">
-                <div class="qty-controls" id="modalQtyControls">
-                    <button class="qty-btn modal-qty-minus"><i class="fas fa-minus"></i></button>
-                    <input type="number" class="qty-input modal-qty-input" value="1" min="1" />
-                    <button class="qty-btn modal-qty-plus"><i class="fas fa-plus"></i></button>
-                </div>
-                <button class="add-btn" id="modalAddBtn"><i class="fas fa-plus"></i> Add to Cart</button>
-            </div>
-
-            <div class="product-reviews" id="productReviews">
-                <h3><i class="fas fa-star" style="color:#f7d875;"></i> Customer Reviews</h3>
-                <div class="review-summary" id="reviewSummary">
-                    <span class="avg-number" id="avgRating">0.0</span>
-                    <div class="stars-display" id="avgStars"></div>
-                    <span class="review-count" id="reviewCount">(0 reviews)</span>
-                </div>
-                <div class="review-list" id="reviewList"></div>
-                <div class="review-form-container" id="reviewFormContainer"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== LOGIN MODAL (Customer) ===== -->
-    <div class="auth-overlay" id="loginOverlay">
-        <div class="auth-panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
-                <button class="close-auth" id="loginClose"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="sub">Welcome back! Log in to your account.</p>
-            <form class="auth-form" id="loginForm">
-                <div class="field">
-                    <label for="loginEmail">Email / Username *</label>
-                    <input type="text" id="loginEmail" required placeholder="Email or Username" />
-                </div>
-                <div class="field">
-                    <label for="loginPassword">Password *</label>
-                    <input type="password" id="loginPassword" required placeholder="Enter your password" />
-                </div>
-                <div id="loginError" class="auth-error"></div>
-                <div class="auth-actions">
-                    <button type="button" class="auth-cancel" id="loginCancel">Cancel</button>
-                    <button type="submit" class="auth-submit"><i class="fas fa-sign-in-alt"></i> Login</button>
-                </div>
-                <div class="auth-switch">Don't have an account? <a id="switchToRegister">Register here</a></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== REGISTER MODAL ===== -->
-    <div class="auth-overlay" id="registerOverlay">
-        <div class="auth-panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h2><i class="fas fa-user-plus"></i> Register</h2>
-                <button class="close-auth" id="registerClose"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="sub">Create your account for faster checkout and order tracking.</p>
-            <form class="auth-form" id="registerForm">
-                <div class="field">
-                    <label for="registerName">Username*</label>
-                    <input type="text" id="registerName" required placeholder="Username" />
-                </div>
-                <div class="field">
-                    <label for="registerPhone">Phone Number *</label>
-                    <input type="tel" id="registerPhone" required placeholder="012-3456789" />
-                </div>
-                <div class="field">
-                    <label for="registerEmail">Email *</label>
-                    <input type="email" id="registerEmail" required placeholder="you@example.com" />
-                </div>
-                <div class="field">
-                    <label for="registerPassword">Password *</label>
-                    <input type="password" id="registerPassword" required placeholder="Min 6 characters" />
-                </div>
-                <div class="field">
-                    <label for="registerConfirmPassword">Confirm Password *</label>
-                    <input type="password" id="registerConfirmPassword" required placeholder="Confirm your password" />
-                </div>
-                <div id="registerError" class="auth-error"></div>
-                <div class="auth-actions">
-                    <button type="button" class="auth-cancel" id="registerCancel">Cancel</button>
-                    <button type="submit" class="auth-submit"><i class="fas fa-user-plus"></i> Register</button>
-                </div>
-                <div class="auth-switch">Already have an account? <a id="switchToLogin">Log in here</a></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== ADMIN LOGIN MODAL ===== -->
-    <div class="auth-overlay" id="adminLoginOverlay">
-        <div class="auth-panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h2><i class="fas fa-user-cog"></i> Admin Login</h2>
-                <button class="close-auth" id="adminLoginClose"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="sub">Enter the admin password to access the control panel.</p>
-            <form class="auth-form" id="adminLoginForm">
-                <div class="field">
-                    <label for="adminPassword">Admin Password *</label>
-                    <input type="password" id="adminPassword" required placeholder="Enter admin password" />
-                </div>
-                <div id="adminLoginError" class="auth-error"></div>
-                <div class="auth-actions">
-                    <button type="button" class="auth-cancel" id="adminLoginCancel">Cancel</button>
-                    <button type="submit" class="auth-submit"><i class="fas fa-sign-in-alt"></i> Login as Admin</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== TRACK ORDER MODAL ===== -->
-    <div class="track-overlay" id="trackOverlay">
-        <div class="track-panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h2><i class="fas fa-search"></i> Track Your Orders</h2>
-                <button class="close-edit" id="trackClose" style="background:transparent; border:none; color:#8aa1c0; font-size:28px; cursor:pointer;"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="sub">Enter your email to see all your orders and their current status.</p>
-            <div class="track-form">
-                <input type="email" id="trackEmail" placeholder="you@example.com" required />
-                <button id="trackSubmit"><i class="fas fa-search"></i> Find</button>
-            </div>
-            <div class="track-results" id="trackResults"></div>
-        </div>
-    </div>
-
-    <!-- ===== EDIT MODAL ===== -->
-    <div class="edit-overlay" id="editOverlay">
-        <div class="edit-panel">
-            <div class="edit-panel-header">
-                <div>
-                    <h2><i class="fas fa-edit"></i> Edit Game</h2>
-                    <p class="edit-panel-sub">Update the game details below. Changes are saved immediately.</p>
-                </div>
-                <button class="close-edit" id="editClose"><i class="fas fa-times"></i></button>
-            </div>
-            <form class="edit-form" id="editForm">
-                <div id="editFormError" class="form-error-message" style="display:none;"></div>
-
-                <div class="edit-preview-card" id="editPreviewCard">
-                    <div class="edit-preview-img-wrap">
-                        <img id="editPreviewImg" src="" alt="Preview" style="display:none;" />
-                        <div class="edit-preview-img-placeholder" id="editPreviewImgPlaceholder">
-                            <i class="fas fa-image"></i>
-                            <span>Image preview</span>
-                        </div>
-                    </div>
-                    <div class="edit-preview-info">
-                        <div class="edit-preview-title" id="editPreviewTitle">Game Title</div>
-                        <div class="edit-preview-category" id="editPreviewCategory">Category</div>
-                        <div class="edit-preview-price" id="editPreviewPrice">RM 0.00</div>
-                        <div class="edit-preview-badge" id="editPreviewBadge" style="display:none;"></div>
-                    </div>
-                </div>
-
-                <div class="edit-form-grid">
-                    <div class="field">
-                        <label for="editTitle">Title <span class="required">*</span></label>
-                        <input type="text" id="editTitle" required placeholder="Game title" />
-                    </div>
-                    <div class="field">
-                        <label for="editCategory">Category</label>
-                        <input type="text" id="editCategory" placeholder="e.g. RPG, FPS" />
-                    </div>
-                    <div class="field field-full">
-                        <label for="editGameType">Game Type <span class="required">*</span></label>
-                        <select id="editGameType" required>
-                            <option value="roblox">Roblox — Username + Nickname</option>
-                            <option value="ml">Mobile Legends — User ID + Zone ID</option>
-                            <option value="pubg">PUBG Mobile — User ID + Nickname</option>
-                            <option value="other">Other / Generic — Account ID</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="editPrice">Price (RM) <span class="required">*</span></label>
-                        <input type="number" id="editPrice" required step="0.01" min="0" placeholder="249.90" />
-                    </div>
-                    <div class="field">
-                        <label for="editCost">Cost (RM) <span class="required">*</span></label>
-                        <input type="number" id="editCost" required step="0.01" min="0" placeholder="180.00" />
-                    </div>
-                    <div class="field">
-                        <label for="editDiscount">Discount (%)</label>
-                        <input type="number" id="editDiscount" step="1" min="0" max="100" placeholder="20" />
-                    </div>
-                    <div class="field">
-                        <label for="editQuantity">Quantity (stock)</label>
-                        <input type="number" id="editQuantity" step="1" min="0" placeholder="10" />
-                    </div>
-                    <div class="field field-full">
-                        <label for="editDescription">Description</label>
-                        <textarea id="editDescription" placeholder="Enter description..."></textarea>
-                        <div class="field-hint"><span id="editDescCount">0</span> / 2000 characters</div>
-                    </div>
-<div class="field field-full image-upload-wrapper">
-    <label for="editImage">Main Image</label>
-    <div class="image-upload-row">
-        <input type="url" id="editImage" placeholder="Paste URL or click Upload" />
-        <input type="file" id="editMainImageFileInput" accept="image/*" style="display:none;" />
-        <button type="button" class="upload-img-btn" id="editUploadMainImgBtn"><i class="fas fa-upload"></i> Upload</button>
-    </div>
-    <div class="image-previews" id="editMainImagePreviewContainer"></div>
-</div>
-                    <div class="field">
-                        <label for="editBadge">Badge</label>
-                        <input type="text" id="editBadge" placeholder="Hot, New, Free..." />
-                    </div>
-<div class="field field-full image-upload-wrapper">
-    <label for="editAdditionalImages">Additional Images</label>
-    <div class="image-upload-row">
-        <input type="file" id="editAdditionalImagesFiles" accept="image/*" multiple style="display:none;" />
-        <button type="button" class="upload-img-btn" id="editUploadAdditionalImgsBtn" style="width:100%; justify-content:center;">
-            <i class="fas fa-images"></i> Upload Additional Images
-        </button>
-    </div>
-    <div class="image-previews" id="editAdditionalImagesPreviewContainer"></div>
-    <textarea id="editAdditionalImages" placeholder="URLs will appear here after upload..." style="margin-top:6px;"></textarea>
-</div>
-</div>
-
-<!-- ✅ NEW: Product Type (Edit) -->
-<div class="field field-full">
-    <label>Product Type *</label>
-    <div class="product-type-toggle">
-        <label class="pt-option">
-            <input type="radio" name="editProductType" value="digital" checked />
-            <span class="pt-content">
-                <i class="fas fa-download"></i>
-                <span class="pt-title">Digital</span>
-                <span class="pt-sub">Game codes, top-ups, accounts</span>
-            </span>
-        </label>
-        <label class="pt-option">
-            <input type="radio" name="editProductType" value="physical" />
-            <span class="pt-content">
-                <i class="fas fa-box"></i>
-                <span class="pt-title">Physical</span>
-                <span class="pt-sub">Clothing, accessories</span>
-            </span>
-        </label>
-    </div>
-</div>
-
-<div class="field field-full" id="editRequiresShippingField" style="display:none;">
-    <label class="check-label">
-        <input type="checkbox" id="editRequiresShipping" checked />
-        <span>Requires shipping address from customer</span>
-    </label>
-</div>
-
-<div class="field field-full">
-    <label class="check-label">
-        <input type="checkbox" id="editHasVariants" />
-        <span>This product has variants (Color, Size, etc.)</span>
-    </label>
-</div>
-
-<div class="field field-full" id="editVariantEditorContainer" style="display:none;">
-    <div class="variant-editor">
-        <div class="variant-editor-header">
-            <h4><i class="fas fa-layer-group"></i> Variant Options</h4>
-            <p>Add options like "Color", "Size", then their values. Each combination becomes a row below.</p>
-        </div>
-
-        <div class="variant-option-add-row">
-            <input type="text" id="editNewOptionInput" placeholder="Option name (e.g. Color)" />
-            <button type="button" class="variant-add-btn" id="editNewOptionBtn">
-                <i class="fas fa-plus"></i> Add Option
-            </button>
-        </div>
-
-        <div id="editVariantOptionList" class="variant-option-list"></div>
-
-        <div class="variant-table-wrap">
-            <div class="variant-table-header">
-                <h4><i class="fas fa-th"></i> Variant Combinations</h4>
-                <span id="editVariantCount" class="variant-count">0 variants</span>
-            </div>
-            <div id="editVariantTable" class="variant-table"></div>
-        </div>
-    </div>
-</div>
-
-                <div class="edit-actions">
-                    <button type="button" class="cancel-btn" id="editCancel">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                    <button type="submit" class="save-btn">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                </div>
-                <input type="hidden" id="editId" />
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== DELETE MODAL ===== -->
-    <div class="delete-overlay" id="deleteOverlay">
-        <div class="delete-panel">
-            <div class="icon" style="font-size:48px; color:#ff6b6b; margin-bottom:12px;"><i class="fas fa-trash-alt"></i></div>
-            <h2>Confirm Deletion</h2>
-            <p style="color:#8aa1c0; font-size:15px; margin-bottom:24px;">Are you sure you want to delete this game? This action cannot be undone.</p>
-            <div class="delete-actions">
-                <button class="cancel-delete" id="deleteCancel">Cancel</button>
-                <button class="confirm-delete" id="deleteConfirm"><i class="fas fa-trash"></i> Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== CHECKOUT MODAL (UPDATED WITH PAYMENT METHOD) ===== -->
-    <div class="checkout-overlay" id="checkoutOverlay">
-        <div class="checkout-panel">
-            <h2><i class="fas fa-shopping-bag"></i> Complete Order</h2>
-            <p class="sub">Please fill in your details to place the order.</p>
-            <form class="checkout-form" id="checkoutForm">
-                <div class="field"><label for="checkoutPhone">Phone Number *</label><input type="tel" id="checkoutPhone" required placeholder="012-3456789" /></div>
-                <div id="gameIdFields"></div>
-
-                <!-- ✅ SHIPPING FORM (auto-shown if cart has physical items) -->
-                <div class="field" id="shippingFormContainer" style="display:none;">
-                    <label style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                        <i class="fas fa-shipping-fast" style="color:#f7d875;"></i>
-                        Delivery Address <span style="color:#ff6b6b;">*</span>
-                    </label>
-                    <div class="shipping-form-box">
-                        <div class="field">
-                            <label for="shippingName">Full Name *</label>
-                            <input type="text" id="shippingName" placeholder="Recipient name" />
-                        </div>
-                        <div class="field">
-                            <label for="shippingPhone">Phone *</label>
-                            <input type="tel" id="shippingPhone" placeholder="012-3456789" />
-                        </div>
-                        <div class="field">
-                            <label for="shippingAddress">Full Address *</label>
-                            <textarea id="shippingAddress" rows="2" placeholder="Street, building, unit #"></textarea>
-                        </div>
-                        <div class="shipping-grid-3">
-                            <div class="field">
-                                <label for="shippingCity">City *</label>
-                                <input type="text" id="shippingCity" placeholder="City" />
-                            </div>
-                            <div class="field">
-                                <label for="shippingState">State *</label>
-                                <input type="text" id="shippingState" placeholder="State" />
-                            </div>
-                            <div class="field">
-                                <label for="shippingPostcode">Postcode *</label>
-                                <input type="text" id="shippingPostcode" placeholder="50000" />
-                            </div>
-                        </div>
-                        <div class="shipping-note">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>
-                                <strong style="color:#f7d875;">Pre-Order Basis:</strong>
-                                Physical items are shipped on the <strong>13th of every month</strong>.
-                                Orders placed before the 13th ship same month; after the 13th ship next month.
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field"><label for="checkoutEmail">Email Address *</label><input type="email" id="checkoutEmail" required placeholder="you@example.com" /><span class="hint">We'll send order confirmation and payment instructions to this email.</span></div>
-                <div class="field">
-                    <label for="promoCode">Promo Code</label>
-                    <div class="promo-group">
-                        <input type="text" id="promoCode" placeholder="Enter promo code" autocomplete="off" />
-                        <button type="button" class="apply-promo-btn" id="applyPromoBtn">
-                            <i class="fas fa-tag"></i> Apply
-                        </button>
-                    </div>
-                    <div id="promoFeedback" class="promo-feedback"></div>
-                </div>
-
-                <!-- ===== LOYALTY POINTS REDEMPTION ===== -->
-<div class="field" id="pointsRedemptionSection" style="display:none;">
-    <label>
-        <i class="fas fa-coins" style="color:#f7d875;"></i> Use Your Points
-    </label>
-    <div style="background:#0b0e14; border:1px solid #1e2a3a; border-radius:14px; padding:14px 16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px;">
-            <span style="color:#8aa1c0;">Available Balance:</span>
-            <span style="color:#f7d875; font-weight:700; font-size:15px;">
-                <span id="availablePointsDisplay">0</span> Points
-                <span style="color:#6a7f9e; font-size:12px; font-weight:400;">(= RM<span id="availablePointsValue">0.00</span>)</span>
-            </span>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-            <input type="number" id="pointsToUseInput" min="0" step="1" value="0" placeholder="0" 
-                style="flex:1; background:#121821; border:1px solid #2a3a52; border-radius:10px; padding:10px 14px; color:#e8edf5; font-family:'Inter',sans-serif; font-size:14px; font-weight:600;" />
-            <button type="button" id="useMaxPointsBtn" 
-                style="background:#2a3a52; border:1px solid #3d5a7a; color:#b0c8e0; padding:10px 16px; border-radius:10px; font-weight:600; font-size:12px; cursor:pointer; font-family:'Inter',sans-serif; white-space:nowrap;">
-                Use Max
-            </button>
-        </div>
-        <div id="pointsFeedback" style="font-size:12px; margin-top:8px; min-height:16px; color:#8aa1c0;"></div>
-    </div>
-</div>
-
-                <!-- ===== PAYMENT METHOD SELECTOR (NEW) ===== -->
-                <div class="field payment-method-section">
-                    <label>Payment Method <span style="color:#ff6b6b;">*</span></label>
-                    <div class="pm-options" id="paymentMethodOptions">
-                        <label class="payment-method-option" data-method="mae">
-                            <input type="radio" name="paymentMethod" value="mae" />
-                            <span class="pm-check"><i class="fas fa-check"></i></span>
-                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHOYpS3G_bIUHBJNp_xKD1_7NxSF3J66qxMX1VzWrq5g&s=10" alt="MAE" />
-                            <span class="pm-name">MAE</span>
-                        </label>
-                        <label class="payment-method-option" data-method="tng">
-                            <input type="radio" name="paymentMethod" value="tng" />
-                            <span class="pm-check"><i class="fas fa-check"></i></span>
-                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPQhtet5iK5zwJYL00UIrGJUvz3_NlK4y5urak093NHg&s=10" alt="Touch 'n Go" />
-                            <span class="pm-name">TNG</span>
-                        </label>
-                        <label class="payment-method-option" data-method="shopee">
-                            <input type="radio" name="paymentMethod" value="shopee" />
-                            <span class="pm-check"><i class="fas fa-check"></i></span>
-                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" />
-                            <span class="pm-name">ShopeePay</span>
-                        </label>
-                    </div>
-                    <div id="paymentMethodError" style="color:#ff6b6b; font-size:13px; margin-top:6px; min-height:18px;"></div>
-                </div>
-
-                <div class="order-summary" id="checkoutSummary"></div>
-                <div id="checkoutError" class="checkout-error"></div>
-                <div class="checkout-actions">
-                    <button type="button" class="cancel-btn" id="checkoutCancel">Cancel</button>
-                    <button type="submit" class="place-order-btn"><i class="fas fa-check"></i> Place Order</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== CHANGE PASSWORD MODAL ===== -->
-    <div class="password-overlay" id="passwordOverlay">
-        <div class="password-panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h2><i class="fas fa-key"></i> Change Password</h2>
-                <button class="close-pwd" id="passwordClose"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="sub">Enter your current password and set a new one.</p>
-            <form class="password-form" id="passwordForm">
-                <div class="field">
-                    <label for="currentPwd">Current Password *</label>
-                    <input type="password" id="currentPwd" required placeholder="Enter current password" />
-                </div>
-                <div class="field">
-                    <label for="newPwd">New Password *</label>
-                    <input type="password" id="newPwd" required placeholder="Min 6 characters" />
-                </div>
-                <div class="field">
-                    <label for="confirmPwd">Confirm New Password *</label>
-                    <input type="password" id="confirmPwd" required placeholder="Confirm new password" />
-                </div>
-                <div id="pwdError" class="pwd-error"></div>
-                <div class="pwd-actions">
-                    <button type="button" class="pwd-cancel" id="passwordCancel">Cancel</button>
-                    <button type="submit" class="pwd-submit"><i class="fas fa-save"></i> Update Password</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== CART SIDEBAR ===== -->
-    <div class="cart-overlay" id="cartOverlay">
-        <div class="cart-panel">
-            <div class="cart-header"><h2><i class="fas fa-shopping-cart"></i> Your Cart</h2><button class="cart-close" id="cartClose"><i class="fas fa-times"></i></button></div>
-            <div class="cart-items" id="cartItems"></div>
-            <div class="cart-footer">
-                <div class="total"><span>Total</span><span class="amount" id="cartTotal">RM 0.00</span></div>
-                <button class="checkout-btn" id="checkoutBtn">Checkout</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== CONFIRMATION MODAL ===== -->
-    <div class="confirm-overlay" id="confirmOverlay">
-        <div class="confirm-panel">
-            <div class="icon" id="confirmIcon"><i class="fas fa-check-circle"></i></div>
-            <h3 id="confirmTitle">Confirm Action</h3>
-            <p id="confirmMessage">Are you sure?</p>
-            <div class="actions">
-                <button class="confirm-cancel" id="confirmCancel">Cancel</button>
-                <button class="confirm-approve" id="confirmApprove">Approve</button>
-                <button class="confirm-reject" id="confirmReject" style="display:none;">Reject</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== QR PAYMENT MODAL (NEW) ===== -->
-    <div class="qr-overlay" id="qrOverlay">
-        <div class="qr-panel">
-            <div class="qr-success-icon"><i class="fas fa-check"></i></div>
-            <h2>Order Placed!</h2>
-            <p class="qr-sub">Complete your payment to process the order</p>
-
-            <div class="qr-order-info">
-                <div class="row"><span class="label">Order ID</span><span class="value" id="qrOrderId">-</span></div>
-                <div class="row"><span class="label">Payment Method</span><span class="value" id="qrMethod">-</span></div>
-                <div class="row"><span class="label">Amount</span><span class="value big" id="qrAmount">RM 0.00</span></div>
-            </div>
-
-            <div class="qr-display" id="qrDisplay">
-                <div class="qr-loading"><i class="fas fa-spinner fa-spin"></i><br />Loading QR code...</div>
-            </div>
-
-            <div class="qr-instructions" id="qrInstructions">
-                <strong>How to pay:</strong><br />
-                1. Open your <span id="qrInstructionsMethod">payment app</span><br />
-                2. Scan the QR code above<br />
-                3. Pay the exact amount shown
-            </div>
-
-            <div class="receipt-upload-section" id="receiptUploadSection">
-                <h4><i class="fas fa-receipt"></i> Upload Payment Receipt</h4>
-                <label class="upload-area" id="uploadArea" for="receiptFileInput">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <span class="upload-text">Tap to upload receipt</span>
-                    <span class="upload-hint">Choose from your photo library (JPG, PNG, PDF)</span>
-                    <input type="file" id="receiptFileInput" accept="image/*,application/pdf" />
-                </label>
-                <div class="receipt-preview" id="receiptPreview">
-                    <img id="receiptPreviewImg" src="" alt="Receipt preview" />
-                    <span class="preview-name" id="receiptPreviewName"></span>
-                </div>
-                <div class="receipt-actions" id="receiptActions">
-                    <button type="button" class="btn-upload" id="receiptUploadBtn" disabled>
-                        <i class="fas fa-upload"></i> Submit Receipt
-                    </button>
-                </div>
-                <div class="receipt-success" id="receiptSuccess">
-                    <i class="fas fa-check-circle"></i>
-                    <h4>Receipt Submitted!</h4>
-                    <p style="font-size:12px; color:#8aa1c0; margin-top:4px;">Your receipt number:</p>
-                    <span class="receipt-num" id="receiptNumberDisplay">RCT-XXXXXXXX-XXXX</span>
-                    <p style="font-size:12px; color:#6a7f9e; margin-top:10px;">Admin will verify and process your order shortly.</p>
-                </div>
-                
-                <!-- ✅ THE NEW DONE BUTTON (Place it here) -->
-                <button type="button" id="qrDoneBtn">
-                    <i class="fas fa-check"></i> Done, Close Window
-                </button>
-                
-            </div>
-        </div>
-    </div>
-
-        <!-- ===== IMAGE CROP MODAL (Admin) ===== -->
-    <div class="crop-overlay" id="cropOverlay">
-        <div class="crop-panel">
-            <div class="crop-panel-header">
-                <div>
-                    <h2><i class="fas fa-crop-alt"></i> Crop Image</h2>
-                    <p class="crop-panel-sub">Drag the box to choose what customers will see on the product card.</p>
-                </div>
-                <button type="button" class="crop-close" id="cropClose"><i class="fas fa-times"></i></button>
-            </div>
-
-            <div class="crop-ratio-tabs" id="cropRatioTabs">
-                <button type="button" class="ratio-btn active" data-ratio="1.7777"><i class="fas fa-16-9"></i> 16:9 (Card)</button>
-                <button type="button" class="ratio-btn" data-ratio="1"><i class="fas fa-square"></i> 1:1 (Square)</button>
-                <button type="button" class="ratio-btn" data-ratio="0.75"><i class="fas fa-portrait"></i> 3:4 (Portrait)</button>
-                <button type="button" class="ratio-btn" data-ratio="NaN"><i class="fas fa-expand"></i> Free</button>
-            </div>
-
-            <div class="crop-stage">
-                <img id="cropImage" src="" alt="To crop" />
-            </div>
-
-            <div class="crop-controls">
-                <button type="button" class="crop-tool-btn" id="cropZoomIn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
-                <button type="button" class="crop-tool-btn" id="cropZoomOut" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
-                <button type="button" class="crop-tool-btn" id="cropRotate" title="Rotate 90°"><i class="fas fa-redo-alt"></i></button>
-                <button type="button" class="crop-tool-btn" id="cropFlipH" title="Flip Horizontal"><i class="fas fa-arrows-alt-h"></i></button>
-                <button type="button" class="crop-tool-btn" id="cropFlipV" title="Flip Vertical"><i class="fas fa-arrows-alt-v"></i></button>
-                <button type="button" class="crop-tool-btn" id="cropReset" title="Reset"><i class="fas fa-undo"></i></button>
-            </div>
-
-            <div class="crop-actions">
-                <button type="button" class="crop-cancel-btn" id="cropCancel">Cancel</button>
-                <button type="button" class="crop-save-btn" id="cropSave">
-                    <i class="fas fa-check"></i> Crop & Upload
-                </button>
-            </div>
-        </div>
-    </div>
-
+ 
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMessage">Added to cart!</span></div>
 
@@ -7698,6 +6678,7 @@ var referralCodeFromUrl = null;
         var sections = {
             'add-item': document.getElementById('section-add-item'),
             'dashboard': document.getElementById('section-dashboard'),
+            'inbox': document.getElementById('section-inbox'),
             'payment-approval': document.getElementById('section-payment-approval'),
             'orders': document.getElementById('section-orders'),
             'genres': document.getElementById('section-genres'),
@@ -9693,6 +8674,7 @@ if (cart.length > 0) {
                         showAdminView();
                         showAdminSection('add-item');
                         renderAdminList();
+                        refreshAdminUnreadBadge();
                         loadOrders();
                         loadDashboard(currentRange);
                         loadPendingOrders();
@@ -9732,20 +8714,24 @@ if (cart.length > 0) {
             }
         });
 
-        // ================================================================
-        // 14. ADMIN LOGOUT
-        // ================================================================
-        function logoutAdmin() {
-            isAdmin = false;
-            profileToggle.classList.remove('active');
-            sidebar.classList.remove('visible');
-            adminSections.style.display = 'none';
-            for (var key in sections) { sections[key].classList.remove('active'); }
-            showStoreView();
-            renderPaginatedGrid();
-            updateProfileDropdown();
-            showToast('Admin mode closed.');
-        }
+// ================================================================
+// 14. ADMIN LOGOUT
+// ================================================================
+function logoutAdmin() {
+    // ✅ NEW — stop the inbox poller and reset state
+    if (inboxPollTimer) { clearInterval(inboxPollTimer); inboxPollTimer = null; }
+    inboxCurrentEmail = null;
+
+    isAdmin = false;
+    profileToggle.classList.remove('active');
+    sidebar.classList.remove('visible');
+    adminSections.style.display = 'none';
+    for (var key in sections) { sections[key].classList.remove('active'); }
+    showStoreView();
+    renderPaginatedGrid();
+    updateProfileDropdown();
+    showToast('Admin mode closed.');
+}
 
         sidebarLogout.addEventListener('click', logoutAdmin);
 
@@ -9778,6 +8764,10 @@ if (cart.length > 0) {
                         loadReferralConfig();
                     } else if (section === 'backup') {
                         loadBackupHistory();
+                   } else if (section === 'inbox') {
+                        loadInboxConversations();
+                        refreshAdminUnreadBadge();
+                    }
                     }
                 }
             });
@@ -13697,8 +12687,1765 @@ function resetVariantEditor(ctx) {
                 c.innerHTML = '';
             }
         }
+    </style>
+</head>
+<body>
 
-                // ================================================================
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="logo">
+            <!-- Desktop: N4 Arrow Icon + NEX4UP Text -->
+            <img src="https://lh3.googleusercontent.com/d/1ZfT9IOAc2kL7pF1dUVRdq9p7AKez3a47" alt="N4" class="logo-icon" />
+            <div class="logo-text">
+                <span class="logo-text-light">NEX</span><span class="logo-text-accent">4</span><span class="logo-text-light">UP</span>
+            </div>
+            <!-- Mobile: Emblem only -->
+            <img src="https://lh3.googleusercontent.com/d/1kmjuyfdgwMT30GV-yV1nOtwCv2FfEbSD" alt="N4P" class="mobile-emblem" />
+        </div>
+        <div class="header-controls">
+            <div class="search-wrapper">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search games..." autocomplete="off" />
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                    <button class="clear-search" id="clearSearchBtn"><i class="fas fa-times-circle"></i></button>
+                </div>
+                <div id="searchDropdown"></div>
+            </div>
+            <button class="track-btn" id="trackBtn"><i class="fas fa-search"></i> Track Order</button>
+            <button class="cart-btn" id="cartToggle">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+                <span class="badge" id="cartCount">0</span>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+                <button class="profile-toggle" id="profileToggle">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div class="profile-dropdown-content" id="profileDropdownContent"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== APP CONTAINER ===== -->
+    <div class="app-container">
+        <!-- ===== SIDEBAR ===== -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-item back-item" id="sidebarBack">
+                <i class="fas fa-arrow-left"></i> Back to Store
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-item active" data-section="add-item">
+                <i class="fas fa-plus-circle"></i> Add Item
+            </div>
+            <div class="sidebar-item" data-section="dashboard">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </div>
+            <div class="sidebar-item" data-section="payment-approval">
+                <i class="fas fa-check-double"></i> Payment Approval
+            </div>
+            <div class="sidebar-item" data-section="orders">
+                <i class="fas fa-box"></i> Orders
+            </div>
+            <div class="sidebar-item" data-section="genres">
+                <i class="fas fa-images"></i> Genres
+            </div>
+            <div class="sidebar-item" data-section="referral-settings">
+                <i class="fas fa-share-alt"></i> Referral Settings
+            </div>
+            <div class="sidebar-item" data-section="inbox">
+  <i class="fas fa-inbox"></i> Inbox
+  <span class="sidebar-badge" id="adminInboxBadge" style="display:none;">0</span>
+</div>
+            <!-- ✅ NEW: Backup Sidebar Item -->
+            <div class="sidebar-item" data-section="backup">
+                <i class="fas fa-database"></i> Backup & Restore
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-item" data-section="change-password">
+                <i class="fas fa-key"></i> Change Admin Password
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-item logout-item" id="sidebarLogout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </div>
+        </div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="main-content">
+            <!-- PUBLIC VIEW -->
+            <div id="publicView">
+                <div class="hero">
+                    <div>
+                        <h1>Level Up <span>Your Library</span></h1>
+                        <p>Discover top‑tier games, exclusive deals, and instant digital delivery in MYR.</p>
+                    </div>
+                    <div class="stats">
+                        <div><div class="num" id="totalGames">0</div><div class="label">Games</div></div>
+                        <div><div class="num" id="totalCategories">0</div><div class="label">Categories</div></div>
+                    </div>
+                </div>
+
+                <div id="referralBanner" style="display:none; background:#1e2a3a; border:1px solid #f7d875; border-radius:16px; padding:16px 24px; margin-bottom:24px; text-align:center;">
+                    <i class="fas fa-gift" style="color:#f7d875; font-size:24px;"></i>
+                    <span style="font-weight:600; margin-left:12px;">You were referred by a friend!</span>
+                    <span style="color:#8aa1c0; margin-left:8px;">Register now and get a welcome coupon on your first order.</span>
+                </div>
+
+                <div class="genre-carousel-wrapper" id="genreCarouselWrapper">
+                    <div id="genreCardsContainer" class="genre-cards"></div>
+                    <button class="carousel-arrow left" id="carouselLeft"><i class="fas fa-chevron-left"></i></button>
+                    <button class="carousel-arrow right" id="carouselRight"><i class="fas fa-chevron-right"></i></button>
+                </div>
+
+                <div id="genreBannerContainer" style="display:none;"></div>
+
+                <div class="filters" id="filterContainer">
+                    <span class="filter-label"><i class="fas fa-tag"></i> Genre</span>
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="hotselling">🔥 Hot Selling</button>
+                </div>
+                <div class="games-grid" id="gamesGrid"></div>
+                <div class="pagination-container" id="paginationContainer"></div>
+
+                <!-- ===== PAYMENT METHODS BANNER (Customer View) ===== -->
+                <div class="payment-methods-banner" id="paymentMethodsBanner">
+                    <div class="pm-label">
+                        <i class="fas fa-credit-card"></i>
+                        We Accept
+                    </div>
+                    <div class="pm-row">
+                        <div class="pm-item" title="MAE by Maybank2u">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHOYpS3G_bIUHBJNp_xKD1_7NxSF3J66qxMX1VzWrq5g&s=10" alt="MAE" loading="lazy" />
+                            <span class="pm-name">MAE</span>
+                        </div>
+                        <div class="pm-item" title="Touch 'n Go eWallet">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPQhtet5iK5zwJYL00UIrGJUvz3_NlK4y5urak093NHg&s=10" alt="Touch 'n Go" loading="lazy" />
+                            <span class="pm-name">TNG</span>
+                        </div>
+                        <div class="pm-item" title="ShopeePay">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" loading="lazy" />
+                            <span class="pm-name">ShopeePay</span>
+                        </div>
+                    </div>
+                    <div class="pm-secure">
+                        <i class="fas fa-shield-alt"></i>
+                        100% Secure Payment
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN SECTIONS -->
+            <div id="adminSections">
+                <!-- Add Item -->
+                <div class="admin-section active" id="section-add-item">
+                    <h2 style="margin-bottom:20px;"><i class="fas fa-user-cog"></i> Admin – Manage Products</h2>
+                    <form class="admin-form" id="addGameForm">
+
+                        <!-- ============ SECTION 1: BASIC INFORMATION ============ -->
+                        <div class="admin-form-section">
+                            <div class="admin-form-section-header">
+                                <i class="fas fa-info-circle"></i> Basic Information
+                            </div>
+                            <div class="admin-form-grid">
+                                <div class="field">
+                                    <label for="title">Title *</label>
+                                    <input type="text" id="title" required placeholder="Game / Product title" />
+                                </div>
+                                <div class="field">
+                                    <label for="category">Category</label>
+                                    <input type="text" id="category" placeholder="e.g. RPG, Pants, Sneakers" />
+                                </div>
+                                <div class="field field-full">
+                                    <label>Product Type *</label>
+                                    <div class="product-type-toggle">
+                                        <label class="pt-option">
+                                            <input type="radio" name="addProductType" value="digital" checked />
+                                            <span class="pt-content">
+                                                <i class="fas fa-download"></i>
+                                                <span class="pt-title">Digital</span>
+                                                <span class="pt-sub">Game codes, top-ups, accounts</span>
+                                            </span>
+                                        </label>
+                                        <label class="pt-option">
+                                            <input type="radio" name="addProductType" value="physical" />
+                                            <span class="pt-content">
+                                                <i class="fas fa-box"></i>
+                                                <span class="pt-title">Physical</span>
+                                                <span class="pt-sub">Clothing, accessories, etc.</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="field field-full">
+                                    <label for="gameType">Game Type (for digital products) *</label>
+                                    <select id="gameType" required>
+                                        <option value="roblox">Roblox — Username + Nickname</option>
+                                        <option value="ml">Mobile Legends — User ID + Zone ID</option>
+                                        <option value="pubg">PUBG Mobile — User ID + Nickname</option>
+                                        <option value="other">Other / Generic — Account ID</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                                                <!-- ============ SECTION 2: PRICING & STOCK (Digital only) ============ -->
+                        <div class="admin-form-section" id="addPricingStockSection">
+                            <div class="admin-form-section-header">
+                                <i class="fas fa-tag"></i> Pricing & Stock
+                            </div>
+                            <div class="admin-form-grid">
+                                <div class="field">
+                                    <label for="price">Price (RM) *</label>
+                                    <input type="number" id="price" required step="0.01" min="0" placeholder="249.90" />
+                                </div>
+                                <div class="field">
+                                    <label for="cost">Cost (RM) *</label>
+                                    <input type="number" id="cost" required step="0.01" min="0" placeholder="180.00" />
+                                </div>
+                                <div class="field">
+                                    <label for="discount">Discount (%)</label>
+                                    <input type="number" id="discount" step="1" min="0" max="100" placeholder="20" />
+                                </div>
+                                <div class="field">
+                                    <label for="quantity">Quantity (stock)</label>
+                                    <input type="number" id="quantity" step="1" min="0" placeholder="10" value="0" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ============ SECTION 3: PRODUCT VARIANTS + SHIPPING (Physical only) ============ -->
+                        <div class="admin-form-section" id="addVariantShippingSection" style="display:none;">
+                            <div class="admin-form-section-header">
+                                <i class="fas fa-layer-group"></i> Product Variants
+                            </div>
+
+                            <div class="field" style="margin-bottom:14px;">
+                                <label class="check-label">
+                                    <input type="checkbox" id="addHasVariants" checked />
+                                    <span>This product has variants (Color, Size, etc.)</span>
+                                </label>
+                            </div>
+
+                            <div id="addVariantEditorContainer">
+                                <div class="variant-editor">
+                                    <div class="variant-editor-header">
+                                        <h4><i class="fas fa-layer-group"></i> Variant Options</h4>
+                                        <p>Add options like "Color", "Size", then add values. Each combination becomes a row below with its own price, cost, and stock.</p>
+                                    </div>
+
+                                    <div class="variant-option-add-row">
+                                        <input type="text" id="addNewOptionInput" placeholder="Option name (e.g. Color)" />
+                                        <button type="button" class="variant-add-btn" id="addNewOptionBtn">
+                                            <i class="fas fa-plus"></i> Add Option
+                                        </button>
+                                    </div>
+
+                                    <div id="addVariantOptionList" class="variant-option-list"></div>
+
+                                    <div class="variant-table-wrap">
+                                        <div class="variant-table-header">
+                                            <h4><i class="fas fa-th"></i> Variant Combinations</h4>
+                                            <span id="addVariantCount" class="variant-count">0 variants</span>
+                                        </div>
+                                        <div id="addVariantTable" class="variant-table"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ✅ Fallback base price/cost when variants disabled -->
+                            <div id="addPhysicalBaseFields" style="display:none; margin-top:14px;">
+                                <div class="admin-form-grid">
+                                    <div class="field">
+                                        <label for="physicalBasePrice">Base Price (RM) *</label>
+                                        <input type="number" id="physicalBasePrice" step="0.01" min="0" placeholder="50.00" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="physicalBaseCost">Base Cost (RM) *</label>
+                                        <input type="number" id="physicalBaseCost" step="0.01" min="0" placeholder="30.00" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="physicalBaseQty">Total Stock</label>
+                                        <input type="number" id="physicalBaseQty" step="1" min="0" placeholder="10" value="0" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="physicalDiscount">Discount (%)</label>
+                                        <input type="number" id="physicalDiscount" step="1" min="0" max="100" placeholder="0" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shipping toggle inside physical section -->
+                            <div class="field" style="margin-top:18px;">
+                                <label class="check-label">
+                                    <input type="checkbox" id="addRequiresShipping" checked />
+                                    <span><i class="fas fa-shipping-fast" style="color:#f7d875;margin-right:6px;"></i>Requires a shipping address from the customer</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- ============ SECTION 4: DESCRIPTION & MEDIA ============ -->
+<div class="admin-form-section">
+    <div class="admin-form-section-header">
+        <i class="fas fa-image"></i> Description & Media
+    </div>
+    <div class="admin-form-grid">
+        <div class="field field-full">
+            <label for="description">Description</label>
+            <textarea id="description" placeholder="Enter product description..." rows="3"></textarea>
+        </div>
+
+        <div class="field field-full image-upload-wrapper">
+            <label for="image">Main Image</label>
+            <div class="image-upload-row">
+                <input type="url" id="image" placeholder="Paste URL or click Upload" />
+                <input type="file" id="mainImageFileInput" accept="image/*" style="display:none;" />
+                <button type="button" class="upload-img-btn" id="uploadMainImgBtn">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+            </div>
+            <div class="image-previews" id="mainImagePreviewContainer"></div>
+        </div>
+
+        <div class="field">
+            <label for="badge">Badge</label>
+            <input type="text" id="badge" placeholder="Hot, New, Sale..." />
+        </div>
+
+        <div class="field field-full image-upload-wrapper">
+            <label for="additionalImages">Additional Images (Gallery)</label>
+            <div class="image-upload-row">
+                <input type="file" id="additionalImagesFiles" accept="image/*" multiple style="display:none;" />
+                <button type="button" class="upload-img-btn" id="uploadAdditionalImgsBtn" style="width:100%; justify-content:center;">
+                    <i class="fas fa-images"></i> Upload Additional Images
+                </button>
+            </div>
+            <div class="image-previews" id="additionalImagesPreviewContainer"></div>
+            <textarea id="additionalImages" placeholder="URLs will appear here after upload..." style="margin-top:6px;"></textarea>
+        </div>
+    </div>
+</div>
+
+                        <!-- ============ SECTION 6: ACTIONS ============ -->
+                        <div class="admin-form-actions">
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-plus-circle"></i> Add Product
+                            </button>
+                            <span id="adminStatus" style="color:#8aa1c0; font-size:14px;"></span>
+                            <button type="button" class="debug-toggle" id="debugOrdersBtn">🔍 Debug Orders</button>
+                        </div>
+
+                    </form>
+                    <h3 style="margin:30px 0 16px;">Current Products</h3>
+
+                    <!-- ===== Product Toolbar (Search / Filter / Sort) ===== -->
+                    <div class="product-toolbar">
+                        <div class="toolbar-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="adminProductSearch" placeholder="Search by title or ID..." autocomplete="off" />
+                            <button type="button" id="adminProductClearSearch" title="Clear"><i class="fas fa-times"></i></button>
+                        </div>
+
+                        <select id="adminProductCategory" class="toolbar-select">
+                            <option value="all">All Categories</option>
+                        </select>
+
+                        <select id="adminProductSort" class="toolbar-select">
+                            <option value="id-desc">Newest First (ID ↓)</option>
+                            <option value="id-asc">Oldest First (ID ↑)</option>
+                            <option value="title-asc">Title (A → Z)</option>
+                            <option value="title-desc">Title (Z → A)</option>
+                            <option value="price-desc">Price (High → Low)</option>
+                            <option value="price-asc">Price (Low → High)</option>
+                            <option value="stock-asc">Stock (Low → High)</option>
+                            <option value="stock-desc">Stock (High → Low)</option>
+                        </select>
+
+                        <span id="adminProductCount" class="toolbar-count">0 items</span>
+                    </div>
+
+                    <div class="admin-list"><div id="adminGameList"></div></div>
+                    <div class="admin-product-pagination" id="adminProductPagination"></div>
+                    <div class="debug-panel" id="debugPanel">
+                        <strong>Raw Orders Data:</strong>
+                        <pre id="debugContent">Click "Debug Orders" to load data.</pre>
+                    </div>
+                </div>
+
+                <!-- Dashboard -->
+                <div class="admin-section" id="section-dashboard">
+                    <h2 style="margin-bottom:20px;"><i class="fas fa-chart-line"></i> Sales Dashboard</h2>
+                    <div class="dashboard-filters">
+                        <button class="filter-btn active" data-range="today">Today</button>
+                        <button class="filter-btn" data-range="week">This Week</button>
+                        <button class="filter-btn" data-range="month">This Month</button>
+                        <button class="filter-btn" data-range="all">All Time</button>
+                    </div>
+                    <div class="dashboard-stats" id="dashboardStats">
+                        <div class="stat-card"><div class="stat-number" id="totalOrders">0</div><div class="stat-label">Total Orders</div></div>
+                        <div class="stat-card"><div class="stat-number" id="totalRevenue">RM 0.00</div><div class="stat-label">Total Revenue</div></div>
+                        <div class="stat-card"><div class="stat-number" id="totalCost">RM 0.00</div><div class="stat-label">Total Cost</div></div>
+                        <div class="stat-card"><div class="stat-number profit" id="totalProfit">RM 0.00</div><div class="stat-label">Profit</div></div>
+                        <div class="stat-card"><div class="stat-number margin" id="totalMargin">0%</div><div class="stat-label">Margin</div></div>
+                    </div>
+                    <div class="extra-sections">
+                        <div class="extra-card" id="lowStockCard">
+                            <h3><i class="fas fa-exclamation-triangle" style="color:#ff6b6b;"></i> Low Stock (≤ 5)</h3>
+                            <div id="lowStockList"><p style="color:#6a7f9e;">Loading...</p></div>
+                        </div>
+                        <div class="extra-card" id="topSellingCard">
+                            <h3><i class="fas fa-trophy" style="color:#f7d875;"></i> Top Selling</h3>
+                            <div id="topSellingList"><p style="color:#6a7f9e;">Loading...</p></div>
+                        </div>
+                    </div>
+                    <div class="status-breakdown">
+                        <h3>Orders by Status</h3>
+                        <div id="statusBreakdown">
+                            <div class="status-item"><span class="status-label"><span class="status-dot awaiting-payment"></span> Awaiting Payment</span><span id="statusAwaitingPayment">0</span></div>
+                            <div class="status-item"><span class="status-label"><span class="status-dot awaiting-verification"></span> Awaiting Verification</span><span id="statusAwaitingVerification">0</span></div>
+                            <div class="status-item"><span class="status-label"><span class="status-dot pending"></span> Pending</span><span id="statusPending">0</span></div>
+                            <div class="status-item"><span class="status-label"><span class="status-dot paid"></span> Paid</span><span id="statusPaid">0</span></div>
+                            <div class="status-item"><span class="status-label"><span class="status-dot shipped"></span> Shipped</span><span id="statusShipped">0</span></div>
+                            <div class="status-item"><span class="status-label"><span class="status-dot cancelled"></span> Cancelled</span><span id="statusCancelled">0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Approval -->
+                <div class="admin-section" id="section-payment-approval">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                        <h2><i class="fas fa-check-double"></i> Payment Approval</h2>
+                        <button class="submit-btn" id="refreshApprovalBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+
+                    <!-- ✅ NEW: Receipt search bar -->
+                    <div class="product-toolbar" style="grid-template-columns: 1fr auto;">
+                        <div class="toolbar-search" id="approvalSearchWrapper">
+                            <i class="fas fa-receipt"></i>
+                            <input type="text" id="approvalSearchInput" placeholder="Search by Receipt Number or Order ID..." autocomplete="off" />
+                            <button type="button" id="approvalSearchClear" title="Clear"><i class="fas fa-times"></i></button>
+                        </div>
+                        <span id="approvalSearchCount" class="toolbar-count">0 orders</span>
+                    </div>
+
+                    <div class="orders-container">
+                        <div id="approvalList">
+                            <p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading pending orders...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders -->
+                <div class="admin-section" id="section-orders">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2><i class="fas fa-box"></i> Orders</h2>
+                        <button class="submit-btn" id="refreshOrdersBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="orders-container">
+                        <div id="ordersList"><p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading orders...</p></div>
+                    </div>
+                </div>
+
+                <!-- Genres Management -->
+                <div class="admin-section" id="section-genres">
+                    <h2 style="margin-bottom:20px;"><i class="fas fa-images"></i> Manage Genre Images</h2>
+                    <p style="color:#8aa1c0; margin-bottom:20px;">Assign a banner image URL for each genre. The image will be displayed when users select that genre.</p>
+                    <div class="genre-manager" id="genreManager">
+                        <div id="genreList"><p style="color:#6a7f9e;">Loading genres...</p></div>
+                        <div id="genreStatus" class="genre-status"></div>
+                    </div>
+                </div>
+
+                <!-- Referral Settings (Admin) -->
+                <div class="admin-section" id="section-referral-settings">
+                    <h2 style="margin-bottom:20px;"><i class="fas fa-share-alt"></i> Referral Settings</h2>
+                    <p style="color:#8aa1c0; margin-bottom:20px;">Configure referral rewards, friend coupons, and tier thresholds.</p>
+                    <div id="referralConfigContainer">
+                        <p style="color:#6a7f9e;">Loading settings...</p>
+                    </div>
+                </div>
+
+                                <!-- Backup & Restore -->
+                <div class="admin-section" id="section-backup">
+                    <h2 style="margin-bottom:20px;"><i class="fas fa-database"></i> Backup & Restore</h2>
+                    <p style="color:#8aa1c0; margin-bottom:20px;">Create manual backups of your game/product data. If something goes wrong, you can restore any backup with one click.</p>
+                    
+                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:24px; margin-bottom:24px;">
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <button type="button" class="submit-btn" id="createBackupBtn">
+                                <i class="fas fa-cloud-upload-alt"></i> Create Backup Now
+                            </button>
+                            <button type="button" class="submit-btn" id="refreshBackupBtn" style="background:#1e2a3a; color:#8aa1c0; border:1px solid #2a3a52;">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <span id="backupStatus" style="color:#8aa1c0; font-size:14px;"></span>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-bottom:16px;"><i class="fas fa-history"></i> Backup History</h3>
+                    <div class="orders-container" id="backupList">
+                        <p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading backups...</p>
+                    </div>
+                </div>
+
+                <!-- Change Admin Password -->
+                <div class="admin-section" id="section-change-password">
+                    <h2 style="margin-bottom:20px;"><i class="fas fa-key"></i> Change Admin Password</h2>
+                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:24px; padding:30px; max-width:500px;">
+                        <form id="changePasswordForm">
+                            <div class="field" style="margin-bottom:16px;">
+                                <label for="currentPassword">Current Password *</label>
+                                <input type="password" id="currentPassword" required placeholder="Enter current password" />
+                            </div>
+                            <div class="field" style="margin-bottom:16px;">
+                                <label for="newPassword">New Password *</label>
+                                <input type="password" id="newPassword" required placeholder="Min 6 characters" />
+                            </div>
+                            <div class="field" style="margin-bottom:16px;">
+                                <label for="confirmPassword">Confirm New Password *</label>
+                                <input type="password" id="confirmPassword" required placeholder="Confirm new password" />
+                            </div>
+                            <div id="changePasswordError" style="color:#ff6b6b; margin-bottom:12px;"></div>
+                            <button type="submit" class="submit-btn"><i class="fas fa-save"></i> Update Password</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- ===== INBOX ===== -->
+<div class="admin-section" id="section-inbox">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+    <h2><i class="fas fa-inbox"></i> Customer Inbox</h2>
+    <button class="submit-btn" id="refreshInboxBtn" style="padding:8px 20px; font-size:14px;">
+      <i class="fas fa-sync-alt"></i> Refresh
+    </button>
+  </div>
+  <div class="inbox-layout">
+    <div class="inbox-list" id="inboxConversations">
+      <div class="inbox-empty">Loading conversations...</div>
+    </div>
+    <div class="inbox-chat">
+      <div class="inbox-chat-header" id="inboxChatHeader">
+        <h4>Select a conversation</h4>
+      </div>
+      <div class="inbox-chat-body" id="inboxChatBody">
+        <div class="chat-empty">Pick a conversation from the left to reply.</div>
+      </div>
+      <div class="inbox-preview-strip" id="inboxPreviewStrip">
+        <img id="inboxPreviewImg" src="" alt="preview" />
+        <button type="button" id="inboxRemoveImg"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="inbox-chat-input">
+        <button type="button" class="inbox-attach-btn" id="inboxAttachBtn" title="Attach image">
+          <i class="fas fa-image"></i>
+        </button>
+        <input type="file" id="inboxImageInput" accept="image/*" style="display:none;" />
+        <textarea id="inboxReplyInput" placeholder="Type your reply..." rows="1" disabled></textarea>
+        <button type="button" class="inbox-send-btn" id="inboxSendBtn" disabled title="Send">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+            </div>
+
+            <!-- ===== MY ACCOUNT (Customer Dashboard) ===== -->
+            <div id="myAccountSection">
+                <div class="account-container">
+                    <div class="account-header">
+                        <h2><i class="fas fa-user-circle"></i> My Account</h2>
+                        <button class="back-btn" id="backToStoreBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
+                    </div>
+                    <div class="profile-header">
+                        <div id="profileAvatarContainer">
+                            <img id="profileAvatar" class="profile-avatar" src="" alt="Profile" style="display:none;" />
+                            <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder"><i class="fas fa-user"></i></div>
+                        </div>
+                        <div class="profile-info">
+                            <div class="profile-name" id="profileName">-</div>
+                            <div class="profile-email" id="profileEmail">-</div>
+                        </div>
+                    </div>
+<div class="profile-details">
+    <div class="detail-row"><span class="label">Phone</span><span class="value" id="profilePhone">-</span></div>
+    <div class="detail-row"><span class="label">Member Since</span><span class="value" id="profileDate">-</span></div>
+    <div class="detail-row"><span class="label"><i class="fas fa-coins" style="color:#f7d875;"></i> Points Balance</span><span class="value" id="profilePoints" style="color:#f7d875; font-weight:700;">-</span></div>
+</div>
+                    <div class="account-actions">
+                        <button class="action-btn primary" id="editProfileBtn"><i class="fas fa-edit"></i> Edit Profile</button>
+                        <button class="action-btn" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
+                    </div>
+                    <div class="edit-profile-form" id="editProfileForm">
+                        <div class="field">
+                            <label for="editName">Name</label>
+                            <input type="text" id="editName" placeholder="Your full name" />
+                        </div>
+                        <div class="field">
+                            <label for="editPhone">Phone</label>
+                            <input type="text" id="editPhone" placeholder="Phone number" />
+                        </div>
+                        <div class="field">
+                            <label for="editProfileImageUrl">Profile Image URL (or upload below)</label>
+                            <input type="text" id="editProfileImageUrl" placeholder="https://example.com/avatar.jpg" />
+                            <div class="profile-image-upload">
+                                <label class="upload-btn" for="profileImageFileInput"><i class="fas fa-cloud-upload-alt"></i> Upload from device</label>
+                                <input type="file" id="profileImageFileInput" accept="image/*" />
+                                <img id="editProfilePreview" class="preview-img" style="display:none;" alt="Preview" />
+                                <span class="hint">Choose an image from your device (will be converted to data URL).</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="save-btn" id="saveProfileBtn"><i class="fas fa-save"></i> Save Changes</button>
+                            <button class="cancel-btn" id="cancelEditProfileBtn">Cancel</button>
+                        </div>
+                        <div id="profileUpdateMessage" class="profile-message"></div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom:16px;">My Orders</h3>
+                <div id="myOrdersList"><p style="color:#6a7f9e;">Loading your orders...</p></div>
+
+                <!-- ===== REFERRAL SECTION (Customer) ===== -->
+                <div class="account-container" style="margin-top:20px;">
+                    <h3 style="margin-bottom:12px;"><i class="fas fa-share-alt"></i> Refer & Earn</h3>
+                    <p style="color:#8aa1c0; font-size:14px; margin-bottom:12px;">
+                        Share your referral link with friends. When they register and place their first order, you both get a coupon!
+                    </p>
+                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                        <input type="text" id="referralLink" readonly style="flex:1; background:#0b0e14; border:1px solid #2a3a52; border-radius:40px; padding:10px 20px; color:#e8edf5; font-size:14px;" />
+                        <button class="submit-btn" id="copyReferralBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <div id="referralStatus" style="margin-top:8px; font-size:14px; color:#4caf50;"></div>
+
+                    <div style="margin-top:16px; border-top:1px solid #1a2538; padding-top:16px;">
+                        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                            <div>
+                                <span style="color:#6a7f9e; font-size:13px;">Completed Referrals</span>
+                                <span id="referralCompletedCount" style="font-size:20px; font-weight:700; color:#f7d875; display:block;">0</span>
+                            </div>
+                            <div>
+                                <span style="color:#6a7f9e; font-size:13px;">Next Reward</span>
+                                <span id="referralNextReward" style="font-size:16px; font-weight:600; color:#4caf50; display:block;">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <h4 style="color:#8aa1c0; font-size:14px; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Referral History</h4>
+                        <div id="referralHistory" style="background:#0b0e14; border-radius:12px; border:1px solid #1e2a3a; padding:8px 0;">
+                            <p style="color:#6a7f9e; text-align:center; padding:12px;">Loading referrals...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== WISHLIST SECTION ===== -->
+            <div id="wishlistSection">
+                <div class="account-container">
+                    <div class="account-header">
+                        <h2><i class="fas fa-heart" style="color:#ff6b6b;"></i> My Wishlist</h2>
+                        <button class="back-btn" id="backToStoreFromWishlistBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
+                    </div>
+                    <div id="wishlistGrid" class="games-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
+                        <p style="color:#6a7f9e; grid-column:1/-1; text-align:center; padding:40px 0;">Loading your wishlist...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PRODUCT DETAIL MODAL ===== -->
+    <div class="product-overlay" id="productOverlay">
+        <div class="product-panel">
+            <button class="close-product" id="productClose"><i class="fas fa-times"></i></button>
+            <div class="product-gallery" id="productGallery">
+                <img class="main-img" id="productModalMainImg" src="" alt="Product image" />
+                <div class="thumbnails" id="productModalThumbnails"></div>
+            </div>
+            <div class="product-title" id="productModalTitle"></div>
+            <div class="product-category" id="productModalCategory"></div>
+            <div class="product-desc" id="productModalDesc"></div>
+            <div class="product-price" id="productModalPrice"></div>
+            <div class="product-stock" id="productModalStock"></div>
+
+            <!-- ✅ Variant Picker (auto-shown for variant products) -->
+            <div class="variant-picker" id="productVariantPicker" style="display:none;"></div>
+
+            <div class="product-actions">
+                <div class="qty-controls" id="modalQtyControls">
+                    <button class="qty-btn modal-qty-minus"><i class="fas fa-minus"></i></button>
+                    <input type="number" class="qty-input modal-qty-input" value="1" min="1" />
+                    <button class="qty-btn modal-qty-plus"><i class="fas fa-plus"></i></button>
+                </div>
+                <button class="add-btn" id="modalAddBtn"><i class="fas fa-plus"></i> Add to Cart</button>
+            </div>
+
+            <div class="product-reviews" id="productReviews">
+                <h3><i class="fas fa-star" style="color:#f7d875;"></i> Customer Reviews</h3>
+                <div class="review-summary" id="reviewSummary">
+                    <span class="avg-number" id="avgRating">0.0</span>
+                    <div class="stars-display" id="avgStars"></div>
+                    <span class="review-count" id="reviewCount">(0 reviews)</span>
+                </div>
+                <div class="review-list" id="reviewList"></div>
+                <div class="review-form-container" id="reviewFormContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LOGIN MODAL (Customer) ===== -->
+    <div class="auth-overlay" id="loginOverlay">
+        <div class="auth-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+                <button class="close-auth" id="loginClose"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="sub">Welcome back! Log in to your account.</p>
+            <form class="auth-form" id="loginForm">
+                <div class="field">
+                    <label for="loginEmail">Email / Username *</label>
+                    <input type="text" id="loginEmail" required placeholder="Email or Username" />
+                </div>
+                <div class="field">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password" />
+                </div>
+                <div id="loginError" class="auth-error"></div>
+                <div class="auth-actions">
+                    <button type="button" class="auth-cancel" id="loginCancel">Cancel</button>
+                    <button type="submit" class="auth-submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+                </div>
+                <div class="auth-switch">Don't have an account? <a id="switchToRegister">Register here</a></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== REGISTER MODAL ===== -->
+    <div class="auth-overlay" id="registerOverlay">
+        <div class="auth-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h2><i class="fas fa-user-plus"></i> Register</h2>
+                <button class="close-auth" id="registerClose"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="sub">Create your account for faster checkout and order tracking.</p>
+            <form class="auth-form" id="registerForm">
+                <div class="field">
+                    <label for="registerName">Username*</label>
+                    <input type="text" id="registerName" required placeholder="Username" />
+                </div>
+                <div class="field">
+                    <label for="registerPhone">Phone Number *</label>
+                    <input type="tel" id="registerPhone" required placeholder="012-3456789" />
+                </div>
+                <div class="field">
+                    <label for="registerEmail">Email *</label>
+                    <input type="email" id="registerEmail" required placeholder="you@example.com" />
+                </div>
+                <div class="field">
+                    <label for="registerPassword">Password *</label>
+                    <input type="password" id="registerPassword" required placeholder="Min 6 characters" />
+                </div>
+                <div class="field">
+                    <label for="registerConfirmPassword">Confirm Password *</label>
+                    <input type="password" id="registerConfirmPassword" required placeholder="Confirm your password" />
+                </div>
+                <div id="registerError" class="auth-error"></div>
+                <div class="auth-actions">
+                    <button type="button" class="auth-cancel" id="registerCancel">Cancel</button>
+                    <button type="submit" class="auth-submit"><i class="fas fa-user-plus"></i> Register</button>
+                </div>
+                <div class="auth-switch">Already have an account? <a id="switchToLogin">Log in here</a></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== ADMIN LOGIN MODAL ===== -->
+    <div class="auth-overlay" id="adminLoginOverlay">
+        <div class="auth-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h2><i class="fas fa-user-cog"></i> Admin Login</h2>
+                <button class="close-auth" id="adminLoginClose"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="sub">Enter the admin password to access the control panel.</p>
+            <form class="auth-form" id="adminLoginForm">
+                <div class="field">
+                    <label for="adminPassword">Admin Password *</label>
+                    <input type="password" id="adminPassword" required placeholder="Enter admin password" />
+                </div>
+                <div id="adminLoginError" class="auth-error"></div>
+                <div class="auth-actions">
+                    <button type="button" class="auth-cancel" id="adminLoginCancel">Cancel</button>
+                    <button type="submit" class="auth-submit"><i class="fas fa-sign-in-alt"></i> Login as Admin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== TRACK ORDER MODAL ===== -->
+    <div class="track-overlay" id="trackOverlay">
+        <div class="track-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h2><i class="fas fa-search"></i> Track Your Orders</h2>
+                <button class="close-edit" id="trackClose" style="background:transparent; border:none; color:#8aa1c0; font-size:28px; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="sub">Enter your email to see all your orders and their current status.</p>
+            <div class="track-form">
+                <input type="email" id="trackEmail" placeholder="you@example.com" required />
+                <button id="trackSubmit"><i class="fas fa-search"></i> Find</button>
+            </div>
+            <div class="track-results" id="trackResults"></div>
+        </div>
+    </div>
+
+    <!-- ===== EDIT MODAL ===== -->
+    <div class="edit-overlay" id="editOverlay">
+        <div class="edit-panel">
+            <div class="edit-panel-header">
+                <div>
+                    <h2><i class="fas fa-edit"></i> Edit Game</h2>
+                    <p class="edit-panel-sub">Update the game details below. Changes are saved immediately.</p>
+                </div>
+                <button class="close-edit" id="editClose"><i class="fas fa-times"></i></button>
+            </div>
+            <form class="edit-form" id="editForm">
+                <div id="editFormError" class="form-error-message" style="display:none;"></div>
+
+                <div class="edit-preview-card" id="editPreviewCard">
+                    <div class="edit-preview-img-wrap">
+                        <img id="editPreviewImg" src="" alt="Preview" style="display:none;" />
+                        <div class="edit-preview-img-placeholder" id="editPreviewImgPlaceholder">
+                            <i class="fas fa-image"></i>
+                            <span>Image preview</span>
+                        </div>
+                    </div>
+                    <div class="edit-preview-info">
+                        <div class="edit-preview-title" id="editPreviewTitle">Game Title</div>
+                        <div class="edit-preview-category" id="editPreviewCategory">Category</div>
+                        <div class="edit-preview-price" id="editPreviewPrice">RM 0.00</div>
+                        <div class="edit-preview-badge" id="editPreviewBadge" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <div class="edit-form-grid">
+                    <div class="field">
+                        <label for="editTitle">Title <span class="required">*</span></label>
+                        <input type="text" id="editTitle" required placeholder="Game title" />
+                    </div>
+                    <div class="field">
+                        <label for="editCategory">Category</label>
+                        <input type="text" id="editCategory" placeholder="e.g. RPG, FPS" />
+                    </div>
+                    <div class="field field-full">
+                        <label for="editGameType">Game Type <span class="required">*</span></label>
+                        <select id="editGameType" required>
+                            <option value="roblox">Roblox — Username + Nickname</option>
+                            <option value="ml">Mobile Legends — User ID + Zone ID</option>
+                            <option value="pubg">PUBG Mobile — User ID + Nickname</option>
+                            <option value="other">Other / Generic — Account ID</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="editPrice">Price (RM) <span class="required">*</span></label>
+                        <input type="number" id="editPrice" required step="0.01" min="0" placeholder="249.90" />
+                    </div>
+                    <div class="field">
+                        <label for="editCost">Cost (RM) <span class="required">*</span></label>
+                        <input type="number" id="editCost" required step="0.01" min="0" placeholder="180.00" />
+                    </div>
+                    <div class="field">
+                        <label for="editDiscount">Discount (%)</label>
+                        <input type="number" id="editDiscount" step="1" min="0" max="100" placeholder="20" />
+                    </div>
+                    <div class="field">
+                        <label for="editQuantity">Quantity (stock)</label>
+                        <input type="number" id="editQuantity" step="1" min="0" placeholder="10" />
+                    </div>
+                    <div class="field field-full">
+                        <label for="editDescription">Description</label>
+                        <textarea id="editDescription" placeholder="Enter description..."></textarea>
+                        <div class="field-hint"><span id="editDescCount">0</span> / 2000 characters</div>
+                    </div>
+<div class="field field-full image-upload-wrapper">
+    <label for="editImage">Main Image</label>
+    <div class="image-upload-row">
+        <input type="url" id="editImage" placeholder="Paste URL or click Upload" />
+        <input type="file" id="editMainImageFileInput" accept="image/*" style="display:none;" />
+        <button type="button" class="upload-img-btn" id="editUploadMainImgBtn"><i class="fas fa-upload"></i> Upload</button>
+    </div>
+    <div class="image-previews" id="editMainImagePreviewContainer"></div>
+</div>
+                    <div class="field">
+                        <label for="editBadge">Badge</label>
+                        <input type="text" id="editBadge" placeholder="Hot, New, Free..." />
+                    </div>
+<div class="field field-full image-upload-wrapper">
+    <label for="editAdditionalImages">Additional Images</label>
+    <div class="image-upload-row">
+        <input type="file" id="editAdditionalImagesFiles" accept="image/*" multiple style="display:none;" />
+        <button type="button" class="upload-img-btn" id="editUploadAdditionalImgsBtn" style="width:100%; justify-content:center;">
+            <i class="fas fa-images"></i> Upload Additional Images
+        </button>
+    </div>
+    <div class="image-previews" id="editAdditionalImagesPreviewContainer"></div>
+    <textarea id="editAdditionalImages" placeholder="URLs will appear here after upload..." style="margin-top:6px;"></textarea>
+</div>
+</div>
+
+<!-- ✅ NEW: Product Type (Edit) -->
+<div class="field field-full">
+    <label>Product Type *</label>
+    <div class="product-type-toggle">
+        <label class="pt-option">
+            <input type="radio" name="editProductType" value="digital" checked />
+            <span class="pt-content">
+                <i class="fas fa-download"></i>
+                <span class="pt-title">Digital</span>
+                <span class="pt-sub">Game codes, top-ups, accounts</span>
+            </span>
+        </label>
+        <label class="pt-option">
+            <input type="radio" name="editProductType" value="physical" />
+            <span class="pt-content">
+                <i class="fas fa-box"></i>
+                <span class="pt-title">Physical</span>
+                <span class="pt-sub">Clothing, accessories</span>
+            </span>
+        </label>
+    </div>
+</div>
+
+<div class="field field-full" id="editRequiresShippingField" style="display:none;">
+    <label class="check-label">
+        <input type="checkbox" id="editRequiresShipping" checked />
+        <span>Requires shipping address from customer</span>
+    </label>
+</div>
+
+<div class="field field-full">
+    <label class="check-label">
+        <input type="checkbox" id="editHasVariants" />
+        <span>This product has variants (Color, Size, etc.)</span>
+    </label>
+</div>
+
+<div class="field field-full" id="editVariantEditorContainer" style="display:none;">
+    <div class="variant-editor">
+        <div class="variant-editor-header">
+            <h4><i class="fas fa-layer-group"></i> Variant Options</h4>
+            <p>Add options like "Color", "Size", then their values. Each combination becomes a row below.</p>
+        </div>
+
+        <div class="variant-option-add-row">
+            <input type="text" id="editNewOptionInput" placeholder="Option name (e.g. Color)" />
+            <button type="button" class="variant-add-btn" id="editNewOptionBtn">
+                <i class="fas fa-plus"></i> Add Option
+            </button>
+        </div>
+
+        <div id="editVariantOptionList" class="variant-option-list"></div>
+
+        <div class="variant-table-wrap">
+            <div class="variant-table-header">
+                <h4><i class="fas fa-th"></i> Variant Combinations</h4>
+                <span id="editVariantCount" class="variant-count">0 variants</span>
+            </div>
+            <div id="editVariantTable" class="variant-table"></div>
+        </div>
+    </div>
+</div>
+
+                <div class="edit-actions">
+                    <button type="button" class="cancel-btn" id="editCancel">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+                <input type="hidden" id="editId" />
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== DELETE MODAL ===== -->
+    <div class="delete-overlay" id="deleteOverlay">
+        <div class="delete-panel">
+            <div class="icon" style="font-size:48px; color:#ff6b6b; margin-bottom:12px;"><i class="fas fa-trash-alt"></i></div>
+            <h2>Confirm Deletion</h2>
+            <p style="color:#8aa1c0; font-size:15px; margin-bottom:24px;">Are you sure you want to delete this game? This action cannot be undone.</p>
+            <div class="delete-actions">
+                <button class="cancel-delete" id="deleteCancel">Cancel</button>
+                <button class="confirm-delete" id="deleteConfirm"><i class="fas fa-trash"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CHECKOUT MODAL (UPDATED WITH PAYMENT METHOD) ===== -->
+    <div class="checkout-overlay" id="checkoutOverlay">
+        <div class="checkout-panel">
+            <h2><i class="fas fa-shopping-bag"></i> Complete Order</h2>
+            <p class="sub">Please fill in your details to place the order.</p>
+            <form class="checkout-form" id="checkoutForm">
+                <div class="field"><label for="checkoutPhone">Phone Number *</label><input type="tel" id="checkoutPhone" required placeholder="012-3456789" /></div>
+                <div id="gameIdFields"></div>
+
+                <!-- ✅ SHIPPING FORM (auto-shown if cart has physical items) -->
+                <div class="field" id="shippingFormContainer" style="display:none;">
+                    <label style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <i class="fas fa-shipping-fast" style="color:#f7d875;"></i>
+                        Delivery Address <span style="color:#ff6b6b;">*</span>
+                    </label>
+                    <div class="shipping-form-box">
+                        <div class="field">
+                            <label for="shippingName">Full Name *</label>
+                            <input type="text" id="shippingName" placeholder="Recipient name" />
+                        </div>
+                        <div class="field">
+                            <label for="shippingPhone">Phone *</label>
+                            <input type="tel" id="shippingPhone" placeholder="012-3456789" />
+                        </div>
+                        <div class="field">
+                            <label for="shippingAddress">Full Address *</label>
+                            <textarea id="shippingAddress" rows="2" placeholder="Street, building, unit #"></textarea>
+                        </div>
+                        <div class="shipping-grid-3">
+                            <div class="field">
+                                <label for="shippingCity">City *</label>
+                                <input type="text" id="shippingCity" placeholder="City" />
+                            </div>
+                            <div class="field">
+                                <label for="shippingState">State *</label>
+                                <input type="text" id="shippingState" placeholder="State" />
+                            </div>
+                            <div class="field">
+                                <label for="shippingPostcode">Postcode *</label>
+                                <input type="text" id="shippingPostcode" placeholder="50000" />
+                            </div>
+                        </div>
+                        <div class="shipping-note">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>
+                                <strong style="color:#f7d875;">Pre-Order Basis:</strong>
+                                Physical items are shipped on the <strong>13th of every month</strong>.
+                                Orders placed before the 13th ship same month; after the 13th ship next month.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field"><label for="checkoutEmail">Email Address *</label><input type="email" id="checkoutEmail" required placeholder="you@example.com" /><span class="hint">We'll send order confirmation and payment instructions to this email.</span></div>
+                <div class="field">
+                    <label for="promoCode">Promo Code</label>
+                    <div class="promo-group">
+                        <input type="text" id="promoCode" placeholder="Enter promo code" autocomplete="off" />
+                        <button type="button" class="apply-promo-btn" id="applyPromoBtn">
+                            <i class="fas fa-tag"></i> Apply
+                        </button>
+                    </div>
+                    <div id="promoFeedback" class="promo-feedback"></div>
+                </div>
+
+                <!-- ===== LOYALTY POINTS REDEMPTION ===== -->
+<div class="field" id="pointsRedemptionSection" style="display:none;">
+    <label>
+        <i class="fas fa-coins" style="color:#f7d875;"></i> Use Your Points
+    </label>
+    <div style="background:#0b0e14; border:1px solid #1e2a3a; border-radius:14px; padding:14px 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px;">
+            <span style="color:#8aa1c0;">Available Balance:</span>
+            <span style="color:#f7d875; font-weight:700; font-size:15px;">
+                <span id="availablePointsDisplay">0</span> Points
+                <span style="color:#6a7f9e; font-size:12px; font-weight:400;">(= RM<span id="availablePointsValue">0.00</span>)</span>
+            </span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <input type="number" id="pointsToUseInput" min="0" step="1" value="0" placeholder="0" 
+                style="flex:1; background:#121821; border:1px solid #2a3a52; border-radius:10px; padding:10px 14px; color:#e8edf5; font-family:'Inter',sans-serif; font-size:14px; font-weight:600;" />
+            <button type="button" id="useMaxPointsBtn" 
+                style="background:#2a3a52; border:1px solid #3d5a7a; color:#b0c8e0; padding:10px 16px; border-radius:10px; font-weight:600; font-size:12px; cursor:pointer; font-family:'Inter',sans-serif; white-space:nowrap;">
+                Use Max
+            </button>
+        </div>
+        <div id="pointsFeedback" style="font-size:12px; margin-top:8px; min-height:16px; color:#8aa1c0;"></div>
+    </div>
+</div>
+
+                <!-- ===== PAYMENT METHOD SELECTOR (NEW) ===== -->
+                <div class="field payment-method-section">
+                    <label>Payment Method <span style="color:#ff6b6b;">*</span></label>
+                    <div class="pm-options" id="paymentMethodOptions">
+                        <label class="payment-method-option" data-method="mae">
+                            <input type="radio" name="paymentMethod" value="mae" />
+                            <span class="pm-check"><i class="fas fa-check"></i></span>
+                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHOYpS3G_bIUHBJNp_xKD1_7NxSF3J66qxMX1VzWrq5g&s=10" alt="MAE" />
+                            <span class="pm-name">MAE</span>
+                        </label>
+                        <label class="payment-method-option" data-method="tng">
+                            <input type="radio" name="paymentMethod" value="tng" />
+                            <span class="pm-check"><i class="fas fa-check"></i></span>
+                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPQhtet5iK5zwJYL00UIrGJUvz3_NlK4y5urak093NHg&s=10" alt="Touch 'n Go" />
+                            <span class="pm-name">TNG</span>
+                        </label>
+                        <label class="payment-method-option" data-method="shopee">
+                            <input type="radio" name="paymentMethod" value="shopee" />
+                            <span class="pm-check"><i class="fas fa-check"></i></span>
+                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" />
+                            <span class="pm-name">ShopeePay</span>
+                        </label>
+                    </div>
+                    <div id="paymentMethodError" style="color:#ff6b6b; font-size:13px; margin-top:6px; min-height:18px;"></div>
+                </div>
+
+                <div class="order-summary" id="checkoutSummary"></div>
+                <div id="checkoutError" class="checkout-error"></div>
+                <div class="checkout-actions">
+                    <button type="button" class="cancel-btn" id="checkoutCancel">Cancel</button>
+                    <button type="submit" class="place-order-btn"><i class="fas fa-check"></i> Place Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== CHANGE PASSWORD MODAL ===== -->
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h2><i class="fas fa-key"></i> Change Password</h2>
+                <button class="close-pwd" id="passwordClose"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="sub">Enter your current password and set a new one.</p>
+            <form class="password-form" id="passwordForm">
+                <div class="field">
+                    <label for="currentPwd">Current Password *</label>
+                    <input type="password" id="currentPwd" required placeholder="Enter current password" />
+                </div>
+                <div class="field">
+                    <label for="newPwd">New Password *</label>
+                    <input type="password" id="newPwd" required placeholder="Min 6 characters" />
+                </div>
+                <div class="field">
+                    <label for="confirmPwd">Confirm New Password *</label>
+                    <input type="password" id="confirmPwd" required placeholder="Confirm new password" />
+                </div>
+                <div id="pwdError" class="pwd-error"></div>
+                <div class="pwd-actions">
+                    <button type="button" class="pwd-cancel" id="passwordCancel">Cancel</button>
+                    <button type="submit" class="pwd-submit"><i class="fas fa-save"></i> Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== CART SIDEBAR ===== -->
+    <div class="cart-overlay" id="cartOverlay">
+        <div class="cart-panel">
+            <div class="cart-header"><h2><i class="fas fa-shopping-cart"></i> Your Cart</h2><button class="cart-close" id="cartClose"><i class="fas fa-times"></i></button></div>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="cart-footer">
+                <div class="total"><span>Total</span><span class="amount" id="cartTotal">RM 0.00</span></div>
+                <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONFIRMATION MODAL ===== -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-panel">
+            <div class="icon" id="confirmIcon"><i class="fas fa-check-circle"></i></div>
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="actions">
+                <button class="confirm-cancel" id="confirmCancel">Cancel</button>
+                <button class="confirm-approve" id="confirmApprove">Approve</button>
+                <button class="confirm-reject" id="confirmReject" style="display:none;">Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== QR PAYMENT MODAL (NEW) ===== -->
+    <div class="qr-overlay" id="qrOverlay">
+        <div class="qr-panel">
+            <div class="qr-success-icon"><i class="fas fa-check"></i></div>
+            <h2>Order Placed!</h2>
+            <p class="qr-sub">Complete your payment to process the order</p>
+
+            <div class="qr-order-info">
+                <div class="row"><span class="label">Order ID</span><span class="value" id="qrOrderId">-</span></div>
+                <div class="row"><span class="label">Payment Method</span><span class="value" id="qrMethod">-</span></div>
+                <div class="row"><span class="label">Amount</span><span class="value big" id="qrAmount">RM 0.00</span></div>
+            </div>
+
+            <div class="qr-display" id="qrDisplay">
+                <div class="qr-loading"><i class="fas fa-spinner fa-spin"></i><br />Loading QR code...</div>
+            </div>
+
+            <div class="qr-instructions" id="qrInstructions">
+                <strong>How to pay:</strong><br />
+                1. Open your <span id="qrInstructionsMethod">payment app</span><br />
+                2. Scan the QR code above<br />
+                3. Pay the exact amount shown
+            </div>
+
+            <div class="receipt-upload-section" id="receiptUploadSection">
+                <h4><i class="fas fa-receipt"></i> Upload Payment Receipt</h4>
+                <label class="upload-area" id="uploadArea" for="receiptFileInput">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span class="upload-text">Tap to upload receipt</span>
+                    <span class="upload-hint">Choose from your photo library (JPG, PNG, PDF)</span>
+                    <input type="file" id="receiptFileInput" accept="image/*,application/pdf" />
+                </label>
+                <div class="receipt-preview" id="receiptPreview">
+                    <img id="receiptPreviewImg" src="" alt="Receipt preview" />
+                    <span class="preview-name" id="receiptPreviewName"></span>
+                </div>
+                <div class="receipt-actions" id="receiptActions">
+                    <button type="button" class="btn-upload" id="receiptUploadBtn" disabled>
+                        <i class="fas fa-upload"></i> Submit Receipt
+                    </button>
+                </div>
+                <div class="receipt-success" id="receiptSuccess">
+                    <i class="fas fa-check-circle"></i>
+                    <h4>Receipt Submitted!</h4>
+                    <p style="font-size:12px; color:#8aa1c0; margin-top:4px;">Your receipt number:</p>
+                    <span class="receipt-num" id="receiptNumberDisplay">RCT-XXXXXXXX-XXXX</span>
+                    <p style="font-size:12px; color:#6a7f9e; margin-top:10px;">Admin will verify and process your order shortly.</p>
+                </div>
+                
+                <!-- ✅ THE NEW DONE BUTTON (Place it here) -->
+                <button type="button" id="qrDoneBtn">
+                    <i class="fas fa-check"></i> Done, Close Window
+                </button>
+                
+            </div>
+        </div>
+    </div>
+
+        <!-- ===== IMAGE CROP MODAL (Admin) ===== -->
+    <div class="crop-overlay" id="cropOverlay">
+        <div class="crop-panel">
+            <div class="crop-panel-header">
+                <div>
+                    <h2><i class="fas fa-crop-alt"></i> Crop Image</h2>
+                    <p class="crop-panel-sub">Drag the box to choose what customers will see on the product card.</p>
+                </div>
+                <button type="button" class="crop-close" id="cropClose"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="crop-ratio-tabs" id="cropRatioTabs">
+                <button type="button" class="ratio-btn active" data-ratio="1.7777"><i class="fas fa-16-9"></i> 16:9 (Card)</button>
+                <button type="button" class="ratio-btn" data-ratio="1"><i class="fas fa-square"></i> 1:1 (Square)</button>
+                <button type="button" class="ratio-btn" data-ratio="0.75"><i class="fas fa-portrait"></i> 3:4 (Portrait)</button>
+                <button type="button" class="ratio-btn" data-ratio="NaN"><i class="fas fa-expand"></i> Free</button>
+            </div>
+
+            <div class="crop-stage">
+                <img id="cropImage" src="" alt="To crop" />
+            </div>
+
+            <div class="crop-controls">
+                <button type="button" class="crop-tool-btn" id="cropZoomIn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                <button type="button" class="crop-tool-btn" id="cropZoomOut" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                <button type="button" class="crop-tool-btn" id="cropRotate" title="Rotate 90°"><i class="fas fa-redo-alt"></i></button>
+                <button type="button" class="crop-tool-btn" id="cropFlipH" title="Flip Horizontal"><i class="fas fa-arrows-alt-h"></i></button>
+                <button type="button" class="crop-tool-btn" id="cropFlipV" title="Flip Vertical"><i class="fas fa-arrows-alt-v"></i></button>
+                <button type="button" class="crop-tool-btn" id="cropReset" title="Reset"><i class="fas fa-undo"></i></button>
+            </div>
+
+            <div class="crop-actions">
+                <button type="button" class="crop-cancel-btn" id="cropCancel">Cancel</button>
+                <button type="button" class="crop-save-btn" id="cropSave">
+                    <i class="fas fa-check"></i> Crop & Upload
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CUSTOMER CHAT WIDGET ===== -->
+<button class="chat-fab" id="chatFab" title="Chat with us">
+  <i class="fas fa-comments"></i>
+  <span class="chat-fab-badge" id="chatFabBadge" style="display:none;">0</span>
+</button>
+
+<div class="chat-panel-overlay" id="chatPanelOverlay">
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div>
+        <h3><i class="fas fa-headset"></i> Customer Support</h3>
+        <p>We usually reply within 1–2 hours</p>
+      </div>
+      <button class="chat-close" id="chatClose"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="chat-identity" id="chatIdentity">
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="chatGuestName" placeholder="Your name" />
+      </div>
+      <div class="field">
+        <label>Your Email</label>
+        <input type="email" id="chatGuestEmail" placeholder="you@example.com" />
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-empty">👋 Hi! Send us a message — we'll reply soon.</div>
+    </div>
+
+    <div class="chat-image-preview" id="chatImagePreview" style="display:none;">
+      <img id="chatPreviewImg" src="" alt="preview" />
+      <button type="button" id="chatRemoveImg"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="chat-input-area">
+      <button type="button" class="chat-attach-btn" id="chatAttachBtn" title="Attach image">
+        <i class="fas fa-image"></i>
+      </button>
+      <input type="file" id="chatImageInput" accept="image/*" style="display:none;" />
+      <textarea id="chatInput" placeholder="Type your message..." rows="1"></textarea>
+      <button type="button" class="chat-send-btn" id="chatSendBtn" title="Send">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+// ================================================================
+// 💬 CUSTOMER CHAT WIDGET
+// ================================================================
+var chatIsOpen = false;
+var chatPollTimer = null;
+var chatPendingImage = null;
+var chatLastUnreadCheck = 0;
+
+function chatGetIdentity() {
+  if (customer && customer.email) {
+    return { email: customer.email, name: customer.name || customer.email.split('@')[0] };
+  }
+  const saved = sessionStorage.getItem('nex4up_chat_guest');
+  if (saved) {
+    try { const g = JSON.parse(saved); if (g.email) return g; } catch (e) {}
+  }
+  return null;
+}
+
+function chatSaveGuestIdentity(name, email) {
+  sessionStorage.setItem('nex4up_chat_guest', JSON.stringify({ name, email }));
+}
+
+function openChatWidget() {
+  chatIsOpen = true;
+  document.getElementById('chatPanelOverlay').classList.add('open');
+  renderChatIdentity();
+  loadChatMessages();
+  chatPollTimer = setInterval(pollChatMessages, 20000);
+  updateChatBadge(0);
+}
+
+function closeChatWidget() {
+  chatIsOpen = false;
+  document.getElementById('chatPanelOverlay').classList.remove('open');
+  if (chatPollTimer) { clearInterval(chatPollTimer); chatPollTimer = null; }
+}
+
+function renderChatIdentity() {
+  const idEl = document.getElementById('chatIdentity');
+  const identity = chatGetIdentity();
+  if (identity) {
+    idEl.style.display = 'none';
+  } else {
+    idEl.style.display = 'block';
+    // Prefill if guest identity partially exists
+    const nameEl = document.getElementById('chatGuestName');
+    const emailEl = document.getElementById('chatGuestEmail');
+    if (nameEl && !nameEl.value) {
+      try {
+        const saved = sessionStorage.getItem('nex4up_chat_guest');
+        if (saved) { const g = JSON.parse(saved); nameEl.value = g.name || ''; emailEl.value = g.email || ''; }
+      } catch (e) {}
+    }
+  }
+}
+
+function loadChatMessages() {
+  const identity = chatGetIdentity();
+  if (!identity) return;
+
+  google.script.run
+    .withSuccessHandler(function(msgs) {
+      renderChatMessages(msgs || []);
+      // Mark admin messages as read by customer
+      google.script.run
+        .withSuccessHandler(function() { updateChatBadge(0); })
+        .markMessagesRead(identity.email, 'customer');
+      // Scroll to bottom
+      const container = document.getElementById('chatMessages');
+      container.scrollTop = container.scrollHeight;
+    })
+    .withFailureHandler(function(err) {
+      console.error('loadChatMessages:', err);
+    })
+    .getMessages(identity.email);
+}
+
+function pollChatMessages() {
+  if (!chatIsOpen) return;
+  const identity = chatGetIdentity();
+  if (!identity) return;
+  google.script.run
+    .withSuccessHandler(function(msgs) {
+      renderChatMessages(msgs || []);
+      const container = document.getElementById('chatMessages');
+      const wasAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 80;
+      if (wasAtBottom) container.scrollTop = container.scrollHeight;
+    })
+    .getMessages(identity.email);
+}
+
+function escapeChatHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderChatMessages(msgs) {
+  const container = document.getElementById('chatMessages');
+  if (!msgs || msgs.length === 0) {
+    container.innerHTML = '<div class="chat-empty">👋 Hi! Send us a message — we\'ll reply soon.</div>';
+    return;
+  }
+  let html = '';
+  msgs.forEach(function(m) {
+    const isMine = m.sender === 'customer';
+    const bubbleClass = isMine ? 'mine' : 'theirs';
+    const timeStr = m.date ? String(m.date).split(' ')[1]?.substring(0,5) || '' : '';
+    html += '<div class="chat-bubble ' + bubbleClass + '">';
+    if (m.message) html += '<div>' + escapeChatHtml(m.message) + '</div>';
+    if (m.imageUrl) {
+      html += '<img src="' + escapeChatHtml(m.imageUrl) + '" alt="image" onclick="window.open(this.src, \'_blank\')" />';
+    }
+    html += '<span class="chat-time">' + escapeChatHtml(timeStr) + '</span>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function updateChatBadge(count) {
+  const badge = document.getElementById('chatFabBadge');
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : count;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function checkChatUnread() {
+  const identity = chatGetIdentity();
+  if (!identity) return;
+  google.script.run
+    .withSuccessHandler(function(n) { updateChatBadge(n || 0); })
+    .getCustomerUnreadCount(identity.email);
+}
+
+function sendChatMessage() {
+  const identity = chatGetIdentity();
+  if (!identity) {
+    // Try to capture guest identity from inputs
+    const nameVal = document.getElementById('chatGuestName').value.trim();
+    const emailVal = document.getElementById('chatGuestEmail').value.trim();
+    if (!nameVal || !emailVal) {
+      showToast('Please enter your name and email first.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      showToast('Please enter a valid email.');
+      return;
+    }
+    chatSaveGuestIdentity(nameVal, emailVal);
+    renderChatIdentity();
+    // retry sending now that identity is saved
+    setTimeout(sendChatMessage, 100);
+    return;
+  }
+
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  const imageData = chatPendingImage;
+
+  if (!text && !imageData) { showToast('Type a message or attach a photo.'); return; }
+
+  const btn = document.getElementById('chatSendBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+  // Optimistic clear
+  input.value = '';
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+      if (res && res.success) {
+        chatPendingImage = null;
+        document.getElementById('chatImagePreview').style.display = 'none';
+        document.getElementById('chatPreviewImg').src = '';
+        loadChatMessages();
+      } else {
+        showToast((res && res.message) || 'Failed to send.');
+      }
+    })
+    .withFailureHandler(function(err) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+      showToast('Send error: ' + err.message);
+    })
+    .sendMessage(identity.email, identity.name, text, imageData);
+}
+
+function handleChatImageSelect(file) {
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5 MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    chatPendingImage = ev.target.result;
+    document.getElementById('chatPreviewImg').src = ev.target.result;
+    document.getElementById('chatImagePreview').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+(function setupChatWidget() {
+  const fab = document.getElementById('chatFab');
+  if (!fab) return;
+  fab.addEventListener('click', openChatWidget);
+  document.getElementById('chatClose').addEventListener('click', closeChatWidget);
+  document.getElementById('chatPanelOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeChatWidget();
+  });
+  document.getElementById('chatSendBtn').addEventListener('click', sendChatMessage);
+  document.getElementById('chatInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+  });
+  document.getElementById('chatAttachBtn').addEventListener('click', function() {
+    document.getElementById('chatImageInput').click();
+  });
+  document.getElementById('chatImageInput').addEventListener('change', function() {
+    if (this.files && this.files[0]) handleChatImageSelect(this.files[0]);
+    this.value = '';
+  });
+  document.getElementById('chatRemoveImg').addEventListener('click', function() {
+    chatPendingImage = null;
+    document.getElementById('chatImagePreview').style.display = 'none';
+    document.getElementById('chatPreviewImg').src = '';
+  });
+  // Poll unread every 60 seconds when logged in
+  setInterval(function() {
+    if (!chatIsOpen && customer) checkChatUnread();
+  }, 60000);
+  // Initial unread check
+  if (customer) setTimeout(checkChatUnread, 2000);
+})();
+
+// ================================================================
+// 💬 ADMIN INBOX
+// ================================================================
+var inboxCurrentEmail = null;
+var inboxPollTimer = null;
+var inboxPendingImage = null;
+var inboxConversations = [];
+
+function loadInboxConversations() {
+  if (!isAdmin) return;
+  const list = document.getElementById('inboxConversations');
+  list.innerHTML = '<div class="inbox-empty">Loading conversations...</div>';
+
+  google.script.run
+    .withSuccessHandler(function(convs) {
+      inboxConversations = convs || [];
+      renderInboxConversations(inboxConversations);
+    })
+    .withFailureHandler(function(err) {
+      list.innerHTML = '<div class="inbox-empty" style="color:#ff6b6b;">Error: ' + err.message + '</div>';
+    })
+    .getAllConversations();
+}
+
+function renderInboxConversations(convs) {
+  const list = document.getElementById('inboxConversations');
+  if (!convs || convs.length === 0) {
+    list.innerHTML = '<div class="inbox-empty">No conversations yet.</div>';
+    return;
+  }
+  let html = '';
+  convs.forEach(function(c) {
+    const initial = (c.name || c.email || '?').charAt(0).toUpperCase();
+    const timeStr = c.lastDate ? c.lastDate.split(' ')[1]?.substring(0,5) || '' : '';
+    const preview = c.lastSender === 'admin' ? 'You: ' + (c.lastMessage || '[Image]') : (c.lastMessage || '[Image]');
+    const activeClass = inboxCurrentEmail === c.email ? 'active' : '';
+    html += '<div class="inbox-conv ' + activeClass + '" data-email="' + escapeChatHtml(c.email) + '">';
+    html += '<div class="conv-avatar">' + initial + '</div>';
+    html += '<div class="conv-body">';
+    html += '<div class="conv-name">' + escapeChatHtml(c.name || c.email) + '</div>';
+    html += '<div class="conv-preview">' + escapeChatHtml(preview.substring(0, 40)) + '</div>';
+    html += '</div>';
+    html += '<div class="conv-meta">';
+    html += '<span class="conv-time">' + escapeChatHtml(timeStr) + '</span>';
+    if (c.unread > 0) html += '<span class="conv-badge">' + c.unread + '</span>';
+    html += '</div></div>';
+  });
+  list.innerHTML = html;
+
+  list.querySelectorAll('.inbox-conv').forEach(function(el) {
+    el.addEventListener('click', function() {
+      openInboxConversation(this.dataset.email);
+    });
+  });
+}
+
+function openInboxConversation(email) {
+  inboxCurrentEmail = email;
+  // Mark all customer messages from this conversation as read by admin
+  google.script.run.withSuccessHandler(function() {
+    loadInboxConversations();
+    refreshAdminUnreadBadge();
+  }).markMessagesRead(email, 'admin');
+
+  const header = document.getElementById('inboxChatHeader');
+  const conv = inboxConversations.find(c => c.email === email);
+  const displayName = conv ? (conv.name || conv.email) : email;
+  header.innerHTML = '<div><h4>' + escapeChatHtml(displayName) + '</h4><small>' + escapeChatHtml(email) + '</small></div>';
+
+  document.getElementById('inboxReplyInput').disabled = false;
+  document.getElementById('inboxSendBtn').disabled = false;
+
+  loadInboxMessages();
+  if (inboxPollTimer) clearInterval(inboxPollTimer);
+  inboxPollTimer = setInterval(loadInboxMessages, 20000);
+}
+
+function loadInboxMessages() {
+  if (!inboxCurrentEmail) return;
+  google.script.run
+    .withSuccessHandler(function(msgs) {
+      renderInboxChat(msgs || []);
+    })
+    .getMessages(inboxCurrentEmail);
+}
+
+function renderInboxChat(msgs) {
+  const body = document.getElementById('inboxChatBody');
+  if (!msgs || msgs.length === 0) {
+    body.innerHTML = '<div class="chat-empty">No messages yet.</div>';
+    return;
+  }
+  let html = '';
+  msgs.forEach(function(m) {
+    const isMine = m.sender === 'admin';
+    const bubbleClass = isMine ? 'mine' : 'theirs';
+    const timeStr = m.date ? String(m.date).split(' ')[1]?.substring(0,5) || '' : '';
+    html += '<div class="chat-bubble ' + bubbleClass + '">';
+    if (m.message) html += '<div>' + escapeChatHtml(m.message) + '</div>';
+    if (m.imageUrl) {
+      html += '<img src="' + escapeChatHtml(m.imageUrl) + '" alt="image" onclick="window.open(this.src, \'_blank\')" />';
+    }
+    html += '<span class="chat-time">' + escapeChatHtml(timeStr) + '</span>';
+    html += '</div>';
+  });
+  body.innerHTML = html;
+  body.scrollTop = body.scrollHeight;
+}
+
+function sendInboxReply() {
+  if (!inboxCurrentEmail) return;
+  const input = document.getElementById('inboxReplyInput');
+  const text = input.value.trim();
+  const imageData = inboxPendingImage;
+  if (!text && !imageData) { showToast('Type a reply or attach an image.'); return; }
+
+  const btn = document.getElementById('inboxSendBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  input.value = '';
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+      if (res && res.success) {
+        inboxPendingImage = null;
+        document.getElementById('inboxPreviewStrip').classList.remove('show');
+        document.getElementById('inboxPreviewImg').src = '';
+        loadInboxMessages();
+        loadInboxConversations();
+      } else {
+        showToast((res && res.message) || 'Failed to send reply.');
+      }
+    })
+    .withFailureHandler(function(err) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+      showToast('Send error: ' + err.message);
+    })
+    .adminSendMessage(inboxCurrentEmail, text, imageData);
+}
+
+function refreshAdminUnreadBadge() {
+  if (!isAdmin) return;
+  google.script.run
+    .withSuccessHandler(function(n) {
+      const badge = document.getElementById('adminInboxBadge');
+      if (!badge) return;
+      if (n > 0) { badge.textContent = n > 99 ? '99+' : n; badge.style.display = 'inline-block'; }
+      else { badge.style.display = 'none'; }
+    })
+    .getAdminUnreadCount();
+}
+
+(function setupAdminInbox() {
+  const refreshBtn = document.getElementById('refreshInboxBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function() {
+      loadInboxConversations();
+      refreshAdminUnreadBadge();
+    });
+  }
+
+  const sendBtn = document.getElementById('inboxSendBtn');
+  const replyInput = document.getElementById('inboxReplyInput');
+  const attachBtn = document.getElementById('inboxAttachBtn');
+  const imgInput = document.getElementById('inboxImageInput');
+  const removeImg = document.getElementById('inboxRemoveImg');
+
+  if (sendBtn) sendBtn.addEventListener('click', sendInboxReply);
+  if (replyInput) {
+    replyInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendInboxReply(); }
+    });
+  }
+  if (attachBtn) attachBtn.addEventListener('click', function() { imgInput.click(); });
+  if (imgInput) imgInput.addEventListener('change', function() {
+    const file = this.files && this.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5 MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      inboxPendingImage = ev.target.result;
+      document.getElementById('inboxPreviewImg').src = ev.target.result;
+      document.getElementById('inboxPreviewStrip').classList.add('show');
+    };
+    reader.readAsDataURL(file);
+    this.value = '';
+  });
+  if (removeImg) removeImg.addEventListener('click', function() {
+    inboxPendingImage = null;
+    document.getElementById('inboxPreviewStrip').classList.remove('show');
+    document.getElementById('inboxPreviewImg').src = '';
+  });
+
+  // Refresh badge every 60 seconds when admin is active
+  setInterval(function() {
+    if (isAdmin) refreshAdminUnreadBadge();
+  }, 60000);
+})();    
+
+        // ================================================================
         // ✅ FOOTER: YEAR + POLICY MODAL SYSTEM
         // ================================================================
         (function setFooterYear() {
