@@ -9915,22 +9915,6 @@ checkoutBtn.addEventListener('click', function() {
             }
         }
 
-            if (isAdmin) {
-                var el7 = document.getElementById('dropdownAdminPanel');
-                if (el7) el7.addEventListener('click', function() {
-                    sidebar.classList.add('visible');
-                    showAdminView();
-                    showAdminSection('add-item');
-                    closeProfileDropdown();
-                });
-                var el8 = document.getElementById('dropdownLogoutAdmin');
-                if (el8) el8.addEventListener('click', function() {
-                    logoutAdmin();
-                    closeProfileDropdown();
-                });
-            }
-        }
-
         function closeProfileDropdown() {
             profileDropdownContent.classList.remove('open');
         }
