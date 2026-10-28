@@ -6748,7 +6748,7 @@
                     </div>
                 </div>
 
-                                <!-- ===== INBOX ===== -->
+                 <!-- ===== INBOX ===== -->
                 <div class="admin-section" id="section-inbox">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
                         <h2><i class="fas fa-inbox"></i> Customer Inbox</h2>
@@ -6756,6 +6756,16 @@
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                     </div>
+
+                    <!-- ✅ NEW: Inbox Search Bar -->
+                    <div class="product-toolbar" style="grid-template-columns: 1fr; margin-bottom: 16px;">
+                        <div class="toolbar-search" id="inboxSearchWrapper" style="width: 100%;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="inboxSearchInput" placeholder="Search by name/email, or type an email to start a new chat..." autocomplete="off" />
+                            <button type="button" id="inboxSearchClear" title="Clear"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    
                     <div class="inbox-layout">
                         <div class="inbox-list" id="inboxConversations">
                             <div class="inbox-empty">Loading conversations...</div>
@@ -14235,7 +14245,9 @@ function resetVariantEditor(ctx) {
         var inboxCurrentEmail = null;
         var inboxPollTimer = null;
         var inboxPendingImage = null;
-        var inboxConversations = [];
+        var inboxConversations = [];      // Filtered list
+        var inboxAllConversations = [];   // Raw list from server
+        var inboxSearchQuery = '';
 
         function loadInboxConversations() {
             if (!isAdmin) return;
@@ -14244,8 +14256,8 @@ function resetVariantEditor(ctx) {
 
             google.script.run
                 .withSuccessHandler(function(convs) {
-                    inboxConversations = convs || [];
-                    renderInboxConversations(inboxConversations);
+                    inboxAllConversations = convs || [];
+                    filterAndRenderInbox();
                 })
                 .withFailureHandler(function(err) {
                     list.innerHTML = '<div class="inbox-empty" style="color:#ff6b6b;">Error: ' + err.message + '</div>';
@@ -14253,29 +14265,67 @@ function resetVariantEditor(ctx) {
                 .getAllConversations();
         }
 
-        function renderInboxConversations(convs) {
+                function filterAndRenderInbox() {
+            var q = inboxSearchQuery.trim().toLowerCase();
+            var filtered = inboxAllConversations.slice(0);
+
+            if (q) {
+                filtered = filtered.filter(function(c) {
+                    var name = (c.name || '').toLowerCase();
+                    var email = (c.email || '').toLowerCase();
+                    return name.indexOf(q) !== -1 || email.indexOf(q) !== -1;
+                });
+            }
+
+            // Check if we should show "Start new chat" option
+            var showNewChat = false;
+            var newChatEmail = '';
+            if (q && q.indexOf('@') !== -1 && filtered.length === 0) {
+                showNewChat = true;
+                newChatEmail = inboxSearchQuery.trim();
+            }
+
+            renderInboxConversations(filtered, showNewChat, newChatEmail);
+        }
+
+         function renderInboxConversations(convs, showNewChat, newChatEmail) {
             var list = document.getElementById('inboxConversations');
-            if (!convs || convs.length === 0) {
-                list.innerHTML = '<div class="inbox-empty">No conversations yet.</div>';
+            if ((!convs || convs.length === 0) && !showNewChat) {
+                list.innerHTML = '<div class="inbox-empty">No conversations found.</div>';
                 return;
             }
+            
             var html = '';
-            convs.forEach(function(c) {
-                var initial = (c.name || c.email || '?').charAt(0).toUpperCase();
-                var timeStr = c.lastDate ? c.lastDate.split(' ')[1]?.substring(0,5) || '' : '';
-                var preview = c.lastSender === 'admin' ? 'You: ' + (c.lastMessage || '[Image]') : (c.lastMessage || '[Image]');
-                var activeClass = inboxCurrentEmail === c.email ? 'active' : '';
-                html += '<div class="inbox-conv ' + activeClass + '" data-email="' + escapeChatHtml(c.email) + '">';
-                html += '<div class="conv-avatar">' + initial + '</div>';
+            
+            // ✅ Add "Start New Chat" option if user typed a new email
+            if (showNewChat) {
+                html += '<div class="inbox-conv new-chat-conv" data-email="' + escapeChatHtml(newChatEmail) + '">';
+                html += '<div class="conv-avatar" style="background:#4caf50; color:#fff;"><i class="fas fa-plus"></i></div>';
                 html += '<div class="conv-body">';
-                html += '<div class="conv-name">' + escapeChatHtml(c.name || c.email) + '</div>';
-                html += '<div class="conv-preview">' + escapeChatHtml(preview.substring(0, 40)) + '</div>';
-                html += '</div>';
-                html += '<div class="conv-meta">';
-                html += '<span class="conv-time">' + escapeChatHtml(timeStr) + '</span>';
-                if (c.unread > 0) html += '<span class="conv-badge">' + c.unread + '</span>';
+                html += '<div class="conv-name" style="color:#4caf50;">Start new chat</div>';
+                html += '<div class="conv-preview">' + escapeChatHtml(newChatEmail) + '</div>';
                 html += '</div></div>';
-            });
+            }
+
+            if (convs && convs.length > 0) {
+                convs.forEach(function(c) {
+                    var initial = (c.name || c.email || '?').charAt(0).toUpperCase();
+                    var timeStr = c.lastDate ? c.lastDate.split(' ')[1]?.substring(0,5) || '' : '';
+                    var preview = c.lastSender === 'admin' ? 'You: ' + (c.lastMessage || '[Image]') : (c.lastMessage || '[Image]');
+                    var activeClass = inboxCurrentEmail === c.email ? 'active' : '';
+                    
+                    html += '<div class="inbox-conv ' + activeClass + '" data-email="' + escapeChatHtml(c.email) + '">';
+                    html += '<div class="conv-avatar">' + initial + '</div>';
+                    html += '<div class="conv-body">';
+                    html += '<div class="conv-name">' + escapeChatHtml(c.name || c.email) + '</div>';
+                    html += '<div class="conv-preview">' + escapeChatHtml(preview.substring(0, 40)) + '</div>';
+                    html += '</div>';
+                    html += '<div class="conv-meta">';
+                    html += '<span class="conv-time">' + escapeChatHtml(timeStr) + '</span>';
+                    if (c.unread > 0) html += '<span class="conv-badge">' + c.unread + '</span>';
+                    html += '</div></div>';
+                });
+            }
             list.innerHTML = html;
 
             list.querySelectorAll('.inbox-conv').forEach(function(el) {
@@ -14387,6 +14437,39 @@ function resetVariantEditor(ctx) {
                     refreshAdminUnreadBadge();
                 });
             }
+
+            // ✅ NEW: Setup Inbox Search
+            var searchInput = document.getElementById('inboxSearchInput');
+            var clearBtn = document.getElementById('inboxSearchClear');
+            var debounce = null;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounce);
+                    var val = this.value;
+                    var wrapper = document.getElementById('inboxSearchWrapper');
+                    
+                    if (val.trim()) wrapper.classList.add('has-value');
+                    else wrapper.classList.remove('has-value');
+
+                    debounce = setTimeout(function() {
+                        inboxSearchQuery = val;
+                        filterAndRenderInbox();
+                    }, 200);
+                });
+            }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    document.getElementById('inboxSearchWrapper').classList.remove('has-value');
+                    inboxSearchQuery = '';
+                    filterAndRenderInbox();
+                    searchInput.focus();
+                });
+            }
+
+            // ... (Keep the existing sendBtn, replyInput, attachBtn, imgInput, removeImg code here) ...
 
             var sendBtn = document.getElementById('inboxSendBtn');
             var replyInput = document.getElementById('inboxReplyInput');
