@@ -9112,7 +9112,7 @@ function updateCheckoutSummary() {
 // ===== LOYALTY POINTS STATE =====
 var customerPointsBalance = 0;
 var pointsToRedeem = 0;
-var POINT_VALUE = 0.10; // 1 point = RM0.01
+var POINT_VALUE = 0.01; // 1 point = RM0.01
 
 function loadCustomerPoints() {
     if (!customer || !customer.email) {
@@ -12015,7 +12015,7 @@ switchToLogin.addEventListener('click', function(e) {
         .withSuccessHandler(function(points) {
             var pointsDisplay = document.getElementById('profilePoints');
             if (pointsDisplay) {
-                pointsDisplay.textContent = points + ' Points (= RM' + (points * 0.10).toFixed(2) + ')';
+            pointsDisplay.textContent = points + ' Points (= RM' + (points * 0.01).toFixed(2) + ')';
             }
         })
         .getCustomerPoints(customer.email);
