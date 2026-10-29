@@ -6637,9 +6637,17 @@
                     <h2 style="margin-bottom:20px;"><i class="fas fa-chart-line"></i> Sales Dashboard</h2>
                     
                     <div class="dashboard-filters" style="align-items: center; gap: 12px; margin-bottom: 24px; background: #121821; padding: 16px; border-radius: 16px; border: 1px solid #1e2a3a;">
-                        <label style="color:#8aa1c0; font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Select Month:</label>
-                        <input type="month" id="dashboardMonthPicker" style="background:#0b0e14; border:1px solid #2a3a52; color:#e8edf5; padding:10px 16px; border-radius:8px; font-family:'Inter'; font-weight:600; outline:none; cursor:pointer; transition:0.2s;" onfocus="this.style.borderColor='#f7d875'" onblur="this.style.borderColor='#2a3a52'" />
-                        <button class="filter-btn" id="refreshDashboardBtn" style="padding:10px 20px; border-radius:8px;"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                        <label style="color:#8aa1c0; font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Filter Sales:</label>
+                        <select id="dashboardTimeFilter" style="background:#0b0e14; border:1px solid #2a3a52; color:#e8edf5; padding:10px 16px; border-radius:8px; font-family:'Inter'; font-weight:600; outline:none; cursor:pointer; transition:0.2s; min-width: 200px;" onfocus="this.style.borderColor='#f7d875'" onblur="this.style.borderColor='#2a3a52'">
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month" selected>This Month</option>
+                            <option value="year">This Year</option>
+                            <option value="all">All Time</option>
+                            <option disabled>──────</option>
+                            <!-- Months will be generated here -->
+                        </select>
+                        <button class="filter-btn" id="refreshDashboardBtn" style="padding:10px 20px; border-radius:8px;"><i class="fas fa-sync-alt"></i> Refresh</button>
                     </div>
 
                     <div class="dashboard-stats" id="dashboardStats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
@@ -11228,11 +11236,11 @@ if (!hasVariants) {
         });
 
         // ================================================================
-        // 22. LOAD DASHBOARD (Advanced Monthly View)
+        // 22. LOAD DASHBOARD (Advanced Filter View)
         // ================================================================
         function loadAdvancedDashboard() {
-            var monthPicker = document.getElementById('dashboardMonthPicker');
-            var monthStr = monthPicker ? monthPicker.value : '';
+            var filterEl = document.getElementById('dashboardTimeFilter');
+            var range = filterEl ? filterEl.value : 'month';
             
             // Skeleton loading
             var statNumbers = document.querySelectorAll('#dashboardStats .stat-number');
@@ -11283,33 +11291,37 @@ if (!hasVariants) {
                 .withFailureHandler(function(err) {
                     document.getElementById('dashboardStats').innerHTML = '<p style="color:#ff6b6b; text-align:center; grid-column:1/-1;">Error loading dashboard data: ' + err.message + '</p>';
                 })
-                .getAdvancedSalesSummary(monthStr);
+                .getAdvancedSalesSummary(range);
         }
 
-        // Initialize Dashboard Month Picker
-        (function setupDashboard() {
-            var picker = document.getElementById('dashboardMonthPicker');
-            if (picker) {
-                var now = new Date();
-                var currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-                picker.value = currentMonth;
+        // ✅ Generate Dropdown Options & Setup Listener
+        (function setupDashboardDropdown() {
+            var picker = document.getElementById('dashboardTimeFilter');
+            if (!picker) return;
+
+            // Generate past 24 months dynamically
+            var now = new Date();
+            for (var i = 0; i < 24; i++) {
+                var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                var y = d.getFullYear();
+                var m = String(d.getMonth() + 1).padStart(2, '0');
+                var val = y + '-' + m;
                 
-                picker.addEventListener('change', loadAdvancedDashboard);
-                var refreshBtn = document.getElementById('refreshDashboardBtn');
-                if (refreshBtn) refreshBtn.addEventListener('click', loadAdvancedDashboard);
+                // Format label like "October 2024"
+                var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                var label = monthNames[d.getMonth()] + ' ' + y;
+                
+                var opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = label;
+                picker.appendChild(opt);
             }
+
+            picker.addEventListener('change', loadAdvancedDashboard);
+            
+            var refreshBtn = document.getElementById('refreshDashboardBtn');
+            if (refreshBtn) refreshBtn.addEventListener('click', loadAdvancedDashboard);
         })();
-
-        refreshOrdersBtn.addEventListener('click', function() {
-            if (isAdmin) { 
-                loadOrders();
-                loadAdvancedDashboard(); 
-            }
-        });
-
-        refreshApprovalBtn.addEventListener('click', function() {
-            if (isAdmin) loadPendingOrders();
-        });
 
         // ================================================================
         // 23. TRACK ORDER MODAL
