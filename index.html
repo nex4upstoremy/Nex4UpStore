@@ -6635,19 +6635,23 @@
                 <!-- Dashboard -->
                 <div class="admin-section" id="section-dashboard">
                     <h2 style="margin-bottom:20px;"><i class="fas fa-chart-line"></i> Sales Dashboard</h2>
-                    <div class="dashboard-filters">
-                        <button class="filter-btn active" data-range="today">Today</button>
-                        <button class="filter-btn" data-range="week">This Week</button>
-                        <button class="filter-btn" data-range="month">This Month</button>
-                        <button class="filter-btn" data-range="all">All Time</button>
+                    
+                    <div class="dashboard-filters" style="align-items: center; gap: 12px; margin-bottom: 24px; background: #121821; padding: 16px; border-radius: 16px; border: 1px solid #1e2a3a;">
+                        <label style="color:#8aa1c0; font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Select Month:</label>
+                        <input type="month" id="dashboardMonthPicker" style="background:#0b0e14; border:1px solid #2a3a52; color:#e8edf5; padding:10px 16px; border-radius:8px; font-family:'Inter'; font-weight:600; outline:none; cursor:pointer; transition:0.2s;" onfocus="this.style.borderColor='#f7d875'" onblur="this.style.borderColor='#2a3a52'" />
+                        <button class="filter-btn" id="refreshDashboardBtn" style="padding:10px 20px; border-radius:8px;"><i class="fas fa-sync-alt"></i> Refresh Data</button>
                     </div>
-                    <div class="dashboard-stats" id="dashboardStats">
-                        <div class="stat-card"><div class="stat-number" id="totalOrders">0</div><div class="stat-label">Total Orders</div></div>
-                        <div class="stat-card"><div class="stat-number" id="totalRevenue">RM 0.00</div><div class="stat-label">Total Revenue</div></div>
-                        <div class="stat-card"><div class="stat-number" id="totalCost">RM 0.00</div><div class="stat-label">Total Cost</div></div>
-                        <div class="stat-card"><div class="stat-number profit" id="totalProfit">RM 0.00</div><div class="stat-label">Profit</div></div>
-                        <div class="stat-card"><div class="stat-number margin" id="totalMargin">0%</div><div class="stat-label">Margin</div></div>
+
+                    <div class="dashboard-stats" id="dashboardStats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div class="stat-card"><div class="stat-number" id="dashTotalOrders">0</div><div class="stat-label">Total Orders</div></div>
+                        <div class="stat-card" style="border-bottom: 3px solid #f7d875;"><div class="stat-number" id="dashGrossRev" style="font-size:24px;">RM 0.00</div><div class="stat-label">Gross Revenue</div></div>
+                        <div class="stat-card" style="border-bottom: 3px solid #ff6b6b;"><div class="stat-number" id="dashPromoDisc" style="color:#ff6b6b; font-size:24px;">- RM 0.00</div><div class="stat-label">Promo Discounts</div></div>
+                        <div class="stat-card" style="border-bottom: 3px solid #ffa726;"><div class="stat-number" id="dashPointsDisc" style="color:#ffa726; font-size:24px;">- RM 0.00</div><div class="stat-label">Points Discounts</div></div>
+                        <div class="stat-card" style="border-bottom: 3px solid #f7d875;"><div class="stat-number" id="dashNetRev" style="color:#f7d875; font-size:24px;">RM 0.00</div><div class="stat-label">Net Revenue</div></div>
+                        <div class="stat-card"><div class="stat-number" id="dashTotalCost" style="font-size:24px;">RM 0.00</div><div class="stat-label">Total Cost</div></div>
+                        <div class="stat-card" style="border-bottom: 3px solid #4caf50; background: rgba(76,175,80,0.05);"><div class="stat-number profit" id="dashNetProfit" style="font-size:24px;">RM 0.00</div><div class="stat-label">Net Profit</div></div>
                     </div>
+
                     <div class="extra-sections">
                         <div class="extra-card" id="lowStockCard">
                             <h3><i class="fas fa-exclamation-triangle" style="color:#ff6b6b;"></i> Low Stock (≤ 5)</h3>
@@ -6658,6 +6662,7 @@
                             <div id="topSellingList"><p style="color:#6a7f9e;">Loading...</p></div>
                         </div>
                     </div>
+                    
                     <div class="status-breakdown">
                         <h3>Orders by Status</h3>
                         <div id="statusBreakdown">
@@ -11223,23 +11228,30 @@ if (!hasVariants) {
         });
 
         // ================================================================
-        // 22. LOAD DASHBOARD
+        // 22. LOAD DASHBOARD (Advanced Monthly View)
         // ================================================================
-        function loadDashboard(range) {
-            currentRange = range;
+        function loadAdvancedDashboard() {
+            var monthPicker = document.getElementById('dashboardMonthPicker');
+            var monthStr = monthPicker ? monthPicker.value : '';
+            
+            // Skeleton loading
             var statNumbers = document.querySelectorAll('#dashboardStats .stat-number');
             for (var sn = 0; sn < statNumbers.length; sn++) {
-                statNumbers[sn].innerHTML = '<span class="skeleton skeleton-number" style="display:inline-block;"></span>';
+                statNumbers[sn].innerHTML = '<span class="skeleton skeleton-number" style="display:inline-block; width:80%; height:24px;"></span>';
             }
-            lowStockList.innerHTML = '<div class="skeleton skeleton-item"></div><div class="skeleton skeleton-item"></div><div class="skeleton skeleton-item"></div>';
-            topSellingList.innerHTML = '<div class="skeleton skeleton-item"></div><div class="skeleton skeleton-item"></div><div class="skeleton skeleton-item"></div>';
+            lowStockList.innerHTML = '<div class="skeleton skeleton-item"></div><div class="skeleton skeleton-item"></div>';
+            topSellingList.innerHTML = '<div class="skeleton skeleton-item"></div><div class="skeleton skeleton-item"></div>';
+
             google.script.run
                 .withSuccessHandler(function(summary) {
-                    totalOrdersEl.textContent = summary.totalOrders || 0;
-                    totalRevenueEl.textContent = CURRENCY + ' ' + (summary.totalRevenue || 0).toFixed(2);
-                    totalCostEl.textContent = CURRENCY + ' ' + (summary.totalCost || 0).toFixed(2);
-                    totalProfitEl.textContent = CURRENCY + ' ' + (summary.profit || 0).toFixed(2);
-                    totalMarginEl.textContent = (summary.margin || 0).toFixed(1) + '%';
+                    document.getElementById('dashTotalOrders').textContent = summary.totalOrders || 0;
+                    document.getElementById('dashGrossRev').textContent = 'RM ' + (summary.grossRevenue || 0).toFixed(2);
+                    document.getElementById('dashPromoDisc').textContent = '- RM ' + (summary.promoDiscount || 0).toFixed(2);
+                    document.getElementById('dashPointsDisc').textContent = '- RM ' + (summary.pointsDiscount || 0).toFixed(2);
+                    document.getElementById('dashNetRev').textContent = 'RM ' + (summary.netRevenue || 0).toFixed(2);
+                    document.getElementById('dashTotalCost').textContent = 'RM ' + (summary.totalCost || 0).toFixed(2);
+                    document.getElementById('dashNetProfit').textContent = 'RM ' + (summary.netProfit || 0).toFixed(2);
+
                     var counts = summary.statusCounts || {};
                     if (statusAwaitingPaymentEl) statusAwaitingPaymentEl.textContent = counts['Awaiting Payment'] || 0;
                     if (statusAwaitingVerificationEl) statusAwaitingVerificationEl.textContent = counts['Awaiting Verification'] || 0;
@@ -11247,6 +11259,7 @@ if (!hasVariants) {
                     statusPaidEl.textContent = counts.Paid || 0;
                     statusShippedEl.textContent = counts.Shipped || 0;
                     statusCancelledEl.textContent = counts.Cancelled || 0;
+
                     if (summary.lowStock && summary.lowStock.length > 0) {
                         var lsHtml = '';
                         for (var ls = 0; ls < summary.lowStock.length; ls++) {
@@ -11256,6 +11269,7 @@ if (!hasVariants) {
                     } else {
                         lowStockList.innerHTML = '<div class="item" style="color:#4caf50;">✅ All products have sufficient stock</div>';
                     }
+
                     if (summary.topSelling && summary.topSelling.length > 0) {
                         var tsHtml = '';
                         for (var ts = 0; ts < summary.topSelling.length; ts++) {
@@ -11267,23 +11281,30 @@ if (!hasVariants) {
                     }
                 })
                 .withFailureHandler(function(err) {
-                    document.getElementById('dashboardStats').innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading dashboard data. Please refresh.</p>';
+                    document.getElementById('dashboardStats').innerHTML = '<p style="color:#ff6b6b; text-align:center; grid-column:1/-1;">Error loading dashboard data: ' + err.message + '</p>';
                 })
-                .getSalesSummaryWithCost(range);
+                .getAdvancedSalesSummary(monthStr);
         }
 
-        for (var df = 0; df < dashboardFilterBtns.length; df++) {
-            dashboardFilterBtns[df].addEventListener('click', function() {
-                for (var b = 0; b < dashboardFilterBtns.length; b++) dashboardFilterBtns[b].classList.remove('active');
-                this.classList.add('active');
-                var range = this.dataset.range;
-                loadDashboard(range);
-            });
-        }
+        // Initialize Dashboard Month Picker
+        (function setupDashboard() {
+            var picker = document.getElementById('dashboardMonthPicker');
+            if (picker) {
+                var now = new Date();
+                var currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+                picker.value = currentMonth;
+                
+                picker.addEventListener('change', loadAdvancedDashboard);
+                var refreshBtn = document.getElementById('refreshDashboardBtn');
+                if (refreshBtn) refreshBtn.addEventListener('click', loadAdvancedDashboard);
+            }
+        })();
 
         refreshOrdersBtn.addEventListener('click', function() {
-            if (isAdmin) { loadOrders();
-                loadDashboard(currentRange); }
+            if (isAdmin) { 
+                loadOrders();
+                loadAdvancedDashboard(); 
+            }
         });
 
         refreshApprovalBtn.addEventListener('click', function() {
