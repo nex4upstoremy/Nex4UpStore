@@ -9567,7 +9567,7 @@ checkoutBtn.addEventListener('click', function() {
 
                     if (isAdmin) {
                         loadOrders();
-                        loadDashboard();
+                        loadAdvancedDashboard();
                         loadPendingOrders();
                     }
                     if (customer) {
@@ -9757,7 +9757,7 @@ checkoutBtn.addEventListener('click', function() {
                         if (doneBtn) doneBtn.style.display = 'flex'; // ✅ Show the Done button
                         showToast('Receipt uploaded! Ref: ' + result.receiptNumber);
 
-                        if (isAdmin) { loadOrders(); loadDashboard(); loadPendingOrders(); }
+                        if (isAdmin) { loadOrders(); loadAdvancedDashboard(); loadPendingOrders(); }
                         if (customer) loadMyOrders();
                     } else {
                         btn.disabled = false;
@@ -9978,7 +9978,7 @@ if (cart.length > 0) {
                         showAdminSection('add-item');
                         renderAdminList();
                         loadOrders();
-                        loadDashboard(currentRange);
+                        loadAdvancedDashboard();
                         loadPendingOrders();
                         refreshAdminUnreadBadge();
                         loadPublicGenreImages(function() {
@@ -11238,6 +11238,9 @@ if (!hasVariants) {
         // ================================================================
         // 22. LOAD DASHBOARD (Advanced Filter View)
         // ================================================================
+        // Alias to prevent crashes from old code
+        function loadDashboard() { loadAdvancedDashboard(); }
+
         function loadAdvancedDashboard() {
             var filterEl = document.getElementById('dashboardTimeFilter');
             var range = filterEl ? filterEl.value : 'month';
