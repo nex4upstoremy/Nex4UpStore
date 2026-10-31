@@ -6346,11 +6346,11 @@
                     </div>
                 </div>
 
-                <div id="referralBanner" style="display:none; background:#1e2a3a; border:1px solid #f7d875; border-radius:16px; padding:16px 24px; margin-bottom:24px; text-align:center;">
-                    <i class="fas fa-gift" style="color:#f7d875; font-size:24px;"></i>
-                    <span style="font-weight:600; margin-left:12px;">You were referred by a friend!</span>
-                    <span style="color:#8aa1c0; margin-left:8px;">Register now and get a welcome coupon on your first order.</span>
-                </div>
+<div id="referralBanner" style="background:#1e2a3a; border:1px solid #f7d875; border-radius:16px; padding:16px 24px; margin-bottom:24px; text-align:center; display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;">
+    <i class="fas fa-gift" style="color:#f7d875; font-size:24px;"></i>
+    <span style="font-weight:600;">New User Special!</span>
+    <span style="color:#8aa1c0;">Register now and get a <strong style="color:#f7d875;">10% discount</strong> on your first order! (Auto-applied at checkout)</span>
+</div>
 
                 <div class="genre-carousel-wrapper" id="genreCarouselWrapper">
                     <div id="genreCardsContainer" class="genre-cards"></div>
@@ -7912,9 +7912,7 @@ var referralCodeFromUrl = null;
         if (ref) {
             referralCodeFromUrl = ref;
             sessionStorage.setItem('nex4up_ref', ref);
-            var banner = document.getElementById('referralBanner');
-            if (banner) banner.style.display = 'block';
-            showToast('🎉 You were referred by a friend! Get a welcome discount.');
+            // ✅ Removed forced banner display here (handled by showStoreView)
         }
     }
 
@@ -7928,7 +7926,7 @@ var referralCodeFromUrl = null;
         console.warn('Session storage unavailable:', e);
     }
 
-    // 2. Read from URL — ONLY if we are inside GAS (google.script.url is available)
+    // 2. Read from URL
     try {
         if (typeof google !== 'undefined' && google.script && google.script.url && typeof google.script.url.getLocation === 'function') {
             google.script.url.getLocation(function(location) {
@@ -7936,7 +7934,6 @@ var referralCodeFromUrl = null;
                 setReferralCode(ref);
             });
         } else {
-            // Fallback for GitHub / any non‑GAS environment
             var params = new URLSearchParams(window.location.search);
             var ref = params.get('ref');
             setReferralCode(ref);
@@ -8191,17 +8188,27 @@ var referralCodeFromUrl = null;
         // ================================================================
         // 4. VIEW CONTROLLERS
         // ================================================================
-        function showStoreView() {
-            publicView.style.display = 'block';
-            adminSections.style.display = 'none';
-            myAccountSection.classList.remove('visible');
-            myAccountSection.style.display = 'none';
-            wishlistSection.classList.remove('visible');
-            wishlistSection.style.display = 'none';
-            if (isAdmin) {
-                adminSections.style.display = 'block';
-            }
+function showStoreView() {
+    publicView.style.display = 'block';
+    adminSections.style.display = 'none';
+    myAccountSection.classList.remove('visible');
+    myAccountSection.style.display = 'none';
+    wishlistSection.classList.remove('visible');
+    wishlistSection.style.display = 'none';
+    if (isAdmin) {
+        adminSections.style.display = 'block';
+    }
+    
+    // ✅ Toggle the 10% Banner
+    var banner = document.getElementById('referralBanner');
+    if (banner) {
+        if (customer) {
+            banner.style.display = 'none'; // Hide if registered
+        } else {
+            banner.style.display = 'flex'; // Show if not registered
         }
+    }
+}
 
         function showMyAccount() {
             publicView.style.display = 'none';
@@ -9923,9 +9930,14 @@ checkoutBtn.addEventListener('click', function() {
                         loginError.textContent = 'Server returned an empty response. Please try again.';
                         return;
                     }
-                    if (result.success) {
-                        customer = result.customer;
-                        try {
+if (result.success) {
+    customer = result.customer;
+    
+    // ✅ Hide the banner
+    var banner = document.getElementById('referralBanner');
+    if (banner) banner.style.display = 'none';
+    
+    try {
                             localStorage.setItem('nex4up_customer', JSON.stringify(customer));
                         } catch (e) {}
 loginOverlay.classList.remove('open');
@@ -11829,8 +11841,12 @@ if (!hasVariants) {
 
             google.script.run
                 .withSuccessHandler(function(result) {
-                    if (result.success) {
-                        referralCodeFromUrl = null;
+if (result.success) {
+    referralCodeFromUrl = null;
+    
+    // ✅ Hide the banner
+    var banner = document.getElementById('referralBanner');
+    if (banner) banner.style.display = 'none';
 registerOverlay.classList.remove('open');
 registerForm.reset();
 registerError.textContent = '';
