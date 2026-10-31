@@ -6317,6 +6317,10 @@
                 <i class="fas fa-inbox"></i> Inbox
                 <span class="sidebar-badge" id="adminInboxBadge" style="display:none;">0</span>
             </div>
+
+        <div class="sidebar-item" data-section="sales-team">
+    <i class="fas fa-users-cog"></i> Sales Team & Commissions
+</div>
             <!-- ✅ NEW: Backup Sidebar Item -->
             <div class="sidebar-item" data-section="backup">
                 <i class="fas fa-database"></i> Backup & Restore
@@ -6738,6 +6742,37 @@
                     </div>
                 </div>
 
+                <!-- Sales Team Settings -->
+<div class="admin-section" id="section-sales-team">
+    <h2 style="margin-bottom:20px;"><i class="fas fa-users-cog"></i> Sales Team & Commissions</h2>
+    
+    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:24px; margin-bottom:24px;">
+        <h3 style="margin-bottom:12px;">Global Cost Settings</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div class="field"><label>Default Commission Rate (%)</label><input type="number" id="cfgDefaultComm" /></div>
+            <div class="field"><label>Payment Gateway Fee (%)</label><input type="number" id="cfgGwFee" step="0.1" /></div>
+            <div class="field"><label>Platform Fee (RM)</label><input type="number" id="cfgPlatformFee" step="0.01" /></div>
+        </div>
+        <button class="submit-btn" id="saveCostSettingsBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-save"></i> Save Settings</button>
+    </div>
+
+    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:24px;">
+        <h3 style="margin-bottom:12px;">Add Salesperson</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap:16px; align-items:end;">
+            <div class="field"><label>Email</label><input type="email" id="newAgentEmail" placeholder="agent@example.com" /></div>
+            <div class="field"><label>Name</label><input type="text" id="newAgentName" placeholder="Name" /></div>
+            <div class="field"><label>Agent Code</label><input type="text" id="newAgentCode" placeholder="e.g. ALI20" /></div>
+            <div class="field"><label>Commission Rate (%)</label><input type="number" id="newAgentRate" value="20" /></div>
+            <button class="submit-btn" id="addAgentBtn" style="padding:10px 20px; height:42px;"><i class="fas fa-plus"></i> Add</button>
+        </div>
+    </div>
+    
+    <h3 style="margin-top:24px; margin-bottom:16px;">Active Sales Team</h3>
+    <div class="orders-container" id="salesTeamList">
+        <!-- Table loads here -->
+    </div>
+</div>
+
                                 <!-- Backup & Restore -->
                 <div class="admin-section" id="section-backup">
                     <h2 style="margin-bottom:20px;"><i class="fas fa-database"></i> Backup & Restore</h2>
@@ -6921,6 +6956,32 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ===== SALES AGENT DASHBOARD ===== -->
+<div id="agentDashboardSection" style="display:none; padding: 20px 0;">
+    <div class="account-container">
+        <div class="account-header">
+            <h2><i class="fas fa-briefcase"></i> Partner Dashboard</h2>
+            <button class="back-btn" id="backToStoreFromAgentBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
+        </div>
+        
+        <div class="dashboard-stats" style="margin-bottom: 24px;">
+            <div class="stat-card" style="border-bottom: 3px solid #f7d875;">
+                <div class="stat-number" id="agentTotalSales">RM 0.00</div>
+                <div class="stat-label">Total Sales Generated</div>
+            </div>
+            <div class="stat-card" style="border-bottom: 3px solid #4caf50; background: rgba(76,175,80,0.05);">
+                <div class="stat-number profit" id="agentTotalCommission">RM 0.00</div>
+                <div class="stat-label">Total Commission Earned</div>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 16px;">Your Orders & Commissions</h3>
+        <div class="orders-container">
+            <div id="agentOrderHistory">Loading history...</div>
+        </div>
+    </div>
+</div>
 
             <!-- ===== WISHLIST SECTION ===== -->
             <div id="wishlistSection">
@@ -7906,6 +7967,7 @@ return function() {
 // REFERRAL DETECTION (safe for both GAS and GitHub)
 // ================================================================
 var referralCodeFromUrl = null;
+var agentCodeFromUrl = null;
 
 (function() {
     function setReferralCode(ref) {
@@ -14823,6 +14885,159 @@ function resetVariantEditor(ctx) {
                 if (e.key === 'Escape') closePolicy();
             });
         })();
+
+// ================================================================
+// 💼 SALES AGENT & COMMISSIONS LOGIC
+// ================================================================
+
+// 1. Agent Dashboard View
+function showAgentDashboard() {
+    if (!customer) return;
+    publicView.style.display = 'none';
+    adminSections.style.display = 'none';
+    myAccountSection.style.display = 'none';
+    wishlistSection.style.display = 'none';
+    
+    var sec = document.getElementById('agentDashboardSection');
+    if(sec) sec.style.display = 'block';
+    
+    // Load data from Backend
+    google.script.run
+        .withSuccessHandler(function(data) {
+            document.getElementById('agentTotalSales').textContent = 'RM ' + data.totalSales.toFixed(2);
+            document.getElementById('agentTotalCommission').textContent = 'RM ' + data.totalCommission.toFixed(2);
+            
+            var html = '';
+            if (data.history.length === 0) {
+                html = '<p style="text-align:center; color:#6a7f9e; padding:20px;">No sales generated yet. Share your link to start earning!</p>';
+            } else {
+                html = '<table><thead><tr><th>Order ID</th><th>Date</th><th>Net Revenue</th><th>Net Profit</th><th>Rate</th><th>Commission</th><th>Status</th></tr></thead><tbody>';
+                data.history.forEach(function(o) {
+                    var statusColor = o.status === 'Approved' ? '#4caf50' : (o.status === 'Reversed' ? '#ff6b6b' : '#f7d875');
+                    html += `<tr>
+                        <td>${o.orderId}</td>
+                        <td>${o.date.split(' ')[0]}</td>
+                        <td>RM ${o.netRevenue.toFixed(2)}</td>
+                        <td>RM ${o.netProfit.toFixed(2)}</td>
+                        <td>${o.rate}%</td>
+                        <td style="color:#4caf50; font-weight:700;">RM ${o.commission.toFixed(2)}</td>
+                        <td><span style="color:${statusColor}; font-weight:600;">${o.status}</span></td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+            }
+            document.getElementById('agentOrderHistory').innerHTML = html;
+        })
+        .withFailureHandler(function(err) {
+            document.getElementById('agentOrderHistory').innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading data.</p>';
+        })
+        .getSalespersonDashboard(customer.email);
+}
+
+// 2. Add Agent Dashboard to Profile Dropdown
+var originalUpdateProfileDropdown = updateProfileDropdown;
+updateProfileDropdown = function() {
+    originalUpdateProfileDropdown();
+    
+    // Add the Partner Dashboard button if they are logged in
+    if (customer && !IS_ADMIN_MODE) {
+        var html = profileDropdownContent.innerHTML;
+        // Insert before Wishlist
+        if (html.indexOf('dropdownWishlist') !== -1) {
+            html = html.replace(
+                '<button class="dropdown-item" id="dropdownWishlist">',
+                '<button class="dropdown-item" id="dropdownAgentDashboard"><i class="fas fa-briefcase"></i> Partner Dashboard</button><button class="dropdown-item" id="dropdownWishlist">'
+            );
+            profileDropdownContent.innerHTML = html;
+            
+            var agentDash = document.getElementById('dropdownAgentDashboard');
+            if (agentDash) agentDash.addEventListener('click', function (e) {
+                e.preventDefault(); showAgentDashboard(); closeProfileDropdown();
+            });
+        }
+    }
+};
+
+// Make sure button listeners exist for going back to store
+document.getElementById('backToStoreFromAgentBtn')?.addEventListener('click', showStoreView);
+
+
+// 3. Admin Sales Team UI Logic
+function loadAdminSalesTeam() {
+    if (!isAdmin) return;
+    
+    // Load Settings
+    google.script.run.withSuccessHandler(function(settings) {
+        if (document.getElementById('cfgDefaultComm')) {
+            document.getElementById('cfgDefaultComm').value = settings['Default Commission Rate'] || 20;
+            document.getElementById('cfgGwFee').value = settings['Payment Gateway Fee (%)'] || 2;
+            document.getElementById('cfgPlatformFee').value = settings['Platform Fee (RM)'] || 0.50;
+        }
+    }).getCostSettings();
+
+    // Load Team
+    google.script.run.withSuccessHandler(function(team) {
+        var container = document.getElementById('salesTeamList');
+        if (!container) return;
+        
+        if (team.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:20px; color:#6a7f9e;">No salespeople added yet.</p>';
+            return;
+        }
+        var html = '<table><thead><tr><th>Name</th><th>Email</th><th>Agent Code</th><th>Rate (%)</th><th>Status</th><th>Date Added</th></tr></thead><tbody>';
+        team.forEach(function(a) {
+            html += `<tr>
+                <td>${a.name}</td>
+                <td>${a.email}</td>
+                <td style="font-family:monospace; color:#f7d875;">${a.code}</td>
+                <td>${a.rate}%</td>
+                <td><span class="status-badge status-${a.status === 'Active' ? 'paid' : 'cancelled'}">${a.status}</span></td>
+                <td>${a.dateAdded.split(' ')[0]}</td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }).getSalesTeam();
+}
+
+// Admin: Save Settings Button
+document.getElementById('saveCostSettingsBtn')?.addEventListener('click', function() {
+    var settings = {
+        'Default Commission Rate': document.getElementById('cfgDefaultComm').value,
+        'Payment Gateway Fee (%)': document.getElementById('cfgGwFee').value,
+        'Platform Fee (RM)': document.getElementById('cfgPlatformFee').value
+    };
+    google.script.run.withSuccessHandler(function(res) {
+        showToast(res.message);
+    }).updateCostSettings(settings);
+});
+
+// Admin: Add Agent Button
+document.getElementById('addAgentBtn')?.addEventListener('click', function() {
+    var email = document.getElementById('newAgentEmail').value;
+    var name = document.getElementById('newAgentName').value;
+    var code = document.getElementById('newAgentCode').value;
+    var rate = document.getElementById('newAgentRate').value;
+    
+    if (!email || !name || !code) { showToast('Please fill all fields'); return; }
+    
+    google.script.run.withSuccessHandler(function(res) {
+        showToast(res.message);
+        loadAdminSalesTeam();
+        document.getElementById('newAgentEmail').value = '';
+        document.getElementById('newAgentName').value = '';
+        document.getElementById('newAgentCode').value = '';
+    }).addSalesperson(email, name, code, rate);
+});
+
+// 4. Connect Sidebar Click to load Sales Team Admin view
+var originalShowAdminSection = showAdminSection;
+showAdminSection = function(sectionId) {
+    originalShowAdminSection(sectionId);
+    if (sectionId === 'sales-team') {
+        loadAdminSalesTeam();
+    }
+};
 
     </script>
 </body>
