@@ -6248,6 +6248,38 @@
                 padding-left: 0;
             }
         }
+/* ============================================================
+   SALES TEAM SECTION — field styles
+   ============================================================ */
+#section-sales-team .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+#section-sales-team .field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #8aa1c0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+#section-sales-team .field input {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: #e8edf5;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+#section-sales-team .field input:focus {
+    outline: none;
+    border-color: #f7d875;
+    box-shadow: 0 0 0 3px rgba(247,216,117,0.1);
+}
+
     </style>
 </head>
 <body>
@@ -7974,16 +8006,23 @@ var agentCodeFromUrl = null;
         if (ref) {
             referralCodeFromUrl = ref;
             sessionStorage.setItem('nex4up_ref', ref);
-            // ✅ Removed forced banner display here (handled by showStoreView)
         }
     }
 
-    // 1. Check session storage first
+    function setAgentCode(code) {
+        if (code) {
+            agentCodeFromUrl = code;
+            sessionStorage.setItem('nex4up_agent', code);
+        }
+    }
+
+    // 1. Restore from session storage first
     try {
         var savedRef = sessionStorage.getItem('nex4up_ref');
-        if (savedRef) {
-            setReferralCode(savedRef);
-        }
+        if (savedRef) setReferralCode(savedRef);
+
+        var savedAgent = sessionStorage.getItem('nex4up_agent');
+        if (savedAgent) agentCodeFromUrl = savedAgent;
     } catch (e) {
         console.warn('Session storage unavailable:', e);
     }
@@ -7994,14 +8033,17 @@ var agentCodeFromUrl = null;
             google.script.url.getLocation(function(location) {
                 var ref = location.parameters.ref ? location.parameters.ref[0] : null;
                 setReferralCode(ref);
+
+                var agent = location.parameters.agent ? location.parameters.agent[0] : null;
+                setAgentCode(agent);
             });
         } else {
             var params = new URLSearchParams(window.location.search);
-            var ref = params.get('ref');
-            setReferralCode(ref);
+            setReferralCode(params.get('ref'));
+            setAgentCode(params.get('agent'));
         }
     } catch (e) {
-        console.error('Referral detection failed:', e);
+        console.error('Referral/agent detection failed:', e);
     }
 })();
 
@@ -9650,7 +9692,7 @@ checkoutBtn.addEventListener('click', function() {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
                 })
-                                .placeOrder(customerData, items, total2, promoData, gameIds, selectedPaymentMethod, pointsToRedeem, shippingData, hasPhysicalItem);
+                    .placeOrder(customerData, items, total2, promoData, gameIds, selectedPaymentMethod, pointsToRedeem, shippingData, hasPhysicalItem, agentCodeFromUrl || '');
         });
 
         // ================================================================
@@ -11019,31 +11061,6 @@ if (!hasVariants) {
                 }
             }
             return 'Pending';
-        }
-
-        function updateOrderStatus(orderId, newStatus) {
-            var selects = ordersList.querySelectorAll('.order-status-select');
-            var targetSelect = null;
-            for (var i = 0; i < selects.length; i++) {
-                if (selects[i].dataset.orderid === orderId) {
-                    targetSelect = selects[i];
-                    selects[i].disabled = true;
-                    break;
-                }
-            }
-            google.script.run
-                .withSuccessHandler(function(updatedOrders) {
-                    loadOrders();
-                    loadAdvancedDashboard();
-                    loadPendingOrders();
-                    showToast('Order ' + orderId + ' status updated to ' + newStatus + '.');
-                })
-                .withFailureHandler(function(err) {
-                    showToast('Error updating order status.');
-                    console.error(err);
-                    if (targetSelect) targetSelect.disabled = false;
-                })
-                .updateOrderStatus(orderId, newStatus);
         }
 
         // ================================================================
@@ -14935,27 +14952,41 @@ function showAgentDashboard() {
         .getSalespersonDashboard(customer.email);
 }
 
-// 2. Add Agent Dashboard to Profile Dropdown
+// 2. Add Agent Dashboard to Profile Dropdown (agent-only + listener re-binding)
 var originalUpdateProfileDropdown = updateProfileDropdown;
 updateProfileDropdown = function() {
     originalUpdateProfileDropdown();
-    
-    // Add the Partner Dashboard button if they are logged in
+
     if (customer && !IS_ADMIN_MODE) {
-        var html = profileDropdownContent.innerHTML;
-        // Insert before Wishlist
-        if (html.indexOf('dropdownWishlist') !== -1) {
-            html = html.replace(
-                '<button class="dropdown-item" id="dropdownWishlist">',
-                '<button class="dropdown-item" id="dropdownAgentDashboard"><i class="fas fa-briefcase"></i> Partner Dashboard</button><button class="dropdown-item" id="dropdownWishlist">'
-            );
-            profileDropdownContent.innerHTML = html;
-            
-            var agentDash = document.getElementById('dropdownAgentDashboard');
-            if (agentDash) agentDash.addEventListener('click', function (e) {
-                e.preventDefault(); showAgentDashboard(); closeProfileDropdown();
-            });
-        }
+        // Verify the customer is actually an active sales agent
+        google.script.run
+            .withSuccessHandler(function(team) {
+                team = team || [];
+                var isAgent = team.some(function(a) {
+                    return a && a.email === customer.email && a.status === 'Active';
+                });
+                if (!isAgent) return;
+
+                var html = profileDropdownContent.innerHTML;
+                if (html.indexOf('dropdownWishlist') !== -1 && html.indexOf('dropdownAgentDashboard') === -1) {
+                    html = html.replace(
+                        '<button class="dropdown-item" id="dropdownWishlist">',
+                        '<button class="dropdown-item" id="dropdownAgentDashboard"><i class="fas fa-briefcase"></i> Partner Dashboard</button><button class="dropdown-item" id="dropdownWishlist">'
+                    );
+                    profileDropdownContent.innerHTML = html;
+
+                    var myAcc = document.getElementById('dropdownMyAccount');
+                    if (myAcc) myAcc.addEventListener('click', function(e){ e.preventDefault(); showMyAccount(); closeProfileDropdown(); });
+                    var wish = document.getElementById('dropdownWishlist');
+                    if (wish) wish.addEventListener('click', function(e){ e.preventDefault(); showWishlist(); closeProfileDropdown(); });
+                    var logoutCust = document.getElementById('dropdownLogout');
+                    if (logoutCust) logoutCust.addEventListener('click', function(e){ e.preventDefault(); logoutCustomer(); });
+                    var agentDash = document.getElementById('dropdownAgentDashboard');
+                    if (agentDash) agentDash.addEventListener('click', function(e){ e.preventDefault(); showAgentDashboard(); closeProfileDropdown(); });
+                }
+            })
+            .withFailureHandler(function() { /* silent — not an agent */ })
+            .getSalesTeam();
     }
 };
 
