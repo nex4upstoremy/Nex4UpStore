@@ -10168,6 +10168,9 @@ if (cart.length > 0) {
         // 15. SIDEBAR NAVIGATION
         // ================================================================
         function showAdminSection(sectionId) {
+                // ✅ If the agent dashboard is open, hide it first
+    var agentSec = document.getElementById('agentDashboardSection');
+    if (agentSec) agentSec.style.display = 'none';
             for (var key in sections) { sections[key].classList.remove('active'); }
             if (sections[sectionId]) {
                 sections[sectionId].classList.add('active');
@@ -14936,48 +14939,76 @@ function resetVariantEditor(ctx) {
 // 💼 SALES AGENT & COMMISSIONS LOGIC
 // ================================================================
 
-// 1. Agent Dashboard View
-function showAgentDashboard() {
-    if (!customer) return;
+// 1. Agent Dashboard View — works for both the agent themselves
+//    AND for admin viewing any agent (pass targetEmail)
+function showAgentDashboard(targetEmail) {
+    var email = (targetEmail || (customer && customer.email) || '').trim();
+    if (!email) {
+        showToast('No email to load dashboard for.');
+        return;
+    }
+
+    window._agentDashboardEmail = email;
+    window._agentDashboardOpenedByAdmin = !!(isAdmin && targetEmail);
+
     publicView.style.display = 'none';
     adminSections.style.display = 'none';
     myAccountSection.style.display = 'none';
     wishlistSection.style.display = 'none';
-    
+
     var sec = document.getElementById('agentDashboardSection');
-    if(sec) sec.style.display = 'block';
-    
-    // Load data from Backend
+    if (sec) sec.style.display = 'block';
+
+    // Update header title
+    var titleEl = sec.querySelector('.account-header h2');
+    if (titleEl) {
+        if (targetEmail && isAdmin) {
+            titleEl.innerHTML = '<i class="fas fa-briefcase"></i> Partner Dashboard — ' + email;
+        } else {
+            titleEl.innerHTML = '<i class="fas fa-briefcase"></i> Partner Dashboard';
+        }
+    }
+
+    document.getElementById('agentTotalSales').textContent = 'Loading...';
+    document.getElementById('agentTotalCommission').textContent = 'Loading...';
+    document.getElementById('agentOrderHistory').innerHTML = '<p style="text-align:center; color:#6a7f9e; padding:20px;">Loading...</p>';
+
     google.script.run
         .withSuccessHandler(function(data) {
             document.getElementById('agentTotalSales').textContent = 'RM ' + data.totalSales.toFixed(2);
             document.getElementById('agentTotalCommission').textContent = 'RM ' + data.totalCommission.toFixed(2);
-            
+
             var html = '';
-            if (data.history.length === 0) {
-                html = '<p style="text-align:center; color:#6a7f9e; padding:20px;">No sales generated yet. Share your link to start earning!</p>';
+            if (!data.history || data.history.length === 0) {
+                html = '<p style="text-align:center; color:#6a7f9e; padding:20px;">No sales generated yet.</p>';
             } else {
-                html = '<table><thead><tr><th>Order ID</th><th>Date</th><th>Net Revenue</th><th>Net Profit</th><th>Rate</th><th>Commission</th><th>Status</th></tr></thead><tbody>';
+                html = '<table><thead><tr>' +
+                    '<th>Order ID</th><th>Date</th><th>Net Revenue</th><th>Net Profit</th>' +
+                    '<th>Rate</th><th>Commission</th><th>Status</th>' +
+                    '</tr></thead><tbody>';
                 data.history.forEach(function(o) {
-                    var statusColor = o.status === 'Approved' ? '#4caf50' : (o.status === 'Reversed' ? '#ff6b6b' : '#f7d875');
-                    html += `<tr>
-                        <td>${o.orderId}</td>
-                        <td>${o.date.split(' ')[0]}</td>
-                        <td>RM ${o.netRevenue.toFixed(2)}</td>
-                        <td>RM ${o.netProfit.toFixed(2)}</td>
-                        <td>${o.rate}%</td>
-                        <td style="color:#4caf50; font-weight:700;">RM ${o.commission.toFixed(2)}</td>
-                        <td><span style="color:${statusColor}; font-weight:600;">${o.status}</span></td>
-                    </tr>`;
+                    var statusColor = o.status === 'Approved' ? '#4caf50'
+                                    : o.status === 'Reversed' ? '#ff6b6b'
+                                    : '#f7d875';
+                    html += '<tr>' +
+                        '<td>' + o.orderId + '</td>' +
+                        '<td>' + (o.date ? String(o.date).split(' ')[0] : '') + '</td>' +
+                        '<td>RM ' + o.netRevenue.toFixed(2) + '</td>' +
+                        '<td>RM ' + o.netProfit.toFixed(2) + '</td>' +
+                        '<td>' + o.rate + '%</td>' +
+                        '<td style="color:#4caf50; font-weight:700;">RM ' + o.commission.toFixed(2) + '</td>' +
+                        '<td><span style="color:' + statusColor + '; font-weight:600;">' + (o.status || 'Pending') + '</span></td>' +
+                    '</tr>';
                 });
                 html += '</tbody></table>';
             }
             document.getElementById('agentOrderHistory').innerHTML = html;
         })
         .withFailureHandler(function(err) {
-            document.getElementById('agentOrderHistory').innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading data.</p>';
+            document.getElementById('agentOrderHistory').innerHTML =
+                '<p style="color:#ff6b6b; text-align:center;">Error: ' + err.message + '</p>';
         })
-        .getSalespersonDashboard(customer.email);
+        .getSalespersonDashboard(email);
 }
 
 // 2. Add Agent Dashboard to Profile Dropdown (agent-only + listener re-binding)
@@ -15029,7 +15060,19 @@ if (customer && !IS_ADMIN_MODE) {
 }
 
 // Make sure button listeners exist for going back to store
-document.getElementById('backToStoreFromAgentBtn')?.addEventListener('click', showStoreView);
+document.getElementById('backToStoreFromAgentBtn').addEventListener('click', function() {
+    var sec = document.getElementById('agentDashboardSection');
+    if (sec) sec.style.display = 'none';
+
+    if (window._agentDashboardOpenedByAdmin && isAdmin) {
+        // Return to admin Sales Team section
+        showAdminView();
+        showAdminSection('sales-team');
+        loadAdminSalesTeam();
+    } else {
+        showStoreView();
+    }
+});
 
 
 // 3. Admin Sales Team UI Logic
@@ -15054,19 +15097,36 @@ function loadAdminSalesTeam() {
             container.innerHTML = '<p style="text-align:center; padding:20px; color:#6a7f9e;">No salespeople added yet.</p>';
             return;
         }
-        var html = '<table><thead><tr><th>Name</th><th>Email</th><th>Agent Code</th><th>Rate (%)</th><th>Status</th><th>Date Added</th></tr></thead><tbody>';
-        team.forEach(function(a) {
-            html += `<tr>
-                <td>${a.name}</td>
-                <td>${a.email}</td>
-                <td style="font-family:monospace; color:#f7d875;">${a.code}</td>
-                <td>${a.rate}%</td>
-                <td><span class="status-badge status-${a.status === 'Active' ? 'paid' : 'cancelled'}">${a.status}</span></td>
-                <td>${a.dateAdded.split(' ')[0]}</td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
+var html = '<table><thead><tr>' +
+    '<th>Name</th><th>Email</th><th>Agent Code</th><th>Rate (%)</th>' +
+    '<th>Status</th><th>Date Added</th><th>Actions</th>' +
+    '</tr></thead><tbody>';
+team.forEach(function(a) {
+    html += '<tr>' +
+        '<td>' + a.name + '</td>' +
+        '<td>' + a.email + '</td>' +
+        '<td style="font-family:monospace; color:#f7d875;">' + a.code + '</td>' +
+        '<td>' + a.rate + '%</td>' +
+        '<td><span class="status-badge status-' + (a.status === 'Active' ? 'paid' : 'cancelled') + '">' + a.status + '</span></td>' +
+        '<td>' + (a.dateAdded ? a.dateAdded.split(' ')[0] : '-') + '</td>' +
+        '<td>' +
+            '<button class="view-agent-dash-btn" data-email="' + escapeHtmlForAdmin(a.email) + '" ...' +
+                    'style="background:#f7d875; color:#0b0e14; border:none; padding:6px 14px; border-radius:20px; cursor:pointer; font-weight:700; font-size:12px;">' +
+                '<i class="fas fa-chart-line"></i> View Dashboard' +
+            '</button>' +
+        '</td>' +
+    '</tr>';
+});
+html += '</tbody></table>';
+container.innerHTML = html;
+
+// Wire up the buttons
+container.querySelectorAll('.view-agent-dash-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var email = this.dataset.email;
+        showAgentDashboard(email);   // pass email explicitly — admin viewing
+    });
+});
     }).getSalesTeam();
 }
 
