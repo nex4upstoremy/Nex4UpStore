@@ -11063,6 +11063,34 @@ if (!hasVariants) {
             return 'Pending';
         }
 
+        function updateOrderStatus(orderId, newStatus) {
+    var targetSelect = null;
+    if (ordersList) {
+        var selects = ordersList.querySelectorAll('.order-status-select');
+        for (var i = 0; i < selects.length; i++) {
+            if (selects[i].dataset.orderid === orderId) {
+                targetSelect = selects[i];
+                selects[i].disabled = true;
+                break;
+            }
+        }
+    }
+
+    google.script.run
+        .withSuccessHandler(function (updatedOrders) {
+            try { loadOrders(); } catch (e) { console.warn('loadOrders:', e); }
+            try { loadAdvancedDashboard(); } catch (e) { console.warn('loadAdvancedDashboard:', e); }
+            try { loadPendingOrders(); } catch (e) { console.warn('loadPendingOrders:', e); }
+            showToast('✅ Order ' + orderId + ' → ' + newStatus);
+        })
+        .withFailureHandler(function (err) {
+            showToast('❌ Error updating order status.');
+            console.error('updateOrderStatus error:', err);
+            if (targetSelect) targetSelect.disabled = false;
+        })
+        .updateOrderStatus(orderId, newStatus);
+}
+
         // ================================================================
         // PAYMENT APPROVAL — with receipt number search
         // ================================================================
