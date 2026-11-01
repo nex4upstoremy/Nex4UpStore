@@ -14958,12 +14958,15 @@ updateProfileDropdown = function() {
     originalUpdateProfileDropdown();
 
     if (customer && !IS_ADMIN_MODE) {
-        // Verify the customer is actually an active sales agent
+        var customerEmailLower = String(customer.email || '').toLowerCase().trim();
+
         google.script.run
             .withSuccessHandler(function(team) {
                 team = team || [];
                 var isAgent = team.some(function(a) {
-                    return a && a.email === customer.email && a.status === 'Active';
+                    return a
+                        && String(a.email || '').toLowerCase().trim() === customerEmailLower
+                        && a.status === 'Active';
                 });
                 if (!isAgent) return;
 
@@ -14989,6 +14992,13 @@ updateProfileDropdown = function() {
             .getSalesTeam();
     }
 };
+
+// ✅ NEW: The init block ran BEFORE this override was installed.
+// Force one more refresh now that the override is active, so
+// "Partner Dashboard" appears immediately after a page refresh.
+if (customer && !IS_ADMIN_MODE) {
+    setTimeout(updateProfileDropdown, 100);
+}
 
 // Make sure button listeners exist for going back to store
 document.getElementById('backToStoreFromAgentBtn')?.addEventListener('click', showStoreView);
