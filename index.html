@@ -7983,9 +7983,13 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycbyP6vjyx1o4XDZZpmPXJTfvQD
 var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.run);
 
 (function installGASShim() {
-    if (IS_GAS) return; // Real GAS → nothing to do
+    if (IS_GAS) return;
 
     console.log('🚀 Running in GitHub/fetch mode → GAS:', GAS_URL);
+
+    // Global circuit breaker — after 2 consecutive total failures, stop hammering
+    window._gasBroken = false;
+    window._gasFailStreak = 0;
 
     function makeChain(success, failure) {
         return new Proxy({}, {
@@ -7996,41 +8000,79 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
                 if (prop === 'withFailureHandler') {
                     return function(fn) { return makeChain(success, fn); };
                 }
-                // Any other property = a backend function name.
-                // Return a function that fires the fetch.
-                // Cari bahagian ini dalam index.html anda:
-return function() {
-    var args = Array.prototype.slice.call(arguments);
-    
-    // ✅ TUKAR KEPADA INI (Gunakan URLSearchParams)
-    var formData = new URLSearchParams();
-    formData.append('action', prop);
-    formData.append('payload', JSON.stringify(args));
+                return function() {
+                    var args = Array.prototype.slice.call(arguments);
 
-    fetch(GAS_URL, {
-        method: 'POST',
-        body: formData
-    })
-    .then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-    })
-    .then(function(text) {
-        var data;
-        try { data = JSON.parse(text); }
-        catch (e) { throw new Error('Bad JSON from backend: ' + text.slice(0, 120)); }
-        if (success) success(data);
-    })
-    .catch(function(err) {
-        console.error('API error (' + prop + '):', err);
-        if (failure) failure(err);
-    });
-};
+                    // Circuit breaker: if the endpoint is confirmed dead, fail instantly.
+                    if (window._gasBroken) {
+                        if (failure) failure(new Error('Backend unavailable (circuit open)'));
+                        return;
+                    }
+
+                    var formData = new URLSearchParams();
+                    formData.append('action', prop);
+                    formData.append('payload', JSON.stringify(args));
+
+                    var attempt = 0, maxAttempts = 2;
+
+                    (function doFetch() {
+                        attempt++;
+                        var controller = new AbortController();
+                        var timeoutId = setTimeout(function () { controller.abort(); }, 25000);
+
+                        fetch(GAS_URL, {
+                            method: 'POST',
+                            body: formData,
+                            signal: controller.signal,
+                            credentials: 'omit'
+                        })
+                        .then(function (res) {
+                            clearTimeout(timeoutId);
+                            if (!res.ok) throw new Error('HTTP ' + res.status);
+                            return res.text();
+                        })
+                        .then(function (text) {
+                            // Detect sign-in / permission HTML response (the #1 GAS gotcha)
+                            if (text.trim().charAt(0) === '<') {
+                                throw new Error(
+                                    'Backend returned HTML instead of JSON — deployment is not set to "Anyone".'
+                                );
+                            }
+                            var data;
+                            try { data = JSON.parse(text); }
+                            catch (e) { throw new Error('Bad JSON: ' + text.slice(0, 100)); }
+
+                            window._gasFailStreak = 0;
+                            if (success) success(data);
+                        })
+                        .catch(function (err) {
+                            clearTimeout(timeoutId);
+                            if (err.name === 'AbortError') err = new Error('Request timed out (25s)');
+
+                            // Retry once for transient network blips
+                            if (attempt < maxAttempts &&
+                                (err.name === 'TypeError' || err.message.indexOf('HTTP 5') === 0)) {
+                                console.warn('🔄 Retry ' + attempt + '/' + maxAttempts + ' for ' + prop);
+                                setTimeout(doFetch, 800);
+                                return;
+                            }
+
+                            window._gasFailStreak++;
+                            if (window._gasFailStreak >= 3) {
+                                window._gasBroken = true;
+                                console.error('🔴 Backend unreachable — circuit opened. Run deploy fix.');
+                                if (typeof showBackendError === 'function') showBackendError(err);
+                            }
+
+                            console.error('API error (' + prop + '):', err);
+                            if (failure) failure(err);
+                        });
+                    })();
+                };
             }
         });
     }
 
-    // Install the shim
     window.google = window.google || {};
     window.google.script = window.google.script || {};
     window.google.script.run = makeChain(null, null);
@@ -8534,41 +8576,35 @@ function showStoreView() {
         // ================================================================
         // 5. LOAD GAMES
         // ================================================================
-        function loadGames() {
-            grid.innerHTML = createSkeletonCards(6);
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run
-                    .withSuccessHandler(function(data) {
-                        allGames = data || [];
-                        loadPublicGenreImages(function() {
-                            renderAll();
-                            renderAdminList();
-                            if (isAdmin) {
-                                loadOrders();
-                                loadAdvancedDashboard();
-                                loadPendingOrders();
-                            }
-                        });
-                    })
-                    .withFailureHandler(function(err) {
-                        console.error('❌ Failed to load games:', err);
-                        allGames = getSampleGames();
-                        loadPublicGenreImages(function() {
-                            renderAll();
-                            renderAdminList();
-                        });
-                        showDebugLoadButton();
-                    })
-                    .getGamesData();
-            } else {
-                allGames = getSampleGames();
-                loadPublicGenreImages(function() {
-                    renderAll();
-                    renderAdminList();
-                    showDebugLoadButton();
-                });
-            }
-        }
+function loadGames() {
+    grid.innerHTML = createSkeletonCards(6);
+
+    google.script.run
+        .withSuccessHandler(function (data) {
+            allGames = data || [];
+            loadPublicGenreImages(function () {
+                renderAll();
+                renderAdminList();
+                if (isAdmin) {
+                    loadOrders();
+                    loadAdvancedDashboard();
+                    loadPendingOrders();
+                }
+            });
+        })
+        .withFailureHandler(function (err) {
+            console.error('❌ Failed to load games:', err);
+
+            // ⛔ DO NOT call loadPublicGenreImages() here — the backend is down.
+            // Just render fallback data and stop.
+            allGames = getSampleGames();
+            genreImages = {};
+            renderAll();
+            renderAdminList();
+            showBackendError(err);
+        })
+        .getGamesData();
+}
 
         function loadPublicGenreImages(callback) {
             if (typeof google !== 'undefined' && google.script && google.script.run) {
@@ -8614,7 +8650,6 @@ function showStoreView() {
             updateStats();
             renderCart();
             if (customer) {
-                loadWishlistIds();
             }
         }
 
@@ -9338,7 +9373,7 @@ html += '<img src="' + (item.image || PLACEHOLDER_IMG) + '" alt="' + item.title 
             }
         }
 
-        // ================================================================
+         // ================================================================
         // 8. TOAST
         // ================================================================
         var toastTimeout;
@@ -9348,6 +9383,60 @@ html += '<img src="' + (item.image || PLACEHOLDER_IMG) + '" alt="' + item.title 
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(function() { toast.classList.remove('show'); }, 2400);
         }
+
+        // 👇👇👇 PASTE FIX D HERE 👇👇👇
+        function showBackendError(err) {
+            if (document.getElementById('backendErrorBanner')) return;
+
+            var msg = err && err.message ? String(err.message) : 'Unknown error';
+            var isHtml = msg.indexOf('HTML') !== -1;
+
+            var banner = document.createElement('div');
+            banner.id = 'backendErrorBanner';
+            banner.style.cssText =
+                'background:rgba(255,107,107,0.08); border:1px solid rgba(255,107,107,0.35);' +
+                'border-radius:14px; padding:18px 22px; margin:20px 0; color:#ff6b6b;' +
+                'font-family:Inter,sans-serif; font-size:14px;';
+
+            banner.innerHTML =
+                '<div style="display:flex;gap:14px;align-items:flex-start;">' +
+                    '<i class="fas fa-exclamation-triangle" style="font-size:22px;margin-top:2px;"></i>' +
+                    '<div style="flex:1;">' +
+                        '<div style="font-weight:800;font-size:16px;margin-bottom:6px;">' +
+                            'Store backend is unreachable' +
+                        '</div>' +
+                        '<div style="color:#8aa1c0;line-height:1.65;margin-bottom:14px;">' +
+                            (isHtml
+                                ? 'Your Apps Script deployment is set to <strong>"Anyone with Google account"</strong>. Anonymous visitors get redirected to a sign-in page, which the browser blocks — so every API call fails.'
+                                : 'The website can\'t reach the Google Apps Script backend. This is almost always a deployment access setting.') +
+                        '</div>' +
+                        '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:10px;padding:12px 16px;margin-bottom:12px;">' +
+                            '<div style="color:#8aa1c0;font-size:11.5px;font-weight:700;letter-spacing:.5px;margin-bottom:8px;">TO FIX (2 minutes):</div>' +
+                            '<ol style="color:#b0c8e0;font-size:13px;line-height:1.9;margin:0;padding-left:20px;">' +
+                                '<li>Open your <strong>Apps Script</strong> project</li>' +
+                                '<li><strong>Deploy</strong> → <strong>Manage deployments</strong></li>' +
+                                '<li>Click the <strong>pencil (Edit)</strong> on the active deployment</li>' +
+                                '<li>Version → <strong>New version</strong> (not "Save")</li>' +
+                                '<li>Who has access → <strong>Anyone</strong></li>' +
+                                '<li><strong>Deploy</strong>, then hard-refresh this page (Ctrl+Shift+R)</li>' +
+                            '</ol>' +
+                        '</div>' +
+                        '<div style="color:#6a7f9e;font-size:11.5px;">' +
+                            'Error: ' + msg.replace(/[<>&]/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];}) +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+
+            var target = document.getElementById('publicView') || grid.parentNode;
+            if (target && target.firstChild) {
+                target.insertBefore(banner, target.firstChild);
+            }
+        }
+        // 👆👆👆 END OF FIX D 👆👆👆
+
+        // ================================================================
+        // 9. CART OVERLAY
+        // ================================================================
 
         // ================================================================
         // 9. CART OVERLAY
@@ -13328,6 +13417,7 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
                 loadMyAccount();
                 loadMyOrders();
                 loadReferralData();
+                loadWishlistIds();
             }
 
             loadGames();
