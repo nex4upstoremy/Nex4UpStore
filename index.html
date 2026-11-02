@@ -1497,14 +1497,60 @@
             border-radius: 12px;
             padding: 14px 16px;
         }
-        .review-item .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
+.review-item .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* 👇 ADD THIS BLOCK 👇 */
+.review-author-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+.review-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #2a3a52;
+    background: #0b0e14;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+.review-avatar-placeholder {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f0b34b, #f7d875);
+    color: #0b0e14;
+    font-weight: 800;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #2a3a52;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(247,216,117,0.25);
+}
+.review-author-text { min-width: 0; }
+.review-author-text .review-author {
+    font-weight: 700;
+    font-size: 14px;
+    color: #e8edf5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+/* 👆 END OF NEW BLOCK 👆 */
         .review-item .review-author {
             font-weight: 600;
             font-size: 14px;
@@ -12032,51 +12078,71 @@ function loadOrders() {
                 .getReviews(gameId);
         }
 
-        function renderReviews(reviews) {
-            if (!reviews || !Array.isArray(reviews)) reviews = [];
+function renderReviews(reviews) {
+    if (!reviews || !Array.isArray(reviews)) reviews = [];
 
-            var avg = 0;
-            if (reviews.length > 0) {
-                var total = 0;
-                for (var i = 0; i < reviews.length; i++) total += Number(reviews[i].rating) || 0;
-                avg = total / reviews.length;
-            }
-            avgRatingEl.textContent = avg.toFixed(1);
-            reviewCountEl.textContent = '(' + reviews.length + ' review' + (reviews.length !== 1 ? 's' : '') + ')';
+    var avg = 0;
+    if (reviews.length > 0) {
+        var total = 0;
+        for (var i = 0; i < reviews.length; i++) total += Number(reviews[i].rating) || 0;
+        avg = total / reviews.length;
+    }
+    avgRatingEl.textContent = avg.toFixed(1);
+    reviewCountEl.textContent = '(' + reviews.length + ' review' + (reviews.length !== 1 ? 's' : '') + ')';
 
-            var starHtml = '';
-            var rounded = Math.round(avg * 2) / 2;
-            for (var s = 1; s <= 5; s++) {
-                if (s <= rounded) starHtml += '<i class="fas fa-star"></i>';
-                else if (s - 0.5 === rounded) starHtml += '<i class="fas fa-star-half-alt"></i>';
-                else starHtml += '<i class="far fa-star"></i>';
-            }
-            avgStarsEl.innerHTML = starHtml;
+    var starHtml = '';
+    var rounded = Math.round(avg * 2) / 2;
+    for (var s = 1; s <= 5; s++) {
+        if (s <= rounded) starHtml += '<i class="fas fa-star"></i>';
+        else if (s - 0.5 === rounded) starHtml += '<i class="fas fa-star-half-alt"></i>';
+        else starHtml += '<i class="far fa-star"></i>';
+    }
+    avgStarsEl.innerHTML = starHtml;
 
-            var listHtml = '';
-            if (reviews.length === 0) {
-                listHtml = '<p style="color:#6a7f9e; text-align:center; padding:20px 0;">No reviews yet. Be the first to review!</p>';
+    var listHtml = '';
+    if (reviews.length === 0) {
+        listHtml = '<p style="color:#6a7f9e; text-align:center; padding:20px 0;">No reviews yet. Be the first to review!</p>';
+    } else {
+        for (var j = 0; j < reviews.length; j++) {
+            var r = reviews[j];
+
+            // ✅ Build avatar + name row
+            var displayName = r.customerName || 'Anonymous';
+            var initial = displayName.charAt(0).toUpperCase();
+            var imgSrc = r.customerProfileImage || '';
+            var avatarHtml;
+            if (imgSrc) {
+                avatarHtml =
+                    '<img src="' + imgSrc + '" alt="' + displayName + '" class="review-avatar"' +
+                    ' onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />' +
+                    '<div class="review-avatar-placeholder" style="display:none;">' + initial + '</div>';
             } else {
-                for (var j = 0; j < reviews.length; j++) {
-                    var r = reviews[j];
-                    listHtml += '<div class="review-item">';
-                    listHtml += '<div class="review-header">';
-                    listHtml += '<span class="review-author">' + (r.customerName || 'Anonymous') + '</span>';
-                    listHtml += '<span class="review-date">' + (r.date ? new Date(r.date).toLocaleDateString() : '') + '</span>';
-                    listHtml += '</div>';
-                    listHtml += '<div class="review-stars">';
-                    var rStarHtml = '';
-                    for (var rs = 1; rs <= 5; rs++) {
-                        rStarHtml += rs <= r.rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
-                    }
-                    listHtml += rStarHtml;
-                    listHtml += '</div>';
-                    listHtml += '<p class="review-text">' + (r.reviewText || '') + '</p>';
-                    listHtml += '</div>';
-                }
+                avatarHtml = '<div class="review-avatar-placeholder">' + initial + '</div>';
             }
-            reviewListEl.innerHTML = listHtml;
+
+            listHtml += '<div class="review-item">';
+            listHtml += '<div class="review-header">';
+            listHtml += '<div class="review-author-row">';
+            listHtml += avatarHtml;
+            listHtml += '<div class="review-author-text">';
+            listHtml += '<span class="review-author">' + displayName + '</span>';
+            listHtml += '</div>';
+            listHtml += '</div>';
+            listHtml += '<span class="review-date">' + (r.date ? new Date(r.date).toLocaleDateString() : '') + '</span>';
+            listHtml += '</div>';
+            listHtml += '<div class="review-stars">';
+            var rStarHtml = '';
+            for (var rs = 1; rs <= 5; rs++) {
+                rStarHtml += rs <= r.rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+            }
+            listHtml += rStarHtml;
+            listHtml += '</div>';
+            listHtml += '<p class="review-text">' + (r.reviewText || '') + '</p>';
+            listHtml += '</div>';
         }
+    }
+    reviewListEl.innerHTML = listHtml;
+}
 
         function renderReviewForm(existingReview) {
             var container = reviewFormContainer;
