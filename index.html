@@ -6280,6 +6280,100 @@
     box-shadow: 0 0 0 3px rgba(247,216,117,0.1);
 }
 
+/* ============================================================
+   MY ORDERS & REWARDS — Tabs, Cards, Review Prompt
+   ============================================================ */
+.order-tabs {
+    display: flex; gap: 6px; margin-bottom: 20px;
+    border-bottom: 1px solid #1e2a3a; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.order-tab {
+    background: transparent; border: none; color: #8aa1c0;
+    padding: 12px 18px; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    border-bottom: 3px solid transparent; transition: 0.2s;
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+}
+.order-tab:hover { color: #e8edf5; background: #1a2538; }
+.order-tab.active { color: #f7d875; border-bottom-color: #f7d875; }
+.order-tab .tab-count {
+    background: #1e2a3a; color: #8aa1c0; font-size: 11px;
+    padding: 2px 8px; border-radius: 20px; font-weight: 700;
+}
+.order-tab.active .tab-count { background: #f7d875; color: #0b0e14; }
+
+.order-card {
+    background: #0b0e14; border: 1px solid #1e2a3a;
+    border-radius: 16px; padding: 16px 20px; margin-bottom: 12px;
+    transition: border-color 0.2s;
+}
+.order-card:hover { border-color: #2a3a52; }
+.order-card .order-header {
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1px solid #1a2538;
+}
+.order-card .order-id { font-weight: 700; color: #f7d875; font-size: 15px; }
+.order-card .order-date { color: #6a7f9e; font-size: 12px; }
+.order-card .order-items { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.order-card .order-item-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 0; border-bottom: 1px solid #1a2538;
+}
+.order-card .order-item-row:last-child { border-bottom: none; }
+.order-card .order-item-row img {
+    width: 48px; height: 48px; object-fit: contain;
+    border-radius: 8px; background: #121821; flex-shrink: 0;
+}
+.order-card .order-item-row .item-info { flex: 1; min-width: 0; }
+.order-card .order-item-row .item-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.order-card .order-item-row .item-qty { color: #6a7f9e; font-size: 12px; }
+.order-card .order-footer {
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 10px;
+    padding-top: 10px; border-top: 1px solid #1a2538;
+}
+.order-card .order-total { font-size: 18px; font-weight: 800; color: #f7d875; }
+.order-card .order-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+.status-badge { padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.status-awaiting-payment { background: rgba(255,167,38,0.15); color: #ffa726; border: 1px solid rgba(255,167,38,0.3); }
+.status-paid { background: rgba(76,175,80,0.15); color: #4caf50; border: 1px solid rgba(76,175,80,0.3); }
+.status-shipped { background: rgba(33,150,243,0.15); color: #2196f3; border: 1px solid rgba(33,150,243,0.3); }
+.status-delivered { background: rgba(76,175,80,0.2); color: #66bb6a; border: 1px solid rgba(76,175,80,0.4); }
+.status-cancelled { background: rgba(106,127,158,0.15); color: #6a7f9e; border: 1px solid rgba(106,127,158,0.3); }
+.status-completed { background: rgba(33,150,243,0.2); color: #42a5f5; border: 1px solid rgba(33,150,243,0.4); }
+.status-paid-awaiting-shipment { background: rgba(76,175,80,0.15); color: #4caf50; border: 1px solid rgba(76,175,80,0.3); }
+.status-awaiting-verification { background: rgba(255,213,79,0.15); color: #ffd54f; border: 1px solid rgba(255,213,79,0.3); }
+.status-pending { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); }
+
+.review-prompt {
+    background: rgba(247,216,117,0.06); border: 1px dashed rgba(247,216,117,0.3);
+    border-radius: 12px; padding: 14px 16px; margin-top: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px; width: 100%;
+}
+.review-prompt .reward-badge {
+    display: flex; align-items: center; gap: 8px;
+    color: #f7d875; font-weight: 700; font-size: 14px;
+}
+.review-prompt .reward-badge i { font-size: 20px; }
+.rate-btn {
+    background: #f7d875; color: #0b0e14; border: none;
+    padding: 8px 20px; border-radius: 40px; font-weight: 700;
+    font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
+}
+.rate-btn:hover { background: #ffe08a; transform: scale(1.04); }
+.rate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.order-empty-state { text-align: center; padding: 60px 20px; color: #6a7f9e; }
+.order-empty-state i { font-size: 48px; color: #2a3a52; margin-bottom: 16px; display: block; }
+.order-empty-state p { font-size: 15px; }
+
     </style>
 </head>
 <body>
@@ -6952,8 +7046,21 @@
                     </div>
                 </div>
 
-                <h3 style="margin-bottom:16px;">My Orders</h3>
-                <div id="myOrdersList"><p style="color:#6a7f9e;">Loading your orders...</p></div>
+<h3 style="margin-bottom:16px;"><i class="fas fa-box-open" style="color:#f7d875;"></i> My Orders</h3>
+
+<!-- Tabs (static — stay mounted, only counts update) -->
+<div class="order-tabs" id="orderTabs">
+    <button class="order-tab active" data-tab="All">All <span class="tab-count" id="countAll">0</span></button>
+    <button class="order-tab" data-tab="To Pay">To Pay <span class="tab-count" id="countToPay">0</span></button>
+    <button class="order-tab" data-tab="To Ship">To Ship <span class="tab-count" id="countToShip">0</span></button>
+    <button class="order-tab" data-tab="To Receive">To Receive <span class="tab-count" id="countToReceive">0</span></button>
+    <button class="order-tab" data-tab="To Review">To Review <span class="tab-count" id="countToReview">0</span></button>
+</div>
+
+<!-- Content: still uses #myOrdersList so the existing `myOrdersList` variable keeps working -->
+<div id="myOrdersList">
+    <p style="color:#6a7f9e; text-align:center; padding:40px;">Loading your orders...</p>
+</div>
 
                 <!-- ===== REFERRAL SECTION (Customer) ===== -->
                 <div class="account-container" style="margin-top:20px;">
@@ -11032,7 +11139,13 @@ if (!hasVariants) {
                         for (var s = 0; s < statuses.length; s++) {
                             html += '<option value="' + statuses[s] + '" ' + (status === statuses[s] ? 'selected' : '') + '>' + statuses[s] + '</option>';
                         }
-                        html += '</select></td></tr>';
+                        html += '</select>';
+// 🆕 Confirm Delivery button (only for Paid/Shipped orders)
+var fulfil = String(o['Fulfilment Status'] || '').trim();
+if (status === 'Paid' || status === 'Shipped' || fulfil === 'Shipped') {
+    html += ' <button class="confirm-delivery-btn" data-orderid="' + (o['Order ID'] || '') + '" title="Mark as delivered — starts 24h auto-confirm window" style="background:#2196f3;color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:Inter;font-weight:700;white-space:nowrap;"><i class="fas fa-truck"></i> Delivery Confirmed</button>';
+}
+html += '</td></tr>';
                     }
                     html += '</tbody></table>';
                     ordersList.innerHTML = html;
@@ -11044,7 +11157,32 @@ if (!hasVariants) {
                             updateOrderStatus(orderId, newStatus);
                         });
                     }
-                })
+
+                    // 🆕 Wire up Confirm Delivery buttons
+                    var deliveryBtns = ordersList.querySelectorAll('.confirm-delivery-btn');
+                    for (var db = 0; db < deliveryBtns.length; db++) {
+                        deliveryBtns[db].addEventListener('click', function() {
+                            var oid = this.dataset.orderid;
+                            var trackingNum = prompt('Enter tracking number (optional, leave blank to skip):') || '';
+                            var trackingUrl = '';
+                            if (trackingNum) {
+                                trackingUrl = prompt('Enter tracking URL (optional):') || '';
+                            }
+                            if (!confirm('Mark order ' + oid + ' as delivered?\n\nThis starts a 24-hour auto-confirm countdown for the customer.')) return;
+
+                            google.script.run
+                                .withSuccessHandler(function(res) {
+                                    showToast(res.message || 'Delivery confirmed.');
+                                    if (res.success) loadOrders();
+                                })
+                                .withFailureHandler(function(err) {
+                                    showToast('Error: ' + err.message);
+                                })
+                                .confirmDeliveryBySeller(oid, trackingNum, trackingUrl);
+                        });
+                    }
+
+                })                  // ⬅️ unchanged
                 .withFailureHandler(function(err) {
                     ordersList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading orders: ' + err.message + '</p>';
                 })
@@ -12000,33 +12138,284 @@ switchToLogin.addEventListener('click', function(e) {
         registerCancel.addEventListener('click', function() { registerOverlay.classList.remove('open'); });
         registerOverlay.addEventListener('click', function(e) { if (e.target === registerOverlay) registerOverlay.classList.remove('open'); });
 
-        // ================================================================
-        // 28. LOAD MY ORDERS
-        // ================================================================
-        function loadMyOrders() {
-            if (!customer) return;
-            myOrdersList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>' + createSkeletonTableRows(3) + '</tbody></table></div>';
-            google.script.run
-                .withSuccessHandler(function(orders) {
-                    if (!orders || orders.length === 0) {
-                        myOrdersList.innerHTML = '<div class="empty-msg">You haven\'t placed any orders yet.</div>';
-                        return;
-                    }
-                    var html = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>';
-                    for (var i = 0; i < orders.length; i++) {
-                        var o = orders[i];
-                        var status = getStatusValue(o);
-                        var statusClass = status.toLowerCase().replace(/\s+/g, '-');
-                        html += '<tr><td>' + (o['Order ID'] || 'N/A') + '</td><td>' + (o['Date'] || 'N/A') + '</td><td>' + (o['Items'] || 'N/A') + '</td><td>' + CURRENCY + ' ' + parseFloat(o['Total (RM)'] || 0).toFixed(2) + '</td><td><span class="status-badge status-' + statusClass + '">' + status + '</span></td></tr>';
-                    }
-                    html += '</tbody></table></div>';
-                    myOrdersList.innerHTML = html;
-                })
-                .withFailureHandler(function(err) {
-                    myOrdersList.innerHTML = '<p style="color:#ff6b6b;">Error loading orders: ' + err.message + '</p>';
-                })
-                .getCustomerOrders(customer.email);
+// ================================================================
+// 🆕 MY ORDERS & REWARDS — FRONTEND
+// ================================================================
+var myOrdersCache = [];
+var activeOrderTab = 'All';
+
+function loadMyOrders() {
+    if (!customer) return;
+    myOrdersList.innerHTML = '<p style="color:#6a7f9e; text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading orders...</p>';
+
+    google.script.run
+        .withSuccessHandler(function(res) {
+            if (!res || !res.success) {
+                myOrdersList.innerHTML = '<p style="color:#ff6b6b; text-align:center; padding:20px;">Error: ' + (res && res.message ? res.message : 'Unknown error') + '</p>';
+                return;
+            }
+            myOrdersCache = res.orders || [];
+            renderOrderTabCounts();
+            renderOrderList(activeOrderTab);
+        })
+        .withFailureHandler(function(err) {
+            myOrdersList.innerHTML = '<p style="color:#ff6b6b; text-align:center; padding:20px;">Error loading orders: ' + err.message + '</p>';
+        })
+        .getMyOrdersData(customer.email);
+}
+
+function renderOrderTabCounts() {
+    var counts = { 'All': 0, 'To Pay': 0, 'To Ship': 0, 'To Receive': 0, 'To Review': 0 };
+    for (var i = 0; i < myOrdersCache.length; i++) {
+        counts['All']++;
+        var tab = myOrdersCache[i]._tab || 'All';
+        if (counts[tab] !== undefined) counts[tab]++;
+    }
+    document.getElementById('countAll').textContent = counts['All'];
+    document.getElementById('countToPay').textContent = counts['To Pay'];
+    document.getElementById('countToShip').textContent = counts['To Ship'];
+    document.getElementById('countToReceive').textContent = counts['To Receive'];
+    document.getElementById('countToReview').textContent = counts['To Review'];
+}
+
+function renderOrderList(tab) {
+    activeOrderTab = tab;
+
+    // Update active tab visual
+    var allTabs = document.querySelectorAll('.order-tab');
+    for (var t = 0; t < allTabs.length; t++) {
+        allTabs[t].classList.toggle('active', allTabs[t].dataset.tab === tab);
+    }
+
+    var filtered = myOrdersCache.filter(function(o) { return (o._tab || 'All') === tab; });
+
+    if (filtered.length === 0) {
+        var emptyMsg = {
+            'All': 'You haven\'t placed any orders yet.',
+            'To Pay': 'Nothing waiting for payment.',
+            'To Ship': 'No orders are currently being prepared for shipment.',
+            'To Receive': 'No orders are currently in transit.',
+            'To Review': 'You have no pending reviews. Thank you for shopping with Nex4UpStore!'
+        }[tab] || 'No orders found.';
+        myOrdersList.innerHTML = '<div class="order-empty-state"><i class="fas fa-box-open"></i><p>' + emptyMsg + '</p></div>';
+        return;
+    }
+
+    var html = '';
+    for (var i = 0; i < filtered.length; i++) {
+        var order = filtered[i];
+        var orderId = order['Order ID'] || '';
+        var date = order['Date'] || '';
+        var total = parseFloat(order['Total (RM)'] || 0).toFixed(2);
+        var status = order._customerStatus || getStatusValue(order);
+        var statusClass = 'status-' + status.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z-]/g, '');
+        var items = String(order['Items'] || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+
+        html += '<div class="order-card">';
+        html += '<div class="order-header">';
+        html += '<span class="order-id">' + orderId + '</span>';
+        html += '<span class="order-date">' + date + '</span>';
+        html += '</div>';
+
+        // Items
+        html += '<div class="order-items">';
+        for (var j = 0; j < items.length; j++) {
+            var match = items[j].match(/^(.*?)\s*×\s*(\d+)$/);
+            var name = match ? match[1].trim() : items[j];
+            var qty = match ? match[2] : '1';
+            var game = null;
+            for (var g = 0; g < allGames.length; g++) {
+                if (allGames[g].title === name) { game = allGames[g]; break; }
+            }
+            var img = (game && game.image) ? game.image : PLACEHOLDER_IMG;
+            html += '<div class="order-item-row">';
+            html += '<img src="' + img + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
+            html += '<div class="item-info"><div class="item-name">' + name + '</div><div class="item-qty">Qty: ' + qty + '</div></div>';
+            html += '</div>';
         }
+        html += '</div>';
+
+        // Footer
+        html += '<div class="order-footer">';
+        html += '<span class="order-total">RM ' + total + '</span>';
+        html += '<span class="status-badge ' + statusClass + '">' + status + '</span>';
+        html += '</div>';
+
+        // Actions
+        html += '<div class="order-actions">';
+
+        if (tab === 'To Pay') {
+            html += '<button class="rate-btn" style="background:#ff6b6b;color:#fff;" onclick="cancelMyOrder(\'' + orderId + '\')">';
+            html += '<i class="fas fa-times"></i> Cancel Order';
+            html += '</button>';
+        }
+
+        if (tab === 'To Receive') {
+            html += '<button class="rate-btn" onclick="confirmOrderReceived(\'' + orderId + '\')">';
+            html += '<i class="fas fa-check-circle"></i> Order Received';
+            html += '</button>';
+        }
+
+        if (tab === 'To Review' && !order._alreadyReviewed) {
+            // One review prompt per item in the order
+            for (var k = 0; k < items.length; k++) {
+                var m2 = items[k].match(/^(.*?)\s*×\s*(\d+)$/);
+                var name2 = m2 ? m2[1].trim() : items[k];
+                var game2 = null;
+                for (var g2 = 0; g2 < allGames.length; g2++) {
+                    if (allGames[g2].title === name2) { game2 = allGames[g2]; break; }
+                }
+                if (game2) {
+                    html += '<div class="review-prompt">';
+                    html += '<span class="reward-badge"><i class="fas fa-coins"></i> Earn 5 Wallet Points</span>';
+                    html += '<button class="rate-btn" onclick="openInlineReview(' + game2.id + ', \'' + orderId + '\')">';
+                    html += '<i class="fas fa-star"></i> Rate ' + name2;
+                    html += '</button>';
+                    html += '</div>';
+                }
+            }
+        }
+
+        html += '</div></div>';
+    }
+
+    myOrdersList.innerHTML = html;
+}
+
+// ===== Cancel unpaid order =====
+function cancelMyOrder(orderId) {
+    if (!confirm('Are you sure you want to cancel order ' + orderId + '?\n\nStock will be restored and any points used will be refunded.')) return;
+    showToast('Cancelling...');
+    google.script.run
+        .withSuccessHandler(function(res) {
+            showToast(res.message || 'Order cancelled.');
+            if (res.success) loadMyOrders();
+        })
+        .withFailureHandler(function(err) {
+            showToast('Error: ' + err.message);
+        })
+        .cancelCustomerOrder(orderId, customer.email);
+}
+
+// ===== Mark order received =====
+function confirmOrderReceived(orderId) {
+    if (!confirm('Have you received order ' + orderId + '?\n\nThis starts a 24-hour window to submit your review.')) return;
+    showToast('Confirming...');
+    google.script.run
+        .withSuccessHandler(function(res) {
+            showToast(res.message || 'Confirmed.');
+            if (res.success) loadMyOrders();
+        })
+        .withFailureHandler(function(err) {
+            showToast('Error: ' + err.message);
+        })
+        .markOrderReceived(orderId, customer.email);
+}
+
+// ===== Inline review form =====
+var inlineReviewGameId = null;
+var inlineReviewOrderId = null;
+var inlineReviewRating = 0;
+
+function openInlineReview(gameId, orderId) {
+    inlineReviewGameId = gameId;
+    inlineReviewOrderId = orderId;
+    inlineReviewRating = 0;
+
+    var game = null;
+    for (var i = 0; i < allGames.length; i++) {
+        if (allGames[i].id == gameId) { game = allGames[i]; break; }
+    }
+
+    var html = '<div class="order-card" style="max-width:600px; margin:0 auto;">';
+    html += '<div class="order-header">';
+    html += '<span class="order-id"><i class="fas fa-star" style="color:#f7d875;"></i> Rate Product</span>';
+    html += '<button class="back-btn" onclick="loadMyOrders()" style="background:#1a2538;border:1px solid #2a3a52;color:#b0c8e0;padding:6px 14px;border-radius:40px;cursor:pointer;font-size:12px;"><i class="fas fa-arrow-left"></i> Back</button>';
+    html += '</div>';
+
+    html += '<div style="text-align:center;margin-bottom:16px;">';
+    html += '<img src="' + ((game && game.image) ? game.image : PLACEHOLDER_IMG) + '" style="width:120px;height:80px;object-fit:contain;border-radius:12px;background:#0b0e14;" />';
+    html += '<h3 style="margin-top:8px;">' + (game ? game.title : 'Product') + '</h3>';
+    html += '<p style="color:#f7d875;font-weight:600;margin-top:4px;"><i class="fas fa-coins"></i> Earn 5 Wallet Points</p>';
+    html += '</div>';
+
+    html += '<div class="star-input" id="inlineStarInput" style="justify-content:center;margin-bottom:12px;">';
+    for (var s = 1; s <= 5; s++) {
+        html += '<i class="far fa-star" data-value="' + s + '" style="font-size:32px;color:#2a3a52;cursor:pointer;transition:0.15s;"></i>';
+    }
+    html += '</div>';
+
+    html += '<textarea id="inlineReviewText" placeholder="Optional: share your thoughts..." rows="3" style="width:100%;background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;color:#e8edf5;font-family:Inter;margin-bottom:12px;resize:vertical;"></textarea>';
+
+    html += '<div style="display:flex;gap:10px;">';
+    html += '<button id="inlineSubmitBtn" class="rate-btn" onclick="submitInlineReview()" style="flex:1;padding:12px;justify-content:center;"><i class="fas fa-check"></i> Submit Review</button>';
+    html += '<button onclick="loadMyOrders()" style="background:#1e2a3a;border:none;color:#8aa1c0;padding:12px 20px;border-radius:40px;cursor:pointer;font-weight:600;font-family:Inter;">Cancel</button>';
+    html += '</div>';
+
+    html += '<div id="inlineReviewError" style="color:#ff6b6b;margin-top:8px;min-height:20px;font-size:13px;"></div>';
+    html += '</div>';
+
+    myOrdersList.innerHTML = html;
+
+    // Wire up star clicks
+    var stars = document.querySelectorAll('#inlineStarInput i');
+    for (var si = 0; si < stars.length; si++) {
+        stars[si].addEventListener('click', function() {
+            inlineReviewRating = parseInt(this.dataset.value);
+            var all = document.querySelectorAll('#inlineStarInput i');
+            for (var a = 0; a < all.length; a++) {
+                var v = parseInt(all[a].dataset.value);
+                all[a].className = (v <= inlineReviewRating) ? 'fas fa-star' : 'far fa-star';
+                all[a].style.color = (v <= inlineReviewRating) ? '#f7d875' : '#2a3a52';
+            }
+        });
+        stars[si].addEventListener('mouseover', function() {
+            var val = parseInt(this.dataset.value);
+            var all = document.querySelectorAll('#inlineStarInput i');
+            for (var b = 0; b < all.length; b++) {
+                var v2 = parseInt(all[b].dataset.value);
+                all[b].style.color = (v2 <= val) ? '#f7d875' : '#2a3a52';
+            }
+        });
+        stars[si].addEventListener('mouseout', function() {
+            var all = document.querySelectorAll('#inlineStarInput i');
+            for (var c = 0; c < all.length; c++) {
+                var v3 = parseInt(all[c].dataset.value);
+                all[c].style.color = (v3 <= inlineReviewRating) ? '#f7d875' : '#2a3a52';
+            }
+        });
+    }
+}
+
+function submitInlineReview() {
+    var errEl = document.getElementById('inlineReviewError');
+    if (inlineReviewRating < 1) {
+        errEl.textContent = 'Please select a star rating.';
+        return;
+    }
+    var text = document.getElementById('inlineReviewText').value.trim();
+    var btn = document.getElementById('inlineSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+    google.script.run
+        .withSuccessHandler(function(res) {
+            if (res.success) {
+                showToast(res.message);
+                setTimeout(function() { loadMyOrders(); }, 800);
+            } else {
+                errEl.textContent = res.message;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Submit Review';
+            }
+        })
+        .withFailureHandler(function(err) {
+            errEl.textContent = 'Error: ' + err.message;
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check"></i> Submit Review';
+        })
+        .addReviewWithReward(inlineReviewGameId, customer.email, customer.name, inlineReviewRating, text, inlineReviewOrderId);
+}
 
         // ================================================================
         // 29. WISHLIST FUNCTIONS
@@ -12684,6 +13073,21 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
         // 40. INIT  (mode-aware)
         // ================================================================
         setupPaymentMethodSelector();
+
+        
+        // ================================================================
+        // 🆕 MY ORDERS — Tab click handlers
+        // ================================================================
+        (function setupOrderTabs() {
+            var tabs = document.querySelectorAll('.order-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].addEventListener('click', function() {
+                    var tabName = this.dataset.tab;
+                    renderOrderList(tabName);
+                });
+            }
+        })();
+
 
         if (IS_ADMIN_MODE) {
 
