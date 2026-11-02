@@ -463,6 +463,34 @@
             color: #0b0e14;
             border-color: #f7d875;
         }
+        /* ===== PROFILE PENDING-ORDER BADGE ===== */
+.profile-toggle { position: relative; }
+.profile-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: #ff4757;
+    color: #fff;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #0b0e14;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.5);
+    animation: profileBadgePulse 2s ease-in-out infinite;
+}
+.profile-badge.hidden { display: none; }
+@keyframes profileBadgePulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(255, 71, 87, 0.5); }
+    50%      { box-shadow: 0 2px 16px rgba(255, 71, 87, 0.9); }
+}
         .profile-dropdown-content {
             display: none;
             position: absolute;
@@ -694,6 +722,36 @@
         .confirm-panel .actions .confirm-reject:hover {
             background: #ff5252;
         }
+        /* ===== ORDER RECEIVED CONFIRM MODAL (Customer) ===== */
+.confirm-panel.order-received .icon.received { color: #4caf50; }
+.confirm-panel .order-id-chip {
+    display: inline-block;
+    background: #0b0e14;
+    color: #f7d875;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border: 1px solid #1e2a3a;
+    margin: 4px 0 16px;
+    word-break: break-all;
+}
+.confirm-panel .info-list {
+    text-align: left;
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    color: #b0c8e0;
+    line-height: 1.65;
+}
+.confirm-panel .info-list > div { display: flex; align-items: flex-start; gap: 8px; }
+.confirm-panel .info-list > div i { color: #f7d875; margin-top: 3px; flex-shrink: 0; }
+.confirm-panel .info-list + div { margin-top: 8px; }
 
         /* ===== GENRE CARDS CAROUSEL ===== */
         .genre-carousel-wrapper {
@@ -6405,9 +6463,10 @@
                 <span class="badge" id="cartCount">0</span>
             </button>
             <div class="profile-dropdown" id="profileDropdown">
-                <button class="profile-toggle" id="profileToggle">
-                    <i class="fas fa-user-circle"></i>
-                </button>
+<button class="profile-toggle" id="profileToggle">
+    <i class="fas fa-user-circle"></i>
+    <span class="profile-badge hidden" id="profileBadge">0</span>
+</button>
                 <div class="profile-dropdown-content" id="profileDropdownContent"></div>
             </div>
         </div>
@@ -7630,6 +7689,25 @@
             </div>
         </div>
     </div>
+
+        <!-- ===== ORDER RECEIVED CONFIRM MODAL (Customer) ===== -->
+    <div class="confirm-overlay" id="orderReceivedOverlay">
+        <div class="confirm-panel order-received">
+            <div class="icon received"><i class="fas fa-check-circle"></i></div>
+            <h3>Confirm Order Received</h3>
+            <p>Have you received this order?</p>
+            <div class="order-id-chip" id="orderReceivedId">ORD-XXXXXX-XXX</div>
+            <div class="info-list">
+                <div><i class="fas fa-info-circle"></i><span>Once you confirm, you'll be able to review each product in this order.</span></div>
+                <div style="margin-top:10px;"><i class="fas fa-star"></i><span>Each review earns you <strong style="color:#f7d875;">5 Wallet Points</strong>.</span></div>
+            </div>
+            <div class="actions">
+                <button class="confirm-cancel" id="orderReceivedCancel">Cancel</button>
+                <button class="confirm-approve" id="orderReceivedConfirm"><i class="fas fa-check"></i> Yes, I Received It</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- ===== CONFIRMATION MODAL ===== -->
     <div class="confirm-overlay" id="confirmOverlay">
@@ -10158,10 +10236,11 @@ loginError.textContent = '';
 // ✅ Reset sub-text back to default
 var sub = loginOverlay.querySelector('.sub');
 if (sub) sub.textContent = 'Welcome back! Log in to your account.';
-updateProfileDropdown();
-showToast('Welcome back, ' + (customer.name || customer.email) + '!');
-loadWishlistIds();
-renderPaginatedGrid();
+    updateProfileDropdown();
+    setTimeout(refreshPendingBadge, 400);
+    showToast('Welcome back, ' + (customer.name || customer.email) + '!');
+    loadWishlistIds();
+    renderPaginatedGrid();
 if (myAccountSection.classList.contains('visible')) {
     loadMyAccount();
     loadMyOrders();
@@ -10798,6 +10877,11 @@ if (pt === 'physical') {
                 if (productOverlay.classList.contains('open')) closeProductModal();
                 if (cartOverlay.classList.contains('open')) cartOverlay.classList.remove('open');
                 if (document.getElementById('qrOverlay').classList.contains('open')) closeQRModal();
+                var orOvl = document.getElementById('orderReceivedOverlay');
+                if (orOvl && orOvl.classList.contains('open')) {
+                    orOvl.classList.remove('open');
+                    window._pendingOrderReceivedId = null;
+                }
             }
         });
 
@@ -12065,6 +12149,7 @@ function loadOrders() {
             customer = null;
             wishlistIds = new Set();
             try { localStorage.removeItem('nex4up_customer'); } catch (e) {}
+            updateProfileBadge(0);
             updateProfileDropdown();
             showToast('Logged out successfully.');
             showStoreView();
@@ -12180,6 +12265,7 @@ function renderOrderTabCounts() {
     document.getElementById('countToShip').textContent = counts['To Ship'];
     document.getElementById('countToReceive').textContent = counts['To Receive'];
     document.getElementById('countToReview').textContent = counts['To Review'];
+    updateProfileBadge(counts['To Receive'] + counts['To Review']);
 }
 
 function renderOrderList(tab) {
@@ -12314,21 +12400,111 @@ function cancelMyOrder(orderId) {
 }
 
 function confirmOrderReceived(orderId) {
-    if (!confirm('Have you received order ' + orderId + '?\n\nOnce confirmed, you can review the products you purchased.')) return;
-    showToast('Confirming...');
+    showOrderReceivedModal(orderId);
+}
+
+function showOrderReceivedModal(orderId) {
+    var el = document.getElementById('orderReceivedId');
+    if (el) el.textContent = orderId;
+    window._pendingOrderReceivedId = orderId;
+    var overlay = document.getElementById('orderReceivedOverlay');
+    if (overlay) overlay.classList.add('open');
+}
+
+// ================================================================
+// 🎯 PENDING-ORDER BADGE + ORDER RECEIVED MODAL WIRING
+// ================================================================
+
+function updateProfileBadge(count) {
+    var badge = document.getElementById('profileBadge');
+    if (!badge) return;
+    var n = parseInt(count) || 0;
+    if (n > 0) {
+        badge.textContent = n > 99 ? '99+' : n;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
+function refreshPendingBadge() {
+    if (!customer || !customer.email) {
+        updateProfileBadge(0);
+        return;
+    }
     google.script.run
         .withSuccessHandler(function(res) {
-            showToast(res.message || 'Confirmed.');
-            if (res.success) {
-                // Small delay so the toast shows before the list refreshes
-                setTimeout(function() { loadMyOrders(); }, 250);
+            if (!res || !res.success || !res.orders) { updateProfileBadge(0); return; }
+            var pending = 0;
+            for (var i = 0; i < res.orders.length; i++) {
+                var t = res.orders[i]._tab;
+                if (t === 'To Receive' || t === 'To Review') pending++;
             }
+            updateProfileBadge(pending);
         })
-        .withFailureHandler(function(err) {
-            showToast('Error: ' + err.message);
-        })
-        .markOrderReceived(orderId, customer.email);
+        .withFailureHandler(function() { /* silent */ })
+        .getMyOrdersData(customer.email);
 }
+
+// Wire up the Order Received modal buttons
+(function setupOrderReceivedModal() {
+    var overlay = document.getElementById('orderReceivedOverlay');
+    var cancelBtn = document.getElementById('orderReceivedCancel');
+    var confirmBtn = document.getElementById('orderReceivedConfirm');
+    if (!overlay || !cancelBtn || !confirmBtn) return;
+
+    function close() {
+        overlay.classList.remove('open');
+        window._pendingOrderReceivedId = null;
+    }
+
+    cancelBtn.addEventListener('click', close);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+
+    confirmBtn.addEventListener('click', function() {
+        var oid = window._pendingOrderReceivedId;
+        if (!oid) { close(); return; }
+        if (!customer || !customer.email) {
+            close();
+            showToast('Please log in first.');
+            return;
+        }
+        var originalText = confirmBtn.innerHTML;
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming...';
+        showToast('Confirming...');
+
+        google.script.run
+            .withSuccessHandler(function(res) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = originalText;
+                close();
+                showToast((res && res.message) || 'Order confirmed!');
+                if (res && res.success) {
+                    setTimeout(function() {
+                        try { loadMyOrders(); } catch (e) {}
+                        refreshPendingBadge();
+                    }, 200);
+                }
+            })
+            .withFailureHandler(function(err) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = originalText;
+                showToast('Error: ' + err.message);
+            })
+            .markOrderReceived(oid, customer.email);
+    });
+})();
+
+// Light background poll so the badge stays fresh
+setInterval(function() {
+    if (customer && customer.email) refreshPendingBadge();
+}, 120000); // every 2 minutes
+
+// Refresh badge when user returns to the tab
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden && customer && customer.email) refreshPendingBadge();
+});
 
 // ===== Inline review form =====
 var inlineReviewGameId = null;
@@ -12428,6 +12604,7 @@ function submitInlineReview() {
                     }).getCustomerPoints(customer.email);
                 }
                 setTimeout(function() { loadMyOrders(); }, 700);
+                setTimeout(refreshPendingBadge, 900);
             } else {
                 errEl.textContent = res.message;
                 btn.disabled = false;
@@ -12743,12 +12920,13 @@ function submitInlineReview() {
                 var saved = localStorage.getItem('nex4up_customer');
                 if (saved) {
                     var data = JSON.parse(saved);
-                    if (data && data.email) {
-                        customer = data;
-                        updateProfileDropdown();
-                        setTimeout(loadWishlistIds, 500);
-                        return true;
-                    }
+                if (data && data.email) {
+                    customer = data;
+                    updateProfileDropdown();
+                    setTimeout(loadWishlistIds, 500);
+                    setTimeout(refreshPendingBadge, 800);
+                    return true;
+                }
                 }
             } catch (e) {}
             return false;
