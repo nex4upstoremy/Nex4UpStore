@@ -11127,23 +11127,27 @@ function loadOrders() {
                 });
 
                 // Payment Status dropdown (unchanged behavior)
-                var pStatus = getStatusValue(o);
+                // ✅ Payment Status dropdown — now mirrors the actual Payment Status field
+                var payStatusRaw = String(o['Payment Status'] || 'Awaiting Payment').trim();
+                var fulfilStatusRaw = String(o['Fulfilment Status'] || '').trim();
                 html += '<td><select class="order-status-select" data-orderid="' + (o['Order ID'] || '') + '">';
-                var pStatuses = ['Awaiting Payment', 'Awaiting Verification', 'Pending', 'Paid', 'Shipped', 'Cancelled'];
-                pStatuses.forEach(s => {
-                    html += '<option value="' + s + '"' + (pStatus === s ? ' selected' : '') + '>' + s + '</option>';
+                var pStatuses = ['Awaiting Payment', 'Awaiting Verification', 'Pending', 'Paid', 'Cancelled'];
+                pStatuses.forEach(function(s) {
+                    html += '<option value="' + s + '"' + (payStatusRaw === s ? ' selected' : '') + '>' + s + '</option>';
                 });
                 html += '</select></td>';
 
                 // Fulfilment column
-                var fulfil = String(o['Fulfilment Status'] || '').trim();
+                // ✅ Fulfilment column — separate from Payment Status
                 html += '<td>';
-                if (pStatus === 'Paid' && fulfil !== 'Shipped' && fulfil !== 'Delivered') {
+                if (payStatusRaw === 'Paid' && fulfilStatusRaw !== 'Shipped' && fulfilStatusRaw !== 'Delivered') {
                     html += '<button class="mark-shipped-btn" data-orderid="' + (o['Order ID'] || '') + '" '
                           + 'style="background:#2196f3;color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:Inter;font-weight:700;white-space:nowrap;">'
                           + '<i class="fas fa-truck"></i> Mark as Shipped</button>';
-                } else if (fulfil) {
-                    html += '<span style="color:#8aa1c0;font-size:12px;">' + fulfil + '</span>';
+                } else if (fulfilStatusRaw) {
+                    html += '<span style="color:#8aa1c0;font-size:12px;">' + fulfilStatusRaw + '</span>';
+                } else if (payStatusRaw === 'Paid') {
+                    html += '<span style="color:#6a7f9e;font-size:12px;">Awaiting Shipment</span>';
                 } else {
                     html += '<span style="color:#6a7f9e;font-size:12px;">—</span>';
                 }
@@ -12315,7 +12319,10 @@ function confirmOrderReceived(orderId) {
     google.script.run
         .withSuccessHandler(function(res) {
             showToast(res.message || 'Confirmed.');
-            if (res.success) loadMyOrders();
+            if (res.success) {
+                // Small delay so the toast shows before the list refreshes
+                setTimeout(function() { loadMyOrders(); }, 250);
+            }
         })
         .withFailureHandler(function(err) {
             showToast('Error: ' + err.message);
