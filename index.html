@@ -11092,102 +11092,102 @@ if (!hasVariants) {
         // ================================================================
         // 21. LOAD ORDERS
         // ================================================================
-        function loadOrders() {
-            ordersList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Payment Method</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>' + createSkeletonTableRows(5) + '</tbody></table></div>';
-            google.script.run
-                .withSuccessHandler(function(orders) {
-                    if (!orders || orders.length === 0) {
-                        ordersList.innerHTML = '<div class="empty-msg">No orders yet.</div>';
-                        return;
-                    }
-                    var sampleOrder = orders[0];
-                    var allKeys = Object.keys(sampleOrder);
-                    var displayColumns = [
-                        { key: 'Order ID', label: 'Order ID' },
-                        { key: 'Date', label: 'Date' },
-                        { key: 'Customer Name', label: 'Customer' },
-                        { key: 'Phone', label: 'Phone' },
-                        { key: 'Payment Method', label: 'Payment' },
-                        { key: 'Email', label: 'Email' },
-                        { key: 'Items', label: 'Items' },
-                        { key: 'Total (RM)', label: 'Total' }
-                    ];
-                    var activeColumns = [];
-                    for (var i = 0; i < displayColumns.length; i++) {
-                        if (allKeys.indexOf(displayColumns[i].key) !== -1) activeColumns.push(displayColumns[i]);
-                    }
-                    var html = '<table><thead><tr>';
-                    for (var j = 0; j < activeColumns.length; j++) {
-                        html += '<th>' + activeColumns[j].label + '</th>';
-                    }
-                    html += '<th>Status</th></tr></thead><tbody>';
-                    for (var oi = 0; oi < orders.length; oi++) {
-                        var o = orders[oi];
-                        html += '<tr>';
-                        for (var ac = 0; ac < activeColumns.length; ac++) {
-                            var val = o[activeColumns[ac].key] || '';
-                            if (activeColumns[ac].key === 'Total (RM)') {
-                                html += '<td>' + CURRENCY + ' ' + parseFloat(val || 0).toFixed(2) + '</td>';
-                            } else {
-                                html += '<td>' + val + '</td>';
-                            }
-                        }
-                        var status = getStatusValue(o);
-                        var statusSlug = status.toLowerCase().replace(/\s+/g, '-');
-                        html += '<td><select class="order-status-select" data-orderid="' + (o['Order ID'] || '') + '">';
-                        var statuses = ['Awaiting Payment', 'Awaiting Verification', 'Pending', 'Paid', 'Shipped', 'Cancelled'];
-                        for (var s = 0; s < statuses.length; s++) {
-                            html += '<option value="' + statuses[s] + '" ' + (status === statuses[s] ? 'selected' : '') + '>' + statuses[s] + '</option>';
-                        }
-                        html += '</select>';
-// 🆕 Confirm Delivery button (only for Paid/Shipped orders)
-var fulfil = String(o['Fulfilment Status'] || '').trim();
-if (status === 'Paid' || status === 'Shipped' || fulfil === 'Shipped') {
-    html += ' <button class="confirm-delivery-btn" data-orderid="' + (o['Order ID'] || '') + '" title="Mark as delivered — starts 24h auto-confirm window" style="background:#2196f3;color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:Inter;font-weight:700;white-space:nowrap;"><i class="fas fa-truck"></i> Delivery Confirmed</button>';
+function loadOrders() {
+    ordersList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Payment</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Fulfilment</th></tr></thead><tbody>' + createSkeletonTableRows(5) + '</tbody></table></div>';
+    google.script.run
+        .withSuccessHandler(function(orders) {
+            if (!orders || orders.length === 0) {
+                ordersList.innerHTML = '<div class="empty-msg">No orders yet.</div>';
+                return;
+            }
+            var sample = orders[0];
+            var allKeys = Object.keys(sample);
+            var cols = [
+                { key: 'Order ID', label: 'Order ID' },
+                { key: 'Date', label: 'Date' },
+                { key: 'Customer Name', label: 'Customer' },
+                { key: 'Phone', label: 'Phone' },
+                { key: 'Payment Method', label: 'Payment' },
+                { key: 'Email', label: 'Email' },
+                { key: 'Items', label: 'Items' },
+                { key: 'Total (RM)', label: 'Total' }
+            ].filter(c => allKeys.indexOf(c.key) !== -1);
+
+            var html = '<table><thead><tr>';
+            cols.forEach(c => { html += '<th>' + c.label + '</th>'; });
+            html += '<th>Payment Status</th><th>Fulfilment</th></tr></thead><tbody>';
+
+            for (var i = 0; i < orders.length; i++) {
+                var o = orders[i];
+                html += '<tr>';
+                cols.forEach(c => {
+                    var v = o[c.key] || '';
+                    if (c.key === 'Total (RM)') v = CURRENCY + ' ' + parseFloat(v || 0).toFixed(2);
+                    html += '<td>' + v + '</td>';
+                });
+
+                // Payment Status dropdown (unchanged behavior)
+                var pStatus = getStatusValue(o);
+                html += '<td><select class="order-status-select" data-orderid="' + (o['Order ID'] || '') + '">';
+                var pStatuses = ['Awaiting Payment', 'Awaiting Verification', 'Pending', 'Paid', 'Shipped', 'Cancelled'];
+                pStatuses.forEach(s => {
+                    html += '<option value="' + s + '"' + (pStatus === s ? ' selected' : '') + '>' + s + '</option>';
+                });
+                html += '</select></td>';
+
+                // Fulfilment column
+                var fulfil = String(o['Fulfilment Status'] || '').trim();
+                html += '<td>';
+                if (pStatus === 'Paid' && fulfil !== 'Shipped' && fulfil !== 'Delivered') {
+                    html += '<button class="mark-shipped-btn" data-orderid="' + (o['Order ID'] || '') + '" '
+                          + 'style="background:#2196f3;color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:Inter;font-weight:700;white-space:nowrap;">'
+                          + '<i class="fas fa-truck"></i> Mark as Shipped</button>';
+                } else if (fulfil) {
+                    html += '<span style="color:#8aa1c0;font-size:12px;">' + fulfil + '</span>';
+                } else {
+                    html += '<span style="color:#6a7f9e;font-size:12px;">—</span>';
+                }
+                html += '</td></tr>';
+            }
+            html += '</tbody></table>';
+            ordersList.innerHTML = html;
+
+            // Payment status change
+            var selects = ordersList.querySelectorAll('.order-status-select');
+            for (var s = 0; s < selects.length; s++) {
+                selects[s].addEventListener('change', function() {
+                    updateOrderStatus(this.dataset.orderid, this.value);
+                });
+            }
+
+            // Mark as Shipped
+            var shipBtns = ordersList.querySelectorAll('.mark-shipped-btn');
+            for (var b = 0; b < shipBtns.length; b++) {
+                shipBtns[b].addEventListener('click', function() {
+                    var oid = this.dataset.orderid;
+                    if (!confirm('Mark order ' + oid + ' as Shipped?\n\nThe customer will then see an "Order Received" button.')) return;
+                    var btn = this;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    google.script.run
+                        .withSuccessHandler(function(res) {
+                            showToast(res.message || 'Shipped.');
+                            loadOrders();
+                        })
+                        .withFailureHandler(function(err) {
+                            showToast('Error: ' + err.message);
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-truck"></i> Mark as Shipped';
+                        })
+                        .updateFulfilmentStatus(oid, 'Shipped');
+                });
+            }
+        })
+        .withFailureHandler(function(err) {
+            ordersList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading orders: ' + err.message + '</p>';
+        })
+        .getOrdersData();
 }
-html += '</td></tr>';
-                    }
-                    html += '</tbody></table>';
-                    ordersList.innerHTML = html;
-                    var selects = ordersList.querySelectorAll('.order-status-select');
-                    for (var sel = 0; sel < selects.length; sel++) {
-                        selects[sel].addEventListener('change', function() {
-                            var orderId = this.dataset.orderid;
-                            var newStatus = this.value;
-                            updateOrderStatus(orderId, newStatus);
-                        });
-                    }
-
-                    // 🆕 Wire up Confirm Delivery buttons
-                    var deliveryBtns = ordersList.querySelectorAll('.confirm-delivery-btn');
-                    for (var db = 0; db < deliveryBtns.length; db++) {
-                        deliveryBtns[db].addEventListener('click', function() {
-                            var oid = this.dataset.orderid;
-                            var trackingNum = prompt('Enter tracking number (optional, leave blank to skip):') || '';
-                            var trackingUrl = '';
-                            if (trackingNum) {
-                                trackingUrl = prompt('Enter tracking URL (optional):') || '';
-                            }
-                            if (!confirm('Mark order ' + oid + ' as delivered?\n\nThis starts a 24-hour auto-confirm countdown for the customer.')) return;
-
-                            google.script.run
-                                .withSuccessHandler(function(res) {
-                                    showToast(res.message || 'Delivery confirmed.');
-                                    if (res.success) loadOrders();
-                                })
-                                .withFailureHandler(function(err) {
-                                    showToast('Error: ' + err.message);
-                                })
-                                .confirmDeliveryBySeller(oid, trackingNum, trackingUrl);
-                        });
-                    }
-
-                })                  // ⬅️ unchanged
-                .withFailureHandler(function(err) {
-                    ordersList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading orders: ' + err.message + '</p>';
-                })
-                .getOrdersData();
-        }
 
         function getStatusValue(order) {
             var statusKeys = ['Payment Status', 'Status', 'payment status', 'status'];
@@ -12181,7 +12181,6 @@ function renderOrderTabCounts() {
 function renderOrderList(tab) {
     activeOrderTab = tab;
 
-    // Update active tab visual
     var allTabs = document.querySelectorAll('.order-tab');
     for (var t = 0; t < allTabs.length; t++) {
         allTabs[t].classList.toggle('active', allTabs[t].dataset.tab === tab);
@@ -12193,8 +12192,8 @@ function renderOrderList(tab) {
         var emptyMsg = {
             'All': 'You haven\'t placed any orders yet.',
             'To Pay': 'Nothing waiting for payment.',
-            'To Ship': 'No orders are currently being prepared for shipment.',
-            'To Receive': 'No orders are currently in transit.',
+            'To Ship': 'No orders awaiting shipment.',
+            'To Receive': 'No orders currently in transit.',
             'To Review': 'You have no pending reviews. Thank you for shopping with Nex4UpStore!'
         }[tab] || 'No orders found.';
         myOrdersList.innerHTML = '<div class="order-empty-state"><i class="fas fa-box-open"></i><p>' + emptyMsg + '</p></div>';
@@ -12210,6 +12209,7 @@ function renderOrderList(tab) {
         var status = order._customerStatus || getStatusValue(order);
         var statusClass = 'status-' + status.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z-]/g, '');
         var items = String(order['Items'] || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+        var reviewedIds = order._reviewedProductIds || [];
 
         html += '<div class="order-card">';
         html += '<div class="order-header">';
@@ -12217,7 +12217,6 @@ function renderOrderList(tab) {
         html += '<span class="order-date">' + date + '</span>';
         html += '</div>';
 
-        // Items
         html += '<div class="order-items">';
         for (var j = 0; j < items.length; j++) {
             var match = items[j].match(/^(.*?)\s*×\s*(\d+)$/);
@@ -12227,6 +12226,12 @@ function renderOrderList(tab) {
             for (var g = 0; g < allGames.length; g++) {
                 if (allGames[g].title === name) { game = allGames[g]; break; }
             }
+            if (!game) {
+                var stripped = name.replace(/\s*\([^)]*\)\s*$/, '').trim();
+                for (var g2 = 0; g2 < allGames.length; g2++) {
+                    if (allGames[g2].title === stripped) { game = allGames[g2]; break; }
+                }
+            }
             var img = (game && game.image) ? game.image : PLACEHOLDER_IMG;
             html += '<div class="order-item-row">';
             html += '<img src="' + img + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
@@ -12235,42 +12240,49 @@ function renderOrderList(tab) {
         }
         html += '</div>';
 
-        // Footer
         html += '<div class="order-footer">';
         html += '<span class="order-total">RM ' + total + '</span>';
         html += '<span class="status-badge ' + statusClass + '">' + status + '</span>';
         html += '</div>';
 
-        // Actions
         html += '<div class="order-actions">';
 
         if (tab === 'To Pay') {
             html += '<button class="rate-btn" style="background:#ff6b6b;color:#fff;" onclick="cancelMyOrder(\'' + orderId + '\')">';
-            html += '<i class="fas fa-times"></i> Cancel Order';
-            html += '</button>';
+            html += '<i class="fas fa-times"></i> Cancel Order</button>';
         }
 
         if (tab === 'To Receive') {
             html += '<button class="rate-btn" onclick="confirmOrderReceived(\'' + orderId + '\')">';
-            html += '<i class="fas fa-check-circle"></i> Order Received';
-            html += '</button>';
+            html += '<i class="fas fa-check-circle"></i> Order Received</button>';
         }
 
-        if (tab === 'To Review' && !order._alreadyReviewed) {
-            // One review prompt per item in the order
+        if (tab === 'To Review') {
             for (var k = 0; k < items.length; k++) {
                 var m2 = items[k].match(/^(.*?)\s*×\s*(\d+)$/);
                 var name2 = m2 ? m2[1].trim() : items[k];
                 var game2 = null;
-                for (var g2 = 0; g2 < allGames.length; g2++) {
-                    if (allGames[g2].title === name2) { game2 = allGames[g2]; break; }
+                for (var g3 = 0; g3 < allGames.length; g3++) {
+                    if (allGames[g3].title === name2) { game2 = allGames[g3]; break; }
                 }
-                if (game2) {
+                if (!game2) {
+                    var st2 = name2.replace(/\s*\([^)]*\)\s*$/, '').trim();
+                    for (var g4 = 0; g4 < allGames.length; g4++) {
+                        if (allGames[g4].title === st2) { game2 = allGames[g4]; break; }
+                    }
+                }
+                if (!game2) continue;
+
+                var alreadyReviewed = reviewedIds.indexOf(String(game2.id)) !== -1;
+                if (alreadyReviewed) {
+                    html += '<div class="review-prompt" style="opacity:0.7;">';
+                    html += '<span class="reward-badge" style="color:#4caf50;"><i class="fas fa-check-circle"></i> ' + name2 + ' — Reviewed</span>';
+                    html += '</div>';
+                } else {
                     html += '<div class="review-prompt">';
                     html += '<span class="reward-badge"><i class="fas fa-coins"></i> Earn 5 Wallet Points</span>';
                     html += '<button class="rate-btn" onclick="openInlineReview(' + game2.id + ', \'' + orderId + '\')">';
-                    html += '<i class="fas fa-star"></i> Rate ' + name2;
-                    html += '</button>';
+                    html += '<i class="fas fa-star"></i> Rate ' + name2 + '</button>';
                     html += '</div>';
                 }
             }
@@ -12297,9 +12309,8 @@ function cancelMyOrder(orderId) {
         .cancelCustomerOrder(orderId, customer.email);
 }
 
-// ===== Mark order received =====
 function confirmOrderReceived(orderId) {
-    if (!confirm('Have you received order ' + orderId + '?\n\nThis starts a 24-hour window to submit your review.')) return;
+    if (!confirm('Have you received order ' + orderId + '?\n\nOnce confirmed, you can review the products you purchased.')) return;
     showToast('Confirming...');
     google.script.run
         .withSuccessHandler(function(res) {
@@ -12402,7 +12413,14 @@ function submitInlineReview() {
         .withSuccessHandler(function(res) {
             if (res.success) {
                 showToast(res.message);
-                setTimeout(function() { loadMyOrders(); }, 800);
+                // Refresh balance in profile if visible
+                if (customer && document.getElementById('profilePoints')) {
+                    google.script.run.withSuccessHandler(function(points) {
+                        var el = document.getElementById('profilePoints');
+                        if (el) el.textContent = points + ' Points (= RM' + (points * 0.01).toFixed(2) + ')';
+                    }).getCustomerPoints(customer.email);
+                }
+                setTimeout(function() { loadMyOrders(); }, 700);
             } else {
                 errEl.textContent = res.message;
                 btn.disabled = false;
