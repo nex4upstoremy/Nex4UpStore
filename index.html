@@ -6538,6 +6538,9 @@
             <div class="sidebar-item" data-section="orders">
                 <i class="fas fa-box"></i> Orders
             </div>
+                        <div class="sidebar-item" data-section="robux-inventory">
+                <i class="fas fa-gem"></i> Robux Inventory
+            </div>
             <div class="sidebar-item" data-section="genres">
                 <i class="fas fa-images"></i> Genres
             </div>
@@ -6952,6 +6955,108 @@
                     <div class="orders-container">
                         <div id="ordersList"><p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading orders...</p></div>
                     </div>
+                </div>
+
+                                <!-- ===== 💎 ROBUX INVENTORY ===== -->
+                <div class="admin-section" id="section-robux-inventory">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+                        <h2 style="margin:0;"><i class="fas fa-gem"></i> Robux Inventory</h2>
+                        <button class="submit-btn" id="robuxRefreshBtn" style="padding:8px 20px; font-size:14px;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+
+                    <div id="robuxStatusBanner" style="margin-bottom:16px;"></div>
+
+                    <div class="dashboard-stats" id="robuxStats" style="grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:12px;">
+                        <div class="stat-card"><div class="stat-number" id="rbStatPurchased">0</div><div class="stat-label">Total Purchased</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatStock">0</div><div class="stat-label">Current Stock</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatReserved" style="color:#ffa726;">0</div><div class="stat-label">Reserved</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatAvailable" style="color:#4caf50;">0</div><div class="stat-label">Available</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatSold">0</div><div class="stat-label">Total Sold</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatAvg" style="font-size:22px;">RM 0.00</div><div class="stat-label">Avg Cost / 100</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatValue" style="font-size:22px;">RM 0.00</div><div class="stat-label">Inventory Value</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatLatest" style="font-size:22px;">RM 0.00</div><div class="stat-label">Latest Cost / 100</div></div>
+                    </div>
+
+                    <div class="extra-sections" style="margin-top:20px;">
+                        <div class="extra-card">
+                            <h3><i class="fas fa-hourglass-half"></i> Backorders</h3>
+                            <div id="robuxBackorderSummary"><p style="color:#6a7f9e;">Loading...</p></div>
+                        </div>
+                        <div class="extra-card">
+                            <h3><i class="fas fa-cart-plus"></i> Add Robux Stock</h3>
+                            <form id="robuxPurchaseForm" style="display:flex; flex-direction:column; gap:10px;">
+                                <div class="field"><label>Purchase Date</label><input type="date" id="rbPurchaseDate" /></div>
+                                <div class="field"><label>Robux Quantity *</label><input type="number" id="rbPurchaseQty" min="1" step="1" required placeholder="1000" /></div>
+                                <div class="field"><label>Total Cost (RM) *</label><input type="number" id="rbPurchaseCost" min="0" step="0.01" required placeholder="34.50" /></div>
+                                <div class="field"><label>Supplier / Source</label><input type="text" id="rbPurchaseSupplier" placeholder="Optional" /></div>
+                                <div class="field"><label>Notes</label><input type="text" id="rbPurchaseNotes" placeholder="Optional" /></div>
+                                <div class="field"><label>Cost per 100 (auto)</label><input type="text" id="rbPurchaseCostPer100" readonly value="RM 0.00" style="color:#f7d875;" /></div>
+                                <button type="submit" class="submit-btn" id="rbPurchaseSubmit" style="justify-content:center;">
+                                    <i class="fas fa-plus"></i> Add Stock
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="admin-form-section" style="margin-top:20px;">
+                        <div class="admin-form-section-header"><i class="fas fa-sliders-h"></i> Manual Stock Adjustment</div>
+                        <form id="robuxAdjustForm" class="admin-form" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap:14px; align-items:end;">
+                            <div class="field"><label>Quantity (+ / -) *</label><input type="number" id="rbAdjustQty" step="1" required placeholder="e.g. -50" /></div>
+                            <div class="field"><label>Reason *</label><input type="text" id="rbAdjustReason" required placeholder="Why is stock changing?" /></div>
+                            <div class="field"><label>Cost per 100 override (optional)</label><input type="number" id="rbAdjustCost" step="0.0001" min="0" placeholder="Leave blank for current avg" /></div>
+                            <div class="field"><button type="submit" class="submit-btn" style="justify-content:center;"><i class="fas fa-check"></i> Apply Adjustment</button></div>
+                        </form>
+                    </div>
+
+                    <div class="admin-form-section" style="margin-top:20px;">
+                        <div class="admin-form-section-header"><i class="fas fa-tags"></i> Selling Price Management</div>
+                        <form id="robuxPricingSettingsForm" class="admin-form" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap:14px; align-items:end;">
+                            <div class="field"><label>Pricing Mode</label>
+                                <select id="rbPricingMode">
+                                    <option value="manual">Manual (I set prices)</option>
+                                    <option value="auto">Automatic (cost + markup)</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>Target Markup (%)</label><input type="number" id="rbTargetMarkup" min="0" step="0.1" /></div>
+                            <div class="field"><label>Rounding Rule</label>
+                                <select id="rbRoundingRule">
+                                    <option value="none">No rounding</option>
+                                    <option value="0.01">Nearest 0.01</option>
+                                    <option value="0.05">Nearest 0.05</option>
+                                    <option value="0.10">Nearest 0.10</option>
+                                    <option value="0.50">Nearest 0.50</option>
+                                    <option value="1.00">Nearest 1.00</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>Low Stock Threshold</label><input type="number" id="rbLowStockThreshold" min="0" step="1" /></div>
+                            <div class="field"><button type="submit" class="submit-btn" style="justify-content:center;"><i class="fas fa-save"></i> Save Settings</button></div>
+                        </form>
+
+                        <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" class="submit-btn" id="rbApplySuggestedBtn" style="padding:8px 18px; font-size:13px; background:#2a3a52; color:#f7d875; border:1px solid #3d5a7a;">
+                                <i class="fas fa-magic"></i> Apply Suggested Prices (Auto Mode)
+                            </button>
+                            <button type="button" class="submit-btn" id="rbSaveManualPricesBtn" style="padding:8px 18px; font-size:13px;">
+                                <i class="fas fa-save"></i> Save Manual Prices
+                            </button>
+                        </div>
+                        <div id="rbPricingNotice" style="margin-top:10px; font-size:13px; min-height:18px;"></div>
+
+                        <div class="orders-container" style="margin-top:14px;">
+                            <div id="robuxPricingTable"><p style="color:#6a7f9e; text-align:center; padding:16px;">Loading...</p></div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin:24px 0 12px;"><i class="fas fa-receipt"></i> Purchase History</h3>
+                    <div class="orders-container" id="robuxPurchaseHistory"><p style="color:#6a7f9e; text-align:center; padding:16px;">Loading...</p></div>
+
+                    <h3 style="margin:24px 0 12px;"><i class="fas fa-exchange-alt"></i> Transaction History</h3>
+                    <div class="orders-container" id="robuxTransactionHistory"><p style="color:#6a7f9e; text-align:center; padding:16px;">Loading...</p></div>
+
+                    <h3 style="margin:24px 0 12px;"><i class="fas fa-hourglass-half"></i> Backorder Queue (FIFO)</h3>
+                    <div class="orders-container" id="robuxBackorderList"><p style="color:#6a7f9e; text-align:center; padding:16px;">Loading...</p></div>
                 </div>
 
                 <!-- Genres Management -->
@@ -7754,6 +7859,30 @@
         </div>
     </div>
 
+        <!-- ===== ⚠️ ROBUX BACKORDER WARNING ===== -->
+    <div class="confirm-overlay" id="robuxBackorderOverlay">
+        <div class="confirm-panel" style="max-width:500px; text-align:left;">
+            <div class="icon" style="color:#ffa726; text-align:center; font-size:42px; margin-bottom:8px;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 style="text-align:center;">⚠️ Limited Robux Stock</h3>
+            <p id="robuxBackorderText" style="color:#b0c8e0; font-size:14px; line-height:1.65; margin:10px 0 14px;"></p>
+            <div style="background:#0b0e14; border:1px solid #1e2a3a; border-radius:12px; padding:12px 14px; font-size:13px; color:#b0c8e0; line-height:1.7; margin-bottom:18px;">
+                <div><i class="fas fa-clock" style="color:#f7d875;"></i> Your order may require additional processing time.</div>
+                <div><i class="fas fa-boxes" style="color:#f7d875;"></i> We need to replenish the remaining Robux stock.</div>
+                <div><i class="fas fa-calendar-alt" style="color:#f7d875;"></i> Delivery may take at least 1 day or longer, depending on stock availability.</div>
+                <div style="margin-top:8px; color:#ffa726; font-weight:700;">
+                    Backorder quantity: <span id="robuxBackorderShortage">0</span> Robux
+                </div>
+            </div>
+            <p style="color:#e8edf5; font-weight:600; margin-bottom:14px;">Would you like to continue with this purchase?</p>
+            <div class="actions" style="justify-content:stretch;">
+                <button class="confirm-cancel" id="robuxBackorderNo" style="flex:1;">No, Cancel Purchase</button>
+                <button class="confirm-approve" id="robuxBackorderYes" style="flex:1; background:#f7d875; color:#0b0e14;">Yes, I Agree &amp; Continue</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- ===== CONFIRMATION MODAL ===== -->
     <div class="confirm-overlay" id="confirmOverlay">
@@ -8358,6 +8487,7 @@ var agentCodeFromUrl = null;
             'inbox': document.getElementById('section-inbox'),
             'payment-approval': document.getElementById('section-payment-approval'),
             'orders': document.getElementById('section-orders'),
+            'robux-inventory': document.getElementById('section-robux-inventory'),
             'genres': document.getElementById('section-genres'),
             'referral-settings': document.getElementById('section-referral-settings'),
             'sales-team': document.getElementById('section-sales-team'), // ✅ ADD THIS LINE
@@ -8914,7 +9044,8 @@ html += '</div>';
                 }
                 var stock = game.quantity || 0;
                 var sold = game.sold || 0;
-                var outOfStock = stock <= 0;
+                var isRobuxProduct = parseRobuxAmountTitle(game.title) > 0;
+                var outOfStock = isRobuxProduct ? false : (stock <= 0);
                 var isWishlisted = wishlistIds.has(game.id);
                 var avgRating = game.avgRating || 0;
                 var reviewCount = game.reviewCount || 0;
@@ -8952,7 +9083,11 @@ html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title 
                 var preOrderBadge = (game.productType === 'physical')
                     ? ' <span style="color:#f7d875; font-weight:600;">· Pre-Order (Ships 13th)</span>'
                     : '';
-                html += '<div class="stock-info ' + (outOfStock ? 'out-of-stock' : '') + '">' + (outOfStock ? 'Out of Stock' : 'Stock: ' + stock) + ' | Sold: ' + sold + preOrderBadge + '</div>';
+                 html += '<div class="stock-info ' + (outOfStock ? 'out-of-stock' : '') + '">' +
+                    (isRobuxProduct
+                        ? 'Central Robux stock · Sold: ' + sold
+                        : (outOfStock ? 'Out of Stock' : 'Stock: ' + stock) + ' | Sold: ' + sold) +
+                    preOrderBadge + '</div>';
                 html += '<div class="card-footer">';
                 html += '<div class="price">' + priceDisplay + '</div>';
 
@@ -9066,7 +9201,7 @@ html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title 
                     var card = this.closest('.game-card');
                     var qtyInput = card.querySelector('.qty-input');
                     var qty = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
-                    var maxStock = game.quantity || 0;
+                    var maxStock = parseRobuxAmountTitle(game.title) > 0 ? 999999 : (game.quantity || 0);
                     if (qty > maxStock) {
                         showToast('Only ' + maxStock + ' in stock.');
                         qtyInput.value = maxStock;
@@ -9968,51 +10103,79 @@ checkoutBtn.addEventListener('click', function() {
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing...';
 
-            google.script.run
-                .withSuccessHandler(function(orderId) {
-                    showToast('✅ Order placed! Order ID: ' + orderId);
-                    var paidAmount = finalTotal;
-                    var paidMethod = selectedPaymentMethod;
-                    cart = [];
-                    appliedPromo = null;
-                    renderCart();
-                    loadGames();
-                    checkoutOverlay.classList.remove('open');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
-                    checkoutForm.reset();
-                    document.getElementById('promoFeedback').textContent = '';
-                    document.getElementById('gameIdFields').innerHTML = '';
-                    resetPaymentMethodSelector();
-                    // ✅ Reset shipping fields
-                    ['shippingName','shippingPhone','shippingAddress','shippingCity','shippingState','shippingPostcode'].forEach(function(id) {
-                        var el = document.getElementById(id);
-                        if (el) el.value = '';
-                    });
-                    document.getElementById('shippingFormContainer').style.display = 'none';
+            function doPlaceOrder(backorderAccepted) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing...';
 
-                    // ✅ NEW: Open QR modal
-                    setTimeout(function() {
-                        openQRModal(orderId, paidMethod, paidAmount);
-                    }, 250);
+                google.script.run
+                    .withSuccessHandler(function(orderId) {
+                        showToast('✅ Order placed! Order ID: ' + orderId);
+                        var paidAmount = finalTotal;
+                        var paidMethod = selectedPaymentMethod;
+                        cart = [];
+                        appliedPromo = null;
+                        renderCart();
+                        loadGames();
+                        checkoutOverlay.classList.remove('open');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                        checkoutForm.reset();
+                        document.getElementById('promoFeedback').textContent = '';
+                        document.getElementById('gameIdFields').innerHTML = '';
+                        resetPaymentMethodSelector();
+                        ['shippingName','shippingPhone','shippingAddress','shippingCity','shippingState','shippingPostcode'].forEach(function(id) {
+                            var el = document.getElementById(id);
+                            if (el) el.value = '';
+                        });
+                        document.getElementById('shippingFormContainer').style.display = 'none';
 
-                    if (isAdmin) {
-                        loadOrders();
-                        loadAdvancedDashboard();
-                        loadPendingOrders();
-                    }
-                    if (customer) {
-                        loadMyOrders();
-                    }
-                })
-                .withFailureHandler(function(err) {
-                    checkoutError.textContent = 'Error placing order. Please try again.';
-                    console.error(err);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
-                })
-                    .placeOrder(customerData, items, total2, promoData, gameIds, selectedPaymentMethod, pointsToRedeem, shippingData, hasPhysicalItem, agentCodeFromUrl || '');
-        });
+                        setTimeout(function() {
+                            openQRModal(orderId, paidMethod, paidAmount);
+                        }, 250);
+
+                        if (isAdmin) {
+                            loadOrders();
+                            loadAdvancedDashboard();
+                            loadPendingOrders();
+                        }
+                        if (customer) {
+                            loadMyOrders();
+                        }
+                    })
+                    .withFailureHandler(function(err) {
+                        checkoutError.textContent = 'Error placing order. Please try again.';
+                        console.error(err);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                    })
+                    .placeOrder(customerData, items, total2, promoData, gameIds, selectedPaymentMethod, pointsToRedeem, shippingData, hasPhysicalItem, agentCodeFromUrl || '', backorderAccepted);
+            }
+
+            var robuxRequiredNow = getCartRobuxRequired();
+            if (robuxRequiredNow > 0) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking stock...';
+                google.script.run
+                    .withSuccessHandler(function(stock) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                        if (stock && stock.success && stock.available < robuxRequiredNow) {
+                            showRobuxBackorderModal(robuxRequiredNow, stock.available, function(accepted) {
+                                if (accepted) doPlaceOrder(true);
+                            });
+                        } else {
+                            doPlaceOrder(false);
+                        }
+                    })
+                    .withFailureHandler(function(err) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                        checkoutError.textContent = 'Could not check Robux stock: ' + err.message;
+                    })
+                    .getRobuxStockForCheckout(robuxRequiredNow);
+            } else {
+                doPlaceOrder(false);
+            }
 
         // ================================================================
         // 10.5. PAYMENT FLOW (NEW)
@@ -10519,6 +10682,8 @@ if (cart.length > 0) {
                     } else if (section === 'inbox') {
                         loadInboxConversations();
                         refreshAdminUnreadBadge();
+                    } else if (section === 'robux-inventory') {
+                        loadRobuxInventory();
                     }
                 }
             });
@@ -11333,7 +11498,7 @@ function loadOrders() {
 
             var html = '<table><thead><tr>';
             cols.forEach(c => { html += '<th>' + c.label + '</th>'; });
-            html += '<th>Payment Status</th><th>Fulfilment</th></tr></thead><tbody>';
+            html += '<th>Payment Status</th><th>Fulfilment</th><th>Robux</th></tr></thead><tbody>';
 
             for (var i = 0; i < orders.length; i++) {
                 var o = orders[i];
@@ -11368,6 +11533,17 @@ function loadOrders() {
                     html += '<span style="color:#6a7f9e;font-size:12px;">Awaiting Shipment</span>';
                 } else {
                     html += '<span style="color:#6a7f9e;font-size:12px;">—</span>';
+                }
+                html += '</td>';
+
+                var rbReq = parseInt(o['Robux Required'], 10) || 0;
+                var rbBack = parseInt(o['Robux Backorder'], 10) || 0;
+                html += '<td>';
+                if (rbReq > 0) {
+                    html += '<span style="font-size:11px;color:#f7d875;font-weight:700;">' + rbReq + ' Robux</span>';
+                    if (rbBack > 0) html += '<br><span style="font-size:10px;color:#ffa726;">' + rbBack + ' backorder</span>';
+                } else {
+                    html += '<span style="color:#4f6080;">—</span>';
                 }
                 html += '</td></tr>';
             }
@@ -11905,7 +12081,7 @@ function loadOrders() {
                 CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2) + ' <span class="original">' + CURRENCY + ' ' + game.price.toFixed(2) + '</span>' :
                 CURRENCY + ' ' + game.price.toFixed(2);
             productModalPrice.innerHTML = priceDisplay;
-            var stock = game.quantity || 0;
+            var stock = parseRobuxAmountTitle(game.title) > 0 ? 999999 : (game.quantity || 0);
             // ✅ If product has variants — show picker
             if (game.hasVariants && game.variantOptions && game.variantOptions.length > 0) {
                 resetVariantPicker();
@@ -12031,7 +12207,7 @@ function loadOrders() {
             }
 
             // ✅ Non-variant product (existing behavior)
-            var maxStock = game.quantity || 0;
+            var maxStock = parseRobuxAmountTitle(game.title) > 0 ? 999999 : (game.quantity || 0);
             if (qty > maxStock) {
                 showToast('Only ' + maxStock + ' in stock.');
                 modalQtyInput.value = maxStock;
@@ -12488,6 +12664,21 @@ function renderOrderList(tab) {
         html += '<span class="order-total">RM ' + total + '</span>';
         html += '<span class="status-badge ' + statusClass + '">' + status + '</span>';
         html += '</div>';
+        var boStatus = String(order['Backorder Status'] || '');
+        var payStatusStr = String(order['Payment Status'] || '');
+        if (boStatus && payStatusStr === 'Paid') {
+            var boColor = boStatus === 'Ready to ship' ? '#2196f3' : '#ffa726';
+            var boTitle = boStatus === 'Ready to ship'
+                ? 'Robux stock is ready — preparing your order'
+                : 'Order Status: Waiting for Robux Stock';
+            var boBody = boStatus === 'Ready to ship'
+                ? 'The Robux required for your order is now fully allocated. We will transfer it and mark the order as Shipped shortly.'
+                : 'Your payment has been received and verified. We are currently replenishing the Robux required for your order. Estimated delay: at least 1 day. Actual delivery depends on stock availability.';
+            html += '<div style="margin-top:10px;background:rgba(255,167,38,0.07);border:1px solid ' + boColor + '55;border-radius:10px;padding:10px 14px;font-size:13px;color:#b0c8e0;line-height:1.6;">' +
+                '<strong style="color:' + boColor + ';"><i class="fas fa-hourglass-half"></i> ' + boTitle + '</strong><br>' +
+                boBody +
+                '</div>';
+        }
 
         html += '<div class="order-actions">';
 
@@ -15930,6 +16121,369 @@ showAdminSection = function(sectionId) {
         loadAdminSalesTeam();
     }
 };
+
+// ================================================================
+// 💎 ROBUX INVENTORY — ADMIN UI
+// ================================================================
+var robuxDashboardCache = null;
+
+function parseRobuxAmountTitle(title) {
+    var m = String(title || '').match(/([\d][\d,]*)\s*robux/i);
+    return m ? (parseInt(m[1].replace(/,/g, ''), 10) || 0) : 0;
+}
+
+function getCartRobuxRequired() {
+    var total = 0;
+    for (var i = 0; i < cart.length; i++) {
+        total += parseRobuxAmountTitle(cart[i].title) * (parseInt(cart[i].quantity, 10) || 1);
+    }
+    return total;
+}
+
+function loadRobuxInventory() {
+    if (!isAdmin) return;
+    ['rbStatPurchased','rbStatStock','rbStatReserved','rbStatAvailable','rbStatSold','rbStatAvg','rbStatValue','rbStatLatest']
+        .forEach(function (id) { var el = document.getElementById(id); if (el) el.textContent = '…'; });
+
+    google.script.run
+        .withSuccessHandler(function (res) {
+            if (!res || !res.success) { showToast('Failed to load Robux inventory.'); return; }
+            robuxDashboardCache = res;
+            renderRobuxDashboard(res);
+        })
+        .withFailureHandler(function (err) {
+            showToast('Robux inventory error: ' + err.message);
+        })
+        .getRobuxInventoryDashboard();
+}
+
+function renderRobuxDashboard(res) {
+    var st = res.state || {};
+
+    document.getElementById('rbStatPurchased').textContent = st.totalPurchased || 0;
+    document.getElementById('rbStatStock').textContent = st.currentStock || 0;
+    document.getElementById('rbStatReserved').textContent = st.reservedStock || 0;
+    document.getElementById('rbStatAvailable').textContent = st.availableStock || 0;
+    document.getElementById('rbStatSold').textContent = st.totalSold || 0;
+    document.getElementById('rbStatAvg').textContent = 'RM ' + (st.weightedAvgPer100 || 0).toFixed(4);
+    document.getElementById('rbStatValue').textContent = 'RM ' + (st.remainingValue || 0).toFixed(2);
+    document.getElementById('rbStatLatest').textContent = 'RM ' + (st.latestPurchaseCostPer100 || 0).toFixed(4);
+
+    var colors = { healthy: '#4caf50', getting_low: '#ffa726', low: '#ff6b6b', out: '#ff4757' };
+    var color = colors[st.stockStatus] || '#8aa1c0';
+    document.getElementById('robuxStatusBanner').innerHTML =
+        '<div style="background:rgba(255,255,255,0.03);border:1px solid ' + color + '55;border-left:4px solid ' + color +
+        ';border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
+        '<span style="color:' + color + ';font-weight:800;"><i class="fas fa-circle"></i> ' + (st.stockStatusLabel || '') + '</span>' +
+        '<span style="color:#8aa1c0;font-size:13px;">Available: <b style="color:#f7d875;">' + (st.availableStock || 0) +
+        ' Robux</b> · Reserved: <b>' + (st.reservedStock || 0) + '</b> · Physical: <b>' + (st.currentStock || 0) + '</b></span>' +
+        '</div>';
+
+    document.getElementById('robuxBackorderSummary').innerHTML =
+        '<div class="item"><span>Outstanding backorders</span><b style="color:#ffa726;">' + (st.outstandingBackorders || 0) + ' Robux</b></div>' +
+        '<div class="item"><span>Allocated to backorders</span><b>' + (st.allocatedBackorders || 0) + ' Robux</b></div>' +
+        '<div class="item"><span>Remaining shortage</span><b style="color:#ff6b6b;">' + (st.remainingShortage || 0) + ' Robux</b></div>' +
+        '<div class="item"><span>New stock required</span><b style="color:#f7d875;">' + (st.newStockRequired || 0) + ' Robux</b></div>' +
+        '<div class="item"><span>Customers waiting</span><b>' + (st.waitingCustomers || 0) + '</b></div>';
+
+    document.getElementById('rbPricingMode').value = st.pricingMode || 'manual';
+    document.getElementById('rbTargetMarkup').value = st.targetMarkup || 0;
+    document.getElementById('rbRoundingRule').value = st.roundingRule || '0.05';
+    document.getElementById('rbLowStockThreshold').value = st.lowStockThreshold || 2000;
+
+    renderRobuxPricingTable(res.packages || []);
+    renderRobuxPurchaseHistory(res.purchases || []);
+    renderRobuxTransactionHistory(res.transactions || []);
+    renderRobuxBackorders(res.backorders || []);
+}
+
+function renderRobuxPricingTable(packages) {
+    if (!packages.length) {
+        document.getElementById('robuxPricingTable').innerHTML = '<div class="empty-msg">No packages found.</div>';
+        return;
+    }
+    var html = '<table><thead><tr><th>Package</th><th>Acquisition Cost</th><th>Suggested Price</th><th>Manual Price</th><th>Status</th></tr></thead><tbody>';
+    packages.forEach(function (p) {
+        var below = p.manualPrice && p.manualPrice < p.acquisitionCost;
+        html += '<tr>' +
+            '<td>' + p.amount + ' Robux</td>' +
+            '<td>RM ' + p.acquisitionCost.toFixed(2) + '</td>' +
+            '<td style="color:#f7d875;">RM ' + p.suggestedPrice.toFixed(2) + '</td>' +
+            '<td><input type="number" step="0.01" min="0" class="rb-manual-price" data-amount="' + p.amount + '" ' +
+            'value="' + (p.manualPrice ? p.manualPrice.toFixed(2) : '') + '" placeholder="—" ' +
+            'style="width:110px;background:#0b0e14;border:1px solid #2a3a52;border-radius:8px;padding:6px 10px;color:#e8edf5;font-family:Inter;" /></td>' +
+            '<td style="font-size:12px;color:' + (below ? '#ff6b6b' : '#8aa1c0') + ';">' + (below ? 'Below cost' : 'OK') + '</td>' +
+            '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('robuxPricingTable').innerHTML = html;
+}
+
+function renderRobuxPurchaseHistory(rows) {
+    if (!rows.length) {
+        document.getElementById('robuxPurchaseHistory').innerHTML = '<div class="empty-msg">No purchases recorded yet.</div>';
+        return;
+    }
+    var html = '<table><thead><tr><th>Purchase ID</th><th>Date</th><th>Robux</th><th>Total Cost</th><th>Cost / 100</th><th>Supplier</th><th>Notes</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+        html += '<tr>' +
+            '<td style="font-family:monospace;font-size:11px;color:#f7d875;">' + (r['Purchase ID'] || '') + '</td>' +
+            '<td>' + (r['Date'] || '') + '</td>' +
+            '<td>' + (r['Robux Quantity'] || 0) + '</td>' +
+            '<td>RM ' + parseFloat(r['Total Cost (RM)'] || 0).toFixed(2) + '</td>' +
+            '<td>RM ' + parseFloat(r['Cost per 100 (RM)'] || 0).toFixed(4) + '</td>' +
+            '<td>' + (r['Supplier'] || '—') + '</td>' +
+            '<td>' + (r['Notes'] || '—') + '</td>' +
+            '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('robuxPurchaseHistory').innerHTML = html;
+}
+
+function renderRobuxTransactionHistory(rows) {
+    if (!rows.length) {
+        document.getElementById('robuxTransactionHistory').innerHTML = '<div class="empty-msg">No transactions yet.</div>';
+        return;
+    }
+    var colors = { Purchase: '#4caf50', Sale: '#2196f3', Reservation: '#ffa726', Release: '#ff6b6b', Adjustment: '#b0c8e0' };
+    var html = '<table><thead><tr><th>Date</th><th>Type</th><th>Order</th><th>Qty</th><th>Cost / 100</th><th>Total Cost</th><th>Balance</th><th>Notes</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+        var t = String(r['Type'] || '');
+        html += '<tr>' +
+            '<td style="font-size:12px;">' + (r['Date'] || '') + '</td>' +
+            '<td><span style="color:' + (colors[t] || '#b0c8e0') + ';font-weight:700;">' + t + '</span></td>' +
+            '<td style="font-family:monospace;font-size:11px;">' + (r['Order ID'] || '—') + '</td>' +
+            '<td>' + (r['Robux Quantity'] || 0) + '</td>' +
+            '<td>RM ' + parseFloat(r['Cost per 100 (RM)'] || 0).toFixed(4) + '</td>' +
+            '<td>RM ' + parseFloat(r['Total Cost (RM)'] || 0).toFixed(2) + '</td>' +
+            '<td>' + (r['Stock Balance After'] || 0) + '</td>' +
+            '<td style="font-size:12px;color:#8aa1c0;">' + (r['Notes'] || '') + '</td>' +
+            '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('robuxTransactionHistory').innerHTML = html;
+}
+
+function renderRobuxBackorders(rows) {
+    if (!rows.length) {
+        document.getElementById('robuxBackorderList').innerHTML = '<div class="empty-msg">No backorders.</div>';
+        return;
+    }
+    var html = '<table><thead><tr><th>Accepted At</th><th>Order ID</th><th>Customer</th><th>Ordered</th><th>Allocated</th><th>Remaining</th><th>Status</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+        var status = String(r['Backorder Status'] || '');
+        var color = status === 'Fulfilled' ? '#4caf50' : status === 'Cancelled' ? '#6a7f9e' : status === 'Ready to ship' ? '#2196f3' : '#ffa726';
+        html += '<tr>' +
+            '<td style="font-size:12px;">' + (r['Accepted At'] || r['Created At'] || '') + '</td>' +
+            '<td style="font-family:monospace;font-size:11px;color:#f7d875;">' + (r['Order ID'] || '') + '</td>' +
+            '<td style="font-size:12px;">' + (r['Customer Email'] || '') + '</td>' +
+            '<td>' + (r['Ordered Robux'] || 0) + '</td>' +
+            '<td>' + (r['Allocated Robux'] || 0) + '</td>' +
+            '<td style="color:#ff6b6b;font-weight:700;">' + (r['Remaining Shortage'] || 0) + '</td>' +
+            '<td><span style="color:' + color + ';font-weight:700;font-size:12px;">' + status + '</span></td>' +
+            '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('robuxBackorderList').innerHTML = html;
+}
+
+// ----- Robux admin form handlers -----
+(function setupRobuxAdminUI() {
+    var refreshBtn = document.getElementById('robuxRefreshBtn');
+    if (refreshBtn) refreshBtn.addEventListener('click', loadRobuxInventory);
+
+    var d = document.getElementById('rbPurchaseDate');
+    if (d && !d.value) {
+        var t = new Date();
+        d.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+    }
+
+    function updateCostPer100() {
+        var qty = parseFloat(document.getElementById('rbPurchaseQty').value) || 0;
+        var cost = parseFloat(document.getElementById('rbPurchaseCost').value) || 0;
+        var el = document.getElementById('rbPurchaseCostPer100');
+        if (qty > 0) el.value = 'RM ' + (cost / qty * 100).toFixed(4);
+        else el.value = 'RM 0.00';
+    }
+    var qtyEl = document.getElementById('rbPurchaseQty');
+    var costEl = document.getElementById('rbPurchaseCost');
+    if (qtyEl) qtyEl.addEventListener('input', updateCostPer100);
+    if (costEl) costEl.addEventListener('input', updateCostPer100);
+
+    var purchaseForm = document.getElementById('robuxPurchaseForm');
+    if (purchaseForm) {
+        purchaseForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn = document.getElementById('rbPurchaseSubmit');
+            var qty = parseInt(document.getElementById('rbPurchaseQty').value, 10);
+            var cost = parseFloat(document.getElementById('rbPurchaseCost').value);
+            if (!qty || qty <= 0) { showToast('Enter a valid Robux quantity.'); return; }
+            if (isNaN(cost) || cost < 0) { showToast('Enter a valid total cost.'); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-plus"></i> Add Stock';
+                    if (!res || !res.success) { showToast((res && res.message) || 'Failed to add stock.'); return; }
+                    showToast('✅ Stock added. New stock: ' + res.newStock + ' Robux');
+                    purchaseForm.reset();
+                    document.getElementById('rbPurchaseDate').value = new Date().toISOString().slice(0, 10);
+                    updateCostPer100();
+                    loadRobuxInventory();
+                })
+                .withFailureHandler(function (err) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-plus"></i> Add Stock';
+                    showToast('Error: ' + err.message);
+                })
+                .addRobuxPurchase(
+                    document.getElementById('rbPurchaseDate').value,
+                    qty, cost,
+                    document.getElementById('rbPurchaseSupplier').value,
+                    document.getElementById('rbPurchaseNotes').value
+                );
+        });
+    }
+
+    var adjustForm = document.getElementById('robuxAdjustForm');
+    if (adjustForm) {
+        adjustForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var qty = parseInt(document.getElementById('rbAdjustQty').value, 10);
+            var reason = document.getElementById('rbAdjustReason').value;
+            var cost = document.getElementById('rbAdjustCost').value;
+            if (!qty) { showToast('Adjustment quantity cannot be 0.'); return; }
+            if (!reason.trim()) { showToast('Please provide a reason.'); return; }
+
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    if (!res || !res.success) { showToast((res && res.message) || 'Adjustment failed.'); return; }
+                    showToast('✅ Adjustment applied. New stock: ' + res.newStock);
+                    adjustForm.reset();
+                    loadRobuxInventory();
+                })
+                .withFailureHandler(function (err) { showToast('Error: ' + err.message); })
+                .manualAdjustRobux(qty, reason, cost === '' ? '' : cost);
+        });
+    }
+
+    var settingsForm = document.getElementById('robuxPricingSettingsForm');
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    showToast((res && res.message) || 'Settings saved.');
+                    loadRobuxInventory();
+                })
+                .withFailureHandler(function (err) { showToast('Error: ' + err.message); })
+                .updateRobuxPricingSettings({
+                    pricingMode: document.getElementById('rbPricingMode').value,
+                    targetMarkup: document.getElementById('rbTargetMarkup').value,
+                    roundingRule: document.getElementById('rbRoundingRule').value,
+                    lowStockThreshold: document.getElementById('rbLowStockThreshold').value
+                });
+        });
+    }
+
+    var applyBtn = document.getElementById('rbApplySuggestedBtn');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function () {
+            if (!confirm('Apply suggested prices to all Robux products? This updates storefront prices.')) return;
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying...';
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-magic"></i> Apply Suggested Prices (Auto Mode)';
+                    showToast((res && res.message) || 'Done.');
+                    if (res && res.success) loadRobuxInventory();
+                })
+                .withFailureHandler(function (err) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-magic"></i> Apply Suggested Prices (Auto Mode)';
+                    showToast('Error: ' + err.message);
+                })
+                .applyRobuxSuggestedPrices();
+        });
+    }
+
+    var saveManualBtn = document.getElementById('rbSaveManualPricesBtn');
+    if (saveManualBtn) {
+        saveManualBtn.addEventListener('click', function () {
+            var prices = {};
+            document.querySelectorAll('.rb-manual-price').forEach(function (inp) {
+                var amt = inp.getAttribute('data-amount');
+                var val = inp.value.trim();
+                if (val !== '') prices[amt] = parseFloat(val);
+            });
+            saveRobuxManualPrices(prices, false);
+        });
+    }
+})();
+
+function saveRobuxManualPrices(prices, force) {
+    google.script.run
+        .withSuccessHandler(function (res) {
+            if (res && res.requiresConfirmation) {
+                var msg = 'The following prices are below acquisition cost:\n\n';
+                res.warnings.forEach(function (w) {
+                    msg += '• ' + w.amount + ' Robux: RM ' + w.price.toFixed(2) + ' (cost RM ' + w.cost.toFixed(2) + ')\n';
+                });
+                msg += '\nSave anyway?';
+                if (confirm(msg)) saveRobuxManualPrices(prices, true);
+                return;
+            }
+            var notice = document.getElementById('rbPricingNotice');
+            if (notice) {
+                notice.textContent = (res && res.message) || '';
+                notice.style.color = (res && res.success) ? '#4caf50' : '#ff6b6b';
+            }
+            showToast((res && res.message) || 'Saved.');
+            if (res && res.success) loadRobuxInventory();
+        })
+        .withFailureHandler(function (err) {
+            showToast('Error: ' + err.message);
+        })
+        .saveRobuxManualPrices({ prices: prices, force: !!force });
+}
+
+// ================================================================
+// ⚠️ CUSTOMER BACKORDER MODAL
+// ================================================================
+var _robuxBackorderCallback = null;
+
+function showRobuxBackorderModal(required, available, cb) {
+    _robuxBackorderCallback = cb;
+    var shortage = Math.max(0, required - available);
+    document.getElementById('robuxBackorderText').innerHTML =
+        'We currently have only <strong style="color:#f7d875;">' + available + ' Robux available</strong>, ' +
+        'but your selected purchase requires <strong style="color:#f7d875;">' + required + ' Robux</strong>.';
+    document.getElementById('robuxBackorderShortage').textContent = shortage;
+    document.getElementById('robuxBackorderOverlay').classList.add('open');
+}
+
+(function setupRobuxBackorderModal() {
+    var overlay = document.getElementById('robuxBackorderOverlay');
+    if (!overlay) return;
+
+    document.getElementById('robuxBackorderNo').addEventListener('click', function () {
+        overlay.classList.remove('open');
+        _robuxBackorderCallback = null;
+        showToast('Purchase cancelled. You can reduce quantity or choose another package.');
+    });
+
+    document.getElementById('robuxBackorderYes').addEventListener('click', function () {
+        overlay.classList.remove('open');
+        var cb = _robuxBackorderCallback;
+        _robuxBackorderCallback = null;
+        if (cb) cb(true);
+    });
+})();
 
     </script>
 </body>
