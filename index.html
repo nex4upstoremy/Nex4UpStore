@@ -9471,7 +9471,9 @@ html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title 
                 }
             }
 
-            var maxStock = variant ? (variant.stock || 0) : (game.quantity || 0);
+            var maxStock = variant
+                ? (variant.stock || 0)
+                : (parseRobuxAmountTitle(game.title) > 0 ? 999999 : (game.quantity || 0));
 
             if (existing) {
                 var newQty = existing.quantity + qty;
@@ -10176,6 +10178,7 @@ checkoutBtn.addEventListener('click', function() {
             } else {
                 doPlaceOrder(false);
             }
+            });
 
         // ================================================================
         // 10.5. PAYMENT FLOW (NEW)
