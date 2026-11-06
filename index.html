@@ -6977,22 +6977,22 @@
                     </div>
                     
                     <!-- Update the Stat Cards to show Period Data -->
-<div class="dashboard-stats" id="robuxStats" style="grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:12px;">
-    <div class="stat-card"><div class="stat-number" id="rbStatPurchased">0</div><div class="stat-label">Purchased (Period)</div></div>
-    <div class="stat-card"><div class="stat-number" id="rbStatStock">0</div><div class="stat-label">Current Stock</div></div>
-    <div class="stat-card"><div class="stat-number" id="rbStatReserved" style="color:#ffa726;">0</div><div class="stat-label">Reserved</div></div>
-    <div class="stat-card"><div class="stat-number" id="rbStatAvailable" style="color:#4caf50;">0</div><div class="stat-label">Available</div></div>
-    <div class="stat-card"><div class="stat-number" id="rbStatSold" style="color:#f7d875;">0</div><div class="stat-label">Sold (Period)</div></div>
-    
-    <div class="stat-card" style="background:rgba(76,175,80,0.05);"><div class="stat-number" id="rbStatRevenue" style="color:#4caf50; font-size:22px;">RM 0.00</div><div class="stat-label">Revenue (Period)</div></div>
-    <div class="stat-card" style="background:rgba(76,175,80,0.05);"><div class="stat-number" id="rbStatProfit" style="color:#4caf50; font-size:22px;">RM 0.00</div><div class="stat-label">Profit (Period)</div></div>
-    
-    <div class="stat-card"><div class="stat-number" id="rbStatAvg" style="font-size:22px;">RM 0.00</div><div class="stat-label">Avg Cost / 100</div></div>
-    <div class="stat-card"><div class="stat-number" id="rbStatValue" style="font-size:22px;">RM 0.00</div><div class="stat-label">Inventory Value</div></div>
-</div>
+                    <!-- Update the Stat Cards to show Period Data -->
+                    <div id="robuxStatusBanner" style="margin-bottom:16px;"></div>
+                    <div class="dashboard-stats" id="robuxStats" style="grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:12px;">
+                        <div class="stat-card"><div class="stat-number" id="rbStatPurchased">0</div><div class="stat-label">Purchased (Period)</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatStock">0</div><div class="stat-label">Current Stock</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatReserved" style="color:#ffa726;">0</div><div class="stat-label">Reserved</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatAvailable" style="color:#4caf50;">0</div><div class="stat-label">Available</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatSold" style="color:#f7d875;">0</div><div class="stat-label">Sold (Period)</div></div>
+
+                        <div class="stat-card" style="background:rgba(76,175,80,0.05);"><div class="stat-number" id="rbStatRevenue" style="color:#4caf50; font-size:22px;">RM 0.00</div><div class="stat-label">Revenue (Period)</div></div>
+                        <div class="stat-card" style="background:rgba(76,175,80,0.05);"><div class="stat-number" id="rbStatProfit" style="color:#4caf50; font-size:22px;">RM 0.00</div><div class="stat-label">Profit (Period)</div></div>
+
+                        <div class="stat-card"><div class="stat-number" id="rbStatAvg" style="font-size:22px;">RM 0.00</div><div class="stat-label">Avg Cost / 100</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatValue" style="font-size:22px;">RM 0.00</div><div class="stat-label">Inventory Value</div></div>
                         <div class="stat-card"><div class="stat-number" id="rbStatLatest" style="font-size:22px;">RM 0.00</div><div class="stat-label">Latest Cost / 100</div></div>
                     </div>
-
                     <div class="extra-sections" style="margin-top:20px;">
                         <div class="extra-card">
                             <h3><i class="fas fa-hourglass-half"></i> Backorders</h3>
@@ -16213,6 +16213,9 @@ function renderRobuxDashboard(res, range) {
     var elVal = document.getElementById('rbStatValue');
     if (elVal) elVal.textContent = 'RM ' + (st.remainingValue || 0).toFixed(2);
 
+    var elLatest = document.getElementById('rbStatLatest');
+    if (elLatest) elLatest.textContent = 'RM ' + (st.latestPurchaseCostPer100 || 0).toFixed(4);
+
     var colors = { healthy: '#4caf50', getting_low: '#ffa726', low: '#ff6b6b', out: '#ff4757' };
     var color = colors[st.stockStatus] || '#8aa1c0';
     
@@ -16278,46 +16281,6 @@ function setupRobuxTimeFilter() {
     }
 
     picker.addEventListener('change', loadRobuxInventory);
-}
-
-function renderRobuxDashboard(res) {
-    var st = res.state || {};
-
-    document.getElementById('rbStatPurchased').textContent = st.totalPurchased || 0;
-    document.getElementById('rbStatStock').textContent = st.currentStock || 0;
-    document.getElementById('rbStatReserved').textContent = st.reservedStock || 0;
-    document.getElementById('rbStatAvailable').textContent = st.availableStock || 0;
-    document.getElementById('rbStatSold').textContent = st.totalSold || 0;
-    document.getElementById('rbStatAvg').textContent = 'RM ' + (st.weightedAvgPer100 || 0).toFixed(4);
-    document.getElementById('rbStatValue').textContent = 'RM ' + (st.remainingValue || 0).toFixed(2);
-    document.getElementById('rbStatLatest').textContent = 'RM ' + (st.latestPurchaseCostPer100 || 0).toFixed(4);
-
-    var colors = { healthy: '#4caf50', getting_low: '#ffa726', low: '#ff6b6b', out: '#ff4757' };
-    var color = colors[st.stockStatus] || '#8aa1c0';
-    document.getElementById('robuxStatusBanner').innerHTML =
-        '<div style="background:rgba(255,255,255,0.03);border:1px solid ' + color + '55;border-left:4px solid ' + color +
-        ';border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
-        '<span style="color:' + color + ';font-weight:800;"><i class="fas fa-circle"></i> ' + (st.stockStatusLabel || '') + '</span>' +
-        '<span style="color:#8aa1c0;font-size:13px;">Available: <b style="color:#f7d875;">' + (st.availableStock || 0) +
-        ' Robux</b> · Reserved: <b>' + (st.reservedStock || 0) + '</b> · Physical: <b>' + (st.currentStock || 0) + '</b></span>' +
-        '</div>';
-
-    document.getElementById('robuxBackorderSummary').innerHTML =
-        '<div class="item"><span>Outstanding backorders</span><b style="color:#ffa726;">' + (st.outstandingBackorders || 0) + ' Robux</b></div>' +
-        '<div class="item"><span>Allocated to backorders</span><b>' + (st.allocatedBackorders || 0) + ' Robux</b></div>' +
-        '<div class="item"><span>Remaining shortage</span><b style="color:#ff6b6b;">' + (st.remainingShortage || 0) + ' Robux</b></div>' +
-        '<div class="item"><span>New stock required</span><b style="color:#f7d875;">' + (st.newStockRequired || 0) + ' Robux</b></div>' +
-        '<div class="item"><span>Customers waiting</span><b>' + (st.waitingCustomers || 0) + '</b></div>';
-
-    document.getElementById('rbPricingMode').value = st.pricingMode || 'manual';
-    document.getElementById('rbTargetMarkup').value = st.targetMarkup || 0;
-    document.getElementById('rbRoundingRule').value = st.roundingRule || '0.05';
-    document.getElementById('rbLowStockThreshold').value = st.lowStockThreshold || 2000;
-
-    renderRobuxPricingTable(res.packages || []);
-    renderRobuxPurchaseHistory(res.purchases || []);
-    renderRobuxTransactionHistory(res.transactions || []);
-    renderRobuxBackorders(res.backorders || []);
 }
 
 function renderRobuxPricingTable(packages) {
