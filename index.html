@@ -6957,25 +6957,39 @@
                     </div>
                 </div>
 
-                                <!-- ===== 💎 ROBUX INVENTORY ===== -->
+                                                <!-- ===== 💎 ROBUX INVENTORY ===== -->
                 <div class="admin-section" id="section-robux-inventory">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
                         <h2 style="margin:0;"><i class="fas fa-gem"></i> Robux Inventory</h2>
+                        
+                        <!-- ✅ NEW: Date Filter -->
+                        <select id="robuxTimeFilter" style="background:#0b0e14; border:1px solid #2a3a52; color:#e8edf5; padding:10px 16px; border-radius:8px; font-family:'Inter'; font-weight:600; outline:none; cursor:pointer;">
+                            <option value="all">All Time</option>
+                            <option value="this_month" selected>This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option disabled>──────</option>
+                            <!-- Months injected by JS -->
+                        </select>
+
                         <button class="submit-btn" id="robuxRefreshBtn" style="padding:8px 20px; font-size:14px;">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                     </div>
-
-                    <div id="robuxStatusBanner" style="margin-bottom:16px;"></div>
-
+                    
+                    <!-- Update the Stat Cards to show Period Data -->
                     <div class="dashboard-stats" id="robuxStats" style="grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:12px;">
-                        <div class="stat-card"><div class="stat-number" id="rbStatPurchased">0</div><div class="stat-label">Total Purchased</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatPurchased">0</div><div class="stat-label">Purchased (Period)</div></div>
                         <div class="stat-card"><div class="stat-number" id="rbStatStock">0</div><div class="stat-label">Current Stock</div></div>
                         <div class="stat-card"><div class="stat-number" id="rbStatReserved" style="color:#ffa726;">0</div><div class="stat-label">Reserved</div></div>
                         <div class="stat-card"><div class="stat-number" id="rbStatAvailable" style="color:#4caf50;">0</div><div class="stat-label">Available</div></div>
-                        <div class="stat-card"><div class="stat-number" id="rbStatSold">0</div><div class="stat-label">Total Sold</div></div>
+                        <div class="stat-card"><div class="stat-number" id="rbStatSold" style="color:#f7d875;">0</div><div class="stat-label">Sold (Period)</div></div>
+                        
+                        <div class="stat-card" style="background:rgba(76,175,80,0.05);"><div class="stat-number" id="rbStatRevenue" style="color:#4caf50; font-size:22px;">RM 0.00</div><div class="stat-label">Revenue (Period)</div></div>
+                        <div class="stat-card" style="background:rgba(76,175,80,0.05);"><div class="stat-number" id="rbStatProfit" style="color:#4caf50; font-size:22px;">RM 0.00</div><div class="stat-label">Profit (Period)</div></div>
+                        
                         <div class="stat-card"><div class="stat-number" id="rbStatAvg" style="font-size:22px;">RM 0.00</div><div class="stat-label">Avg Cost / 100</div></div>
                         <div class="stat-card"><div class="stat-number" id="rbStatValue" style="font-size:22px;">RM 0.00</div><div class="stat-label">Inventory Value</div></div>
+                    </div>
                         <div class="stat-card"><div class="stat-number" id="rbStatLatest" style="font-size:22px;">RM 0.00</div><div class="stat-label">Latest Cost / 100</div></div>
                     </div>
 
@@ -16145,19 +16159,95 @@ function getCartRobuxRequired() {
 
 function loadRobuxInventory() {
     if (!isAdmin) return;
-    ['rbStatPurchased','rbStatStock','rbStatReserved','rbStatAvailable','rbStatSold','rbStatAvg','rbStatValue','rbStatLatest']
+    
+    // Ensure the month options exist
+    setupRobuxTimeFilter();
+
+    var filterEl = document.getElementById('robuxTimeFilter');
+    var range = filterEl ? filterEl.value : 'this_month';
+
+    ['rbStatPurchased','rbStatStock','rbStatReserved','rbStatAvailable','rbStatSold','rbStatRevenue','rbStatProfit','rbStatAvg','rbStatValue']
         .forEach(function (id) { var el = document.getElementById(id); if (el) el.textContent = '…'; });
 
     google.script.run
         .withSuccessHandler(function (res) {
             if (!res || !res.success) { showToast('Failed to load Robux inventory.'); return; }
             robuxDashboardCache = res;
-            renderRobuxDashboard(res);
+            renderRobuxDashboard(res, range);
         })
         .withFailureHandler(function (err) {
             showToast('Robux inventory error: ' + err.message);
         })
-        .getRobuxInventoryDashboard();
+        .getRobuxInventoryDashboard(range);
+}
+
+function renderRobuxDashboard(res, range) {
+    var st = res.state || {};
+
+    // Period Specific Stats
+    document.getElementById('rbStatPurchased').textContent = (st.periodPurchased || 0) + ' R$';
+    document.getElementById('rbStatSold').textContent = (st.periodSold || 0) + ' R$';
+    document.getElementById('rbStatRevenue').textContent = 'RM ' + (st.periodRevenue || 0).toFixed(2);
+    document.getElementById('rbStatProfit').textContent = 'RM ' + (st.periodProfit || 0).toFixed(2);
+
+    // Real-time Stats
+    document.getElementById('rbStatStock').textContent = (st.currentStock || 0) + ' R$';
+    document.getElementById('rbStatReserved').textContent = (st.reservedStock || 0) + ' R$';
+    document.getElementById('rbStatAvailable').textContent = (st.availableStock || 0) + ' R$';
+    document.getElementById('rbStatAvg').textContent = 'RM ' + (st.weightedAvgPer100 || 0).toFixed(4);
+    document.getElementById('rbStatValue').textContent = 'RM ' + (st.remainingValue || 0).toFixed(2);
+
+    var colors = { healthy: '#4caf50', getting_low: '#ffa726', low: '#ff6b6b', out: '#ff4757' };
+    var color = colors[st.stockStatus] || '#8aa1c0';
+    document.getElementById('robuxStatusBanner').innerHTML =
+        '<div style="background:rgba(255,255,255,0.03);border:1px solid ' + color + '55;border-left:4px solid ' + color +
+        ';border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
+        '<span style="color:' + color + ';font-weight:800;"><i class="fas fa-circle"></i> ' + (st.stockStatusLabel || '') + '</span>' +
+        '<span style="color:#8aa1c0;font-size:13px;">Available: <b style="color:#f7d875;">' + (st.availableStock || 0) +
+        ' Robux</b> · Reserved: <b>' + (st.reservedStock || 0) + '</b> · Physical: <b>' + (st.currentStock || 0) + '</b></span>' +
+        '</div>';
+
+    // ... (Keep your existing backorder summary, pricing table, and history renders) ...
+    document.getElementById('robuxBackorderSummary').innerHTML =
+        '<div class="item"><span>Outstanding backorders</span><b style="color:#ffa726;">' + (st.outstandingBackorders || 0) + ' Robux</b></div>' +
+        '<div class="item"><span>Allocated to backorders</span><b>' + (st.allocatedBackorders || 0) + ' Robux</b></div>' +
+        '<div class="item"><span>Remaining shortage</span><b style="color:#ff6b6b;">' + (st.remainingShortage || 0) + ' Robux</b></div>' +
+        '<div class="item"><span>New stock required</span><b style="color:#f7d875;">' + (st.newStockRequired || 0) + ' Robux</b></div>' +
+        '<div class="item"><span>Customers waiting</span><b>' + (st.waitingCustomers || 0) + '</b></div>';
+
+    document.getElementById('rbPricingMode').value = st.pricingMode || 'manual';
+    document.getElementById('rbTargetMarkup').value = st.targetMarkup || 0;
+    document.getElementById('rbRoundingRule').value = st.roundingRule || '0.05';
+    document.getElementById('rbLowStockThreshold').value = st.lowStockThreshold || 2000;
+
+    renderRobuxPricingTable(res.packages || []);
+    renderRobuxPurchaseHistory(res.purchases || []);
+    renderRobuxTransactionHistory(res.transactions || []);
+    renderRobuxBackorders(res.backorders || []);
+}
+
+// Helper to generate month options
+function setupRobuxTimeFilter() {
+    var picker = document.getElementById('robuxTimeFilter');
+    if (!picker || picker.dataset.init === 'true') return;
+    picker.dataset.init = 'true';
+
+    var now = new Date();
+    for (var i = 0; i < 24; i++) {
+        var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var val = y + '-' + m;
+        var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var label = monthNames[d.getMonth()] + ' ' + y;
+        
+        var opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = label;
+        picker.appendChild(opt);
+    }
+
+    picker.addEventListener('change', loadRobuxInventory);
 }
 
 function renderRobuxDashboard(res) {
