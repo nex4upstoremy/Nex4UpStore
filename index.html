@@ -4047,154 +4047,61 @@
     margin-left: 2px;
 }
 
-        /* ============================================================
-           👁️ EYE CHAT WIDGET
+         /* ============================================================
+           🤖 MASCOT CHAT WIDGET
            ============================================================ */
-        .eye-fab {
+        .mascot-fab {
             position: fixed; bottom: 24px; right: 24px;
-            width: 70px; height: 70px; border-radius: 50%;
-            background: #121821; border: 2px solid #f7d875;
+            width: 70px; height: 70px;
+            border-radius: 26px; /* Squircle shape */
+            background: linear-gradient(135deg, #f0b34b, #f7d875);
+            border: none;
             cursor: pointer; z-index: 995;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 8px 24px rgba(247,216,117,0.25);
-            transition: 0.3s; overflow: hidden;
+            box-shadow: 0 8px 24px rgba(247,216,117,0.35);
+            transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2); 
+            overflow: hidden;
         }
-        .eye-fab:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 32px rgba(247,216,117,0.5);
-            border-color: #ffe08a;
+        .mascot-fab:hover {
+            transform: scale(1.08) translateY(-4px);
+            box-shadow: 0 12px 32px rgba(247,216,117,0.6);
         }
         
-        .eye-container {
-            width: 44px; height: 32px;
-            background: #ffffff;
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            position: relative;
+        .mascot-face {
+            width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-            animation: blinkAnimation 4s infinite;
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.2);
+            position: relative;
         }
 
-        /* The dark pupil */
-        .eye-pupil {
-            width: 18px; height: 18px;
-            background: radial-gradient(circle at 30% 30%, #3d5a7a, #0b0e14);
-            border-radius: 50%;
-            position: absolute;
+        /* The container that moves with the mouse */
+        .mascot-eyes {
+            display: flex; gap: 8px;
             transition: transform 0.1s ease-out;
-            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+
+        /* The actual eyes */
+        .mascot-eye {
+            width: 12px; height: 22px;
+            background: #0b0e14; /* Dark theme color for the eyes */
+            border-radius: 10px;
+            animation: blinkMascot 4s infinite;
+        }
+
+        /* Slight delay on the second eye for cuteness */
+        .mascot-eye:nth-child(2) {
+            animation-delay: 0.15s; 
         }
 
         /* The Blinking Animation */
-        @keyframes blinkAnimation {
-            0%, 92%, 100% { transform: scaleY(1); }
+        @keyframes blinkMascot {
+            0%, 90%, 100% { transform: scaleY(1); }
             95% { transform: scaleY(0.1); }
-            98% { transform: scaleY(0.1); }
-        }
-
-        /* Keep the badge styling */
-        .chat-fab-badge {
-            position: absolute; top: -4px; right: -4px;
-            min-width: 22px; height: 22px; padding: 0 6px;
-            background: #ff4757; color: #fff;
-            border-radius: 12px; font-size: 12px; font-weight: 800;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid #0b0e14;
-            z-index: 10;
         }
 
         @media (max-width: 640px) {
-            .eye-fab { bottom: 16px; right: 16px; width: 60px; height: 60px; }
-            .eye-container { width: 38px; height: 28px; }
-            .eye-pupil { width: 14px; height: 14px; }
+            .mascot-fab { bottom: 16px; right: 16px; width: 60px; height: 60px; border-radius: 22px; }
+            .mascot-eye { width: 10px; height: 18px; }
         }
-        .chat-panel-overlay {
-          position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-          z-index: 996; display: none; align-items: flex-end; justify-content: flex-end;
-          padding: 20px; backdrop-filter: blur(4px);
-        }
-        .chat-panel-overlay.open { display: flex; }
-        .chat-panel {
-          width: 380px; max-width: 100%; height: 560px; max-height: 90vh;
-          background: #121821; border: 1px solid #1e2a3a; border-radius: 20px;
-          display: flex; flex-direction: column; overflow: hidden;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-          animation: chatSlide 0.3s ease;
-        }
-        @keyframes chatSlide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .chat-header {
-          padding: 16px 18px; background: linear-gradient(135deg, #1a2538, #121821);
-          border-bottom: 1px solid #1e2a3a;
-          display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
-        }
-        .chat-header h3 { font-size: 16px; color: #f7d875; display: flex; align-items: center; gap: 8px; }
-        .chat-header p { font-size: 11.5px; color: #6a7f9e; margin-top: 3px; }
-        .chat-close {
-          background: transparent; border: none; color: #8aa1c0; font-size: 22px;
-          cursor: pointer; padding: 4px; transition: 0.2s; flex-shrink: 0;
-        }
-        .chat-close:hover { color: #fff; transform: rotate(90deg); }
-        .chat-identity { padding: 12px 16px; border-bottom: 1px solid #1e2a3a; background: #0b0e14; }
-        .chat-identity .field { margin-bottom: 8px; }
-        .chat-identity .field:last-child { margin-bottom: 0; }
-        .chat-identity .field label { font-size: 11px; color: #6a7f9e; text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 4px; }
-        .chat-identity .field input {
-          width: 100%; background: #121821; border: 1px solid #2a3a52;
-          border-radius: 8px; padding: 8px 12px; color: #e8edf5;
-          font-family: 'Inter', sans-serif; font-size: 13px;
-        }
-        .chat-identity .field input:focus { outline: none; border-color: #f7d875; }
-        .chat-messages {
-          flex: 1; overflow-y: auto; padding: 14px 16px;
-          display: flex; flex-direction: column; gap: 10px;
-          background: #0b0e14;
-        }
-        .chat-empty { color: #6a7f9e; text-align: center; padding: 30px 20px; font-size: 13px; }
-        .chat-bubble {
-          max-width: 80%; padding: 8px 12px; border-radius: 14px;
-          font-size: 13.5px; line-height: 1.5; word-wrap: break-word; white-space: pre-wrap;
-          position: relative;
-        }
-        .chat-bubble.mine { align-self: flex-end; background: #f7d875; color: #0b0e14; border-bottom-right-radius: 4px; }
-        .chat-bubble.theirs { align-self: flex-start; background: #1a2538; color: #e8edf5; border-bottom-left-radius: 4px; }
-        .chat-bubble .chat-time { font-size: 10px; opacity: 0.65; margin-top: 4px; display: block; }
-        .chat-bubble img { max-width: 100%; border-radius: 8px; margin-top: 6px; display: block; cursor: pointer; }
-        .chat-image-preview {
-          padding: 8px 14px; background: #0b0e14; border-top: 1px solid #1e2a3a;
-          display: flex; align-items: center; gap: 10px;
-        }
-        .chat-image-preview img {
-          width: 50px; height: 50px; object-fit: cover; border-radius: 8px;
-          border: 1px solid #2a3a52;
-        }
-        .chat-image-preview button {
-          background: #ff6b6b; color: #fff; border: none; width: 24px; height: 24px;
-          border-radius: 50%; cursor: pointer; font-size: 11px;
-          display: flex; align-items: center; justify-content: center;
-        }
-        .chat-input-area {
-          display: flex; align-items: flex-end; gap: 8px;
-          padding: 12px 14px; border-top: 1px solid #1e2a3a;
-          background: #121821;
-        }
-        .chat-input-area textarea {
-          flex: 1; resize: none; background: #0b0e14; border: 1px solid #2a3a52;
-          border-radius: 18px; padding: 10px 14px; color: #e8edf5;
-          font-family: 'Inter', sans-serif; font-size: 13.5px; max-height: 90px;
-          line-height: 1.4;
-        }
-        .chat-input-area textarea:focus { outline: none; border-color: #f7d875; }
-        .chat-attach-btn, .chat-send-btn {
-          width: 40px; height: 40px; border-radius: 50%; border: none;
-          cursor: pointer; display: flex; align-items: center; justify-content: center;
-          transition: 0.2s; flex-shrink: 0;
-        }
-        .chat-attach-btn { background: #1a2538; color: #8aa1c0; font-size: 15px; }
-        .chat-attach-btn:hover { background: #2a3a52; color: #f7d875; }
-        .chat-send-btn { background: #f7d875; color: #0b0e14; font-size: 15px; }
-        .chat-send-btn:hover { background: #ffe08a; transform: scale(1.05); }
-        .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         /* ============================================================
            💬 ADMIN INBOX
@@ -8050,10 +7957,13 @@
         </div>
     </div>
 
-    <!-- ===== CUSTOMER CHAT WIDGET (EYE UI) ===== -->
-    <button class="eye-fab" id="chatFab" title="Chat with us">
-        <div class="eye-container">
-            <div class="eye-pupil" id="eyePupil"></div>
+    <!-- ===== CUSTOMER CHAT WIDGET (MASCOT UI) ===== -->
+    <button class="mascot-fab" id="chatFab" title="Chat with us">
+        <div class="mascot-face">
+            <div class="mascot-eyes" id="mascotEyes">
+                <div class="mascot-eye"></div>
+                <div class="mascot-eye"></div>
+            </div>
         </div>
         <span class="chat-fab-badge" id="chatFabBadge" style="display:none;">0</span>
     </button>
@@ -15383,40 +15293,40 @@ function resetVariantEditor(ctx) {
             reader.readAsDataURL(file);
         }
 
-                // ================================================================
-        // 👁️ EYE TRACKING SCRIPT
+        // ================================================================
+        // 🤖 MASCOT TRACKING SCRIPT
         // ================================================================
         document.addEventListener('mousemove', function(e) {
-            var eyeContainer = document.querySelector('.eye-container');
-            var pupil = document.getElementById('eyePupil');
-            if (!eyeContainer || !pupil) return;
+            var eyes = document.getElementById('mascotEyes');
+            if (!eyes) return;
 
-            // Get the center coordinates of the eye
-            var rect = eyeContainer.getBoundingClientRect();
-            var eyeX = rect.left + rect.width / 2;
-            var eyeY = rect.top + rect.height / 2;
+            // Get the center coordinates of the button
+            var fab = document.getElementById('chatFab');
+            var rect = fab.getBoundingClientRect();
+            var fabX = rect.left + rect.width / 2;
+            var fabY = rect.top + rect.height / 2;
 
-            // Calculate distance and angle from eye to mouse
-            var deltaX = e.clientX - eyeX;
-            var deltaY = e.clientY - eyeY;
+            // Calculate distance and angle from mascot to mouse
+            var deltaX = e.clientX - fabX;
+            var deltaY = e.clientY - fabY;
             var angle = Math.atan2(deltaY, deltaX);
             
-            // Limit how far the pupil can move (to stay inside the eye)
-            var maxDistance = 10; // pixels
-            var distance = Math.min(maxDistance, Math.hypot(deltaX, deltaY) / 15);
+            // Limit how far the eyes can move inside the face
+            var maxDistance = 6; // pixels
+            var distance = Math.min(maxDistance, Math.hypot(deltaX, deltaY) / 20);
 
-            // Calculate new pupil position
-            var pupilX = Math.cos(angle) * distance;
-            var pupilY = Math.sin(angle) * distance;
+            // Calculate new eyes position
+            var eyeX = Math.cos(angle) * distance;
+            var eyeY = Math.sin(angle) * distance;
 
-            // Move the pupil
-            pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+            // Move the eyes container
+            eyes.style.transform = `translate(${eyeX}px, ${eyeY}px)`;
         });
 
-        // Reset eye when mouse leaves the window
+        // Reset eyes when mouse leaves the window
         document.addEventListener('mouseleave', function() {
-            var pupil = document.getElementById('eyePupil');
-            if (pupil) pupil.style.transform = `translate(0px, 0px)`;
+            var eyes = document.getElementById('mascotEyes');
+            if (eyes) eyes.style.transform = `translate(0px, 0px)`;
         });
 
 
