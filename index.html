@@ -4047,7 +4047,7 @@
     margin-left: 2px;
 }
 
-         /* ============================================================
+        /* ============================================================
            🤖 MASCOT CHAT WIDGET
            ============================================================ */
         .mascot-fab {
@@ -4060,14 +4060,14 @@
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 8px 24px rgba(247,216,117,0.35);
             transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2); 
-            overflow: hidden;
+            /* 👇 REMOVED overflow: hidden; so the bubble can show */
         }
         .mascot-fab:hover {
             transform: scale(1.08) translateY(-4px);
             box-shadow: 0 12px 32px rgba(247,216,117,0.6);
         }
 
-                /* ===== Speech Bubble Styling ===== */
+        /* ===== Speech Bubble Styling ===== */
         .mascot-bubble {
             position: absolute;
             right: 85px;
@@ -4116,37 +4116,30 @@
             50% { transform: translateY(-50%) translateX(-5px); }
         }
 
-        /* Hide the bubble on mobile so it doesn't cover the screen */
+        /* Hide bubble on mobile to save space */
         @media (max-width: 768px) {
             .mascot-bubble { display: none; }
         }
-        
+
         .mascot-face {
             width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             position: relative;
         }
 
-        /* The container that moves with the mouse */
         .mascot-eyes {
             display: flex; gap: 8px;
             transition: transform 0.1s ease-out;
         }
 
-        /* The actual eyes */
         .mascot-eye {
             width: 12px; height: 22px;
-            background: #0b0e14; /* Dark theme color for the eyes */
+            background: #0b0e14;
             border-radius: 10px;
             animation: blinkMascot 4s infinite;
         }
+        .mascot-eye:nth-child(2) { animation-delay: 0.15s; }
 
-        /* Slight delay on the second eye for cuteness */
-        .mascot-eye:nth-child(2) {
-            animation-delay: 0.15s; 
-        }
-
-        /* The Blinking Animation */
         @keyframes blinkMascot {
             0%, 90%, 100% { transform: scaleY(1); }
             95% { transform: scaleY(0.1); }
@@ -8013,8 +8006,8 @@
 
     <!-- ===== CUSTOMER CHAT WIDGET (MASCOT UI) ===== -->
     <button class="mascot-fab" id="chatFab" title="Chat with Customer Support">
-        <!-- 👇 NEW: Speech Bubble -->
-        <div class="mascot-bubble" id="mascotBubble">Need help? Chat with us! 👋</div>
+        <!-- 👇 Speech Bubble -->
+        <div class="mascot-bubble" id="mascotBubble">Need help? Reach us! 👋</div>
         
         <div class="mascot-face">
             <div class="mascot-eyes" id="mascotEyes">
@@ -15179,7 +15172,7 @@ function resetVariantEditor(ctx) {
             chatIsOpen = true;
             document.getElementById('chatPanelOverlay').classList.add('open');
             
-            // 👇 ADD THIS LINE:
+            // 👇 Hide the bubble when chat opens
             var bubble = document.getElementById('mascotBubble');
             if (bubble) bubble.style.display = 'none';
 
@@ -15193,7 +15186,7 @@ function resetVariantEditor(ctx) {
             chatIsOpen = false;
             document.getElementById('chatPanelOverlay').classList.remove('open');
             
-            // 👇 ADD THIS LINE:
+            // 👇 Bring the bubble back when chat closes
             var bubble = document.getElementById('mascotBubble');
             if (bubble) bubble.style.display = 'block';
 
