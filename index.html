@@ -4048,26 +4048,66 @@
 }
 
         /* ============================================================
-           💬 CUSTOMER CHAT WIDGET
+           👁️ EYE CHAT WIDGET
            ============================================================ */
-        .chat-fab {
-          position: fixed; bottom: 24px; right: 24px;
-          width: 60px; height: 60px; border-radius: 50%;
-          background: linear-gradient(135deg, #f0b34b, #f7d875);
-          border: none; cursor: pointer; color: #0b0e14;
-          font-size: 24px; z-index: 995;
-          box-shadow: 0 8px 24px rgba(247,216,117,0.35);
-          transition: 0.25s; display: flex; align-items: center; justify-content: center;
+        .eye-fab {
+            position: fixed; bottom: 24px; right: 24px;
+            width: 70px; height: 70px; border-radius: 50%;
+            background: #121821; border: 2px solid #f7d875;
+            cursor: pointer; z-index: 995;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 24px rgba(247,216,117,0.25);
+            transition: 0.3s; overflow: hidden;
         }
-        .chat-fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(247,216,117,0.5); }
-        .chat-fab.hidden { display: none; }
+        .eye-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(247,216,117,0.5);
+            border-color: #ffe08a;
+        }
+        
+        .eye-container {
+            width: 44px; height: 32px;
+            background: #ffffff;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            animation: blinkAnimation 4s infinite;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.2);
+        }
+
+        /* The dark pupil */
+        .eye-pupil {
+            width: 18px; height: 18px;
+            background: radial-gradient(circle at 30% 30%, #3d5a7a, #0b0e14);
+            border-radius: 50%;
+            position: absolute;
+            transition: transform 0.1s ease-out;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+
+        /* The Blinking Animation */
+        @keyframes blinkAnimation {
+            0%, 92%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+            98% { transform: scaleY(0.1); }
+        }
+
+        /* Keep the badge styling */
         .chat-fab-badge {
-          position: absolute; top: -4px; right: -4px;
-          min-width: 22px; height: 22px; padding: 0 6px;
-          background: #ff4757; color: #fff;
-          border-radius: 12px; font-size: 12px; font-weight: 800;
-          display: flex; align-items: center; justify-content: center;
-          border: 2px solid #0b0e14;
+            position: absolute; top: -4px; right: -4px;
+            min-width: 22px; height: 22px; padding: 0 6px;
+            background: #ff4757; color: #fff;
+            border-radius: 12px; font-size: 12px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #0b0e14;
+            z-index: 10;
+        }
+
+        @media (max-width: 640px) {
+            .eye-fab { bottom: 16px; right: 16px; width: 60px; height: 60px; }
+            .eye-container { width: 38px; height: 28px; }
+            .eye-pupil { width: 14px; height: 14px; }
         }
         .chat-panel-overlay {
           position: fixed; inset: 0; background: rgba(0,0,0,0.5);
@@ -8010,9 +8050,11 @@
         </div>
     </div>
 
-        <!-- ===== CUSTOMER CHAT WIDGET ===== -->
-    <button class="chat-fab" id="chatFab" title="Chat with us">
-        <i class="fas fa-comments"></i>
+    <!-- ===== CUSTOMER CHAT WIDGET (EYE UI) ===== -->
+    <button class="eye-fab" id="chatFab" title="Chat with us">
+        <div class="eye-container">
+            <div class="eye-pupil" id="eyePupil"></div>
+        </div>
         <span class="chat-fab-badge" id="chatFabBadge" style="display:none;">0</span>
     </button>
 
@@ -15340,6 +15382,43 @@ function resetVariantEditor(ctx) {
             };
             reader.readAsDataURL(file);
         }
+
+                // ================================================================
+        // 👁️ EYE TRACKING SCRIPT
+        // ================================================================
+        document.addEventListener('mousemove', function(e) {
+            var eyeContainer = document.querySelector('.eye-container');
+            var pupil = document.getElementById('eyePupil');
+            if (!eyeContainer || !pupil) return;
+
+            // Get the center coordinates of the eye
+            var rect = eyeContainer.getBoundingClientRect();
+            var eyeX = rect.left + rect.width / 2;
+            var eyeY = rect.top + rect.height / 2;
+
+            // Calculate distance and angle from eye to mouse
+            var deltaX = e.clientX - eyeX;
+            var deltaY = e.clientY - eyeY;
+            var angle = Math.atan2(deltaY, deltaX);
+            
+            // Limit how far the pupil can move (to stay inside the eye)
+            var maxDistance = 10; // pixels
+            var distance = Math.min(maxDistance, Math.hypot(deltaX, deltaY) / 15);
+
+            // Calculate new pupil position
+            var pupilX = Math.cos(angle) * distance;
+            var pupilY = Math.sin(angle) * distance;
+
+            // Move the pupil
+            pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+        });
+
+        // Reset eye when mouse leaves the window
+        document.addEventListener('mouseleave', function() {
+            var pupil = document.getElementById('eyePupil');
+            if (pupil) pupil.style.transform = `translate(0px, 0px)`;
+        });
+
 
         (function setupChatWidget() {
             var fab = document.getElementById('chatFab');
