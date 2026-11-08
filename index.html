@@ -4070,9 +4070,9 @@
 /* ===== Speech Bubble Styling (ABOVE the mascot) ===== */
 .mascot-bubble {
     position: absolute;
-    bottom: 100%;               /* place it above the fab */
+    bottom: 100%;
     left: 50%;
-    transform: translateX(-50%) translateY(-10px); /* centre horizontally, add gap */
+    transform: translateX(-50%) translateY(-10px);
     background: #121821;
     color: #f7d875;
     border: 1px solid #f7d875;
@@ -4081,20 +4081,29 @@
     font-size: 13px;
     font-weight: 700;
     font-family: 'Inter', sans-serif;
-    white-space: nowrap;
+    
+    /* ✅ FIXES START HERE */
+    white-space: normal;   /* Allows text to wrap to a new line */
+    text-align: center;    /* Keeps text centered */
+    width: max-content;    /* Box grows based on text */
+    max-width: 180px;      /* Prevents box from getting too wide */
+    line-height: 1.4;
+    /* ✅ FIXES END HERE */
+    
     box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-    pointer-events: none;       /* allow clicks to pass through to the button */
+    pointer-events: none;
     animation: floatBubbleUp 3s ease-in-out infinite;
+    z-index: 999;
 }
 
-/* Little triangle arrow pointing DOWN to the mascot */
+/* Little triangle arrow pointing DOWN */
 .mascot-bubble::after {
     content: '';
     position: absolute;
     left: 50%;
     top: 100%;
     transform: translateX(-50%);
-    border-width: 7px 7px 0 7px;   /* pointing down */
+    border-width: 7px 7px 0 7px;
     border-style: solid;
     border-color: #f7d875 transparent transparent transparent;
 }
@@ -4113,6 +4122,17 @@
 @keyframes floatBubbleUp {
     0%, 100% { transform: translateX(-50%) translateY(-10px); }
     50%      { transform: translateX(-50%) translateY(-15px); }
+}
+
+/* ✅ MOBILE FRIENDLY: Show bubble on phones and adjust size */
+@media (max-width: 768px) {
+    .mascot-bubble {
+        display: block !important; /* Force it to show on mobile */
+        font-size: 12px;
+        padding: 8px 12px;
+        max-width: 140px; /* Make it slightly smaller for narrow phone screens */
+        bottom: 105%; /* Push it up slightly to avoid overlapping the mascot */
+    }
 }
 
         /* Hide bubble on mobile to save space */
