@@ -4067,54 +4067,53 @@
             box-shadow: 0 12px 32px rgba(247,216,117,0.6);
         }
 
-        /* ===== Speech Bubble Styling ===== */
-        .mascot-bubble {
-            position: absolute;
-            right: 85px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #121821;
-            color: #f7d875;
-            border: 1px solid #f7d875;
-            padding: 10px 16px;
-            border-radius: 16px;
-            font-size: 13px;
-            font-weight: 700;
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-            pointer-events: none; 
-            animation: floatBubble 3s ease-in-out infinite;
-        }
-        
-        /* The little triangle arrow pointing to the mascot */
-        .mascot-bubble::after {
-            content: '';
-            position: absolute;
-            right: -7px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 7px 0 7px 7px;
-            border-style: solid;
-            border-color: transparent transparent transparent #f7d875;
-        }
-        .mascot-bubble::before {
-            content: '';
-            position: absolute;
-            right: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 6px 0 6px 6px;
-            border-style: solid;
-            border-color: transparent transparent transparent #121821;
-            z-index: 1;
-        }
+/* ===== Speech Bubble Styling (ABOVE the mascot) ===== */
+.mascot-bubble {
+    position: absolute;
+    bottom: 100%;               /* place it above the fab */
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px); /* centre horizontally, add gap */
+    background: #121821;
+    color: #f7d875;
+    border: 1px solid #f7d875;
+    padding: 10px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    pointer-events: none;       /* allow clicks to pass through to the button */
+    animation: floatBubbleUp 3s ease-in-out infinite;
+}
 
-        /* Gentle floating animation */
-        @keyframes floatBubble {
-            0%, 100% { transform: translateY(-50%) translateX(0); }
-            50% { transform: translateY(-50%) translateX(-5px); }
-        }
+/* Little triangle arrow pointing DOWN to the mascot */
+.mascot-bubble::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    border-width: 7px 7px 0 7px;   /* pointing down */
+    border-style: solid;
+    border-color: #f7d875 transparent transparent transparent;
+}
+.mascot-bubble::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%) translateY(1px);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: #121821 transparent transparent transparent;
+    z-index: 1;
+}
+
+@keyframes floatBubbleUp {
+    0%, 100% { transform: translateX(-50%) translateY(-10px); }
+    50%      { transform: translateX(-50%) translateY(-15px); }
+}
 
         /* Hide bubble on mobile to save space */
         @media (max-width: 768px) {
@@ -4149,6 +4148,260 @@
             .mascot-fab { bottom: 16px; right: 16px; width: 60px; height: 60px; border-radius: 22px; }
             .mascot-eye { width: 10px; height: 18px; }
         }
+
+        /* ============================================================
+   💬 CUSTOMER CHAT PANEL (Missing CSS)
+   ============================================================ */
+.chat-panel-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 998; /* High, but below the mascot fab */
+    display: none; /* Hidden by default */
+    justify-content: flex-end; /* Slide in from the right */
+}
+
+/* 🔥 THIS IS THE RULE THAT MAKES IT OPEN */
+.chat-panel-overlay.open {
+    display: flex;
+}
+
+.chat-panel {
+    background: #121821;
+    width: 380px;
+    max-width: 100vw;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #1e2a3a;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    animation: slideInChat 0.3s ease;
+}
+
+@keyframes slideInChat {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.chat-header {
+    padding: 20px;
+    background: #1a2538;
+    border-bottom: 1px solid #1e2a3a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    font-size: 16px;
+    color: #f7d875;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chat-header p {
+    font-size: 12px;
+    color: #8aa1c0;
+}
+
+.chat-close {
+    background: transparent;
+    border: none;
+    color: #8aa1c0;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.chat-close:hover { color: #fff; transform: rotate(90deg); }
+
+.chat-identity {
+    padding: 16px 20px;
+    background: #0b0e14;
+    border-bottom: 1px solid #1e2a3a;
+}
+
+.chat-identity .field {
+    margin-bottom: 10px;
+}
+.chat-identity .field:last-child { margin-bottom: 0; }
+
+.chat-identity .field label {
+    font-size: 11px;
+    color: #6a7f9e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.chat-identity .field input {
+    width: 100%;
+    background: #121821;
+    border: 1px solid #2a3a52;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #e8edf5;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+.chat-identity .field input:focus { outline: none; border-color: #f7d875; }
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #0b0e14;
+}
+
+.chat-empty {
+    text-align: center;
+    color: #6a7f9e;
+    font-size: 13px;
+    margin-top: 20px;
+}
+
+.chat-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.chat-bubble.mine {
+    align-self: flex-end;
+    background: #f7d875;
+    color: #0b0e14;
+    border-bottom-right-radius: 4px;
+}
+
+.chat-bubble.theirs {
+    align-self: flex-start;
+    background: #1e2a3a;
+    color: #e8edf5;
+    border-bottom-left-radius: 4px;
+}
+
+.chat-bubble img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 6px;
+    cursor: pointer;
+    display: block;
+}
+
+.chat-time {
+    display: block;
+    font-size: 10px;
+    margin-top: 4px;
+    opacity: 0.7;
+    text-align: right;
+}
+
+.chat-image-preview {
+    padding: 10px 20px;
+    background: #0b0e14;
+    border-top: 1px solid #1e2a3a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-image-preview img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #2a3a52;
+}
+
+.chat-image-preview button {
+    background: #ff6b6b;
+    color: #fff;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.chat-input-area {
+    padding: 16px 20px;
+    background: #121821;
+    border-top: 1px solid #1e2a3a;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.chat-input-area textarea {
+    flex: 1;
+    background: #0b0e14;
+    border: 1px solid #2a3a52;
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: #e8edf5;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    resize: none;
+    max-height: 100px;
+}
+.chat-input-area textarea:focus { outline: none; border-color: #f7d875; }
+
+.chat-attach-btn {
+    background: transparent;
+    border: none;
+    color: #8aa1c0;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px;
+    transition: 0.2s;
+}
+.chat-attach-btn:hover { color: #f7d875; }
+
+.chat-send-btn {
+    background: #f7d875;
+    color: #0b0e14;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: 0.2s;
+}
+.chat-send-btn:hover { background: #ffe08a; transform: scale(1.05); }
+
+/* Badge on the Mascot Button */
+.chat-fab-badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: #ff4757;
+    color: #fff;
+    border-radius: 50%;
+    min-width: 20px; height: 20px;
+    font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #0b0e14;
+    box-shadow: 0 2px 8px rgba(255,71,87,0.5);
+}
 
         /* ============================================================
            💬 ADMIN INBOX
