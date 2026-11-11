@@ -6940,6 +6940,16 @@
                                                 <span class="pt-sub">Clothing, accessories, etc.</span>
                                             </span>
                                         </label>
+                                        <!-- 👇 NEW GIFT CODE OPTION 👇 -->
+                                        <label class="pt-option">
+                                            <input type="radio" name="addProductType" value="gift_code" />
+                                            <span class="pt-content">
+                                                <i class="fas fa-gift"></i>
+                                                <span class="pt-title">Gift Code</span>
+                                                <span class="pt-sub">Redeem codes, keys</span>
+                                            </span>
+                                        </label>
+                                        <!-- 👆 END NEW 👆 -->
                                     </div>
                                 </div>
                                 <div class="field field-full">
@@ -7885,6 +7895,16 @@
                 <span class="pt-sub">Clothing, accessories</span>
             </span>
         </label>
+        <!-- 👇 NEW GIFT CODE OPTION 👇 -->
+        <label class="pt-option">
+            <input type="radio" name="editProductType" value="gift_code" />
+            <span class="pt-content">
+                <i class="fas fa-gift"></i>
+                <span class="pt-title">Gift Code</span>
+                <span class="pt-sub">Redeem codes, keys</span>
+            </span>
+        </label>
+        <!-- 👆 END NEW 👆 -->
     </div>
 </div>
 
@@ -8330,6 +8350,18 @@
                 <button type="button" class="chat-send-btn" id="chatSendBtn" title="Send">
                     <i class="fas fa-paper-plane"></i>
                 </button>
+            </div>
+        </div>
+    </div>
+
+        <!-- ===== MANAGE GIFT CODES MODAL ===== -->
+    <div class="confirm-overlay" id="manageCodesOverlay">
+        <div class="confirm-panel" style="max-width: 600px; text-align: left;">
+            <h3 style="margin-bottom: 10px;"><i class="fas fa-gift" style="color: #f7d875;"></i> Manage Gift Codes</h3>
+            <p id="manageCodesOrderId" style="color: #8aa1c0; font-size: 14px; margin-bottom: 20px;"></p>
+            <div id="manageCodesList"></div>
+            <div class="actions" style="margin-top: 20px; justify-content: flex-end;">
+                <button class="confirm-cancel" id="closeManageCodesBtn">Close</button>
             </div>
         </div>
     </div>
@@ -10132,8 +10164,8 @@ checkoutBtn.addEventListener('click', function() {
                 for (var j = 0; j < allGames.length; j++) {
                     if (allGames[j].id === cart[i].id) { g = allGames[j]; break; }
                 }
-                // ✅ Only digital products need game ID fields
-                if (g && g.productType === 'physical') continue;
+      // ✅ Only digital products need game ID fields
+                if (g && (g.productType === 'physical' || g.productType === 'gift_code')) continue;
                 var type = (g && g.gameType) ? g.gameType : 'roblox';
                 typesPresent.add(type);
             }
@@ -11812,9 +11844,20 @@ function loadOrders() {
                 });
                 html += '</select></td>';
 
-                // Fulfilment column
                 // ✅ Fulfilment column — separate from Payment Status
                 html += '<td>';
+                
+                // 👇 NEW: Only show button if order has Gift Codes 👇
+                var orderItems = String(o['Items'] || '').toLowerCase();
+                var hasGiftCode = allGames.some(function(g) {
+                    return g.productType === 'gift_code' && orderItems.includes(g.title.toLowerCase());
+                });
+                
+                if (hasGiftCode) {
+                    html += '<button class="manage-codes-btn" data-orderid="' + (o['Order ID'] || '') + '" data-items="' + (o['Items'] || '').replace(/"/g, '&quot;') + '" style="margin-bottom: 5px; background:#f7d875;color:#0b0e14;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-weight:700;width:100%;"><i class="fas fa-gift"></i> Manage Codes</button>';
+                }
+                // 👆 END NEW 👆
+                
                 if (payStatusRaw === 'Paid' && fulfilStatusRaw !== 'Shipped' && fulfilStatusRaw !== 'Delivered') {
                     html += '<button class="mark-shipped-btn" data-orderid="' + (o['Order ID'] || '') + '" '
                           + 'style="background:#2196f3;color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:Inter;font-weight:700;white-space:nowrap;">'
@@ -11849,6 +11892,15 @@ function loadOrders() {
                     updateOrderStatus(this.dataset.orderid, this.value);
                 });
             }
+
+            // 👇 NEW: Bind Manage Codes Buttons 👇
+            var codeBtns = ordersList.querySelectorAll('.manage-codes-btn');
+            for (var c = 0; c < codeBtns.length; c++) {
+                codeBtns[c].addEventListener('click', function() {
+                    openManageCodesModal(this.dataset.orderid, this.dataset.items);
+                });
+            }
+            // 👆 END NEW 👆
 
             // Mark as Shipped
             var shipBtns = ordersList.querySelectorAll('.mark-shipped-btn');
@@ -12956,6 +13008,23 @@ function renderOrderList(tab) {
         html += '<span class="order-total">RM ' + total + '</span>';
         html += '<span class="status-badge ' + statusClass + '">' + status + '</span>';
         html += '</div>';
+        
+        // 👇 NEW: Render Gift Codes 👇
+        if (order._giftCodes && order._giftCodes.length > 0) {
+            html += '<div style="margin-top:15px; padding:15px; background:#1e2a3a; border-radius:12px; border:1px solid #f7d875;">';
+            html += '<h4 style="color:#f7d875; margin-bottom:12px; font-size:14px;"><i class="fas fa-gift"></i> YOUR REDEMPTION CODE</h4>';
+            order._giftCodes.forEach(gc => {
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#0b0e14; padding:12px; border-radius:8px; margin-bottom:8px;">
+                        <span style="font-family:monospace; font-size:16px; color:#4caf50; font-weight:700; letter-spacing:1px;">${gc.code}</span>
+                        <button onclick="copyToClipboard('${gc.code}')" style="background:#f7d875; border:none; padding:6px 16px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:bold; color:#0b0e14;"><i class="fas fa-copy"></i> COPY</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+        // 👆 END NEW 👆
+
         var boStatus = String(order['Backorder Status'] || '');
         var payStatusStr = String(order['Payment Status'] || '');
         if (boStatus && payStatusStr === 'Paid') {
@@ -13805,6 +13874,20 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
             }
         });
 
+                function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Code copied to clipboard!');
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('Code copied to clipboard!');
+            });
+        }
+
         function copyLinkFallback(text) {
             var textarea = document.createElement('textarea');
             textarea.value = text;
@@ -13908,6 +13991,91 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
                 })
                 .updateReferralConfig(updates);
         }
+
+                // ================================================================
+        // 🎁 ADMIN GIFT CODE MANAGEMENT
+        // ================================================================
+        function openManageCodesModal(orderId, itemsStr) {
+            document.getElementById('manageCodesOverlay').classList.add('open');
+            document.getElementById('manageCodesOrderId').textContent = 'Order: ' + orderId;
+            const list = document.getElementById('manageCodesList');
+            list.innerHTML = '<p style="color:#8aa1c0;">Loading...</p>';
+            
+            google.script.run
+                .withSuccessHandler(function(giftCodes) {
+                    const items = String(itemsStr).split(',').map(s => s.trim());
+                    let html = '';
+                    
+                    items.forEach(item => {
+                        const match = item.match(/^(.*?)\s*×\s*(\d+)$/);
+                        if (!match) return;
+                        const title = match[1].trim();
+                        const qty = parseInt(match[2]) || 1;
+                        const game = allGames.find(g => g.title === title);
+                        
+                        if (game && game.productType === 'gift_code') {
+                            // Find all existing codes for this product, sorted by assignment time
+                            const existingCodes = giftCodes
+                                .filter(c => String(c['Product ID']) === String(game.id))
+                                .sort((a, b) => new Date(a['Assigned At'] || 0) - new Date(b['Assigned At'] || 0));
+                            
+                            for (let i = 0; i < qty; i++) {
+                                const existing = existingCodes[i];
+                                const isSent = existing && existing.Status === 'Sent';
+                                const inputId = `code_${game.id}_${i}`;
+                                
+                                html += `
+                                    <div style="margin-bottom:15px; padding:15px; background:#0b0e14; border:1px solid #2a3a52; border-radius:12px;">
+                                        <h4 style="color:#e8edf5; margin-bottom:8px;">${title} ${qty > 1 ? `(Item ${i+1} of ${qty})` : ''}</h4>
+                                        ${existing ? `<p style="font-size:12px; margin-bottom:8px;">Status: <span style="color:${isSent ? '#4caf50' : '#ffa726'}; font-weight:bold;">${existing.Status}</span></p>` : ''}
+                                        <div style="display:flex; gap:10px; margin-top:10px;">
+                                            <input type="text" id="${inputId}" value="${existing ? existing['Redemption Code'] : ''}" placeholder="Paste code here" style="flex:1; padding:10px; background:#121821; border:1px solid #1e2a3a; border-radius:8px; color:#fff;" />
+                                            <button onclick="submitGiftCode('${orderId}', '${game.id}', '${inputId}', ${i})" style="padding:10px 20px; background:#f7d875; border:none; border-radius:8px; font-weight:bold; cursor:pointer; color:#0b0e14;">SEND CODE</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    });
+                    list.innerHTML = html || '<p style="color:#8aa1c0;">No gift code products in this order.</p>';
+                })
+                .getGiftCodesForOrder(orderId);
+        }
+
+        function submitGiftCode(orderId, productId, inputId, codeIndex) {
+            const codeInput = document.getElementById(inputId);
+            const code = codeInput.value.trim();
+            if (!code) { alert('Please enter a code'); return; }
+            
+            const btn = codeInput.nextElementSibling;
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+            
+            google.script.run
+                .withSuccessHandler(res => {
+                    btn.textContent = 'SEND CODE';
+                    btn.disabled = false;
+                    if (res.success) {
+                        showToast('Code sent successfully!');
+                        loadOrders(); // Refresh list
+                        // Re-open the modal to show the updated "Sent" status
+                        const btnElement = document.querySelector(`.manage-codes-btn[data-orderid="${orderId}"]`);
+                        if (btnElement) openManageCodesModal(orderId, btnElement.dataset.items);
+                    } else {
+                        showToast(res.message);
+                    }
+                })
+                .withFailureHandler(err => {
+                    btn.textContent = 'SEND CODE';
+                    btn.disabled = false;
+                    showToast('Error: ' + err.message);
+                })
+                .processGiftCodeAssignment(orderId, productId, code, codeIndex);
+        }
+
+        document.getElementById('closeManageCodesBtn').addEventListener('click', function() {
+            document.getElementById('manageCodesOverlay').classList.remove('open');
+        });
 
         // ================================================================
         // 40. INIT  (mode-aware)
@@ -14607,53 +14775,49 @@ function applyProductType(type) {
         // Hide digital pricing section
         if (pricingSection) {
             pricingSection.style.display = 'none';
-            // ✅ Disable inputs so hidden required fields don't block submit
-            pricingSection.querySelectorAll('input, select, textarea').forEach(function(el) {
-                el.disabled = true;
-            });
+            pricingSection.querySelectorAll('input, select, textarea').forEach(function(el) { el.disabled = true; });
         }
-        // Show physical variants section
         if (variantSection) variantSection.style.display = 'block';
-        // Show shipping field (legacy)
         if (shippingField) shippingField.style.display = 'block';
         if (shippingCb) shippingCb.checked = true;
-        // Refresh variants UI
+        
         if (hasVariantsCb && hasVariantsCb.checked) {
             if (variantEditor) variantEditor.style.display = 'block';
             if (physicalBaseFields) {
                 physicalBaseFields.style.display = 'none';
-                physicalBaseFields.querySelectorAll('input, select, textarea').forEach(function(el) {
-                    el.disabled = true;
-                });
+                physicalBaseFields.querySelectorAll('input, select, textarea').forEach(function(el) { el.disabled = true; });
             }
             renderVariantTable(ctx);
         } else {
             if (variantEditor) variantEditor.style.display = 'none';
             if (physicalBaseFields) {
                 physicalBaseFields.style.display = 'block';
-                physicalBaseFields.querySelectorAll('input, select, textarea').forEach(function(el) {
-                    el.disabled = false;
-                });
+                physicalBaseFields.querySelectorAll('input, select, textarea').forEach(function(el) { el.disabled = false; });
             }
         }
-    } else {
-        // Show digital pricing section
+    } else if (type === 'gift_code') {
+        // 👇 NEW GIFT CODE LOGIC 👇
         if (pricingSection) {
             pricingSection.style.display = 'block';
-            pricingSection.querySelectorAll('input, select, textarea').forEach(function(el) {
-                el.disabled = false;
-            });
+            pricingSection.querySelectorAll('input, select, textarea').forEach(function(el) { el.disabled = false; });
         }
-        // Hide physical variants section
         if (variantSection) variantSection.style.display = 'none';
-        // Hide shipping field
         if (shippingField) shippingField.style.display = 'none';
         if (shippingCb) shippingCb.checked = false;
-        // Also disable physical base inputs (hidden)
         if (physicalBaseFields) {
-            physicalBaseFields.querySelectorAll('input, select, textarea').forEach(function(el) {
-                el.disabled = true;
-            });
+            physicalBaseFields.querySelectorAll('input, select, textarea').forEach(function(el) { el.disabled = true; });
+        }
+        // 👆 END NEW LOGIC 👆
+    } else {
+        if (pricingSection) {
+            pricingSection.style.display = 'block';
+            pricingSection.querySelectorAll('input, select, textarea').forEach(function(el) { el.disabled = false; });
+        }
+        if (variantSection) variantSection.style.display = 'none';
+        if (shippingField) shippingField.style.display = 'none';
+        if (shippingCb) shippingCb.checked = false;
+        if (physicalBaseFields) {
+            physicalBaseFields.querySelectorAll('input, select, textarea').forEach(function(el) { el.disabled = true; });
         }
     }
 }
