@@ -6952,6 +6952,22 @@
                                         <!-- 👆 END NEW 👆 -->
                                     </div>
                                 </div>
+                                <!-- FIRST PURCHASE DISCOUNT SETTING -->
+<div class="field field-full">
+    <label class="check-label">
+        <input
+            type="checkbox"
+            id="addFirstPurchaseDiscountEligible"
+            checked
+        />
+        <span>Eligible for First Purchase Discount (10%)</span>
+    </label>
+
+    <small style="color:#8aa1c0; display:block; margin-top:6px;">
+        ON = This product can receive the automatic first-purchase discount.
+        OFF = This product will be excluded.
+    </small>
+</div>
                                 <div class="field field-full">
                                     <label for="gameType">Game Type (for digital products) *</label>
                                     <select id="gameType" required>
@@ -7906,6 +7922,22 @@
         </label>
         <!-- 👆 END NEW 👆 -->
     </div>
+</div>
+<!-- FIRST PURCHASE DISCOUNT SETTING (EDIT) -->
+<div class="field field-full">
+    <label class="check-label">
+        <input
+            type="checkbox"
+            id="editFirstPurchaseDiscountEligible"
+            checked
+        />
+        <span>Eligible for First Purchase Discount (10%)</span>
+    </label>
+
+    <small style="color:#8aa1c0; display:block; margin-top:6px;">
+        ON = This product can receive the automatic first-purchase discount.
+        OFF = This product will be excluded.
+    </small>
 </div>
 
 <div class="field field-full" id="editRequiresShippingField" style="display:none;">
@@ -9949,65 +9981,180 @@ html += '<img src="' + (item.image || PLACEHOLDER_IMG) + '" alt="' + item.title 
         cartClose.addEventListener('click', function() { cartOverlay.classList.remove('open'); });
         cartOverlay.addEventListener('click', function(e) { if (e.target === cartOverlay) cartOverlay.classList.remove('open'); });
 
+// ============================================================
+// FIRST PURCHASE DISCOUNT - ELIGIBLE PRODUCT SUBTOTAL
+// ============================================================
+
+function getFirstPurchaseEligibleSubtotal() {
+    var eligibleSubtotal = 0;
+
+    for (var i = 0; i < cart.length; i++) {
+
+        var item = cart[i];
+
+        // Find the original product information.
+        var game = allGames.find(function(g) {
+            return String(g.id) === String(item.id);
+        });
+
+        // Old products default to eligible.
+        var isEligible = !game ||
+            game.firstPurchaseDiscountEligible !== false;
+
+        // Skip products that are switched OFF.
+        if (!isEligible) {
+            continue;
+        }
+
+        // Apply the product's own existing discount first.
+        var itemPrice = item.discount && item.discount > 0
+            ? item.price * (1 - item.discount / 100)
+            : item.price;
+
+        eligibleSubtotal += itemPrice * item.quantity;
+    }
+
+    return eligibleSubtotal;
+}
+        
         // ================================================================
         // 10. CHECKOUT
         // ================================================================
 function updateCheckoutSummary() {
+
+    // Calculate full cart subtotal.
     var subtotal = 0;
+
     for (var i = 0; i < cart.length; i++) {
+
         var item = cart[i];
-        var price = item.discount && item.discount > 0 ? item.price * (1 - item.discount / 100) : item.price;
+
+        var price = item.discount && item.discount > 0
+            ? item.price * (1 - item.discount / 100)
+            : item.price;
+
         subtotal += price * item.quantity;
     }
 
+    // Calculate promo discount.
     var discountAmount = 0;
     var discountLabel = '';
+
     if (appliedPromo) {
+
+        // Automatic first-purchase coupon:
+        // only eligible products are included.
+        var promoBase = appliedPromo.isFirstPurchase
+            ? getFirstPurchaseEligibleSubtotal()
+            : subtotal;
+
         if (appliedPromo.discountType === 'percentage') {
-            discountAmount = subtotal * (appliedPromo.discountValue / 100);
+
+            discountAmount =
+                promoBase * (appliedPromo.discountValue / 100);
+
         } else if (appliedPromo.discountType === 'fixed') {
-            discountAmount = Math.min(appliedPromo.discountValue, subtotal);
+
+            discountAmount = Math.min(
+                appliedPromo.discountValue,
+                promoBase
+            );
         }
+
         discountLabel = ' (' + appliedPromo.code + ')';
     }
 
-    // ✅ Points Discount
+    // Loyalty points discount.
     var pointsDiscount = pointsToRedeem * POINT_VALUE;
+
     var afterPromo = subtotal - discountAmount;
+
     if (pointsDiscount > afterPromo) {
         pointsDiscount = afterPromo;
         pointsToRedeem = Math.floor(pointsDiscount / POINT_VALUE);
     }
 
-    // ✅ Shipping fee
+    // Shipping fee.
     var shippingFee = getShippingFee();
 
     var total = afterPromo - pointsDiscount + shippingFee;
 
+    // Build checkout summary.
     var summaryHtml = '';
+
     for (var j = 0; j < cart.length; j++) {
+
         var item2 = cart[j];
-        var price2 = item2.discount && item2.discount > 0 ? item2.price * (1 - item2.discount / 100) : item2.price;
+
+        var price2 = item2.discount && item2.discount > 0
+            ? item2.price * (1 - item2.discount / 100)
+            : item2.price;
+
         var subtotal2 = price2 * item2.quantity;
+
         var variantTag = item2.variantLabel
-            ? '<span class="checkout-variant-tag"><i class="fas fa-tag"></i> ' + item2.variantLabel + '</span>'
+            ? '<span class="checkout-variant-tag"><i class="fas fa-tag"></i> ' +
+              item2.variantLabel + '</span>'
             : '';
-        summaryHtml += '<div class="item"><span>' + item2.title + ' × ' + item2.quantity + variantTag + '</span><span>' + CURRENCY + ' ' + subtotal2.toFixed(2) + '</span></div>';
+
+        summaryHtml +=
+            '<div class="item">' +
+            '<span>' + item2.title + ' × ' + item2.quantity +
+            variantTag + '</span>' +
+            '<span>' + CURRENCY + ' ' + subtotal2.toFixed(2) + '</span>' +
+            '</div>';
     }
-    summaryHtml += '<div class="item" style="border-top:1px solid #1e2a3a; padding-top:8px; margin-top:4px;"><strong>Subtotal</strong><span>' + CURRENCY + ' ' + subtotal.toFixed(2) + '</span></div>';
+
+    summaryHtml +=
+        '<div class="item" style="border-top:1px solid #1e2a3a; padding-top:8px; margin-top:4px;">' +
+        '<strong>Subtotal</strong>' +
+        '<span>' + CURRENCY + ' ' + subtotal.toFixed(2) + '</span>' +
+        '</div>';
+
     if (appliedPromo) {
-        summaryHtml += '<div class="item" style="color:#4caf50;"><span>Discount' + discountLabel + '</span><span>-' + CURRENCY + ' ' + discountAmount.toFixed(2) + '</span></div>';
+
+        summaryHtml +=
+            '<div class="item" style="color:#4caf50;">' +
+            '<span>Discount' + discountLabel + '</span>' +
+            '<span>-' + CURRENCY + ' ' + discountAmount.toFixed(2) + '</span>' +
+            '</div>';
     }
+
     if (pointsToRedeem > 0) {
-        summaryHtml += '<div class="item" style="color:#f7d875;"><span><i class="fas fa-coins"></i> Points (' + pointsToRedeem + ')</span><span>-' + CURRENCY + ' ' + pointsDiscount.toFixed(2) + '</span></div>';
+
+        summaryHtml +=
+            '<div class="item" style="color:#f7d875;">' +
+            '<span><i class="fas fa-coins"></i> Points (' +
+            pointsToRedeem + ')</span>' +
+            '<span>-' + CURRENCY + ' ' +
+            pointsDiscount.toFixed(2) + '</span>' +
+            '</div>';
     }
+
     if (shippingFee > 0) {
-        summaryHtml += '<div class="shipping-line"><span><i class="fas fa-shipping-fast"></i> Shipping Fee</span><span>' + CURRENCY + ' ' + shippingFee.toFixed(2) + '</span></div>';
+
+        summaryHtml +=
+            '<div class="shipping-line">' +
+            '<span><i class="fas fa-shipping-fast"></i> Shipping Fee</span>' +
+            '<span>' + CURRENCY + ' ' + shippingFee.toFixed(2) + '</span>' +
+            '</div>';
+
     } else if (cartHasPhysicalItems()) {
-        summaryHtml += '<div class="shipping-line" style="color:#4caf50;"><span><i class="fas fa-shipping-fast"></i> Shipping Fee</span><span>FREE</span></div>';
+
+        summaryHtml +=
+            '<div class="shipping-line" style="color:#4caf50;">' +
+            '<span><i class="fas fa-shipping-fast"></i> Shipping Fee</span>' +
+            '<span>FREE</span>' +
+            '</div>';
     }
-    summaryHtml += '<div class="total">Total: ' + CURRENCY + ' ' + total.toFixed(2) + '</div>';
+
+    summaryHtml +=
+        '<div class="total">Total: ' +
+        CURRENCY + ' ' + total.toFixed(2) +
+        '</div>';
+
     checkoutSummary.innerHTML = summaryHtml;
+
     checkoutSummary.dataset.total = total.toFixed(2);
 }
 
@@ -10127,26 +10274,32 @@ checkoutBtn.addEventListener('click', function() {
     // ✅ NEW: Auto-apply the referral welcome coupon for first-time orders
     if (customer && customer.email) {
         google.script.run
-            .withSuccessHandler(function(coupon) {
-                if (coupon) {
-                    appliedPromo = {
-                        code: coupon.code,
-                        discountType: coupon.discountType,
-                        discountValue: coupon.discountValue
-                    };
-                    document.getElementById('promoCode').value = coupon.code;
-                    var feedback = document.getElementById('promoFeedback');
-                    feedback.textContent = '🎉 Welcome coupon auto-applied! ' + coupon.description;
-                    feedback.className = 'promo-feedback success';
-                    
-                    var btn = document.getElementById('applyPromoBtn');
-                    btn.classList.add('success');
-                    btn.innerHTML = '<i class="fas fa-check"></i> Applied';
-                    btn.disabled = true;
+.withSuccessHandler(function(coupon) {
+    if (coupon) {
+        appliedPromo = {
+            code: coupon.code,
+            discountType: coupon.discountType,
+            discountValue: coupon.discountValue,
 
-                    updateCheckoutSummary();
-                }
-            })
+            // Identify this as the automatic first-purchase coupon.
+            isFirstPurchase: true
+        };
+
+        document.getElementById('promoCode').value = coupon.code;
+
+        var feedback = document.getElementById('promoFeedback');
+        feedback.textContent =
+            '🎉 Welcome coupon auto-applied! ' + coupon.description;
+        feedback.className = 'promo-feedback success';
+
+        var btn = document.getElementById('applyPromoBtn');
+        btn.classList.add('success');
+        btn.innerHTML = '<i class="fas fa-check"></i> Applied';
+        btn.disabled = true;
+
+        updateCheckoutSummary();
+    }
+})
             .withFailureHandler(function(err) {
                 console.log('No welcome coupon to apply: ' + err.message);
             })
@@ -10394,14 +10547,29 @@ checkoutBtn.addEventListener('click', function() {
                 var price3 = cart[j2].discount ? cart[j2].price * (1 - cart[j2].discount / 100) : cart[j2].price;
                 subtotal += price3 * cart[j2].quantity;
             }
-            var discountAmount2 = 0;
-            if (appliedPromo) {
-                if (appliedPromo.discountType === 'percentage') {
-                    discountAmount2 = subtotal * (appliedPromo.discountValue / 100);
-                } else if (appliedPromo.discountType === 'fixed') {
-                    discountAmount2 = Math.min(appliedPromo.discountValue, subtotal);
-                }
-            }
+var discountAmount2 = 0;
+
+if (appliedPromo) {
+
+    // Automatic first-purchase coupon:
+    // only eligible products receive the discount.
+    var promoBase2 = appliedPromo.isFirstPurchase
+        ? getFirstPurchaseEligibleSubtotal()
+        : subtotal;
+
+    if (appliedPromo.discountType === 'percentage') {
+
+        discountAmount2 =
+            promoBase2 * (appliedPromo.discountValue / 100);
+
+    } else if (appliedPromo.discountType === 'fixed') {
+
+        discountAmount2 = Math.min(
+            appliedPromo.discountValue,
+            promoBase2
+        );
+    }
+}
             var total2 = subtotal - discountAmount2;
 
             // ✅ Subtract points discount
@@ -10415,12 +10583,15 @@ checkoutBtn.addEventListener('click', function() {
             var shippingFee = hasPhysicalItem ? (parseFloat(shippingData.fee) || 0) : 0;
             var finalTotal = total2 - pointsDiscountFinal + shippingFee;
 
-            var promoData = appliedPromo ? {
-                code: appliedPromo.code,
-                discountType: appliedPromo.discountType,
-                discountValue: appliedPromo.discountValue,
-                discountAmount: discountAmount2
-            } : null;
+var promoData = appliedPromo ? {
+    code: appliedPromo.code,
+    discountType: appliedPromo.discountType,
+    discountValue: appliedPromo.discountValue,
+    discountAmount: discountAmount2,
+
+    // Send the coupon type to the backend.
+    isFirstPurchase: appliedPromo.isFirstPurchase === true
+} : null;
 
             var submitBtn = this.querySelector('.place-order-btn');
             submitBtn.disabled = true;
@@ -11407,15 +11578,26 @@ if (pt === 'physical') {
     shippingField.style.display = 'none';
     shippingCb.checked = false;
 }
+// Load saved first-purchase discount eligibility.
+var firstPurchaseCheckbox = document.getElementById(
+    'editFirstPurchaseDiscountEligible'
+);
 
-            editOverlay.classList.add('open');
+if (firstPurchaseCheckbox) {
+    // Old products with no setting default to ON.
+    firstPurchaseCheckbox.checked =
+        game.firstPurchaseDiscountEligible !== false;
+}
 
-            setTimeout(function() {
-                if (editTitle) {
-                    editTitle.focus();
-                    editTitle.select();
-                }
-            }, 350);
+// Open the edit modal.
+editOverlay.classList.add('open');
+
+setTimeout(function() {
+    if (editTitle) {
+        editTitle.focus();
+        editTitle.select();
+    }
+}, 350);
         }
 
         function updateEditPreview() {
@@ -11568,10 +11750,10 @@ if (isPhysical && !hasVariants) {
     quantityVal = parseInt(editQuantity.value) || 0;
 }
 
-var data = {                              // ✅ ADD THIS LINE
+var data = {
     title: editTitle.value.trim(),
     category: editCategory.value.trim(),
-    price: priceVal,                      // ✅ use computed values
+    price: priceVal,
     cost: costVal,
     discount: discountVal,
     quantity: quantityVal,
@@ -11580,11 +11762,16 @@ var data = {                              // ✅ ADD THIS LINE
     badge: editBadge.value.trim(),
     additionalImages: editAdditionalImages.value.trim(),
     gameType: document.getElementById('editGameType').value,
+
     productType: variantData.productType,
     requiresShipping: variantData.requiresShipping,
     hasVariants: variantData.hasVariants,
     variantOptions: variantData.variantOptions,
-    variants: variantData.variants
+    variants: variantData.variants,
+
+    // NEW: Save the checkbox setting
+    firstPurchaseDiscountEligible:
+        document.getElementById('editFirstPurchaseDiscountEligible').checked
 };
 
             var errorEl = document.getElementById('editFormError');
@@ -11748,11 +11935,16 @@ var data = {
     badge: document.getElementById('badge').value.trim(),
     additionalImages: document.getElementById('additionalImages').value.trim(),
     gameType: document.getElementById('gameType').value,
+
     productType: variantData.productType,
     requiresShipping: variantData.requiresShipping,
     hasVariants: variantData.hasVariants,
     variantOptions: variantData.variantOptions,
-    variants: variantData.variants
+    variants: variantData.variants,
+
+    // NEW: Save the checkbox setting
+    firstPurchaseDiscountEligible:
+        document.getElementById('addFirstPurchaseDiscountEligible').checked
 };
 
 var errors = [];
