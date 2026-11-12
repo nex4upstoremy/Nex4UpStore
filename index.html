@@ -12104,10 +12104,15 @@ function loadOrders() {
                     btn.disabled = true;
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                     google.script.run
-                        .withSuccessHandler(function(res) {
-                            showToast(res.message || 'Shipped.');
-                            loadOrders();
-                        })
+.withSuccessHandler(function(res) {
+    if (res && res.success === false) {
+        showToast('❌ Shipping blocked: ' + (res.message || 'Unknown error'));
+        loadOrders();
+        return;
+    }
+    showToast('✅ Order shipped.');
+    loadOrders();
+})
                         .withFailureHandler(function(err) {
                             showToast('Error: ' + err.message);
                             btn.disabled = false;
