@@ -19176,6 +19176,22 @@ updateProfileDropdown = function () {
     setTimeout(refreshHeaderPointsPill, 600);
 })();
 
+// Allow Admin -> Genres to manage images for both Level 1 Categories and Level 2 Genres
+var _origRenderGenreManager = renderGenreManager;
+renderGenreManager = function () {
+    if (!isAdmin) return;
+    var catalog = buildMarketplaceCatalog();
+    // Ensure every Main Category and Sub-Genre is registered in allGames categories view for the manager
+    if (catalog && catalog.categoriesList) {
+        catalog.categoriesList.forEach(function (c) {
+            if (genreImages && genreImages[c.name] === undefined) {
+                genreImages[c.name] = '';
+            }
+        });
+    }
+    _origRenderGenreManager();
+};        
+
     </script>
 </body>
 </html>
