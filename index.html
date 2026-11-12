@@ -7591,6 +7591,188 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================================
+   ✨ PHASE 2 REFINEMENT: PREMIUM DESIGN SYSTEM, ACCOUNT HUB &
+   EXECUTIVE ADMIN / ROBUX INVENTORY DASHBOARD
+   ============================================================ */
+.game-card {
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    background: #121821 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.game-card:hover {
+    transform: translateY(-4px) !important;
+    border-color: rgba(247, 216, 117, 0.55) !important;
+    box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.65) !important;
+}
+.game-card .card-body .desc {
+    display: none;
+}
+.game-card .stock-info {
+    font-size: 11.5px !important;
+    color: #7c93b3 !important;
+    margin-bottom: 6px !important;
+}
+
+/* Recently Viewed Strip */
+.mp-recent-section {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #1e2a3a;
+}
+.mp-recent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 12px;
+}
+.mp-recent-card {
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: 0.18s ease;
+}
+.mp-recent-card:hover {
+    border-color: #f7d875;
+    background: #161f2c;
+    transform: translateY(-2px);
+}
+.mp-recent-card img {
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+    object-fit: contain;
+    background: #0b0e14;
+    flex-shrink: 0;
+}
+.mp-recent-card .rc-info {
+    min-width: 0;
+    flex: 1;
+}
+.mp-recent-card .rc-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #e8edf5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mp-recent-card .rc-price {
+    font-size: 12px;
+    font-weight: 800;
+    color: #f7d875;
+    margin-top: 2px;
+}
+
+/* Customer VIP Tier Banner */
+.nx-vip-banner {
+    background: linear-gradient(135deg, #172234 0%, #111722 100%);
+    border: 1px solid #263852;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.nx-vip-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(247, 216, 117, 0.14);
+    border: 1px solid rgba(247, 216, 117, 0.4);
+    color: #f7d875;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 12.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+.nx-vip-progress-wrap {
+    flex: 1;
+    min-width: 200px;
+}
+.nx-vip-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #8aa1c0;
+    margin-bottom: 6px;
+}
+.nx-vip-progress-bar {
+    width: 100%;
+    height: 7px;
+    background: #0b0e14;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #1e2a3a;
+}
+.nx-vip-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f0b34b, #f7d875);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+}
+
+/* Executive Admin Stat Cards & Tables */
+.stat-card {
+    background: #121821 !important;
+    border: 1px solid #1e2a3a !important;
+    border-radius: 14px !important;
+    padding: 16px 18px !important;
+    text-align: left !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+}
+.stat-card .stat-label {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #7c93b3 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.6px !important;
+    margin-top: 0 !important;
+    order: -1;
+}
+.stat-card .stat-number {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+}
+.stat-card .stat-sub {
+    font-size: 11.5px;
+    color: #647896;
+    font-weight: 500;
+}
+
+.rb-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+@media (max-width: 1024px) {
+    .rb-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 520px) {
+    .rb-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
     </style>
 </head>
 <body>
@@ -8223,41 +8405,83 @@
                     </div>
                 </div>
 
-                                                <!-- ===== 💎 ROBUX INVENTORY ===== -->
+<!-- ===== 💎 ROBUX INVENTORY ===== -->
                 <div class="admin-section" id="section-robux-inventory">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-                        <h2 style="margin:0;"><i class="fas fa-gem"></i> Robux Inventory</h2>
-                        
-                        <!-- ✅ NEW: Date Filter -->
-                        <select id="robuxTimeFilter" style="background:#0b0e14; border:1px solid #2a3a52; color:#e8edf5; padding:10px 16px; border-radius:8px; font-family:'Inter'; font-weight:600; outline:none; cursor:pointer;">
-                            <option value="all">All Time</option>
-                            <option value="this_month" selected>This Month</option>
-                            <option value="last_month">Last Month</option>
-                            <option disabled>──────</option>
-                            <!-- Months injected by JS -->
-                        </select>
+                        <div>
+                            <h2 style="margin:0; font-size:22px;"><i class="fas fa-gem" style="color:#f7d875;"></i> Robux Inventory &amp; Ledger</h2>
+                            <p style="color:#647896; font-size:13px; margin-top:2px;">Real-time stock, FIFO backorder queue, weighted-average cost &amp; settlement tracking</p>
+                        </div>
 
-                        <button class="submit-btn" id="robuxRefreshBtn" style="padding:8px 20px; font-size:14px;">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <select id="robuxTimeFilter" style="background:#0b0e14; border:1px solid #2a3a52; color:#e8edf5; padding:9px 14px; border-radius:10px; font-family:'Inter'; font-size:13px; font-weight:600; outline:none; cursor:pointer;">
+                                <option value="all" selected>All Time</option>
+                                <option value="this_month">This Month</option>
+                                <option value="last_month">Last Month</option>
+                                <option disabled>──────</option>
+                            </select>
+
+                            <button type="button" class="submit-btn" id="robuxReconcileBtn" style="padding:9px 16px; font-size:13px; background:#1a2538; color:#f7d875; border:1px solid #2e4159;" title="Settle any shipped orders stuck in Reserved and synchronize stock">
+                                <i class="fas fa-check-double"></i> Sync &amp; Repair Reservations
+                            </button>
+
+                            <button type="button" class="submit-btn" id="robuxRefreshBtn" style="padding:9px 18px; font-size:13px;">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
                     </div>
-                    
-                    <!-- Update the Stat Cards to show Period Data -->
-                    <!-- Update the Stat Cards to show Period Data -->
+
                     <div id="robuxStatusBanner" style="margin-bottom:16px;"></div>
-                    <div class="dashboard-stats" id="robuxStats" style="grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:12px;">
-                        <div class="stat-card"><div class="stat-number" id="rbStatPurchased">0</div><div class="stat-label">Purchased (Period)</div></div>
-                        <div class="stat-card"><div class="stat-number" id="rbStatStock">0</div><div class="stat-label">Current Stock</div></div>
-                        <div class="stat-card"><div class="stat-number" id="rbStatReserved" style="color:#ffa726;">0</div><div class="stat-label">Reserved</div></div>
-                        <div class="stat-card"><div class="stat-number" id="rbStatAvailable" style="color:#4caf50;">0</div><div class="stat-label">Available</div></div>
-                        <div class="stat-card"><div class="stat-number" id="rbStatSold" style="color:#f7d875;">0</div><div class="stat-label">Sold (Period)</div></div>
 
-                        <div class="stat-card" style="background:rgba(76,175,80,0.05);"><div class="stat-number" id="rbStatRevenue" style="color:#4caf50; font-size:22px;">RM 0.00</div><div class="stat-label">Revenue (Period)</div></div>
-                        <div class="stat-card" style="background:rgba(76,175,80,0.05);"><div class="stat-number" id="rbStatProfit" style="color:#4caf50; font-size:22px;">RM 0.00</div><div class="stat-label">Profit (Period)</div></div>
+                    <!-- 8 Core Robux Inventory & Financial Metrics -->
+                    <div class="rb-kpi-grid" id="robuxStats">
+                        <div class="stat-card" style="border-left:3px solid #4caf50;">
+                            <div class="stat-label"><i class="fas fa-check-circle" style="color:#4caf50;"></i> Total Available Robux</div>
+                            <div class="stat-number" id="rbStatAvailable" style="color:#4caf50;">0 R$</div>
+                            <div class="stat-sub">Ready for instant allocation</div>
+                        </div>
 
-                        <div class="stat-card"><div class="stat-number" id="rbStatAvg" style="font-size:22px;">RM 0.00</div><div class="stat-label">Avg Cost / 100</div></div>
-                        <div class="stat-card"><div class="stat-number" id="rbStatValue" style="font-size:22px;">RM 0.00</div><div class="stat-label">Inventory Value</div></div>
-                        <div class="stat-card"><div class="stat-number" id="rbStatLatest" style="font-size:22px;">RM 0.00</div><div class="stat-label">Latest Cost / 100</div></div>
+                        <div class="stat-card" style="border-left:3px solid #ffa726;">
+                            <div class="stat-label"><i class="fas fa-lock" style="color:#ffa726;"></i> Total Reserved Robux</div>
+                            <div class="stat-number" id="rbStatReserved" style="color:#ffa726;">0 R$</div>
+                            <div class="stat-sub" id="rbStatReservedSub">Allocated to pending/paid orders</div>
+                        </div>
+
+                        <div class="stat-card" style="border-left:3px solid #29b6f6;">
+                            <div class="stat-label"><i class="fas fa-shipping-fast" style="color:#29b6f6;"></i> Total Sold Robux</div>
+                            <div class="stat-number" id="rbStatSold" style="color:#29b6f6;">0 R$</div>
+                            <div class="stat-sub" id="rbStatSoldSub">Period sold: 0 R$</div>
+                        </div>
+
+                        <div class="stat-card" style="border-left:3px solid #f7d875;">
+                            <div class="stat-label"><i class="fas fa-cubes" style="color:#f7d875;"></i> Total Robux Inventory</div>
+                            <div class="stat-number" id="rbStatStock" style="color:#e8edf5;">0 R$</div>
+                            <div class="stat-sub" id="rbStatPurchasedSub">Available + Reserved on hand</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label"><i class="fas fa-coins" style="color:#8aa1c0;"></i> Total Inventory Cost</div>
+                            <div class="stat-number" id="rbStatValue">RM 0.00</div>
+                            <div class="stat-sub" id="rbStatPurchased">Total purchased: 0 R$</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label"><i class="fas fa-calculator" style="color:#8aa1c0;"></i> Average Cost Per Robux</div>
+                            <div class="stat-number" id="rbStatAvg">RM 0.0000</div>
+                            <div class="stat-sub" id="rbStatLatest">Per 100 R$: RM 0.0000</div>
+                        </div>
+
+                        <div class="stat-card" style="background:rgba(76,175,80,0.04);">
+                            <div class="stat-label"><i class="fas fa-cash-register" style="color:#4caf50;"></i> Total Sales Value</div>
+                            <div class="stat-number" id="rbStatRevenue" style="color:#4caf50;">RM 0.00</div>
+                            <div class="stat-sub" id="rbStatRevenueSub">Completed Robux orders</div>
+                        </div>
+
+                        <div class="stat-card" style="background:rgba(247,216,117,0.04);">
+                            <div class="stat-label"><i class="fas fa-chart-line" style="color:#f7d875;"></i> Total Profit</div>
+                            <div class="stat-number" id="rbStatProfit" style="color:#f7d875;">RM 0.00</div>
+                            <div class="stat-sub" id="rbStatProfitSub">Net profit after Robux cost</div>
+                        </div>
                     </div>
                     <div class="extra-sections" style="margin-top:20px;">
                         <div class="extra-card">
@@ -12912,20 +13136,6 @@ if (hasVariants) {
     discountVal = bdEl ? (parseFloat(bdEl.value) || 0) : 0;
 
 } else if (isPhysical) {
-    priceVal    = parseFloat(document.getElementById('physicalBasePrice').value) || 0;
-    costVal     = parseFloat(document.getElementById('physicalBaseCost').value) || 0;
-    discountVal = parseFloat(document.getElementById('physicalDiscount').value) || 0;
-    quantityVal = parseInt(document.getElementById('physicalBaseQty').value) || 0;
-} else {
-    priceVal    = parseFloat(document.getElementById('price').value) || 0;
-    costVal     = parseFloat(document.getElementById('cost').value) || 0;
-    discountVal = parseFloat(document.getElementById('discount').value) || 0;
-    quantityVal = parseInt(document.getElementById('quantity').value) || 0;
-}
-
-// Get price/cost/stock from either Pricing&Stock OR Physical base fields
-var priceVal, costVal, discountVal, quantityVal;
-if (isPhysical && !hasVariants) {
     priceVal    = parseFloat(document.getElementById('physicalBasePrice').value) || 0;
     costVal     = parseFloat(document.getElementById('physicalBaseCost').value) || 0;
     discountVal = parseFloat(document.getElementById('physicalDiscount').value) || 0;
@@ -19181,7 +19391,6 @@ var _origRenderGenreManager = renderGenreManager;
 renderGenreManager = function () {
     if (!isAdmin) return;
     var catalog = buildMarketplaceCatalog();
-    // Ensure every Main Category and Sub-Genre is registered in allGames categories view for the manager
     if (catalog && catalog.categoriesList) {
         catalog.categoriesList.forEach(function (c) {
             if (genreImages && genreImages[c.name] === undefined) {
@@ -19190,7 +19399,260 @@ renderGenreManager = function () {
         });
     }
     _origRenderGenreManager();
-};        
+};
+
+// ================================================================
+// ✨ PHASE 2 OVERRIDES: ROBUX 8-METRIC DASHBOARD, RECONCILIATION,
+// RECENTLY VIEWED PRODUCTS & CUSTOMER VIP PROGRESS
+// ================================================================
+
+// 1. Upgrade renderRobuxDashboard to populate all 8 required metrics accurately
+renderRobuxDashboard = function (res, range) {
+    var st = res.state || {};
+    var isAllTime = (!range || range === 'all');
+
+    var avail = parseInt(st.availableStock, 10) || 0;
+    var reserved = parseInt(st.reservedStock, 10) || 0;
+    var physical = parseInt(st.currentStock, 10) || 0;
+    var totalSoldAllTime = parseInt(st.totalSold, 10) || 0;
+    var periodSold = parseInt(st.periodSold, 10) || 0;
+    var totalPurchasedAllTime = parseInt(st.totalPurchased, 10) || 0;
+    var periodPurchased = parseInt(st.periodPurchased, 10) || 0;
+
+    var avgPer100 = parseFloat(st.weightedAvgPer100) || 0;
+    var avgPer1   = st.avgCostPerRobux !== undefined ? parseFloat(st.avgCostPerRobux) : (avgPer100 / 100);
+    var latest100 = parseFloat(st.latestPurchaseCostPer100) || 0;
+    var invCost   = parseFloat(st.remainingValue) || 0;
+
+    var dispSold = isAllTime ? totalSoldAllTime : periodSold;
+    var dispRev  = isAllTime && st.allTimeRevenue !== undefined ? parseFloat(st.allTimeRevenue) : (parseFloat(st.periodRevenue) || 0);
+    var dispProf = isAllTime && st.allTimeProfit !== undefined ? parseFloat(st.allTimeProfit) : (parseFloat(st.periodProfit) || 0);
+
+    var setTxt = function (id, txt) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = txt;
+    };
+
+    // 1. Total Available Robux
+    setTxt('rbStatAvailable', avail.toLocaleString() + ' R$');
+
+    // 2. Total Reserved Robux
+    setTxt('rbStatReserved', reserved.toLocaleString() + ' R$');
+    setTxt('rbStatReservedSub', reserved > 0 ? 'Allocated to active orders' : 'No pending reservations');
+
+    // 3. Total Sold Robux
+    setTxt('rbStatSold', dispSold.toLocaleString() + ' R$');
+    setTxt('rbStatSoldSub', isAllTime
+        ? ('All-time settled: ' + totalSoldAllTime.toLocaleString() + ' R$')
+        : ('All-time: ' + totalSoldAllTime.toLocaleString() + ' R$ · Period: ' + periodSold.toLocaleString() + ' R$'));
+
+    // 4. Total Robux Inventory (Physical Stock = Available + Reserved)
+    setTxt('rbStatStock', physical.toLocaleString() + ' R$');
+    setTxt('rbStatPurchasedSub', avail.toLocaleString() + ' Avail + ' + reserved.toLocaleString() + ' Reserved');
+
+    // 5. Total Inventory Cost
+    setTxt('rbStatValue', 'RM ' + invCost.toFixed(2));
+    setTxt('rbStatPurchased', isAllTime
+        ? ('Total purchased: ' + totalPurchasedAllTime.toLocaleString() + ' R$')
+        : ('Period purchased: ' + periodPurchased.toLocaleString() + ' R$'));
+
+    // 6. Average Cost Per Robux (+ Per 100 R$ sub-label)
+    setTxt('rbStatAvg', 'RM ' + avgPer1.toFixed(4) + ' / R$');
+    setTxt('rbStatLatest', 'Per 100 R$: RM ' + avgPer100.toFixed(4) + ' (Latest: RM ' + latest100.toFixed(4) + ')');
+
+    // 7. Total Sales Value
+    setTxt('rbStatRevenue', 'RM ' + dispRev.toFixed(2));
+    setTxt('rbStatRevenueSub', isAllTime ? 'All-time Robux sales value' : 'Selected period sales value');
+
+    // 8. Total Profit
+    setTxt('rbStatProfit', 'RM ' + dispProf.toFixed(2));
+    setTxt('rbStatProfitSub', isAllTime ? 'All-time net profit' : 'Selected period net profit');
+
+    // Status Banner
+    var colors = { healthy: '#4caf50', getting_low: '#ffa726', low: '#ff6b6b', out: '#ff4757' };
+    var color = colors[st.stockStatus] || '#8aa1c0';
+    var banner = document.getElementById('robuxStatusBanner');
+    if (banner) {
+        banner.innerHTML =
+            '<div style="background:#121821;border:1px solid ' + color + '55;border-left:4px solid ' + color +
+            ';border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">' +
+            '<span style="color:' + color + ';font-weight:800;"><i class="fas fa-circle" style="font-size:10px;margin-right:6px;"></i>' + (st.stockStatusLabel || 'Stock Status') + '</span>' +
+            '<span style="color:#8aa1c0;font-size:13px;">' +
+            'Available: <b style="color:#4caf50;">' + avail.toLocaleString() + ' R$</b> &bull; ' +
+            'Reserved: <b style="color:#ffa726;">' + reserved.toLocaleString() + ' R$</b> &bull; ' +
+            'Sold: <b style="color:#29b6f6;">' + totalSoldAllTime.toLocaleString() + ' R$</b> &bull; ' +
+            'Total Inventory: <b style="color:#f7d875;">' + physical.toLocaleString() + ' R$</b>' +
+            '</span></div>';
+    }
+
+    var boSummary = document.getElementById('robuxBackorderSummary');
+    if (boSummary) {
+        boSummary.innerHTML =
+            '<div class="item"><span>Outstanding backorders</span><b style="color:#ffa726;">' + (st.outstandingBackorders || 0) + ' Robux</b></div>' +
+            '<div class="item"><span>Allocated to backorders</span><b>' + (st.allocatedBackorders || 0) + ' Robux</b></div>' +
+            '<div class="item"><span>Remaining shortage</span><b style="color:#ff6b6b;">' + (st.remainingShortage || 0) + ' Robux</b></div>' +
+            '<div class="item"><span>New stock required</span><b style="color:#f7d875;">' + (st.newStockRequired || 0) + ' Robux</b></div>' +
+            '<div class="item"><span>Customers waiting</span><b>' + (st.waitingCustomers || 0) + '</b></div>';
+    }
+
+    var elMode = document.getElementById('rbPricingMode');
+    if (elMode) elMode.value = st.pricingMode || 'manual';
+    var elMarkup = document.getElementById('rbTargetMarkup');
+    if (elMarkup) elMarkup.value = st.targetMarkup || 0;
+    var elRounding = document.getElementById('rbRoundingRule');
+    if (elRounding) elRounding.value = st.roundingRule || '0.05';
+    var elLowStock = document.getElementById('rbLowStockThreshold');
+    if (elLowStock) elLowStock.value = st.lowStockThreshold || 2000;
+
+    try { renderRobuxPricingTable(res.packages || []); } catch (e) {}
+    try { renderRobuxPurchaseHistory(res.purchases || []); } catch (e) {}
+    try { renderRobuxTransactionHistory(res.transactions || []); } catch (e) {}
+    try { renderRobuxBackorders(res.backorders || []); } catch (e) {}
+};
+
+// Wire up "Sync & Repair Reservations" button in Robux Inventory + refresh Robux dashboard after shipping
+(function setupRobuxReconcileButton() {
+    var recBtn = document.getElementById('robuxReconcileBtn');
+    if (!recBtn) return;
+    recBtn.addEventListener('click', function () {
+        var origHtml = recBtn.innerHTML;
+        recBtn.disabled = true;
+        recBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+        google.script.run
+            .withSuccessHandler(function (res) {
+                recBtn.disabled = false;
+                recBtn.innerHTML = origHtml;
+                showToast((res && res.message) || 'Robux inventory synchronized!');
+                loadRobuxInventory();
+                loadOrders();
+            })
+            .withFailureHandler(function (err) {
+                recBtn.disabled = false;
+                recBtn.innerHTML = origHtml;
+                showToast('Sync error: ' + err.message);
+            })
+            .reconcileRobuxInventory();
+    });
+})();
+
+// 2. Recently Viewed Products Tracker (Storefront Discovery Refinement)
+var _recentlyViewedIds = [];
+try {
+    _recentlyViewedIds = JSON.parse(localStorage.getItem('nex4up_recent') || '[]');
+} catch (e) { _recentlyViewedIds = []; }
+
+function recordRecentlyViewed(gameId) {
+    if (!gameId) return;
+    _recentlyViewedIds = _recentlyViewedIds.filter(function (id) { return id !== gameId; });
+    _recentlyViewedIds.unshift(gameId);
+    if (_recentlyViewedIds.length > 6) _recentlyViewedIds = _recentlyViewedIds.slice(0, 6);
+    try { localStorage.setItem('nex4up_recent', JSON.stringify(_recentlyViewedIds)); } catch (e) {}
+    renderRecentlyViewedSection();
+}
+
+function renderRecentlyViewedSection() {
+    if (IS_ADMIN_MODE) return;
+    var prodSec = document.getElementById('mpProductsSection');
+    if (!prodSec) return;
+
+    var container = document.getElementById('mpRecentSection');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'mpRecentSection';
+        container.className = 'mp-recent-section';
+        prodSec.parentNode.insertBefore(container, prodSec.nextSibling);
+    }
+
+    var recentGames = [];
+    _recentlyViewedIds.forEach(function (id) {
+        var g = allGames.find(function (x) { return x.id === id; });
+        if (g) recentGames.push(g);
+    });
+
+    if (recentGames.length === 0 || selectedCategory || selectedGenre || (searchQuery && searchQuery.trim())) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+    var html = '<div class="mp-section-header" style="margin-bottom:12px;">' +
+        '<div><div class="mp-section-title" style="font-size:17px;"><i class="fas fa-history"></i> Recently Viewed</div>' +
+        '<div class="mp-section-sub">Pick up right where you left off</div></div></div>' +
+        '<div class="mp-recent-grid">';
+
+    recentGames.forEach(function (g) {
+        var effPrice = (g.discount && g.discount > 0) ? g.price * (1 - g.discount / 100) : g.price;
+        html += '<div class="mp-recent-card" data-id="' + g.id + '">' +
+            '<img src="' + (g.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(g.title) + '" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;" />' +
+            '<div class="rc-info">' +
+            '<div class="rc-title">' + escapeHtml(g.title) + '</div>' +
+            '<div class="rc-price">' + CURRENCY + ' ' + (effPrice || 0).toFixed(2) + '</div>' +
+            '</div></div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+
+    container.querySelectorAll('.mp-recent-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+            var id = parseInt(this.getAttribute('data-id'), 10);
+            var gm = allGames.find(function (x) { return x.id === id; });
+            if (gm) openProductModal(gm);
+        });
+    });
+}
+
+var _preRecentOpenModal = openProductModal;
+openProductModal = function (game) {
+    _preRecentOpenModal(game);
+    if (game && game.id) recordRecentlyViewed(game.id);
+};
+
+var _preRecentRenderAll = renderAll;
+renderAll = function () {
+    _preRecentRenderAll();
+    renderRecentlyViewedSection();
+};
+
+// 3. Customer VIP Membership & Points Progress Bar in My Account
+var _preVipLoadMyAccount = loadMyAccount;
+loadMyAccount = function () {
+    _preVipLoadMyAccount();
+    if (!customer || !customer.email) return;
+
+    google.script.run
+        .withSuccessHandler(function (pts) {
+            var p = parseInt(pts, 10) || 0;
+            var tier = 'Bronze Member';
+            var nextTier = 'Silver';
+            var nextTarget = 100;
+            if (p >= 1000) { tier = '💎 Diamond VIP'; nextTier = 'Max Tier Reached'; nextTarget = 1000; }
+            else if (p >= 500) { tier = '👑 Gold VIP'; nextTier = 'Diamond VIP'; nextTarget = 1000; }
+            else if (p >= 100) { tier = '🥈 Silver VIP'; nextTier = 'Gold VIP'; nextTarget = 500; }
+
+            var pct = Math.min(100, Math.round((p / nextTarget) * 100));
+            var bannerEl = document.getElementById('nxVipBanner');
+            var detailsEl = document.querySelector('#myAccountSection .profile-details');
+            if (!detailsEl) return;
+
+            if (!bannerEl) {
+                bannerEl = document.createElement('div');
+                bannerEl.id = 'nxVipBanner';
+                bannerEl.className = 'nx-vip-banner';
+                detailsEl.parentNode.insertBefore(bannerEl, detailsEl.nextSibling);
+            }
+
+            bannerEl.innerHTML =
+                '<div class="nx-vip-tier-badge"><i class="fas fa-crown"></i> ' + tier + '</div>' +
+                '<div class="nx-vip-progress-wrap">' +
+                '<div class="nx-vip-progress-labels">' +
+                '<span>Wallet Balance: <strong style="color:#f7d875;">' + p + ' Pts</strong> (= RM ' + (p * 0.01).toFixed(2) + ')</span>' +
+                '<span>' + (p >= 1000 ? 'Top VIP Tier Unlocked' : (nextTarget - p) + ' pts to ' + nextTier) + '</span>' +
+                '</div>' +
+                '<div class="nx-vip-progress-bar"><div class="nx-vip-progress-fill" style="width:' + pct + '%;"></div></div>' +
+                '</div>';
+        })
+        .getCustomerPoints(customer.email);
+};
 
     </script>
 </body>
