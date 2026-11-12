@@ -7773,6 +7773,664 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================================
+   👑 PREMIUM CUSTOMER PROFILE DROPDOWN MENU (DARK + PURPLE ACCENTS)
+   ============================================================ */
+.profile-toggle {
+    position: relative;
+    overflow: visible !important;
+    padding: 0 !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: #141a26 !important;
+    border: 1.5px solid rgba(168, 85, 247, 0.45) !important;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.15);
+    transition: all 0.2s ease !important;
+}
+.profile-toggle:hover,
+.profile-dropdown.menu-open .profile-toggle {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.22) !important;
+    transform: translateY(-1px);
+}
+.profile-toggle .nav-user-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+.profile-toggle .nav-user-initial {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 800;
+    color: #f7d875;
+    background: radial-gradient(circle at 30% 30%, rgba(168, 85, 247, 0.28), #121821 75%);
+    text-transform: uppercase;
+}
+
+.profile-dropdown-content {
+    min-width: 300px !important;
+    width: 310px;
+    right: 0;
+    top: calc(100% + 10px) !important;
+    background: rgba(15, 20, 30, 0.98) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(168, 85, 247, 0.32) !important;
+    border-radius: 18px !important;
+    padding: 0 !important;
+    overflow: hidden;
+    box-shadow: 0 24px 54px rgba(0, 0, 0, 0.8), 0 0 24px rgba(139, 92, 246, 0.12) !important;
+    transform-origin: top right;
+    animation: nxProfileMenuIn 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes nxProfileMenuIn {
+    from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 1. Top User Identity Header */
+.nx-pm-header {
+    padding: 16px 18px 14px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.16) 0%, rgba(18, 24, 33, 0.95) 65%, rgba(247, 216, 117, 0.08) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+.nx-pm-avatar-wrap {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    padding: 2px;
+    background: linear-gradient(135deg, #a855f7, #f7d875);
+}
+.nx-pm-avatar-wrap img,
+.nx-pm-avatar-wrap .nx-pm-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #0b0e14;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f7d875;
+    font-weight: 800;
+    font-size: 19px;
+    text-transform: uppercase;
+}
+.nx-pm-identity {
+    min-width: 0;
+    flex: 1;
+}
+.nx-pm-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+}
+.nx-pm-handle {
+    font-size: 12px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+}
+.nx-pm-vip-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(168, 85, 247, 0.18);
+    border: 1px solid rgba(168, 85, 247, 0.45);
+    color: #d8b4fe;
+}
+.nx-pm-vip-pill i {
+    color: #f7d875;
+    font-size: 10px;
+}
+
+/* 2. Wallet & Points Shortcut Card */
+.nx-pm-wallet-box {
+    margin: 12px 14px 8px;
+    padding: 11px 14px;
+    background: linear-gradient(135deg, #161d2b 0%, #101520 100%);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+.nx-pm-wallet-box:hover {
+    border-color: #a855f7;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.14) 0%, #151d2b 100%);
+    transform: translateY(-1px);
+}
+.nx-pm-wallet-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.nx-pm-wallet-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(247, 216, 117, 0.12);
+    border: 1px solid rgba(247, 216, 117, 0.3);
+    color: #f7d875;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+.nx-pm-wallet-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8aa1c0;
+}
+.nx-pm-wallet-pts {
+    font-size: 14px;
+    font-weight: 800;
+    color: #f7d875;
+    line-height: 1.25;
+}
+.nx-pm-wallet-rm {
+    font-size: 11.5px;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-left: 3px;
+}
+.nx-pm-wallet-cta {
+    font-size: 11px;
+    font-weight: 700;
+    color: #c084fc;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+/* 3. Navigation Links List */
+.nx-pm-nav {
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.profile-dropdown-content .dropdown-item.nx-pm-item {
+    padding: 9px 12px !important;
+    border-radius: 11px !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: #cbd5e1 !important;
+    text-align: left;
+    transition: all 0.16s ease !important;
+}
+.profile-dropdown-content .dropdown-item.nx-pm-item .nx-pm-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #a855f7;
+    flex-shrink: 0;
+    transition: all 0.16s ease;
+}
+.profile-dropdown-content .dropdown-item.nx-pm-item .nx-pm-text {
+    flex: 1;
+    min-width: 0;
+}
+.profile-dropdown-content .dropdown-item.nx-pm-item .nx-pm-sub {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+}
+.profile-dropdown-content .dropdown-item.nx-pm-item .nx-pm-badge {
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(168, 85, 247, 0.45);
+    color: #e9d5ff;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+.profile-dropdown-content .dropdown-item.nx-pm-item:hover {
+    background: rgba(168, 85, 247, 0.12) !important;
+    color: #ffffff !important;
+    transform: translateX(2px);
+}
+.profile-dropdown-content .dropdown-item.nx-pm-item:hover .nx-pm-icon {
+    background: rgba(168, 85, 247, 0.25);
+    border-color: rgba(168, 85, 247, 0.55);
+    color: #f7d875;
+}
+
+/* 4. Bottom Separated Logout Section */
+.nx-pm-footer {
+    padding: 8px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(10, 14, 20, 0.6);
+}
+.profile-dropdown-content .dropdown-item.nx-pm-logout {
+    padding: 9px 12px !important;
+    border-radius: 11px !important;
+    color: #f87171 !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.profile-dropdown-content .dropdown-item.nx-pm-logout .nx-pm-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    color: #f87171;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+.profile-dropdown-content .dropdown-item.nx-pm-logout:hover {
+    background: rgba(248, 113, 113, 0.14) !important;
+    color: #fecaca !important;
+}
+
+/* Mobile Responsive Positioning */
+@media (max-width: 520px) {
+    .profile-dropdown-content {
+        position: fixed !important;
+        top: 62px !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: calc(100vw - 20px) !important;
+        max-height: calc(100dvh - 76px);
+        overflow-y: auto;
+    }
+}        
+
+// ================================================================
+// 👑 PREMIUM CUSTOMER PROFILE DROPDOWN MENU ENGINE
+// ================================================================
+var _cachedDropdownPoints = null;
+var _cachedIsPartnerAgent = null;
+var _cachedPartnerEmail = '';
+
+function getVipTierInfoByPoints(pts) {
+    var p = parseInt(pts, 10) || 0;
+    if (p >= 1000) return { label: 'Diamond VIP', icon: 'fa-gem' };
+    if (p >= 500)  return { label: 'Gold VIP',    icon: 'fa-crown' };
+    if (p >= 100)  return { label: 'Silver VIP',  icon: 'fa-medal' };
+    return { label: 'Bronze Member', icon: 'fa-shield-alt' };
+}
+
+function syncHeaderProfileToggleAvatar() {
+    if (!profileToggle) return;
+    var badgeEl = document.getElementById('profileBadge');
+    var badgeHtml = badgeEl ? badgeEl.outerHTML : '<span class="profile-badge hidden" id="profileBadge">0</span>';
+
+    if (!IS_ADMIN_MODE && customer && customer.email) {
+        var imgUrl = String(customer.profileImage || '').trim();
+        var dispName = String(customer.name || customer.email || 'U').trim();
+        var initial = dispName.charAt(0).toUpperCase();
+
+        if (imgUrl && (imgUrl.indexOf('http') === 0 || imgUrl.indexOf('data:image') === 0)) {
+            profileToggle.innerHTML =
+                '<img src="' + escapeHtml(imgUrl) + '" alt="' + escapeHtml(dispName) + '" class="nav-user-avatar" ' +
+                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" />' +
+                '<span class="nav-user-initial" style="display:none;">' + escapeHtml(initial) + '</span>' +
+                badgeHtml;
+        } else {
+            profileToggle.innerHTML =
+                '<span class="nav-user-initial">' + escapeHtml(initial) + '</span>' +
+                badgeHtml;
+        }
+    } else {
+        profileToggle.innerHTML =
+            '<i class="fas fa-user-circle"></i>' +
+            badgeHtml;
+    }
+}
+
+updateProfileDropdown = function () {
+    syncHeaderProfileToggleAvatar();
+    if (typeof refreshHeaderPointsPill === 'function') {
+        refreshHeaderPointsPill();
+    }
+
+    // 1. ADMIN MODE: Preserve existing Admin menu
+    if (IS_ADMIN_MODE) {
+        var adminHtml = '';
+        if (isAdmin) {
+            adminHtml += '<div class="nx-pm-nav">';
+            adminHtml += '<button class="dropdown-item nx-pm-item" id="dropdownAdminPanel">' +
+                '<span class="nx-pm-icon"><i class="fas fa-user-cog"></i></span>' +
+                '<span class="nx-pm-text">Admin Panel<span class="nx-pm-sub">Manage store &amp; inventory</span></span>' +
+                '</button>';
+            adminHtml += '</div>';
+            adminHtml += '<div class="nx-pm-footer">';
+            adminHtml += '<button class="dropdown-item nx-pm-logout" id="dropdownLogoutAdmin">' +
+                '<span class="nx-pm-icon"><i class="fas fa-sign-out-alt"></i></span>' +
+                '<span>Logout Admin</span>' +
+                '</button>';
+            adminHtml += '</div>';
+        } else {
+            adminHtml += '<div class="nx-pm-nav">';
+            adminHtml += '<button class="dropdown-item nx-pm-item" id="dropdownAdminLogin">' +
+                '<span class="nx-pm-icon"><i class="fas fa-lock"></i></span>' +
+                '<span class="nx-pm-text">Admin Login<span class="nx-pm-sub">Access control panel</span></span>' +
+                '</button>';
+            adminHtml += '</div>';
+        }
+        profileDropdownContent.innerHTML = adminHtml;
+
+        var ap = document.getElementById('dropdownAdminPanel');
+        if (ap) ap.addEventListener('click', function () {
+            sidebar.classList.add('visible');
+            showAdminView();
+            showAdminSection('add-item');
+            closeProfileDropdown();
+        });
+        var lo = document.getElementById('dropdownLogoutAdmin');
+        if (lo) lo.addEventListener('click', function () {
+            logoutAdmin();
+            closeProfileDropdown();
+        });
+        var al = document.getElementById('dropdownAdminLogin');
+        if (al) al.addEventListener('click', function () {
+            closeProfileDropdown();
+            adminLoginOverlay.classList.add('open');
+            adminPassword.value = '';
+            adminLoginError.textContent = '';
+        });
+        return;
+    }
+
+    // 2. GUEST CUSTOMER STATE (Not logged in)
+    if (!customer || !customer.email) {
+        _cachedDropdownPoints = null;
+        _cachedIsPartnerAgent = null;
+        _cachedPartnerEmail = '';
+
+        var guestHtml =
+            '<div class="nx-pm-header">' +
+                '<div class="nx-pm-avatar-wrap">' +
+                    '<div class="nx-pm-avatar-fallback"><i class="fas fa-user"></i></div>' +
+                '</div>' +
+                '<div class="nx-pm-identity">' +
+                    '<div class="nx-pm-name">Welcome, Gamer!</div>' +
+                    '<div class="nx-pm-handle">Sign in to track orders &amp; earn points</div>' +
+                    '<div class="nx-pm-vip-pill"><i class="fas fa-gift"></i> 10% OFF First Order</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="nx-pm-nav">' +
+                '<button class="dropdown-item nx-pm-item" id="dropdownLogin">' +
+                    '<span class="nx-pm-icon"><i class="fas fa-sign-in-alt"></i></span>' +
+                    '<span class="nx-pm-text">Login<span class="nx-pm-sub">Access your Nex4Up account</span></span>' +
+                '</button>' +
+                '<button class="dropdown-item nx-pm-item" id="dropdownRegister">' +
+                    '<span class="nx-pm-icon"><i class="fas fa-user-plus"></i></span>' +
+                    '<span class="nx-pm-text">Create Account<span class="nx-pm-sub">Get instant welcome voucher</span></span>' +
+                '</button>' +
+                '<button class="dropdown-item nx-pm-item" id="dropdownGuestSupport">' +
+                    '<span class="nx-pm-icon"><i class="fas fa-headset"></i></span>' +
+                    '<span class="nx-pm-text">Customer Support<span class="nx-pm-sub">Live chat with our team</span></span>' +
+                '</button>' +
+            '</div>';
+
+        profileDropdownContent.innerHTML = guestHtml;
+
+        var dl = document.getElementById('dropdownLogin');
+        if (dl) dl.addEventListener('click', function () {
+            var sub = loginOverlay.querySelector('.sub');
+            if (sub) sub.textContent = 'Welcome back! Log in to your account.';
+            loginOverlay.classList.add('open');
+            closeProfileDropdown();
+        });
+        var dr = document.getElementById('dropdownRegister');
+        if (dr) dr.addEventListener('click', function () {
+            registerOverlay.classList.add('open');
+            closeProfileDropdown();
+        });
+        var gs = document.getElementById('dropdownGuestSupport');
+        if (gs) gs.addEventListener('click', function () {
+            closeProfileDropdown();
+            if (typeof openChatWidget === 'function') openChatWidget();
+        });
+        return;
+    }
+
+    // 3. AUTHENTICATED CUSTOMER MENU
+    var displayName = String(customer.name || customer.email.split('@')[0] || 'Customer').trim();
+    var usernameHandle = '@' + displayName.toLowerCase().replace(/\s+/g, '');
+    var emailStr = String(customer.email || '').trim();
+    var avatarUrl = String(customer.profileImage || '').trim();
+    var initial = displayName.charAt(0).toUpperCase();
+
+    var pts = (_cachedDropdownPoints !== null) ? _cachedDropdownPoints : (parseInt(customerPointsBalance, 10) || 0);
+    var tierInfo = getVipTierInfoByPoints(pts);
+
+    var avatarInnerHtml = (avatarUrl && (avatarUrl.indexOf('http') === 0 || avatarUrl.indexOf('data:image') === 0))
+        ? '<img src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(displayName) + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" />' +
+          '<div class="nx-pm-avatar-fallback" style="display:none;">' + escapeHtml(initial) + '</div>'
+        : '<div class="nx-pm-avatar-fallback">' + escapeHtml(initial) + '</div>';
+
+    var pendingBadgeEl = document.getElementById('profileBadge');
+    var pendingOrdersCount = (pendingBadgeEl && !pendingBadgeEl.classList.contains('hidden'))
+        ? (parseInt(pendingBadgeEl.textContent, 10) || 0)
+        : 0;
+    var wishCount = wishlistIds ? wishlistIds.size : 0;
+
+    var html =
+        '<!-- 1. User Profile Header -->' +
+        '<div class="nx-pm-header">' +
+            '<div class="nx-pm-avatar-wrap">' + avatarInnerHtml + '</div>' +
+            '<div class="nx-pm-identity">' +
+                '<div class="nx-pm-name" title="' + escapeHtml(displayName) + '">' + escapeHtml(displayName) + '</div>' +
+                '<div class="nx-pm-handle" title="' + escapeHtml(emailStr) + '">' + escapeHtml(usernameHandle) + ' &bull; ' + escapeHtml(emailStr) + '</div>' +
+                '<div class="nx-pm-vip-pill" id="nxPmVipPill"><i class="fas ' + tierInfo.icon + '"></i> <span>' + tierInfo.label + '</span></div>' +
+            '</div>' +
+        '</div>' +
+
+        '<!-- 2. Wallet & Points Shortcut Card -->' +
+        '<div class="nx-pm-wallet-box" id="dropdownWalletCard" title="View Wallet &amp; Points">' +
+            '<div class="nx-pm-wallet-left">' +
+                '<div class="nx-pm-wallet-icon"><i class="fas fa-coins"></i></div>' +
+                '<div>' +
+                    '<div class="nx-pm-wallet-label">Wallet Points</div>' +
+                    '<div class="nx-pm-wallet-pts">' +
+                        '<span id="nxPmPointsVal">' + pts.toLocaleString() + ' Pts</span>' +
+                        '<span class="nx-pm-wallet-rm" id="nxPmPointsRm">(= RM ' + (pts * 0.01).toFixed(2) + ')</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="nx-pm-wallet-cta">Details <i class="fas fa-chevron-right"></i></div>' +
+        '</div>' +
+
+        '<!-- 3. Organized Navigation Links -->' +
+        '<div class="nx-pm-nav">' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownMyOrders">' +
+                '<span class="nx-pm-icon"><i class="fas fa-box-open"></i></span>' +
+                '<span class="nx-pm-text">My Orders<span class="nx-pm-sub">Track status, codes &amp; reviews</span></span>' +
+                (pendingOrdersCount > 0 ? '<span class="nx-pm-badge">' + pendingOrdersCount + '</span>' : '') +
+            '</button>' +
+
+            '<button class="dropdown-item nx-pm-item" id="dropdownWalletPoints">' +
+                '<span class="nx-pm-icon"><i class="fas fa-wallet"></i></span>' +
+                '<span class="nx-pm-text">Wallet &amp; Points<span class="nx-pm-sub">Points balance &amp; referral rewards</span></span>' +
+            '</button>' +
+
+            '<button class="dropdown-item nx-pm-item" id="dropdownSupportInbox">' +
+                '<span class="nx-pm-icon"><i class="fas fa-comments"></i></span>' +
+                '<span class="nx-pm-text">Customer Support / Inbox<span class="nx-pm-sub">Chat with us in real time</span></span>' +
+            '</button>' +
+
+            '<button class="dropdown-item nx-pm-item" id="dropdownWishlist">' +
+                '<span class="nx-pm-icon"><i class="fas fa-heart"></i></span>' +
+                '<span class="nx-pm-text">My Wishlist<span class="nx-pm-sub">Saved games &amp; items</span></span>' +
+                (wishCount > 0 ? '<span class="nx-pm-badge">' + wishCount + '</span>' : '') +
+            '</button>' +
+
+            '<button class="dropdown-item nx-pm-item" id="dropdownAgentDashboard" style="display:' + (_cachedIsPartnerAgent ? 'flex' : 'none') + ';">' +
+                '<span class="nx-pm-icon"><i class="fas fa-briefcase"></i></span>' +
+                '<span class="nx-pm-text">Partner Dashboard<span class="nx-pm-sub">Sales &amp; commissions</span></span>' +
+            '</button>' +
+
+            '<button class="dropdown-item nx-pm-item" id="dropdownMyAccount">' +
+                '<span class="nx-pm-icon"><i class="fas fa-user-cog"></i></span>' +
+                '<span class="nx-pm-text">My Account / Profile Settings<span class="nx-pm-sub">Avatar, phone &amp; password</span></span>' +
+            '</button>' +
+        '</div>' +
+
+        '<!-- 4. Separated Logout Button -->' +
+        '<div class="nx-pm-footer">' +
+            '<button class="dropdown-item nx-pm-logout" id="dropdownLogout">' +
+                '<span class="nx-pm-icon"><i class="fas fa-sign-out-alt"></i></span>' +
+                '<span>Logout</span>' +
+            '</button>' +
+        '</div>';
+
+    profileDropdownContent.innerHTML = html;
+
+    // Bind navigation actions
+    var openAccountAndScroll = function (selector) {
+        showMyAccount();
+        closeProfileDropdown();
+        if (selector) {
+            setTimeout(function () {
+                var target = document.querySelector(selector);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 180);
+        }
+    };
+
+    var walletCard = document.getElementById('dropdownWalletCard');
+    if (walletCard) walletCard.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountAndScroll('#nxVipBanner, #profilePoints');
+    });
+
+    var myOrdersBtn = document.getElementById('dropdownMyOrders');
+    if (myOrdersBtn) myOrdersBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountAndScroll('#orderTabs');
+    });
+
+    var walletBtn = document.getElementById('dropdownWalletPoints');
+    if (walletBtn) walletBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountAndScroll('#nxVipBanner, #referralLink');
+    });
+
+    var supportBtn = document.getElementById('dropdownSupportInbox');
+    if (supportBtn) supportBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeProfileDropdown();
+        if (typeof openChatWidget === 'function') openChatWidget();
+    });
+
+    var wishBtn = document.getElementById('dropdownWishlist');
+    if (wishBtn) wishBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        showWishlist();
+        closeProfileDropdown();
+    });
+
+    var partnerBtn = document.getElementById('dropdownAgentDashboard');
+    if (partnerBtn) partnerBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        showAgentDashboard();
+        closeProfileDropdown();
+    });
+
+    var myAccBtn = document.getElementById('dropdownMyAccount');
+    if (myAccBtn) myAccBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountAndScroll('#myAccountSection .account-container');
+    });
+
+    var logoutBtn = document.getElementById('dropdownLogout');
+    if (logoutBtn) logoutBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeProfileDropdown();
+        logoutCustomer();
+    });
+
+    // Fetch live wallet points & VIP tier from backend
+    google.script.run
+        .withSuccessHandler(function (livePts) {
+            var p = parseInt(livePts, 10) || 0;
+            _cachedDropdownPoints = p;
+            customerPointsBalance = p;
+            var tInfo = getVipTierInfoByPoints(p);
+
+            var ptsEl = document.getElementById('nxPmPointsVal');
+            var rmEl  = document.getElementById('nxPmPointsRm');
+            var vipEl = document.getElementById('nxPmVipPill');
+            if (ptsEl) ptsEl.textContent = p.toLocaleString() + ' Pts';
+            if (rmEl)  rmEl.textContent  = '(= RM ' + (p * 0.01).toFixed(2) + ')';
+            if (vipEl) vipEl.innerHTML   = '<i class="fas ' + tInfo.icon + '"></i> <span>' + tInfo.label + '</span>';
+        })
+        .withFailureHandler(function () {})
+        .getCustomerPoints(customer.email);
+
+    // Check Partner / Sales Team status for this customer email
+    if (_cachedPartnerEmail !== emailStr.toLowerCase()) {
+        _cachedPartnerEmail = emailStr.toLowerCase();
+        google.script.run
+            .withSuccessHandler(function (team) {
+                team = team || [];
+                _cachedIsPartnerAgent = team.some(function (a) {
+                    return a && String(a.email || '').toLowerCase().trim() === _cachedPartnerEmail && a.status === 'Active';
+                });
+                var pBtn = document.getElementById('dropdownAgentDashboard');
+                if (pBtn) pBtn.style.display = _cachedIsPartnerAgent ? 'flex' : 'none';
+            })
+            .withFailureHandler(function () {})
+            .getSalesTeam();
+    }
+};
+
+// Re-render the upgraded dropdown immediately on load
+updateProfileDropdown();
     </style>
 </head>
 <body>
