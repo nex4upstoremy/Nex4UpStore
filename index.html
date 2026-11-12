@@ -6745,13 +6745,859 @@
 .order-empty-state i { font-size: 48px; color: #2a3a52; margin-bottom: 16px; display: block; }
 .order-empty-state p { font-size: 15px; }
 
+/* ============================================================
+   🚀 NEX4UPSTORE MARKETPLACE UI/UX REDESIGN (ITEMKU-INSPIRED)
+   3-Level Hierarchy: Category -> Genre -> Product
+   ============================================================ */
+
+/* --- Header Category Dropdown & Wallet Pill --- */
+.nav-cat-dropdown {
+    position: relative;
+    display: inline-block;
+}
+.nav-cat-btn {
+    background: #182232;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    padding: 9px 16px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+.nav-cat-btn:hover,
+.nav-cat-dropdown.open .nav-cat-btn {
+    border-color: #f7d875;
+    color: #f7d875;
+    background: #1e2a3a;
+}
+.nav-cat-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 280px;
+    max-width: 340px;
+    max-height: 75vh;
+    overflow-y: auto;
+    background: rgba(18, 24, 33, 0.98);
+    backdrop-filter: blur(12px);
+    border: 1px solid #2a3a52;
+    border-radius: 18px;
+    padding: 10px;
+    z-index: 1001;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+}
+.nav-cat-dropdown.open .nav-cat-menu {
+    display: block;
+}
+.nav-cat-group {
+    border-bottom: 1px solid #1e2a3a;
+    padding: 6px 0;
+}
+.nav-cat-group:last-child {
+    border-bottom: none;
+}
+.nav-cat-parent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: #f7d875;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+.nav-cat-parent:hover {
+    background: #1a2538;
+}
+.nav-cat-genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 4px 12px 6px;
+}
+.nav-cat-genre-chip {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    color: #b0c8e0;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+.nav-cat-genre-chip:hover {
+    border-color: #f7d875;
+    color: #f7d875;
+}
+
+.header-points-pill {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(247, 216, 117, 0.1);
+    border: 1px solid rgba(247, 216, 117, 0.35);
+    color: #f7d875;
+    padding: 7px 14px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+.header-points-pill:hover {
+    background: rgba(247, 216, 117, 0.2);
+    transform: translateY(-1px);
+}
+
+/* --- Marketplace Breadcrumb Bar --- */
+.mp-breadcrumb-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 14px;
+    padding: 10px 18px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+}
+.mp-breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: #8aa1c0;
+}
+.mp-crumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #b0c8e0;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.15s;
+}
+.mp-crumb:hover {
+    color: #f7d875;
+}
+.mp-crumb.active {
+    color: #f7d875;
+    font-weight: 700;
+    cursor: default;
+}
+.mp-crumb-sep {
+    color: #4f6080;
+    font-size: 11px;
+}
+.mp-back-btn {
+    background: #1a2538;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+}
+.mp-back-btn:hover {
+    border-color: #f7d875;
+    color: #f7d875;
+}
+
+/* --- Marketplace Hero & Trust Bar --- */
+.mp-hero-grid {
+    display: grid;
+    grid-template-columns: 1.65fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.mp-hero-main {
+    background: radial-gradient(circle at 85% 20%, rgba(247, 216, 117, 0.16), transparent 55%),
+                linear-gradient(135deg, #182338 0%, #0f1622 100%);
+    border: 1px solid #24344d;
+    border-radius: 22px;
+    padding: 32px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.mp-hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(247, 216, 117, 0.14);
+    border: 1px solid rgba(247, 216, 117, 0.35);
+    color: #f7d875;
+    font-size: 11.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 5px 12px;
+    border-radius: 30px;
+    width: fit-content;
+    margin-bottom: 10px;
+}
+.mp-hero-main h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.2;
+    color: #e8edf5;
+}
+.mp-hero-main h1 span {
+    background: linear-gradient(135deg, #f0b34b, #f7d875);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.mp-hero-main p {
+    color: #9ab0cc;
+    font-size: 15px;
+    line-height: 1.55;
+    max-width: 520px;
+    margin-top: 8px;
+}
+.mp-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.mp-cta-primary {
+    background: linear-gradient(135deg, #f0b34b, #f7d875);
+    color: #0b0e14;
+    border: none;
+    padding: 11px 22px;
+    border-radius: 40px;
+    font-weight: 800;
+    font-size: 13.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+    box-shadow: 0 6px 20px rgba(247, 216, 117, 0.25);
+}
+.mp-cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(247, 216, 117, 0.35);
+}
+.mp-cta-secondary {
+    background: #1a2538;
+    color: #e8edf5;
+    border: 1px solid #2a3a52;
+    padding: 11px 20px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+}
+.mp-cta-secondary:hover {
+    border-color: #f7d875;
+    color: #f7d875;
+}
+.mp-hero-side {
+    background: linear-gradient(145deg, #162030, #121821);
+    border: 1px solid #2a3a52;
+    border-radius: 22px;
+    padding: 26px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+}
+.mp-hero-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+}
+.mp-hero-stats-row .num {
+    font-size: 20px;
+    font-weight: 800;
+    color: #f7d875;
+}
+.mp-hero-stats-row .label {
+    font-size: 10.5px;
+    color: #6a7f9e;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 2px;
+}
+
+.mp-trust-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+}
+.mp-trust-item {
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.mp-trust-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(247, 216, 117, 0.1);
+    color: #f7d875;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.mp-trust-text strong {
+    display: block;
+    font-size: 13px;
+    color: #e8edf5;
+}
+.mp-trust-text span {
+    font-size: 11.5px;
+    color: #6a7f9e;
+}
+
+/* --- Section Headers --- */
+.mp-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.mp-section-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #e8edf5;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -0.3px;
+}
+.mp-section-title i {
+    color: #f7d875;
+}
+.mp-section-sub {
+    font-size: 13px;
+    color: #6a7f9e;
+    margin-top: 2px;
+}
+
+/* --- LEVEL 1: Category Cards Grid --- */
+.mp-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+}
+.mp-category-card {
+    background: linear-gradient(160deg, #161f2e 0%, #101620 100%);
+    border: 1px solid #1e2a3a;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.mp-category-card:hover,
+.mp-category-card.active {
+    transform: translateY(-4px);
+    border-color: #f7d875;
+    box-shadow: 0 12px 28px -8px rgba(247, 216, 117, 0.22);
+}
+.mp-category-thumb {
+    position: relative;
+    height: 108px;
+    background: radial-gradient(circle at center, #1e2a3a 0%, #0b0e14 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.mp-category-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.mp-category-card:hover .mp-category-thumb img {
+    transform: scale(1.06);
+}
+.mp-category-icon-fallback {
+    font-size: 36px;
+    color: #f7d875;
+    opacity: 0.9;
+}
+.mp-category-body {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.mp-category-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #e8edf5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mp-category-meta {
+    font-size: 12px;
+    color: #8aa1c0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.mp-category-meta .genre-pill {
+    color: #f7d875;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+/* --- LEVEL 2: Genre Cards Grid (Inside Category or Popular Genres) --- */
+.mp-genre-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.mp-genre-card {
+    background: #121821;
+    border: 1.5px solid #1e2a3a;
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    position: relative;
+}
+.mp-genre-card:hover {
+    border-color: #f7d875;
+    background: #172131;
+    transform: translateY(-2px);
+}
+.mp-genre-card.active {
+    border-color: #f7d875;
+    background: rgba(247, 216, 117, 0.08);
+    box-shadow: 0 0 0 3px rgba(247, 216, 117, 0.15);
+}
+.mp-genre-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: #0b0e14;
+    border: 1px solid #2a3a52;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    color: #f7d875;
+    font-size: 20px;
+}
+.mp-genre-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.mp-genre-info {
+    flex: 1;
+    min-width: 0;
+}
+.mp-genre-parent-tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #6a7f9e;
+}
+.mp-genre-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #e8edf5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mp-genre-sub {
+    font-size: 12px;
+    color: #f7d875;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* --- Product Listing Toolbar (Search within Genre + Sort + Count) --- */
+.mp-listing-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+.mp-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.mp-result-count {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #e8edf5;
+}
+.mp-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.mp-sort-select {
+    background: #0b0e14;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.mp-sort-select:focus {
+    outline: none;
+    border-color: #f7d875;
+}
+
+/* --- LEVEL 3: High-Density Marketplace Product Grid & Cards --- */
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(225px, 1fr)) !important;
+    gap: 18px !important;
+}
+.game-card {
+    border-radius: 16px !important;
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    display: flex;
+    flex-direction: column;
+}
+.game-card .card-body {
+    padding: 14px 15px 15px !important;
+    gap: 4px;
+}
+.mp-card-Dynamic-tags {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6a7f9e;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.mp-delivery-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+}
+.mp-delivery-tag.instant {
+    background: rgba(76, 175, 80, 0.12);
+    color: #66bb6a;
+}
+.mp-delivery-tag.preorder {
+    background: rgba(247, 216, 117, 0.12);
+    color: #f7d875;
+}
+.game-card .card-body h3 {
+    font-size: 15.5px !important;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 2px 0 4px !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 41px;
+}
+.mp-card-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #8aa1c0;
+    margin-bottom: 6px;
+}
+.mp-stock-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #4caf50;
+}
+.mp-stock-dot.out {
+    color: #ff6b6b;
+}
+.game-card .price {
+    font-size: 19px !important;
+    font-weight: 800;
+    color: #f7d875;
+}
+.game-card .card-footer {
+    padding-top: 10px !important;
+    margin-top: auto !important;
+    gap: 6px !important;
+}
+
+/* --- Upgraded 2-Column Product Detail Modal --- */
+.product-panel {
+    max-width: 880px !important;
+    padding: 28px !important;
+}
+.mp-modal-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 24px;
+    align-items: start;
+}
+.mp-modal-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.mp-modal-badge-chip {
+    background: #1a2538;
+    border: 1px solid #2a3a52;
+    color: #b0c8e0;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.mp-modal-badge-chip.accent {
+    background: rgba(247, 216, 117, 0.12);
+    border-color: rgba(247, 216, 117, 0.35);
+    color: #f7d875;
+}
+.mp-delivery-info-box {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin: 12px 0 16px;
+    font-size: 12.5px;
+    color: #9ab0cc;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.mp-delivery-info-box div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mp-delivery-info-box i {
+    color: #f7d875;
+    width: 16px;
+    text-align: center;
+}
+.buy-now-btn {
+    background: linear-gradient(135deg, #f0b34b, #f7d875);
+    color: #0b0e14;
+    border: none;
+    font-weight: 800;
+    padding: 10px 22px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+    box-shadow: 0 4px 14px rgba(247, 216, 117, 0.25);
+}
+.buy-now-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: #ffe08a;
+}
+.buy-now-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.mp-related-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #1e2a3a;
+}
+.mp-related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+.mp-related-card {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.mp-related-card:hover {
+    border-color: #f7d875;
+    transform: translateY(-2px);
+}
+.mp-related-card img {
+    width: 100%;
+    height: 76px;
+    object-fit: contain;
+    background: #121821;
+    border-radius: 8px;
+}
+.mp-related-card .r-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #e8edf5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mp-related-card .r-price {
+    font-size: 13px;
+    font-weight: 800;
+    color: #f7d875;
+}
+
+/* --- Responsive Mobile 2-Column Marketplace Layout --- */
+@media (max-width: 900px) {
+    .mp-hero-grid {
+        grid-template-columns: 1fr;
+    }
+    .mp-trust-strip {
+        grid-template-columns: 1fr 1fr;
+    }
+    .mp-modal-top-grid {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 768px) {
+    .nav-cat-btn span {
+        display: none;
+    }
+    .nav-cat-btn {
+        padding: 7px 10px;
+    }
+    .header-points-pill span.pts-label {
+        display: none;
+    }
+    /* 2-Column Product Grid on Mobile like Itemku / Shopee */
+    .games-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+    .mp-category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .mp-genre-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .game-card .card-body {
+        padding: 10px 10px 12px !important;
+    }
+    .game-card .card-body h3 {
+        font-size: 13.5px !important;
+        min-height: 36px;
+    }
+    .game-card .price {
+        font-size: 15.5px !important;
+    }
+    .game-card .qty-controls {
+        display: none; /* Keep mobile cards ultra-clean; qty can be adjusted in modal or cart */
+    }
+    .game-card .add-btn,
+    .game-card .select-options-btn {
+        width: 100%;
+        padding: 7px 10px !important;
+        font-size: 12px !important;
+        justify-content: center;
+    }
+}
+@media (max-width: 380px) {
+    .mp-trust-strip {
+        grid-template-columns: 1fr;
+    }
+    .mp-genre-grid {
+        grid-template-columns: 1fr;
+    }
+}
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
+<!-- ===== HEADER ===== -->
     <header>
-        <div class="logo">
+        <div class="logo" id="headerLogoHome" title="Back to Marketplace Home">
             <!-- Desktop: N4 Arrow Icon + NEX4UP Text -->
             <img src="https://lh3.googleusercontent.com/d/1ZfT9IOAc2kL7pF1dUVRdq9p7AKez3a47" alt="N4" class="logo-icon" />
             <div class="logo-text">
@@ -6761,25 +7607,44 @@
             <img src="https://lh3.googleusercontent.com/d/1kmjuyfdgwMT30GV-yV1nOtwCv2FfEbSD" alt="N4P" class="mobile-emblem" />
         </div>
         <div class="header-controls">
+            <!-- Category Quick Dropdown (3-Level Navigation) -->
+            <div class="nav-cat-dropdown" id="navCatDropdown">
+                <button type="button" class="nav-cat-btn" id="navCatBtn" title="Browse Categories & Genres">
+                    <i class="fas fa-th-large" style="color:#f7d875;"></i>
+                    <span>Categories</span>
+                    <i class="fas fa-chevron-down" style="font-size:11px; opacity:0.75;"></i>
+                </button>
+                <div class="nav-cat-menu" id="navCatMenu"></div>
+            </div>
+
             <div class="search-wrapper">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Search games..." autocomplete="off" />
+                    <input type="text" id="searchInput" placeholder="Search games, Robux, items, accounts..." autocomplete="off" />
                     <button id="searchBtn"><i class="fas fa-search"></i></button>
                     <button class="clear-search" id="clearSearchBtn"><i class="fas fa-times-circle"></i></button>
                 </div>
                 <div id="searchDropdown"></div>
             </div>
+
             <button class="track-btn" id="trackBtn"><i class="fas fa-search"></i> Track Order</button>
+
+            <!-- Live Wallet Points Pill (Visible when customer is logged in) -->
+            <button type="button" class="header-points-pill" id="headerPointsPill" title="View My Wallet Points">
+                <i class="fas fa-coins"></i>
+                <span id="headerPointsValue">0</span>
+                <span class="pts-label">Pts</span>
+            </button>
+
             <button class="cart-btn" id="cartToggle">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Cart</span>
                 <span class="badge" id="cartCount">0</span>
             </button>
             <div class="profile-dropdown" id="profileDropdown">
-<button class="profile-toggle" id="profileToggle">
-    <i class="fas fa-user-circle"></i>
-    <span class="profile-badge hidden" id="profileBadge">0</span>
-</button>
+                <button class="profile-toggle" id="profileToggle">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="profile-badge hidden" id="profileBadge">0</span>
+                </button>
                 <div class="profile-dropdown-content" id="profileDropdownContent"></div>
             </div>
         </div>
@@ -6838,26 +7703,97 @@
 
         <!-- ===== MAIN CONTENT ===== -->
         <div class="main-content">
-            <!-- PUBLIC VIEW -->
+<!-- PUBLIC VIEW -->
             <div id="publicView">
-                <div class="hero">
-                    <div>
-                        <h1>Level Up <span>Your Library</span></h1>
-                        <p>Discover top‑tier games, exclusive deals, and instant digital delivery in MYR.</p>
+                <!-- Dynamic Breadcrumb Navigation Bar -->
+                <div class="mp-breadcrumb-bar" id="mpBreadcrumbBar" style="display:none;">
+                    <div class="mp-breadcrumbs" id="mpBreadcrumbs"></div>
+                    <button type="button" class="mp-back-btn" id="mpBackBtn">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                </div>
+
+                <!-- Marketplace Hero & Promo Split Section -->
+                <div id="mpHomeHeroWrapper">
+                    <div class="mp-hero-grid">
+                        <div class="mp-hero-main">
+                            <div>
+                                <div class="mp-hero-tag"><i class="fas fa-bolt"></i> Malaysia's Digital Gaming Marketplace</div>
+                                <h1>Level Up <span>Your Gaming Library</span></h1>
+                                <p>Browse by Category &rarr; Genre &rarr; Package. Instant Robux, Game Top-Ups, Verified Accounts, Gift Codes &amp; Exclusive Merch in MYR.</p>
+                            </div>
+                            <div class="mp-hero-actions">
+                                <button type="button" class="mp-cta-primary" id="heroBrowseCatBtn">
+                                    <i class="fas fa-gamepad"></i> Browse Categories
+                                </button>
+                                <button type="button" class="mp-cta-secondary" id="heroHotSellingBtn">
+                                    <i class="fas fa-fire" style="color:#ff6b6b;"></i> Hot Selling
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mp-hero-side">
+                            <div id="referralBanner" style="background:rgba(247,216,117,0.07); border:1px dashed rgba(247,216,117,0.45); border-radius:16px; padding:14px 16px; display:flex; align-items:flex-start; gap:12px;">
+                                <i class="fas fa-gift" style="color:#f7d875; font-size:24px; margin-top:2px;"></i>
+                                <div style="font-size:13px; line-height:1.5;">
+                                    <div style="font-weight:800; color:#f7d875; font-size:14px;">New User Special — 10% OFF!</div>
+                                    <span style="color:#b0c8e0;">Register an account and enjoy an automatic <strong style="color:#f7d875;">10% welcome discount</strong> on your first order.</span>
+                                </div>
+                            </div>
+
+                            <div class="mp-hero-stats-row">
+                                <div><div class="num" id="totalCategories">0</div><div class="label">Categories</div></div>
+                                <div><div class="num" id="totalGenresCount">0</div><div class="label">Genres</div></div>
+                                <div><div class="num" id="totalGames">0</div><div class="label">Products</div></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stats">
-                        <div><div class="num" id="totalGames">0</div><div class="label">Games</div></div>
-                        <div><div class="num" id="totalCategories">0</div><div class="label">Categories</div></div>
+
+                    <!-- Marketplace Trust Strip -->
+                    <div class="mp-trust-strip">
+                        <div class="mp-trust-item">
+                            <div class="mp-trust-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="mp-trust-text"><strong>Fast Processing</strong><span>1–2 hrs (9AM–12PM Daily)</span></div>
+                        </div>
+                        <div class="mp-trust-item">
+                            <div class="mp-trust-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="mp-trust-text"><strong>100% Secure Payment</strong><span>MAE, TNG &amp; ShopeePay QR</span></div>
+                        </div>
+                        <div class="mp-trust-item">
+                            <div class="mp-trust-icon"><i class="fas fa-coins"></i></div>
+                            <div class="mp-trust-text"><strong>Wallet Points Rewards</strong><span>Earn points on orders &amp; reviews</span></div>
+                        </div>
+                        <div class="mp-trust-item">
+                            <div class="mp-trust-icon"><i class="fas fa-headset"></i></div>
+                            <div class="mp-trust-text"><strong>Live Support</strong><span>In-app chat &amp; WhatsApp help</span></div>
+                        </div>
                     </div>
                 </div>
 
-<div id="referralBanner" style="background:#1e2a3a; border:1px solid #f7d875; border-radius:16px; padding:16px 24px; margin-bottom:24px; text-align:center; display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;">
-    <i class="fas fa-gift" style="color:#f7d875; font-size:24px;"></i>
-    <span style="font-weight:600;">New User Special!</span>
-    <span style="color:#8aa1c0;">Register now and get a <strong style="color:#f7d875;">10% discount</strong> on your first order! (Auto-applied at checkout)</span>
-</div>
+                <!-- LEVEL 1: MAIN CATEGORIES SECTION (e.g. Roblox, Mobile Legends, PUBG, etc.) -->
+                <div id="mpCategoriesSection">
+                    <div class="mp-section-header">
+                        <div>
+                            <div class="mp-section-title"><i class="fas fa-th-large"></i> Shop by Category</div>
+                            <div class="mp-section-sub">Select a game or category to explore its genres</div>
+                        </div>
+                    </div>
+                    <div class="mp-category-grid" id="mpCategoryGrid"></div>
+                </div>
 
-                <div class="genre-carousel-wrapper" id="genreCarouselWrapper">
+                <!-- LEVEL 2: GENRES SECTION (Shows Category Genres when a Category is selected, or Popular Genres on Home) -->
+                <div id="mpGenresSection">
+                    <div class="mp-section-header">
+                        <div>
+                            <div class="mp-section-title" id="mpGenresSectionTitle"><i class="fas fa-layer-group"></i> Popular Genres</div>
+                            <div class="mp-section-sub" id="mpGenresSectionSub">Jump directly into a specific product genre</div>
+                        </div>
+                    </div>
+                    <div class="mp-genre-grid" id="mpGenreGrid"></div>
+                </div>
+
+                <!-- Preserved Legacy Containers (Hidden when not needed, kept for full compatibility) -->
+                <div class="genre-carousel-wrapper" id="genreCarouselWrapper" style="display:none;">
                     <div id="genreCardsContainer" class="genre-cards"></div>
                     <button class="carousel-arrow left" id="carouselLeft"><i class="fas fa-chevron-left"></i></button>
                     <button class="carousel-arrow right" id="carouselRight"><i class="fas fa-chevron-right"></i></button>
@@ -6865,13 +7801,40 @@
 
                 <div id="genreBannerContainer" style="display:none;"></div>
 
-                <div class="filters" id="filterContainer">
+                <div class="filters" id="filterContainer" style="display:none;">
                     <span class="filter-label"><i class="fas fa-tag"></i> Genre</span>
                     <button class="filter-btn active" data-filter="all">All</button>
                     <button class="filter-btn" data-filter="hotselling">🔥 Hot Selling</button>
                 </div>
-                <div class="games-grid" id="gamesGrid"></div>
-                <div class="pagination-container" id="paginationContainer"></div>
+
+                <!-- LEVEL 3: PRODUCTS LISTING & SORTING TOOLBAR -->
+                <div id="mpProductsSection">
+                    <div class="mp-section-header" style="margin-bottom:12px;">
+                        <div>
+                            <div class="mp-section-title" id="mpProductsSectionTitle"><i class="fas fa-cubes"></i> Featured Products</div>
+                            <div class="mp-section-sub" id="mpProductsSectionSub">Select a package or item below</div>
+                        </div>
+                    </div>
+
+                    <div class="mp-listing-toolbar">
+                        <div class="mp-toolbar-left">
+                            <span class="mp-result-count" id="mpResultCount">0 products</span>
+                        </div>
+                        <div class="mp-toolbar-right">
+                            <label for="mpSortSelect" style="font-size:12.5px; color:#8aa1c0; font-weight:600;"><i class="fas fa-sort-amount-down"></i> Sort:</label>
+                            <select id="mpSortSelect" class="mp-sort-select">
+                                <option value="package-asc">Recommended / Package Order</option>
+                                <option value="price-asc">Price: Low to High</option>
+                                <option value="price-desc">Price: High to Low</option>
+                                <option value="popular">Best Selling</option>
+                                <option value="rating">Top Rated</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="games-grid" id="gamesGrid"></div>
+                    <div class="pagination-container" id="paginationContainer"></div>
+                </div>
 
                 <!-- ===== PAYMENT METHODS BANNER (Customer View) ===== -->
                 <div class="payment-methods-banner" id="paymentMethodsBanner">
@@ -6913,14 +7876,24 @@
                                 <i class="fas fa-info-circle"></i> Basic Information
                             </div>
                             <div class="admin-form-grid">
-                                <div class="field">
-                                    <label for="title">Title *</label>
-                                    <input type="text" id="title" required placeholder="Game / Product title" />
+<div class="field field-full">
+                                    <label for="title">Product Title *</label>
+                                    <input type="text" id="title" required placeholder="e.g. 100 Robux, Blox Fruits Perm Kitsune, ML 500 Diamonds" />
                                 </div>
                                 <div class="field">
-                                    <label for="category">Category</label>
-                                    <input type="text" id="category" placeholder="e.g. RPG, Pants, Sneakers" />
+                                    <label for="addMainCategory">Main Category (Level 1) *</label>
+                                    <input type="text" id="addMainCategory" list="mpCategoryDatalist" placeholder="e.g. Roblox, Mobile Legends" autocomplete="off" />
                                 </div>
+                                <div class="field">
+                                    <label for="addSubGenre">Genre / Sub-Category (Level 2) *</label>
+                                    <input type="text" id="addSubGenre" list="mpGenreDatalist" placeholder="e.g. Robux, Roblox Items, Roblox Accounts" autocomplete="off" />
+                                </div>
+                                <div class="field field-full" style="display:none;">
+                                    <label for="category">Combined Category Path (Auto-Synced)</label>
+                                    <input type="text" id="category" placeholder="e.g. Roblox > Robux" />
+                                </div>
+                                <datalist id="mpCategoryDatalist"></datalist>
+                                <datalist id="mpGenreDatalist"></datalist>
                                 <div class="field field-full">
                                     <label>Product Type *</label>
                                     <div class="product-type-toggle">
@@ -7654,32 +8627,65 @@
         </div>
     </div>
 
-    <!-- ===== PRODUCT DETAIL MODAL ===== -->
+<!-- ===== PRODUCT DETAIL MODAL ===== -->
     <div class="product-overlay" id="productOverlay">
         <div class="product-panel">
             <button class="close-product" id="productClose"><i class="fas fa-times"></i></button>
-            <div class="product-gallery" id="productGallery">
-                <img class="main-img" id="productModalMainImg" src="" alt="Product image" />
-                <div class="thumbnails" id="productModalThumbnails"></div>
-            </div>
-            <div class="product-title" id="productModalTitle"></div>
-            <div class="product-category" id="productModalCategory"></div>
-            <div class="product-desc" id="productModalDesc"></div>
-            <div class="product-price" id="productModalPrice"></div>
-            <div class="product-stock" id="productModalStock"></div>
 
-            <!-- ✅ Variant Picker (auto-shown for variant products) -->
-            <div class="variant-picker" id="productVariantPicker" style="display:none;"></div>
-
-            <div class="product-actions">
-                <div class="qty-controls" id="modalQtyControls">
-                    <button class="qty-btn modal-qty-minus"><i class="fas fa-minus"></i></button>
-                    <input type="number" class="qty-input modal-qty-input" value="1" min="1" />
-                    <button class="qty-btn modal-qty-plus"><i class="fas fa-plus"></i></button>
+            <div class="mp-modal-top-grid">
+                <!-- Left Column: Gallery -->
+                <div class="product-gallery" id="productGallery" style="margin-bottom:0;">
+                    <img class="main-img" id="productModalMainImg" src="" alt="Product image" />
+                    <div class="thumbnails" id="productModalThumbnails"></div>
                 </div>
-                <button class="add-btn" id="modalAddBtn"><i class="fas fa-plus"></i> Add to Cart</button>
+
+                <!-- Right Column: Purchase Info & Actions -->
+                <div>
+                    <div class="mp-modal-badges" id="productModalBadges"></div>
+                    <div class="product-title" id="productModalTitle" style="font-size:24px; margin-bottom:4px;"></div>
+                    <div class="product-category" id="productModalCategory" style="display:none;"></div>
+                    <div class="product-price" id="productModalPrice" style="margin:8px 0;"></div>
+                    <div class="product-stock" id="productModalStock" style="margin-bottom:10px;"></div>
+
+                    <!-- Delivery & Store Guarantee Box -->
+                    <div class="mp-delivery-info-box" id="productModalDeliveryBox">
+                        <div><i class="fas fa-bolt"></i><span><strong>Delivery:</strong> Processed within 1–2 hours (9:00 AM – 12:00 PM daily)</span></div>
+                        <div><i class="fas fa-shield-alt"></i><span><strong>Guarantee:</strong> 100% Official &amp; Verified Transfer</span></div>
+                        <div><i class="fas fa-coins"></i><span><strong>Rewards:</strong> Earn Wallet Points + 5 bonus points when you review</span></div>
+                    </div>
+
+                    <!-- ✅ Variant Picker (auto-shown for variant products) -->
+                    <div class="variant-picker" id="productVariantPicker" style="display:none;"></div>
+
+                    <div class="product-actions">
+                        <div class="qty-controls" id="modalQtyControls">
+                            <button class="qty-btn modal-qty-minus"><i class="fas fa-minus"></i></button>
+                            <input type="number" class="qty-input modal-qty-input" value="1" min="1" />
+                            <button class="qty-btn modal-qty-plus"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <button class="add-btn" id="modalAddBtn"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+                        <button type="button" class="buy-now-btn" id="modalBuyNowBtn"><i class="fas fa-bolt"></i> Buy Now</button>
+                    </div>
+                </div>
             </div>
 
+            <!-- Description Section -->
+            <div style="margin-top:22px; padding-top:18px; border-top:1px solid #1e2a3a;">
+                <h4 style="font-size:14px; color:#f7d875; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+                    <i class="fas fa-info-circle"></i> Product Description &amp; Details
+                </h4>
+                <div class="product-desc" id="productModalDesc" style="margin-bottom:0;"></div>
+            </div>
+
+            <!-- Related Packages in Same Genre -->
+            <div class="mp-related-section" id="mpRelatedSection" style="display:none;">
+                <h4 style="font-size:14px; color:#f7d875; text-transform:uppercase; letter-spacing:0.5px;">
+                    <i class="fas fa-layer-group"></i> More in This Genre
+                </h4>
+                <div class="mp-related-grid" id="mpRelatedGrid"></div>
+            </div>
+
+            <!-- Customer Reviews -->
             <div class="product-reviews" id="productReviews">
                 <h3><i class="fas fa-star" style="color:#f7d875;"></i> Customer Reviews</h3>
                 <div class="review-summary" id="reviewSummary">
@@ -7827,13 +8833,21 @@
                 </div>
 
                 <div class="edit-form-grid">
-                    <div class="field">
-                        <label for="editTitle">Title <span class="required">*</span></label>
-                        <input type="text" id="editTitle" required placeholder="Game title" />
+<div class="field field-full">
+                        <label for="editTitle">Product Title <span class="required">*</span></label>
+                        <input type="text" id="editTitle" required placeholder="Game / Product title" />
                     </div>
                     <div class="field">
-                        <label for="editCategory">Category</label>
-                        <input type="text" id="editCategory" placeholder="e.g. RPG, FPS" />
+                        <label for="editMainCategory">Main Category (Level 1)</label>
+                        <input type="text" id="editMainCategory" list="mpCategoryDatalist" placeholder="e.g. Roblox" autocomplete="off" />
+                    </div>
+                    <div class="field">
+                        <label for="editSubGenre">Genre / Sub-Category (Level 2)</label>
+                        <input type="text" id="editSubGenre" list="mpGenreDatalist" placeholder="e.g. Robux, Roblox Items" autocomplete="off" />
+                    </div>
+                    <div class="field field-full" style="display:none;">
+                        <label for="editCategory">Combined Category Path</label>
+                        <input type="text" id="editCategory" placeholder="e.g. Roblox > Robux" />
                     </div>
                     <div class="field field-full">
                         <label for="editGameType">Game Type <span class="required">*</span></label>
@@ -17252,6 +18266,914 @@ function showRobuxBackorderModal(required, available, cb) {
         _robuxBackorderCallback = null;
         if (cb) cb(true);
     });
+})();
+
+// ================================================================
+// 🚀 NEX4UPSTORE 3-LEVEL MARKETPLACE ENGINE (CATEGORY -> GENRE -> PRODUCT)
+// ================================================================
+var selectedCategory = null; // Level 1 (e.g., "Roblox")
+var selectedGenre = null;    // Level 2 (e.g., "Robux")
+var mpSortBy = 'package-asc';
+var productsPerPage = 12;    // 12 fits 2, 3, and 4 column grids cleanly
+
+/**
+ * Parses any product into { mainCategory, subGenre }
+ * Supports:
+ * 1) Explicit "Category > Genre" or "Category / Genre" or "Category - Genre" in game.category
+ * 2) Automatic smart fallback for existing products based on gameType / productType / title
+ */
+function getProductHierarchy(game) {
+    if (!game) return { mainCategory: 'General', subGenre: 'General' };
+
+    var rawCat = String(game.category || '').trim();
+    var title = String(game.title || '').trim();
+    var gType = String(game.gameType || 'roblox').toLowerCase().trim();
+    var pType = String(game.productType || 'digital').toLowerCase().trim();
+
+    // 1. Explicit delimiter: "Roblox > Robux" or "Roblox / Roblox Items" or "Roblox : Robux"
+    var delimMatch = rawCat.match(/^([^>\/|:]+?)\s*[>\/|:]\s*(.+)$/);
+    if (delimMatch) {
+        return {
+            mainCategory: delimMatch[1].trim(),
+            subGenre: delimMatch[2].trim()
+        };
+    }
+
+    // 2. Smart classification for existing rows without '>'
+    var isRobuxPkg = parseRobuxAmountTitle(title) > 0 || /^robux$/i.test(rawCat);
+    if (isRobuxPkg) {
+        return { mainCategory: 'Roblox', subGenre: 'Robux' };
+    }
+
+    if (pType === 'physical') {
+        return {
+            mainCategory: 'Merch & Gear',
+            subGenre: rawCat || 'Apparel & Accessories'
+        };
+    }
+
+    if (pType === 'gift_code' && gType === 'other') {
+        return {
+            mainCategory: 'Gift Codes & Vouchers',
+            subGenre: rawCat || 'Gift Codes'
+        };
+    }
+
+    if (gType === 'roblox') {
+        var rGenre = rawCat;
+        if (!rGenre || /^roblox$/i.test(rGenre) || /^general$/i.test(rGenre)) {
+            if (/account/i.test(title)) rGenre = 'Roblox Accounts';
+            else rGenre = 'Roblox Items';
+        }
+        return { mainCategory: 'Roblox', subGenre: rGenre };
+    }
+
+    if (gType === 'ml') {
+        return {
+            mainCategory: 'Mobile Legends',
+            subGenre: (!rawCat || /^mobile legends|ml$/i.test(rawCat)) ? 'Diamonds & Passes' : rawCat
+        };
+    }
+
+    if (gType === 'pubg') {
+        return {
+            mainCategory: 'PUBG Mobile',
+            subGenre: (!rawCat || /^pubg|pubg mobile$/i.test(rawCat)) ? 'UC Top-Up' : rawCat
+        };
+    }
+
+    // Generic / custom categories added in Admin
+    if (rawCat) {
+        return { mainCategory: rawCat, subGenre: pType === 'gift_code' ? 'Gift Codes' : 'All ' + rawCat };
+    }
+
+    return { mainCategory: 'Other Games', subGenre: 'General' };
+}
+
+/**
+ * Builds the complete Category -> Genre -> Products tree from allGames
+ */
+function buildMarketplaceCatalog() {
+    var categoriesMap = {};
+    var allGenresList = [];
+
+    for (var i = 0; i < allGames.length; i++) {
+        var g = allGames[i];
+        var h = getProductHierarchy(g);
+        g._mainCategory = h.mainCategory;
+        g._subGenre = h.subGenre;
+
+        if (!categoriesMap[h.mainCategory]) {
+            categoriesMap[h.mainCategory] = {
+                name: h.mainCategory,
+                products: [],
+                genresMap: {},
+                sampleImage: ''
+            };
+        }
+        var catObj = categoriesMap[h.mainCategory];
+        catObj.products.push(g);
+        if (!catObj.sampleImage && g.image) catObj.sampleImage = g.image;
+
+        if (!catObj.genresMap[h.subGenre]) {
+            var gObj = {
+                name: h.subGenre,
+                parentCategory: h.mainCategory,
+                products: [],
+                minPrice: Infinity,
+                sampleImage: ''
+            };
+            catObj.genresMap[h.subGenre] = gObj;
+            allGenresList.push(gObj);
+        }
+        var genreObj = catObj.genresMap[h.subGenre];
+        genreObj.products.push(g);
+        if (!genreObj.sampleImage && g.image) genreObj.sampleImage = g.image;
+
+        var effPrice = (g.discount && g.discount > 0) ? g.price * (1 - g.discount / 100) : g.price;
+        if (effPrice > 0 && effPrice < genreObj.minPrice) {
+            genreObj.minPrice = effPrice;
+        }
+    }
+
+    return {
+        categoriesMap: categoriesMap,
+        categoriesList: Object.keys(categoriesMap).map(function (k) { return categoriesMap[k]; }),
+        allGenresList: allGenresList
+    };
+}
+
+function getCategoryImage(catObj) {
+    if (!catObj) return '';
+    if (genreImages[catObj.name]) return genreImages[catObj.name];
+    // Fallback to any genre image inside this category, or first product image
+    var gKeys = Object.keys(catObj.genresMap || {});
+    for (var i = 0; i < gKeys.length; i++) {
+        var gName = gKeys[i];
+        var comboKey = catObj.name + ' > ' + gName;
+        if (genreImages[comboKey]) return genreImages[comboKey];
+        if (genreImages[gName]) return genreImages[gName];
+    }
+    return catObj.sampleImage || '';
+}
+
+function getGenreImage(genreObj) {
+    if (!genreObj) return '';
+    var comboKey = genreObj.parentCategory + ' > ' + genreObj.name;
+    if (genreImages[comboKey]) return genreImages[comboKey];
+    if (genreImages[genreObj.name]) return genreImages[genreObj.name];
+    return genreObj.sampleImage || '';
+}
+
+function getCategoryIcon(catName) {
+    var n = String(catName || '').toLowerCase();
+    if (n.indexOf('roblox') !== -1) return 'fa-cubes';
+    if (n.indexOf('mobile legends') !== -1 || n === 'ml') return 'fa-shield-alt';
+    if (n.indexOf('pubg') !== -1) return 'fa-crosshairs';
+    if (n.indexOf('gift') !== -1 || n.indexOf('voucher') !== -1) return 'fa-gift';
+    if (n.indexOf('merch') !== -1 || n.indexOf('gear') !== -1 || n.indexOf('physical') !== -1) return 'fa-tshirt';
+    return 'fa-gamepad';
+}
+
+function getGenreIcon(genreName) {
+    var n = String(genreName || '').toLowerCase();
+    if (n.indexOf('robux') !== -1 || n.indexOf('diamond') !== -1 || n.indexOf('uc') !== -1) return 'fa-gem';
+    if (n.indexOf('account') !== -1) return 'fa-user-shield';
+    if (n.indexOf('item') !== -1 || n.indexOf('fruit') !== -1 || n.indexOf('gamepass') !== -1) return 'fa-magic';
+    if (n.indexOf('code') !== -1 || n.indexOf('card') !== -1) return 'fa-ticket-alt';
+    return 'fa-layer-group';
+}
+
+/**
+ * Navigate to any state in the 3-Level Hierarchy:
+ * - selectMarketplaceLevel(null, null)         -> Marketplace Home
+ * - selectMarketplaceLevel('Roblox', null)     -> Category View (shows Roblox Genres)
+ * - selectMarketplaceLevel('Roblox', 'Robux')  -> Genre View (shows 100..1000 Robux packages)
+ */
+function selectMarketplaceLevel(categoryName, genreName) {
+    selectedCategory = categoryName || null;
+    selectedGenre = genreName || null;
+    currentFilter = 'all';
+    currentPage = 1;
+
+    // Close category dropdown if open
+    var dd = document.getElementById('navCatDropdown');
+    if (dd) dd.classList.remove('open');
+
+    // Ensure store view is visible
+    if (publicView.style.display === 'none') {
+        showStoreView();
+    }
+
+    renderAll();
+
+    // Smooth scroll to top of storefront
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderMarketplaceHeaderMenu(catalog) {
+    var menu = document.getElementById('navCatMenu');
+    if (!menu) return;
+
+    if (!catalog.categoriesList.length) {
+        menu.innerHTML = '<div style="padding:14px; color:#6a7f9e; font-size:13px; text-align:center;">No categories yet</div>';
+        return;
+    }
+
+    var html = '<div class="nav-cat-group">' +
+        '<div class="nav-cat-parent" data-cat="" style="color:#e8edf5;">' +
+        '<span><i class="fas fa-home" style="color:#f7d875; width:20px;"></i> All Categories (Home)</span>' +
+        '<span style="font-size:11px; color:#6a7f9e;">' + allGames.length + ' items</span>' +
+        '</div></div>';
+
+    catalog.categoriesList.forEach(function (cat) {
+        var genres = Object.keys(cat.genresMap).map(function (k) { return cat.genresMap[k]; });
+        html += '<div class="nav-cat-group">';
+        html += '<div class="nav-cat-parent" data-cat="' + escapeHtml(cat.name) + '">' +
+            '<span><i class="fas ' + getCategoryIcon(cat.name) + '" style="width:20px;"></i> ' + escapeHtml(cat.name) + '</span>' +
+            '<span style="font-size:11px; color:#8aa1c0;">' + genres.length + ' genre' + (genres.length !== 1 ? 's' : '') + '</span>' +
+            '</div>';
+        html += '<div class="nav-cat-genres">';
+        genres.forEach(function (g) {
+            html += '<span class="nav-cat-genre-chip" data-cat="' + escapeHtml(cat.name) + '" data-genre="' + escapeHtml(g.name) + '">' +
+                escapeHtml(g.name) + ' (' + g.products.length + ')' +
+                '</span>';
+        });
+        html += '</div></div>';
+    });
+
+    menu.innerHTML = html;
+
+    menu.querySelectorAll('.nav-cat-parent').forEach(function (el) {
+        el.addEventListener('click', function () {
+            var c = this.getAttribute('data-cat');
+            selectMarketplaceLevel(c || null, null);
+        });
+    });
+
+    menu.querySelectorAll('.nav-cat-genre-chip').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            selectMarketplaceLevel(this.getAttribute('data-cat'), this.getAttribute('data-genre'));
+        });
+    });
+}
+
+function renderMarketplaceBreadcrumbs() {
+    var bar = document.getElementById('mpBreadcrumbBar');
+    var crumbs = document.getElementById('mpBreadcrumbs');
+    var heroWrap = document.getElementById('mpHomeHeroWrapper');
+    if (!bar || !crumbs) return;
+
+    var isFiltering = selectedCategory || selectedGenre || currentFilter === 'hotselling' || (searchQuery && searchQuery.trim() !== '');
+    if (!isFiltering) {
+        bar.style.display = 'none';
+        if (heroWrap) heroWrap.style.display = 'block';
+        return;
+    }
+
+    bar.style.display = 'flex';
+    if (heroWrap) heroWrap.style.display = 'none';
+
+    var html = '<span class="mp-crumb" data-step="home"><i class="fas fa-home"></i> Home</span>';
+
+    if (currentFilter === 'hotselling' && !selectedCategory) {
+        html += '<i class="fas fa-chevron-right mp-crumb-sep"></i>';
+        html += '<span class="mp-crumb active"><i class="fas fa-fire"></i> Hot Selling</span>';
+    } else {
+        if (selectedCategory) {
+            html += '<i class="fas fa-chevron-right mp-crumb-sep"></i>';
+            html += '<span class="mp-crumb ' + (!selectedGenre ? 'active' : '') + '" data-step="cat">' +
+                '<i class="fas ' + getCategoryIcon(selectedCategory) + '"></i> ' + escapeHtml(selectedCategory) +
+                '</span>';
+        }
+        if (selectedGenre) {
+            html += '<i class="fas fa-chevron-right mp-crumb-sep"></i>';
+            html += '<span class="mp-crumb active"><i class="fas ' + getGenreIcon(selectedGenre) + '"></i> ' + escapeHtml(selectedGenre) + '</span>';
+        }
+    }
+
+    if (searchQuery && searchQuery.trim()) {
+        html += '<i class="fas fa-chevron-right mp-crumb-sep"></i>';
+        html += '<span class="mp-crumb active">Search: "' + escapeHtml(searchQuery.trim()) + '"</span>';
+    }
+
+    crumbs.innerHTML = html;
+
+    crumbs.querySelectorAll('.mp-crumb[data-step]').forEach(function (el) {
+        el.addEventListener('click', function () {
+            var step = this.getAttribute('data-step');
+            if (step === 'home') {
+                searchInput.value = '';
+                searchQuery = '';
+                clearSearchBtn.style.display = 'none';
+                selectMarketplaceLevel(null, null);
+            } else if (step === 'cat' && selectedCategory) {
+                selectMarketplaceLevel(selectedCategory, null);
+            }
+        });
+    });
+}
+
+function renderMarketplaceCategoriesAndGenres(catalog) {
+    var catSection = document.getElementById('mpCategoriesSection');
+    var catGrid = document.getElementById('mpCategoryGrid');
+    var genreSection = document.getElementById('mpGenresSection');
+    var genreGrid = document.getElementById('mpGenreGrid');
+    var genreTitle = document.getElementById('mpGenresSectionTitle');
+    var genreSub = document.getElementById('mpGenresSectionSub');
+    var prodTitle = document.getElementById('mpProductsSectionTitle');
+    var prodSub = document.getElementById('mpProductsSectionSub');
+
+    if (!catGrid || !genreGrid) return;
+
+    // 1. Render Level 1 Categories (Shown on Home, hidden when inside a specific Category)
+    if (!selectedCategory && currentFilter !== 'hotselling' && !(searchQuery && searchQuery.trim())) {
+        catSection.style.display = 'block';
+        var cHtml = '';
+        catalog.categoriesList.forEach(function (cat) {
+            var genreCount = Object.keys(cat.genresMap).length;
+            var imgUrl = getCategoryImage(cat);
+            cHtml += '<div class="mp-category-card" data-cat="' + escapeHtml(cat.name) + '">';
+            cHtml += '<div class="mp-category-thumb">';
+            if (imgUrl) {
+                cHtml += '<img src="' + imgUrl + '" alt="' + escapeHtml(cat.name) + '" loading="lazy" onerror="this.style.display=\'none\'" />';
+            } else {
+                cHtml += '<i class="fas ' + getCategoryIcon(cat.name) + ' mp-category-icon-fallback"></i>';
+            }
+            cHtml += '</div>';
+            cHtml += '<div class="mp-category-body">';
+            cHtml += '<div class="mp-category-name">' + escapeHtml(cat.name) + '</div>';
+            cHtml += '<div class="mp-category-meta">';
+            cHtml += '<span>' + cat.products.length + ' product' + (cat.products.length !== 1 ? 's' : '') + '</span>';
+            cHtml += '<span class="genre-pill">' + genreCount + ' genre' + (genreCount !== 1 ? 's' : '') + ' &rarr;</span>';
+            cHtml += '</div></div></div>';
+        });
+        catGrid.innerHTML = cHtml;
+
+        catGrid.querySelectorAll('.mp-category-card').forEach(function (card) {
+            card.addEventListener('click', function () {
+                var cName = this.getAttribute('data-cat');
+                var catObj = catalog.categoriesMap[cName];
+                // If category has only 1 genre, auto-select that genre for convenience, else show genres
+                var gKeys = catObj ? Object.keys(catObj.genresMap) : [];
+                if (gKeys.length === 1) {
+                    selectMarketplaceLevel(cName, gKeys[0]);
+                } else {
+                    selectMarketplaceLevel(cName, null);
+                }
+            });
+        });
+    } else {
+        catSection.style.display = 'none';
+    }
+
+    // 2. Render Level 2 Genres
+    var genresToRender = [];
+    if (selectedCategory && catalog.categoriesMap[selectedCategory]) {
+        var catObj = catalog.categoriesMap[selectedCategory];
+        genresToRender = Object.keys(catObj.genresMap).map(function (k) { return catObj.genresMap[k]; });
+        genreTitle.innerHTML = '<i class="fas ' + getCategoryIcon(selectedCategory) + '"></i> ' + escapeHtml(selectedCategory) + ' — Select a Genre';
+        genreSub.textContent = 'Choose a genre below to filter ' + selectedCategory + ' products';
+    } else if (!selectedCategory && currentFilter !== 'hotselling' && !(searchQuery && searchQuery.trim())) {
+        genresToRender = catalog.allGenresList;
+        genreTitle.innerHTML = '<i class="fas fa-layer-group"></i> Browse by Genre';
+        genreSub.textContent = 'Jump directly into Robux, Items, Accounts, Diamonds & more';
+    }
+
+    if (genresToRender.length > 0) {
+        genreSection.style.display = 'block';
+        var gHtml = '';
+
+        // If inside a category with multiple genres, add an "All [Category]" card
+        if (selectedCategory && genresToRender.length > 1) {
+            var allActive = !selectedGenre ? 'active' : '';
+            var totalCatProds = catalog.categoriesMap[selectedCategory].products.length;
+            gHtml += '<div class="mp-genre-card ' + allActive + '" data-cat="' + escapeHtml(selectedCategory) + '" data-genre="">';
+            gHtml += '<div class="mp-genre-thumb"><i class="fas fa-th-large"></i></div>';
+            gHtml += '<div class="mp-genre-info">';
+            gHtml += '<div class="mp-genre-parent-tag">' + escapeHtml(selectedCategory) + '</div>';
+            gHtml += '<div class="mp-genre-title">All ' + escapeHtml(selectedCategory) + '</div>';
+            gHtml += '<div class="mp-genre-sub">' + totalCatProds + ' products</div>';
+            gHtml += '</div></div>';
+        }
+
+        genresToRender.forEach(function (gObj) {
+            var isActive = (selectedCategory === gObj.parentCategory && selectedGenre === gObj.name) ? 'active' : '';
+            var gImg = getGenreImage(gObj);
+            var priceText = (gObj.minPrice < Infinity) ? ('From RM ' + gObj.minPrice.toFixed(2)) : (gObj.products.length + ' items');
+            gHtml += '<div class="mp-genre-card ' + isActive + '" data-cat="' + escapeHtml(gObj.parentCategory) + '" data-genre="' + escapeHtml(gObj.name) + '">';
+            gHtml += '<div class="mp-genre-thumb">';
+            if (gImg) {
+                gHtml += '<img src="' + gImg + '" alt="' + escapeHtml(gObj.name) + '" loading="lazy" onerror="this.style.display=\'none\'" />';
+            } else {
+                gHtml += '<i class="fas ' + getGenreIcon(gObj.name) + '"></i>';
+            }
+            gHtml += '</div>';
+            gHtml += '<div class="mp-genre-info">';
+            gHtml += '<div class="mp-genre-parent-tag">' + escapeHtml(gObj.parentCategory) + '</div>';
+            gHtml += '<div class="mp-genre-title">' + escapeHtml(gObj.name) + '</div>';
+            gHtml += '<div class="mp-genre-sub">' + gObj.products.length + ' items &bull; ' + priceText + '</div>';
+            gHtml += '</div></div>';
+        });
+
+        genreGrid.innerHTML = gHtml;
+
+        genreGrid.querySelectorAll('.mp-genre-card').forEach(function (card) {
+            card.addEventListener('click', function () {
+                var c = this.getAttribute('data-cat');
+                var g = this.getAttribute('data-genre');
+                selectMarketplaceLevel(c, g || null);
+            });
+        });
+    } else {
+        genreSection.style.display = 'none';
+    }
+
+    // 3. Update Product Section Heading
+    if (selectedCategory && selectedGenre) {
+        prodTitle.innerHTML = '<i class="fas ' + getGenreIcon(selectedGenre) + '"></i> ' + escapeHtml(selectedGenre) + ' <span style="font-size:14px; color:#8aa1c0; font-weight:600;">(' + escapeHtml(selectedCategory) + ')</span>';
+        prodSub.textContent = 'Compare packages and prices below';
+    } else if (selectedCategory) {
+        prodTitle.innerHTML = '<i class="fas ' + getCategoryIcon(selectedCategory) + '"></i> All ' + escapeHtml(selectedCategory) + ' Products';
+        prodSub.textContent = 'Select a genre above to narrow down results';
+    } else if (currentFilter === 'hotselling') {
+        prodTitle.innerHTML = '<i class="fas fa-fire" style="color:#ff6b6b;"></i> Hot Selling Products';
+        prodSub.textContent = 'Most popular packages purchased by our community';
+    } else if (searchQuery && searchQuery.trim()) {
+        prodTitle.innerHTML = '<i class="fas fa-search"></i> Search Results for "' + escapeHtml(searchQuery.trim()) + '"';
+        prodSub.textContent = 'Showing matching products across all categories and genres';
+    } else {
+        prodTitle.innerHTML = '<i class="fas fa-star"></i> All Marketplace Products';
+        prodSub.textContent = 'Select a Category or Genre above to filter specific packages';
+    }
+}
+
+// Override getFilteredGames() to support 3-Level Hierarchy + Package/Price Sorting
+getFilteredGames = function () {
+    buildMarketplaceCatalog();
+    var result = allGames.slice(0);
+
+    if (currentFilter === 'hotselling' && !selectedCategory) {
+        result = result.filter(function (g) { return (g.sold || 0) > 0; });
+    }
+
+    if (selectedCategory) {
+        result = result.filter(function (g) { return g._mainCategory === selectedCategory; });
+    }
+    if (selectedGenre) {
+        result = result.filter(function (g) { return g._subGenre === selectedGenre; });
+    }
+
+    if (searchQuery && searchQuery.trim()) {
+        var q = searchQuery.trim().toLowerCase();
+        result = result.filter(function (g) {
+            return (g.title && g.title.toLowerCase().indexOf(q) !== -1) ||
+                (g.description && g.description.toLowerCase().indexOf(q) !== -1) ||
+                (g._mainCategory && g._mainCategory.toLowerCase().indexOf(q) !== -1) ||
+                (g._subGenre && g._subGenre.toLowerCase().indexOf(q) !== -1);
+        });
+    }
+
+    // Apply Sorting
+    result.sort(function (a, b) {
+        var priceA = (a.discount && a.discount > 0) ? a.price * (1 - a.discount / 100) : (a.price || 0);
+        var priceB = (b.discount && b.discount > 0) ? b.price * (1 - b.discount / 100) : (b.price || 0);
+
+        if (mpSortBy === 'price-asc') return priceA - priceB;
+        if (mpSortBy === 'price-desc') return priceB - priceA;
+        if (mpSortBy === 'popular') return (b.sold || 0) - (a.sold || 0);
+        if (mpSortBy === 'rating') return (b.avgRating || 0) - (a.avgRating || 0);
+
+        // Default ('package-asc'): Order denomination packages (like 100 Robux -> 1000 Robux) in ascending order!
+        var robuxA = parseRobuxAmountTitle(a.title);
+        var robuxB = parseRobuxAmountTitle(b.title);
+        if (robuxA > 0 && robuxB > 0) return robuxA - robuxB;
+        if (selectedGenre && priceA !== priceB) return priceA - priceB;
+        return (a.id || 0) - (b.id || 0);
+    });
+
+    return result;
+};
+
+// Override renderAll() to power the new 3-level marketplace layout + datalists
+renderAll = function () {
+    var catalog = buildMarketplaceCatalog();
+    renderMarketplaceHeaderMenu(catalog);
+    renderMarketplaceBreadcrumbs();
+    renderMarketplaceCategoriesAndGenres(catalog);
+    renderGenreBanner();
+    renderPaginatedGrid();
+    updateStats();
+    renderCart();
+    populateAdminHierarchyDatalists(catalog);
+};
+
+// Update stats to include Category, Genre, and Product counts
+updateStats = function () {
+    var catalog = buildMarketplaceCatalog();
+    if (totalGamesEl) totalGamesEl.textContent = allGames.length;
+    if (totalCategoriesEl) totalCategoriesEl.textContent = catalog.categoriesList.length;
+    var gEl = document.getElementById('totalGenresCount');
+    if (gEl) gEl.textContent = catalog.allGenresList.length;
+};
+
+// Upgrade renderPaginatedGrid() for clean Marketplace Product Cards while keeping all event handlers intact
+var _origRenderPaginatedGrid = renderPaginatedGrid;
+renderPaginatedGrid = function () {
+    var filtered = getFilteredGames();
+    var countEl = document.getElementById('mpResultCount');
+    if (countEl) {
+        countEl.textContent = filtered.length + ' product' + (filtered.length !== 1 ? 's' : '');
+    }
+    _origRenderPaginatedGrid();
+
+    // Enhance rendered cards with Category • Genre tags & Instant/Pre-order badges
+    var cards = grid.querySelectorAll('.game-card');
+    for (var i = 0; i < cards.length; i++) {
+        var card = cards[i];
+        var id = parseInt(card.getAttribute('data-id'), 10);
+        var game = null;
+        for (var j = 0; j < allGames.length; j++) {
+            if (allGames[j].id === id) { game = allGames[j]; break; }
+        }
+        if (!game) continue;
+
+        var catEl = card.querySelector('.category');
+        if (catEl) {
+            var h = getProductHierarchy(game);
+            var delivBadge = (game.productType === 'physical')
+                ? '<span class="mp-delivery-tag preorder"><i class="fas fa-box"></i> Pre-Order</span>'
+                : '<span class="mp-delivery-tag instant"><i class="fas fa-bolt"></i> Instant</span>';
+            catEl.className = 'mp-card-Dynamic-tags';
+            catEl.innerHTML = '<span>' + escapeHtml(h.mainCategory) + ' &bull; ' + escapeHtml(h.subGenre) + '</span>' + delivBadge;
+        }
+    }
+};
+
+// Upgrade openProductModal() to populate Category/Genre chips, Buy Now button, and Related Genre Products
+var _origOpenProductModal = openProductModal;
+openProductModal = function (game) {
+    _origOpenProductModal(game);
+    if (!game) return;
+
+    var h = getProductHierarchy(game);
+    var badgesEl = document.getElementById('productModalBadges');
+    if (badgesEl) {
+        var bHtml = '<span class="mp-modal-badge-chip accent"><i class="fas ' + getCategoryIcon(h.mainCategory) + '"></i> ' + escapeHtml(h.mainCategory) + '</span>';
+        bHtml += '<span class="mp-modal-badge-chip"><i class="fas ' + getGenreIcon(h.subGenre) + '"></i> ' + escapeHtml(h.subGenre) + '</span>';
+        if (game.productType === 'physical') {
+            bHtml += '<span class="mp-modal-badge-chip"><i class="fas fa-truck"></i> Ships 13th of Month</span>';
+        } else if (game.productType === 'gift_code') {
+            bHtml += '<span class="mp-modal-badge-chip"><i class="fas fa-key"></i> Digital Redeem Code</span>';
+        } else {
+            bHtml += '<span class="mp-modal-badge-chip"><i class="fas fa-bolt"></i> Instant Digital Top-Up</span>';
+        }
+        badgesEl.innerHTML = bHtml;
+    }
+
+    // Update Buy Now button state to mirror Add to Cart button
+    var buyNowBtn = document.getElementById('modalBuyNowBtn');
+    if (buyNowBtn) {
+        buyNowBtn.disabled = modalAddBtn.disabled;
+    }
+
+    // Render Related Products in the same Genre (e.g., other Robux packages)
+    var relSec = document.getElementById('mpRelatedSection');
+    var relGrid = document.getElementById('mpRelatedGrid');
+    if (relSec && relGrid) {
+        var related = allGames.filter(function (g) {
+            if (g.id === game.id) return false;
+            var gh = getProductHierarchy(g);
+            return gh.mainCategory === h.mainCategory && gh.subGenre === h.subGenre;
+        });
+
+        related.sort(function (a, b) {
+            var ra = parseRobuxAmountTitle(a.title);
+            var rb = parseRobuxAmountTitle(b.title);
+            if (ra > 0 && rb > 0) return ra - rb;
+            return (a.price || 0) - (b.price || 0);
+        });
+
+        related = related.slice(0, 5);
+        if (related.length > 0) {
+            relSec.style.display = 'block';
+            var rHtml = '';
+            related.forEach(function (rg) {
+                var rPrice = (rg.discount && rg.discount > 0) ? rg.price * (1 - rg.discount / 100) : rg.price;
+                rHtml += '<div class="mp-related-card" data-id="' + rg.id + '">' +
+                    '<img src="' + (rg.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(rg.title) + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
+                    '<div class="r-title">' + escapeHtml(rg.title) + '</div>' +
+                    '<div class="r-price">' + CURRENCY + ' ' + (rPrice || 0).toFixed(2) + '</div>' +
+                    '</div>';
+            });
+            relGrid.innerHTML = rHtml;
+
+            relGrid.querySelectorAll('.mp-related-card').forEach(function (card) {
+                card.addEventListener('click', function () {
+                    var rid = parseInt(this.getAttribute('data-id'), 10);
+                    var targetGame = allGames.find(function (x) { return x.id === rid; });
+                    if (targetGame) openProductModal(targetGame);
+                });
+            });
+        } else {
+            relSec.style.display = 'none';
+        }
+    }
+};
+
+// Keep Buy Now enabled/disabled state synced when variants are clicked
+var _origApplyVariantSelection = applyVariantSelection;
+applyVariantSelection = function (game) {
+    _origApplyVariantSelection(game);
+    var buyNowBtn = document.getElementById('modalBuyNowBtn');
+    if (buyNowBtn && modalAddBtn) {
+        buyNowBtn.disabled = modalAddBtn.disabled;
+    }
+};
+
+// Upgrade Search Dropdown to show Categories, Genres, and Products
+updateSearchDropdown = function (query) {
+    var dropdown = searchDropdown;
+    if (!query || !query.trim()) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    var q = query.trim().toLowerCase();
+    var catalog = buildMarketplaceCatalog();
+
+    var catMatches = catalog.categoriesList.filter(function (c) {
+        return c.name.toLowerCase().indexOf(q) !== -1;
+    });
+    var genreMatches = catalog.allGenresList.filter(function (g) {
+        return g.name.toLowerCase().indexOf(q) !== -1 || g.parentCategory.toLowerCase().indexOf(q) !== -1;
+    }).slice(0, 4);
+
+    var gameMatches = [];
+    for (var i = 0; i < allGames.length; i++) {
+        var gm = allGames[i];
+        if (gm.title.toLowerCase().indexOf(q) !== -1 ||
+            (gm.description && gm.description.toLowerCase().indexOf(q) !== -1)) {
+            gameMatches.push(gm);
+            if (gameMatches.length >= 5) break;
+        }
+    }
+
+    if (!catMatches.length && !genreMatches.length && !gameMatches.length) {
+        dropdown.innerHTML = '<div class="no-results">No matching categories, genres, or products.</div>';
+        dropdown.style.display = 'block';
+        return;
+    }
+
+    var html = '';
+    if (catMatches.length > 0) {
+        html += '<div class="dropdown-label">Categories</div>';
+        catMatches.forEach(function (c) {
+            html += '<div class="genre-suggestion" data-cat="' + escapeHtml(c.name) + '" data-genre="">' +
+                '<i class="fas ' + getCategoryIcon(c.name) + '"></i> ' + escapeHtml(c.name) + ' (' + c.products.length + ' products)' +
+                '</div>';
+        });
+    }
+    if (genreMatches.length > 0) {
+        html += '<div class="dropdown-label">Genres</div>';
+        genreMatches.forEach(function (g) {
+            html += '<div class="genre-suggestion" data-cat="' + escapeHtml(g.parentCategory) + '" data-genre="' + escapeHtml(g.name) + '">' +
+                '<i class="fas ' + getGenreIcon(g.name) + '"></i> ' + escapeHtml(g.parentCategory) + ' &rsaquo; ' + escapeHtml(g.name) + ' (' + g.products.length + ')' +
+                '</div>';
+        });
+    }
+    if (gameMatches.length > 0) {
+        html += '<div class="dropdown-label">Products</div>';
+        gameMatches.forEach(function (game) {
+            var price = game.discount && game.discount > 0
+                ? CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2)
+                : CURRENCY + ' ' + game.price.toFixed(2);
+            html += '<div class="dropdown-item" data-gameid="' + game.id + '">' +
+                '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(game.title) + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
+                '<div class="info"><div class="name">' + escapeHtml(game.title) + '</div><div class="price">' + price + '</div></div>' +
+                '</div>';
+        });
+    }
+
+    dropdown.innerHTML = html;
+    dropdown.style.display = 'block';
+
+    dropdown.querySelectorAll('.genre-suggestion').forEach(function (el) {
+        el.addEventListener('click', function () {
+            var c = this.getAttribute('data-cat');
+            var g = this.getAttribute('data-genre');
+            dropdown.style.display = 'none';
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.style.display = 'none';
+            selectMarketplaceLevel(c || null, g || null);
+        });
+    });
+
+    dropdown.querySelectorAll('.dropdown-item[data-gameid]').forEach(function (el) {
+        el.addEventListener('click', function () {
+            var id = parseInt(this.getAttribute('data-gameid'), 10);
+            var gm = allGames.find(function (x) { return x.id === id; });
+            if (gm) {
+                openProductModal(gm);
+                dropdown.style.display = 'none';
+                searchInput.value = '';
+                clearSearchBtn.style.display = 'none';
+            }
+        });
+    });
+};
+
+// Populate Admin Datalists & Sync Main Category + Sub-Genre inputs to `#category` and `#editCategory`
+function populateAdminHierarchyDatalists(catalog) {
+    var catDl = document.getElementById('mpCategoryDatalist');
+    var genDl = document.getElementById('mpGenreDatalist');
+    if (!catDl || !genDl) return;
+
+    var defaultCats = ['Roblox', 'Mobile Legends', 'PUBG Mobile', 'Gift Codes & Vouchers', 'Merch & Gear'];
+    var defaultGenres = ['Robux', 'Roblox Items', 'Roblox Accounts', 'Diamonds & Passes', 'UC Top-Up', 'Gift Codes', 'Apparel & Accessories'];
+
+    var catSet = {};
+    defaultCats.forEach(function (c) { catSet[c] = true; });
+    (catalog.categoriesList || []).forEach(function (c) { catSet[c.name] = true; });
+
+    var genSet = {};
+    defaultGenres.forEach(function (g) { genSet[g] = true; });
+    (catalog.allGenresList || []).forEach(function (g) { genSet[g.name] = true; });
+
+    catDl.innerHTML = Object.keys(catSet).sort().map(function (c) {
+        return '<option value="' + escapeHtml(c) + '"></option>';
+    }).join('');
+    genDl.innerHTML = Object.keys(genSet).sort().map(function (g) {
+        return '<option value="' + escapeHtml(g) + '"></option>';
+    }).join('');
+}
+
+function syncCategoryPathInput(mainInputId, subInputId, hiddenCategoryInputId) {
+    var mainEl = document.getElementById(mainInputId);
+    var subEl = document.getElementById(subInputId);
+    var targetEl = document.getElementById(hiddenCategoryInputId);
+    if (!mainEl || !subEl || !targetEl) return;
+
+    function updateCombined() {
+        var m = mainEl.value.trim();
+        var s = subEl.value.trim();
+        if (m && s) targetEl.value = m + ' > ' + s;
+        else if (m) targetEl.value = m;
+        else if (s) targetEl.value = s;
+        else targetEl.value = 'General';
+        if (hiddenCategoryInputId === 'editCategory' && typeof updateEditPreview === 'function') {
+            updateEditPreview();
+        }
+    }
+    mainEl.addEventListener('input', updateCombined);
+    subEl.addEventListener('input', updateCombined);
+    mainEl.addEventListener('change', updateCombined);
+    subEl.addEventListener('change', updateCombined);
+}
+
+// Sync Edit Modal inputs when opening a product for editing
+var _preHierarchyOpenEditModal = openEditModal;
+openEditModal = function (game) {
+    _preHierarchyOpenEditModal(game);
+    if (!game) return;
+    var h = getProductHierarchy(game);
+    var em = document.getElementById('editMainCategory');
+    var es = document.getElementById('editSubGenre');
+    if (em) em.value = h.mainCategory || '';
+    if (es) es.value = h.subGenre || '';
+};
+
+// Refresh Header Wallet Points Pill when Customer is Logged In
+function refreshHeaderPointsPill() {
+    var pill = document.getElementById('headerPointsPill');
+    var valEl = document.getElementById('headerPointsValue');
+    if (!pill || !valEl) return;
+    if (!customer || !customer.email || IS_ADMIN_MODE) {
+        pill.style.display = 'none';
+        return;
+    }
+    pill.style.display = 'inline-flex';
+    google.script.run
+        .withSuccessHandler(function (pts) {
+            valEl.textContent = parseInt(pts, 10) || 0;
+        })
+        .withFailureHandler(function () {})
+        .getCustomerPoints(customer.email);
+}
+
+var _origUpdateProfileDropdown2 = updateProfileDropdown;
+updateProfileDropdown = function () {
+    _origUpdateProfileDropdown2();
+    refreshHeaderPointsPill();
+};
+
+// Wire up Marketplace Navigation & Interactive Controls
+(function setupMarketplaceControls() {
+    syncCategoryPathInput('addMainCategory', 'addSubGenre', 'category');
+    syncCategoryPathInput('editMainCategory', 'editSubGenre', 'editCategory');
+
+    // Logo click -> Marketplace Home
+    var logoHome = document.getElementById('headerLogoHome');
+    if (logoHome) {
+        logoHome.addEventListener('click', function () {
+            if (IS_ADMIN_MODE) return;
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.style.display = 'none';
+            selectMarketplaceLevel(null, null);
+        });
+    }
+
+    // Header Category Quick Menu toggle
+    var navCatBtn = document.getElementById('navCatBtn');
+    var navCatDropdown = document.getElementById('navCatDropdown');
+    if (navCatBtn && navCatDropdown) {
+        navCatBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            navCatDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function (e) {
+            if (!navCatDropdown.contains(e.target)) {
+                navCatDropdown.classList.remove('open');
+            }
+        });
+    }
+
+    // Breadcrumb Back button
+    var mpBackBtn = document.getElementById('mpBackBtn');
+    if (mpBackBtn) {
+        mpBackBtn.addEventListener('click', function () {
+            if (selectedGenre && selectedCategory) {
+                selectMarketplaceLevel(selectedCategory, null);
+            } else {
+                searchInput.value = '';
+                searchQuery = '';
+                clearSearchBtn.style.display = 'none';
+                selectMarketplaceLevel(null, null);
+            }
+        });
+    }
+
+    // Hero CTA Buttons
+    var browseBtn = document.getElementById('heroBrowseCatBtn');
+    if (browseBtn) {
+        browseBtn.addEventListener('click', function () {
+            var sec = document.getElementById('mpCategoriesSection');
+            if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+    var hotBtn = document.getElementById('heroHotSellingBtn');
+    if (hotBtn) {
+        hotBtn.addEventListener('click', function () {
+            selectedCategory = null;
+            selectedGenre = null;
+            currentFilter = 'hotselling';
+            currentPage = 1;
+            renderAll();
+        });
+    }
+
+    // Sort Select
+    var sortSelect = document.getElementById('mpSortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function () {
+            mpSortBy = this.value;
+            currentPage = 1;
+            renderPaginatedGrid();
+        });
+    }
+
+    // Header Points Pill -> Open My Account
+    var ptsPill = document.getElementById('headerPointsPill');
+    if (ptsPill) {
+        ptsPill.addEventListener('click', function () {
+            if (customer) showMyAccount();
+        });
+    }
+
+    // "Buy Now" Button in Product Detail Modal -> Add to Cart + Open Checkout Immediately
+    var buyNowBtn = document.getElementById('modalBuyNowBtn');
+    if (buyNowBtn) {
+        buyNowBtn.addEventListener('click', function () {
+            if (modalAddBtn && !modalAddBtn.disabled) {
+                var prevCartCount = cart.length;
+                modalAddBtn.click();
+                // If item was added and modal closed, trigger checkout
+                if (!productOverlay.classList.contains('open') || cart.length >= prevCartCount) {
+                    setTimeout(function () {
+                        if (cart.length > 0 && checkoutBtn) checkoutBtn.click();
+                    }, 150);
+                }
+            }
+        });
+    }
+
+    // Initial render if games are already in memory
+    if (allGames && allGames.length > 0 && !IS_ADMIN_MODE) {
+        renderAll();
+    }
+    setTimeout(refreshHeaderPointsPill, 600);
 })();
 
     </script>
