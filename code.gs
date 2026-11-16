@@ -214,6 +214,7 @@ const expectedHeaders = [
   'variant_options',
   'variants',
   'first_purchase_discount_eligible'
+  'is_instant'
 ];
   const gameHeaderRow = gameSheet.getRange(1, 1, 1, expectedHeaders.length).getValues()[0];
   if (!gameHeaderRow[0] || String(gameHeaderRow[0]).trim() !== 'id') {
@@ -1135,7 +1136,7 @@ function getGamesData() {
         ? true
         : String(eligibilityValue).toLowerCase() === 'yes';
 
-    games.push({
+games.push({
       id: gameId,
       title: title,
       category: row[2] || 'General',
@@ -1150,23 +1151,18 @@ function getGamesData() {
       sold: soldMap[title] || 0,
       avgRating: summary.avgRating,
       reviewCount: summary.reviewCount,
-      gameType: row[11]
-        ? row[11].toString().toLowerCase()
-        : 'roblox',
-      productType: row[12]
-        ? row[12].toString().toLowerCase()
-        : 'digital',
-      requiresShipping: row[13]
-        ? row[13].toString().toLowerCase() === 'yes'
-        : false,
-      hasVariants: row[14]
-        ? row[14].toString().toLowerCase() === 'yes'
-        : false,
+      gameType: row[11] ? row[11].toString().toLowerCase() : 'roblox',
+      productType: row[12] ? row[12].toString().toLowerCase() : 'digital',
+      requiresShipping: row[13] ? row[13].toString().toLowerCase() === 'yes' : false,
+      hasVariants: row[14] ? row[14].toString().toLowerCase() === 'yes' : false,
       variantOptions: variantOptions,
       variants: variants,
+      firstPurchaseDiscountEligible: firstPurchaseDiscountEligible,
 
-      // NEW FIELD
-      firstPurchaseDiscountEligible: firstPurchaseDiscountEligible
+      // 👇 ADD THIS PROPERTY HERE 👇
+      isInstant: row[18] !== undefined && row[18] !== null && row[18] !== ''
+        ? String(row[18]).toLowerCase() === 'yes'
+        : (row[12] ? String(row[12]).toLowerCase() !== 'physical' : true)
     });
   }
 
@@ -1233,28 +1229,33 @@ function addGame(data) {
       ? 'no'
       : 'yes';
 
-  const row = [
-    nextId,
-    data.title,
-    data.category || 'General',
-    parseFloat(data.price) || 0,
-    parseFloat(data.cost) || 0,
-    parseFloat(data.discount) || 0,
-    parseInt(data.quantity) || 0,
-    data.description || '',
-    data.image || '',
-    data.badge || '',
-    additionalImagesStr,
-    (data.gameType || 'roblox').toString().toLowerCase(),
-    productType,
-    requiresShipping,
-    hasVariants,
-    variantOptions,
-    variants,
+const isInstant = 
+  data.isInstant === true || data.isInstant === 'yes' || data.isInstant === 'true'
+    ? 'yes'
+    : 'no';
 
-    // NEW COLUMN
-    firstPurchaseDiscountEligible
-  ];
+// Inside your 'row' array definition, add isInstant at the very end:
+const row = [
+  nextId,
+  data.title,
+  data.category || 'General',
+  parseFloat(data.price) || 0,
+  parseFloat(data.cost) || 0,
+  parseFloat(data.discount) || 0,
+  parseInt(data.quantity) || 0,
+  data.description || '',
+  data.image || '',
+  data.badge || '',
+  additionalImagesStr,
+  (data.gameType || 'roblox').toString().toLowerCase(),
+  productType,
+  requiresShipping,
+  hasVariants,
+  variantOptions,
+  variants,
+  firstPurchaseDiscountEligible,
+  isInstant // 👈 ADD THIS AT THE END
+];
 
   sh.appendRow(row);
 
@@ -1310,28 +1311,33 @@ function updateGame(id, data) {
 
         const rowIndex = i + 1;
 
-        const updatedRow = [
-          id,
-          data.title,
-          data.category || 'General',
-          parseFloat(data.price) || 0,
-          parseFloat(data.cost) || 0,
-          parseFloat(data.discount) || 0,
-          parseInt(data.quantity) || 0,
-          data.description || '',
-          data.image || '',
-          data.badge || '',
-          additionalImagesStr,
-          (data.gameType || 'roblox').toString().toLowerCase(),
-          productType,
-          requiresShipping,
-          hasVariants,
-          variantOptions,
-          variants,
+const isInstant = 
+  data.isInstant === true || data.isInstant === 'yes' || data.isInstant === 'true'
+    ? 'yes'
+    : 'no';
 
-          // NEW COLUMN
-          firstPurchaseDiscountEligible
-        ];
+// Inside your 'updatedRow' array definition, add isInstant at the very end:
+const updatedRow = [
+  id,
+  data.title,
+  data.category || 'General',
+  parseFloat(data.price) || 0,
+  parseFloat(data.cost) || 0,
+  parseFloat(data.discount) || 0,
+  parseInt(data.quantity) || 0,
+  data.description || '',
+  data.image || '',
+  data.badge || '',
+  additionalImagesStr,
+  (data.gameType || 'roblox').toString().toLowerCase(),
+  productType,
+  requiresShipping,
+  hasVariants,
+  variantOptions,
+  variants,
+  firstPurchaseDiscountEligible,
+  isInstant // 👈 ADD THIS AT THE END
+];
 
         sheet.getRange(rowIndex, 1, 1, updatedRow.length)
           .setValues([updatedRow]);
