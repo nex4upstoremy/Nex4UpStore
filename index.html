@@ -8668,6 +8668,247 @@
     font-weight: 700;
     margin-left: 8px;
 }
+
+/* ===== ROBOT MASCOT UI + NEXBOT INTERACTIVE SUPPORT + ADMIN INBOX TEMPLATES ===== */
+.mascot-fab {
+    overflow: visible !important;
+}
+.mascot-antenna {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 11px;
+    background: #f7d875;
+    border-radius: 3px;
+}
+.mascot-antenna::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #4caf50;
+    border: 2px solid #0b0e14;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.9);
+    animation: pulseMascotLight 2.2s infinite;
+}
+@keyframes pulseMascotLight {
+    0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.65; transform: translateX(-50%) scale(1.22); }
+}
+.mascot-visor {
+    width: 78%;
+    height: 52%;
+    background: #0b0e14;
+    border-radius: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.28);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+.mascot-visor .mascot-eye {
+    width: 10px;
+    height: 15px;
+    background: #38bdf8;
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.85);
+}
+.mascot-mouth {
+    width: 16px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(56, 189, 248, 0.75);
+    transition: all 0.25s;
+}
+#chatFab[data-mood="alert"] .mascot-antenna::after {
+    background: #ff6b6b;
+    box-shadow: 0 0 12px rgba(255, 107, 107, 0.95);
+}
+#chatFab[data-mood="alert"] .mascot-eye {
+    background: #f7d875;
+    box-shadow: 0 0 8px rgba(247, 216, 117, 0.9);
+}
+#chatFab[data-mood="happy"] .mascot-antenna::after {
+    background: #4ade80;
+}
+#chatFab[data-mood="happy"] .mascot-eye {
+    height: 7px;
+    border-radius: 8px 8px 2px 2px;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.9);
+}
+#chatFab[data-mood="happy"] .mascot-mouth {
+    width: 18px;
+    height: 7px;
+    border-radius: 0 0 12px 12px;
+    background: #4ade80;
+}
+.mascot-bubble {
+    display: flex !important;
+    align-items: center;
+    gap: 7px;
+    pointer-events: auto;
+    max-width: 225px;
+}
+.mascot-bubble-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #8aa1c0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.mascot-bubble-close:hover { background: rgba(255, 107, 107, 0.25); color: #fff; }
+@media (max-width: 768px) {
+    .mascot-bubble {
+        max-width: 185px;
+        font-size: 11.5px;
+        padding: 7px 10px;
+    }
+}
+
+.chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.chat-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    margin-top: 4px;
+}
+.chat-status-pill.online { background: rgba(76, 175, 80, 0.16); color: #4ade80; border: 1px solid rgba(76, 175, 80, 0.4); }
+.chat-status-pill.offline { background: rgba(255, 167, 38, 0.15); color: #ffa726; border: 1px solid rgba(255, 167, 38, 0.35); }
+.chat-wa-header-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(37, 211, 102, 0.16);
+    border: 1px solid rgba(37, 211, 102, 0.45);
+    color: #4ade80;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.chat-wa-header-btn:hover { background: rgba(37, 211, 102, 0.28); }
+
+.nexbot-quick-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 9px 14px;
+    background: #0f151e;
+    border-bottom: 1px solid #1e2a3a;
+    scrollbar-width: none;
+}
+.nexbot-quick-bar::-webkit-scrollbar { display: none; }
+.nexbot-chip {
+    background: #1a2538;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.18s;
+    flex-shrink: 0;
+}
+.nexbot-chip:hover { border-color: #f7d875; color: #f7d875; background: rgba(247, 216, 117, 0.1); }
+
+.chat-bubble.bot {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #162233, #121821);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #e8edf5;
+    border-bottom-left-radius: 4px;
+    max-width: 88%;
+}
+.chat-bot-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #38bdf8;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.chat-order-attach-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 8px 14px 4px;
+    background: #121821;
+    border-top: 1px solid #1e2a3a;
+    scrollbar-width: none;
+}
+.chat-order-attach-bar::-webkit-scrollbar { display: none; }
+.chat-order-chip {
+    background: rgba(247, 216, 117, 0.1);
+    border: 1px solid rgba(247, 216, 117, 0.35);
+    color: #f7d875;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+}
+.chat-order-chip:hover { background: rgba(247, 216, 117, 0.22); }
+
+.inbox-quick-replies {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 8px 14px;
+    background: #0f151e;
+    border-top: 1px solid #1e2a3a;
+    scrollbar-width: none;
+}
+.inbox-quick-replies::-webkit-scrollbar { display: none; }
+.inbox-qr-chip {
+    background: #1a2538;
+    border: 1px solid #2a3a52;
+    color: #b0c8e0;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+}
+.inbox-qr-chip:hover { border-color: #f7d875; color: #f7d875; }
     </style>
 </head>
 <body>
@@ -9693,6 +9934,13 @@
                                 <img id="inboxPreviewImg" src="" alt="preview" />
                                 <button type="button" id="inboxRemoveImg"><i class="fas fa-times"></i></button>
                             </div>
+                            <div class="inbox-quick-replies" id="inboxQuickReplies">
+                                <button type="button" class="inbox-qr-chip" data-reply="✅ Payment verified! We are processing your order now.">✅ Payment Verified</button>
+                                <button type="button" class="inbox-qr-chip" data-reply="🎉 Your order is completed! Please check My Orders for your items/codes.">🎉 Order Completed</button>
+                                <button type="button" class="inbox-qr-chip" data-reply="🧾 Kindly upload your payment receipt in My Orders → To Pay so we can verify immediately.">🧾 Need Receipt</button>
+                                <button type="button" class="inbox-qr-chip" data-reply="⏳ Robux stock is being replenished — your order is safely queued and will ship soon.">⏳ Robux Queue</button>
+                                <button type="button" class="inbox-qr-chip" data-reply="👋 Hi! Thanks for contacting Nex4UpStore Support. How can I help you today?">👋 Welcome</button>
+                            </div>
                             <div class="inbox-chat-input">
                                 <button type="button" class="inbox-attach-btn" id="inboxAttachBtn" title="Attach image">
                                     <i class="fas fa-image"></i>
@@ -10644,15 +10892,22 @@
         </div>
     </div>
 
-    <!-- ===== CUSTOMER CHAT WIDGET (MASCOT UI) ===== -->
-    <button class="mascot-fab" id="chatFab" title="Chat with Customer Support">
-        <!-- 👇 Speech Bubble -->
-        <div class="mascot-bubble" id="mascotBubble">Need help? Reach us! 👋</div>
-        
+    <!-- ===== CUSTOMER CHAT WIDGET (UPGRADED ROBOT MASCOT + NEXBOT UI) ===== -->
+    <button class="mascot-fab" id="chatFab" title="Chat with NexBot &amp; Support">
+        <span class="mascot-antenna" aria-hidden="true"></span>
+        <!-- 👇 Smart Speech Bubble -->
+        <div class="mascot-bubble" id="mascotBubble">
+            <span id="mascotBubbleText">Need help? Ask NexBot! 🤖</span>
+            <span class="mascot-bubble-close" id="mascotBubbleClose" role="button" tabindex="0" title="Dismiss">&times;</span>
+        </div>
+
         <div class="mascot-face">
-            <div class="mascot-eyes" id="mascotEyes">
-                <div class="mascot-eye"></div>
-                <div class="mascot-eye"></div>
+            <div class="mascot-visor">
+                <div class="mascot-eyes" id="mascotEyes">
+                    <div class="mascot-eye"></div>
+                    <div class="mascot-eye"></div>
+                </div>
+                <div class="mascot-mouth" id="mascotMouth"></div>
             </div>
         </div>
         <span class="chat-fab-badge" id="chatFabBadge" style="display:none;">0</span>
@@ -10662,10 +10917,13 @@
         <div class="chat-panel">
             <div class="chat-header">
                 <div>
-                    <h3><i class="fas fa-headset"></i> Customer Support</h3>
-                    <p>We usually reply within 1–2 hours</p>
+                    <h3><i class="fas fa-robot"></i> NexBot &amp; Live Support</h3>
+                    <div class="chat-status-pill online" id="chatLiveStatusPill"><i class="fas fa-circle" style="font-size:7px;"></i> Online (9AM–12PM MYT)</div>
                 </div>
-                <button class="chat-close" id="chatClose"><i class="fas fa-times"></i></button>
+                <div class="chat-header-actions">
+                    <a class="chat-wa-header-btn" href="https://wa.me/60165336856" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <button class="chat-close" id="chatClose"><i class="fas fa-times"></i></button>
+                </div>
             </div>
 
             <div class="chat-identity" id="chatIdentity">
@@ -10679,9 +10937,19 @@
                 </div>
             </div>
 
-            <div class="chat-messages" id="chatMessages">
-                <div class="chat-empty">👋 Hi! Send us a message — we'll reply soon.</div>
+            <div class="nexbot-quick-bar" id="nexbotQuickActions">
+                <button type="button" class="nexbot-chip" data-botaction="order-status">📦 My Order Status</button>
+                <button type="button" class="nexbot-chip" data-botaction="upload-receipt">📤 Upload Receipt</button>
+                <button type="button" class="nexbot-chip" data-botaction="how-to-pay">💳 How to Pay</button>
+                <button type="button" class="nexbot-chip" data-botaction="hours">⏰ Delivery &amp; Hours</button>
+                <button type="button" class="nexbot-chip" data-botaction="human">👨‍💻 Human Admin</button>
             </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-empty">🤖 Hi! Tap a quick action above for instant help, or send us a message below.</div>
+            </div>
+
+            <div class="chat-order-attach-bar" id="chatOrderAttachBar" style="display:none;"></div>
 
             <div class="chat-image-preview" id="chatImagePreview" style="display:none;">
                 <img id="chatPreviewImg" src="" alt="preview" />
@@ -10693,7 +10961,7 @@
                     <i class="fas fa-image"></i>
                 </button>
                 <input type="file" id="chatImageInput" accept="image/*" style="display:none;" />
-                <textarea id="chatInput" placeholder="Type your message..." rows="1"></textarea>
+                <textarea id="chatInput" placeholder="Ask NexBot or message Support..." rows="1"></textarea>
                 <button type="button" class="chat-send-btn" id="chatSendBtn" title="Send">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -12297,6 +12565,7 @@ html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '"
                 cartTotal.textContent = CURRENCY + ' 0.00';
                 if (rewardsPreviewEl) rewardsPreviewEl.style.display = 'none';
                 document.getElementById('checkoutBtn').disabled = true;
+                if (typeof update_mascot_smart_bubble === 'function') update_mascot_smart_bubble();
                 return;
             }
             var html = '',
@@ -12334,6 +12603,7 @@ html += '<img src="' + optimizeDriveImg(item.image || PLACEHOLDER_IMG, 400) + '"
                 rewardsPreviewEl.style.display = 'flex';
             }
             document.getElementById('checkoutBtn').disabled = false;
+            if (typeof update_mascot_smart_bubble === 'function') update_mascot_smart_bubble();
             var removeBtns = cartItemsEl.querySelectorAll('.remove-btn');
             for (var r = 0; r < removeBtns.length; r++) {
                 removeBtns[r].addEventListener('click', function() {
@@ -13400,6 +13670,7 @@ var promoData = appliedPromo ? {
             if (list.length === 0) {
                 banner.style.display = 'none';
                 listEl.innerHTML = '';
+                if (typeof update_mascot_smart_bubble === 'function') update_mascot_smart_bubble();
                 return;
             }
 
@@ -13432,6 +13703,7 @@ var promoData = appliedPromo ? {
                 '</div>';
             }
             listEl.innerHTML = html;
+            if (typeof update_mascot_smart_bubble === 'function') update_mascot_smart_bubble();
         }
 
         function lookupOrderAndOpenReceiptModal(orderIdInputVal, triggerBtn) {
@@ -19322,11 +19594,13 @@ function resetVariantEditor(ctx) {
         }
 
                 // ================================================================
-        // 💬 CUSTOMER CHAT WIDGET
+        // 💬 CUSTOMER CHAT WIDGET & NEXBOT ASSISTANT
         // ================================================================
         var chatIsOpen = false;
         var chatPollTimer = null;
         var chatPendingImage = null;
+        window._nexbotLocalLog = [];
+        window._chatUnreadCount = 0;
 
         function chatGetIdentity() {
             if (customer && customer.email) {
@@ -19343,14 +19617,173 @@ function resetVariantEditor(ctx) {
             sessionStorage.setItem('nex4up_chat_guest', JSON.stringify({ name: name, email: email }));
         }
 
+        function update_chat_online_status_pill() {
+            var pill = document.getElementById('chatLiveStatusPill');
+            if (!pill) return;
+            var nowUtc = Date.now();
+            var mytHour = new Date(nowUtc + (8 * 3600000)).getUTCHours();
+            if (mytHour >= 9 && mytHour < 12) {
+                pill.className = 'chat-status-pill online';
+                pill.innerHTML = '<i class="fas fa-circle" style="font-size:7px;"></i> Online Now • Fast Reply (9AM–12PM)';
+            } else {
+                pill.className = 'chat-status-pill offline';
+                pill.innerHTML = '<i class="fas fa-moon" style="font-size:9px;"></i> After Hours • NexBot Active';
+            }
+        }
+
+        function update_mascot_smart_bubble(unreadOverride) {
+            var fab = document.getElementById('chatFab');
+            var textEl = document.getElementById('mascotBubbleText');
+            var bubble = document.getElementById('mascotBubble');
+            if (!fab || !textEl) return;
+
+            if (unreadOverride !== undefined) window._chatUnreadCount = parseInt(unreadOverride, 10) || 0;
+            var pendingList = (typeof getPendingPaymentSessions === 'function') ? getPendingPaymentSessions() : [];
+
+            if (window._chatUnreadCount > 0) {
+                fab.setAttribute('data-mood', 'happy');
+                textEl.textContent = '💬 New reply from Support! Tap me';
+                if (bubble && !window._mascotBubbleDismissed && !chatIsOpen) bubble.style.setProperty('display', 'flex', 'important');
+            } else if (pendingList.length > 0) {
+                fab.setAttribute('data-mood', 'alert');
+                textEl.textContent = '🧾 Upload receipt for ' + pendingList[0].orderId + '?';
+            } else if (typeof cart !== 'undefined' && cart && cart.length > 0) {
+                fab.removeAttribute('data-mood');
+                textEl.textContent = '🎁 Need help with promo or payment?';
+            } else {
+                fab.removeAttribute('data-mood');
+                textEl.textContent = 'Need help? Ask NexBot! 🤖';
+            }
+        }
+
+        function render_chat_order_attach_chips() {
+            var bar = document.getElementById('chatOrderAttachBar');
+            if (!bar) return;
+            var seen = {};
+            var orderIds = [];
+            if (typeof getPendingPaymentSessions === 'function') {
+                getPendingPaymentSessions().forEach(function(p) {
+                    if (p && p.orderId && !seen[p.orderId]) {
+                        seen[p.orderId] = true;
+                        orderIds.push(p.orderId);
+                    }
+                });
+            }
+            if (typeof myOrdersCache !== 'undefined' && Array.isArray(myOrdersCache)) {
+                myOrdersCache.slice(0, 5).forEach(function(o) {
+                    var oid = o['Order ID'];
+                    if (oid && !seen[oid]) {
+                        seen[oid] = true;
+                        orderIds.push(oid);
+                    }
+                });
+            }
+            if (orderIds.length === 0) {
+                bar.style.display = 'none';
+                bar.innerHTML = '';
+                return;
+            }
+            bar.style.display = 'flex';
+            var html = '';
+            orderIds.slice(0, 4).forEach(function(oid) {
+                html += '<button type="button" class="chat-order-chip" data-attachoid="' + escapeChatHtml(oid) + '">📦 Attach ' + escapeChatHtml(oid) + '</button>';
+            });
+            bar.innerHTML = html;
+            bar.querySelectorAll('.chat-order-chip').forEach(function(chip) {
+                chip.addEventListener('click', function() {
+                    var oid = this.getAttribute('data-attachoid');
+                    var inp = document.getElementById('chatInput');
+                    if (inp && oid) {
+                        var prefix = '[Order: ' + oid + '] ';
+                        if (inp.value.indexOf(oid) === -1) inp.value = prefix + inp.value;
+                        inp.focus();
+                    }
+                });
+            });
+        }
+
+        function append_nexbot_message(htmlBody) {
+            window._nexbotLocalLog.push({
+                html: htmlBody,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            var container = document.getElementById('chatMessages');
+            if (!container) return;
+            var emptyEl = container.querySelector('.chat-empty');
+            if (emptyEl) emptyEl.remove();
+
+            var node = document.createElement('div');
+            node.className = 'chat-bubble bot';
+            node.innerHTML = '<div class="chat-bot-tag"><i class="fas fa-robot"></i> NexBot</div><div>' + htmlBody + '</div>' +
+                '<span class="chat-time">' + escapeChatHtml(window._nexbotLocalLog[window._nexbotLocalLog.length - 1].time) + '</span>';
+            container.appendChild(node);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handle_nexbot_quick_action(action) {
+            var pendingList = (typeof getPendingPaymentSessions === 'function') ? getPendingPaymentSessions() : [];
+            if (action === 'order-status') {
+                if (typeof myOrdersCache !== 'undefined' && myOrdersCache.length > 0) {
+                    var summaryRows = myOrdersCache.slice(0, 3).map(function(o) {
+                        var oid = escapeChatHtml(o['Order ID'] || '');
+                        var st = escapeChatHtml(o._customerStatus || getStatusValue(o));
+                        var amt = (parseFloat(o['Total (RM)']) || 0).toFixed(2);
+                        return '<div style="margin-top:6px;padding:7px 9px;background:#0b0e14;border:1px solid #1e2a3a;border-radius:8px;">' +
+                            '<strong style="color:#f7d875;">' + oid + '</strong> • RM ' + amt + '<br>' +
+                            '<span style="font-size:11.5px;color:#8aa1c0;">Status: <strong style="color:#e8edf5;">' + st + '</strong></span>' +
+                            '</div>';
+                    }).join('');
+                    append_nexbot_message('Here are your latest orders:' + summaryRows +
+                        '<div style="margin-top:8px;"><button type="button" class="nexbot-chip" onclick="closeChatWidget(); trackBtn.click();">🔍 Check Full Tracker</button></div>');
+                } else if (pendingList.length > 0) {
+                    var p = pendingList[0];
+                    append_nexbot_message('You have an unfinished order: <strong style="color:#f7d875;">' + escapeChatHtml(p.orderId) + '</strong> (RM ' + (parseFloat(p.amount) || 0).toFixed(2) + ').' +
+                        '<div style="margin-top:8px;"><button type="button" class="nexbot-chip" onclick="closeChatWidget(); openQRModal(\'' + escapeChatHtml(p.orderId) + '\', \'' + escapeChatHtml(p.method || 'mae') + '\', ' + (parseFloat(p.amount) || 0).toFixed(2) + ', true);">📤 Upload Receipt / Pay</button></div>');
+                } else {
+                    append_nexbot_message('Want to check an Order ID? Tap below to track by Order ID or Email!' +
+                        '<div style="margin-top:8px;"><button type="button" class="nexbot-chip" onclick="closeChatWidget(); trackBtn.click();">🔍 Open Order Tracker</button></div>');
+                }
+            } else if (action === 'upload-receipt') {
+                if (pendingList.length > 0) {
+                    var up = pendingList[0];
+                    append_nexbot_message('Opening payment window for <strong style="color:#f7d875;">' + escapeChatHtml(up.orderId) + '</strong>...');
+                    setTimeout(function() {
+                        closeChatWidget();
+                        openQRModal(up.orderId, up.method || 'mae', up.amount || 0, true);
+                    }, 350);
+                } else {
+                    append_nexbot_message('No pending order saved in this browser. Enter your <strong>Order ID (ORD-...)</strong> in Track Order to upload a receipt anytime:' +
+                        '<div style="margin-top:8px;"><button type="button" class="nexbot-chip" onclick="closeChatWidget(); trackBtn.click();">📤 Lookup &amp; Upload Receipt</button></div>');
+                }
+            } else if (action === 'how-to-pay') {
+                append_nexbot_message(
+                    '<strong>Accepted Payment Methods:</strong><br>' +
+                    '• <strong>MAE / Touch \'n Go / ShopeePay QR:</strong> Scan QR at checkout &amp; upload your receipt.<br>' +
+                    '• <strong>⚡ SociaBuzz:</strong> Pay via our SociaBuzz Tribe link, paste your Order ID in message, and click <em>I Have Completed Payment on SociaBuzz</em> — <strong>no receipt upload needed!</strong>'
+                );
+            } else if (action === 'hours') {
+                append_nexbot_message(
+                    '⏰ <strong>Working Hours:</strong> 9:00 AM – 12:00 PM Daily (MYT)<br>' +
+                    '⚡ <strong>Digital Delivery:</strong> 1–2 hours during working hours<br>' +
+                    '📦 <strong>Physical Pre-Orders:</strong> Shipped every <strong>13th of the month</strong>'
+                );
+            } else if (action === 'human') {
+                append_nexbot_message('Sure! Type your question below (or tap an <strong>Attach Order</strong> chip) and our team will be notified on Telegram right away. 👨‍💻');
+                var inp = document.getElementById('chatInput');
+                if (inp) inp.focus();
+            }
+        }
+
         function openChatWidget() {
             chatIsOpen = true;
             document.getElementById('chatPanelOverlay').classList.add('open');
-            
+
             // 👇 Hide the bubble when chat opens
             var bubble = document.getElementById('mascotBubble');
-            if (bubble) bubble.style.display = 'none';
+            if (bubble) bubble.style.setProperty('display', 'none', 'important');
 
+            update_chat_online_status_pill();
+            render_chat_order_attach_chips();
             renderChatIdentity();
             loadChatMessages();
             chatPollTimer = setInterval(pollChatMessages, 10000);
@@ -19360,10 +19793,10 @@ function resetVariantEditor(ctx) {
         function closeChatWidget() {
             chatIsOpen = false;
             document.getElementById('chatPanelOverlay').classList.remove('open');
-            
-            // 👇 Bring the bubble back when chat closes
+
+            // 👇 Bring the bubble back when chat closes (unless dismissed)
             var bubble = document.getElementById('mascotBubble');
-            if (bubble) bubble.style.display = 'block';
+            if (bubble && !window._mascotBubbleDismissed) bubble.style.setProperty('display', 'flex', 'important');
 
             if (chatPollTimer) { clearInterval(chatPollTimer); chatPollTimer = null; }
         }
@@ -19421,22 +19854,25 @@ function resetVariantEditor(ctx) {
 
         function renderChatMessages(msgs) {
             var container = document.getElementById('chatMessages');
-            if (!msgs || msgs.length === 0) {
-                container.innerHTML = '<div class="chat-empty">👋 Hi! Send us a message — we\'ll reply soon.</div>';
+            if ((!msgs || msgs.length === 0) && (!window._nexbotLocalLog || window._nexbotLocalLog.length === 0)) {
+                container.innerHTML = '<div class="chat-empty">🤖 Hi! Tap a quick action above for instant help, or send us a message below.</div>';
                 return;
             }
             var html = '';
-            msgs.forEach(function(m) {
+            (msgs || []).forEach(function(m) {
                 var isMine = m.sender === 'customer';
                 var bubbleClass = isMine ? 'mine' : 'theirs';
                 var timeStr = m.date ? String(m.date).split(' ')[1]?.substring(0,5) || '' : '';
                 html += '<div class="chat-bubble ' + bubbleClass + '">';
                 if (m.message) html += '<div>' + escapeChatHtml(m.message) + '</div>';
                 if (m.imageUrl) {
-                    html += '<img src="' + escapeChatHtml(m.imageUrl) + '" alt="image" onclick="window.open(this.src, \'_blank\')" />';
+                    html += '<img src="' + escapeChatHtml(optimizeDriveImg(m.imageUrl, 400)) + '" alt="image" loading="lazy" decoding="async" onclick="window.open(this.src, \'_blank\')" />';
                 }
                 html += '<span class="chat-time">' + escapeChatHtml(timeStr) + '</span>';
                 html += '</div>';
+            });
+            (window._nexbotLocalLog || []).forEach(function(bm) {
+                html += '<div class="chat-bubble bot"><div class="chat-bot-tag"><i class="fas fa-robot"></i> NexBot</div><div>' + bm.html + '</div><span class="chat-time">' + escapeChatHtml(bm.time) + '</span></div>';
             });
             container.innerHTML = html;
         }
@@ -19450,6 +19886,7 @@ function resetVariantEditor(ctx) {
             } else {
                 badge.style.display = 'none';
             }
+            update_mascot_smart_bubble(count || 0);
         }
 
         function sendChatMessage() {
@@ -19518,12 +19955,39 @@ function resetVariantEditor(ctx) {
 
         function handleChatImageSelect(file) {
             if (!file) return;
-            if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5 MB.'); return; }
+            if (file.size > 12 * 1024 * 1024) { showToast('Image must be under 12 MB.'); return; }
             var reader = new FileReader();
             reader.onload = function(ev) {
-                chatPendingImage = ev.target.result;
-                document.getElementById('chatPreviewImg').src = ev.target.result;
-                document.getElementById('chatImagePreview').style.display = 'flex';
+                var rawData = ev.target.result;
+                var finishImg = function(finalUrl) {
+                    chatPendingImage = finalUrl;
+                    document.getElementById('chatPreviewImg').src = finalUrl;
+                    document.getElementById('chatImagePreview').style.display = 'flex';
+                };
+                if (file.type.indexOf('image/') === 0 && file.size > 900 * 1024) {
+                    var img = new Image();
+                    img.onload = function() {
+                        try {
+                            var maxDim = 1400;
+                            var w = img.naturalWidth || img.width;
+                            var h = img.naturalHeight || img.height;
+                            if (w > maxDim || h > maxDim) {
+                                var r = Math.min(maxDim / w, maxDim / h);
+                                w = Math.round(w * r);
+                                h = Math.round(h * r);
+                            }
+                            var canvas = document.createElement('canvas');
+                            canvas.width = w;
+                            canvas.height = h;
+                            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            finishImg(canvas.toDataURL('image/jpeg', 0.8));
+                        } catch (_) { finishImg(rawData); }
+                    };
+                    img.onerror = function() { finishImg(rawData); };
+                    img.src = rawData;
+                    return;
+                }
+                finishImg(rawData);
             };
             reader.readAsDataURL(file);
         }
@@ -19569,6 +20033,20 @@ function resetVariantEditor(ctx) {
             var fab = document.getElementById('chatFab');
             if (!fab) return;
             fab.addEventListener('click', openChatWidget);
+            var bubbleCloseBtn = document.getElementById('mascotBubbleClose');
+            if (bubbleCloseBtn) {
+                bubbleCloseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    window._mascotBubbleDismissed = true;
+                    var bubble = document.getElementById('mascotBubble');
+                    if (bubble) bubble.style.setProperty('display', 'none', 'important');
+                });
+            }
+            document.querySelectorAll('#nexbotQuickActions .nexbot-chip').forEach(function(chip) {
+                chip.addEventListener('click', function() {
+                    handle_nexbot_quick_action(this.getAttribute('data-botaction'));
+                });
+            });
             document.getElementById('chatClose').addEventListener('click', closeChatWidget);
             document.getElementById('chatPanelOverlay').addEventListener('click', function(e) {
                 if (e.target === this) closeChatWidget();
@@ -19589,6 +20067,7 @@ function resetVariantEditor(ctx) {
                 document.getElementById('chatImagePreview').style.display = 'none';
                 document.getElementById('chatPreviewImg').src = '';
             });
+            update_mascot_smart_bubble(0);
             setInterval(function() {
                 if (!chatIsOpen && customer) {
                     google.script.run.withSuccessHandler(function(n) { updateChatBadge(n || 0); }).getCustomerUnreadCount(customer.email);
@@ -19858,6 +20337,17 @@ function resetVariantEditor(ctx) {
                 inboxPendingImage = null;
                 document.getElementById('inboxPreviewStrip').classList.remove('show');
                 document.getElementById('inboxPreviewImg').src = '';
+            });
+
+            document.querySelectorAll('#inboxQuickReplies .inbox-qr-chip').forEach(function(chip) {
+                chip.addEventListener('click', function() {
+                    if (!replyInput || replyInput.disabled) {
+                        showToast('Select a customer conversation on the left first.');
+                        return;
+                    }
+                    replyInput.value = this.getAttribute('data-reply') || '';
+                    replyInput.focus();
+                });
             });
 
             setInterval(function() {
