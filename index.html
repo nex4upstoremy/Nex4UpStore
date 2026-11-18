@@ -8669,118 +8669,7 @@
     margin-left: 8px;
 }
 
-/* ===== ROBOT MASCOT UI + NEXBOT INTERACTIVE SUPPORT + ADMIN INBOX TEMPLATES ===== */
-.mascot-fab {
-    overflow: visible !important;
-}
-.mascot-antenna {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 3px;
-    height: 11px;
-    background: #f7d875;
-    border-radius: 3px;
-}
-.mascot-antenna::after {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: #4caf50;
-    border: 2px solid #0b0e14;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.9);
-    animation: pulseMascotLight 2.2s infinite;
-}
-@keyframes pulseMascotLight {
-    0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-    50% { opacity: 0.65; transform: translateX(-50%) scale(1.22); }
-}
-.mascot-visor {
-    width: 78%;
-    height: 52%;
-    background: #0b0e14;
-    border-radius: 14px;
-    border: 2px solid rgba(255, 255, 255, 0.28);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7);
-}
-.mascot-visor .mascot-eye {
-    width: 10px;
-    height: 15px;
-    background: #38bdf8;
-    border-radius: 6px;
-    box-shadow: 0 0 8px rgba(56, 189, 248, 0.85);
-}
-.mascot-mouth {
-    width: 16px;
-    height: 4px;
-    border-radius: 999px;
-    background: rgba(56, 189, 248, 0.75);
-    transition: all 0.25s;
-}
-#chatFab[data-mood="alert"] .mascot-antenna::after {
-    background: #ff6b6b;
-    box-shadow: 0 0 12px rgba(255, 107, 107, 0.95);
-}
-#chatFab[data-mood="alert"] .mascot-eye {
-    background: #f7d875;
-    box-shadow: 0 0 8px rgba(247, 216, 117, 0.9);
-}
-#chatFab[data-mood="happy"] .mascot-antenna::after {
-    background: #4ade80;
-}
-#chatFab[data-mood="happy"] .mascot-eye {
-    height: 7px;
-    border-radius: 8px 8px 2px 2px;
-    background: #4ade80;
-    box-shadow: 0 0 8px rgba(74, 222, 128, 0.9);
-}
-#chatFab[data-mood="happy"] .mascot-mouth {
-    width: 18px;
-    height: 7px;
-    border-radius: 0 0 12px 12px;
-    background: #4ade80;
-}
-.mascot-bubble {
-    display: flex !important;
-    align-items: center;
-    gap: 7px;
-    pointer-events: auto;
-    max-width: 225px;
-}
-.mascot-bubble-close {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: #8aa1c0;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.mascot-bubble-close:hover { background: rgba(255, 107, 107, 0.25); color: #fff; }
-@media (max-width: 768px) {
-    .mascot-bubble {
-        max-width: 185px;
-        font-size: 11.5px;
-        padding: 7px 10px;
-    }
-}
+/* ===== NEXBOT CHAT PANEL + ADMIN INBOX TEMPLATES ===== */
 
 .chat-header-actions {
     display: flex;
@@ -10892,22 +10781,15 @@
         </div>
     </div>
 
-    <!-- ===== CUSTOMER CHAT WIDGET (UPGRADED ROBOT MASCOT + NEXBOT UI) ===== -->
-    <button class="mascot-fab" id="chatFab" title="Chat with NexBot &amp; Support">
-        <span class="mascot-antenna" aria-hidden="true"></span>
-        <!-- 👇 Smart Speech Bubble -->
-        <div class="mascot-bubble" id="mascotBubble">
-            <span id="mascotBubbleText">Need help? Ask NexBot! 🤖</span>
-            <span class="mascot-bubble-close" id="mascotBubbleClose" role="button" tabindex="0" title="Dismiss">&times;</span>
-        </div>
-
+    <!-- ===== CUSTOMER CHAT WIDGET (MASCOT UI) ===== -->
+    <button class="mascot-fab" id="chatFab" title="Chat with Customer Support">
+        <!-- 👇 Speech Bubble -->
+        <div class="mascot-bubble" id="mascotBubble">Need help? Reach us! 👋</div>
+        
         <div class="mascot-face">
-            <div class="mascot-visor">
-                <div class="mascot-eyes" id="mascotEyes">
-                    <div class="mascot-eye"></div>
-                    <div class="mascot-eye"></div>
-                </div>
-                <div class="mascot-mouth" id="mascotMouth"></div>
+            <div class="mascot-eyes" id="mascotEyes">
+                <div class="mascot-eye"></div>
+                <div class="mascot-eye"></div>
             </div>
         </div>
         <span class="chat-fab-badge" id="chatFabBadge" style="display:none;">0</span>
@@ -19631,29 +19513,9 @@ function resetVariantEditor(ctx) {
             }
         }
 
-        function update_mascot_smart_bubble(unreadOverride) {
+        function update_mascot_smart_bubble() {
             var fab = document.getElementById('chatFab');
-            var textEl = document.getElementById('mascotBubbleText');
-            var bubble = document.getElementById('mascotBubble');
-            if (!fab || !textEl) return;
-
-            if (unreadOverride !== undefined) window._chatUnreadCount = parseInt(unreadOverride, 10) || 0;
-            var pendingList = (typeof getPendingPaymentSessions === 'function') ? getPendingPaymentSessions() : [];
-
-            if (window._chatUnreadCount > 0) {
-                fab.setAttribute('data-mood', 'happy');
-                textEl.textContent = '💬 New reply from Support! Tap me';
-                if (bubble && !window._mascotBubbleDismissed && !chatIsOpen) bubble.style.setProperty('display', 'flex', 'important');
-            } else if (pendingList.length > 0) {
-                fab.setAttribute('data-mood', 'alert');
-                textEl.textContent = '🧾 Upload receipt for ' + pendingList[0].orderId + '?';
-            } else if (typeof cart !== 'undefined' && cart && cart.length > 0) {
-                fab.removeAttribute('data-mood');
-                textEl.textContent = '🎁 Need help with promo or payment?';
-            } else {
-                fab.removeAttribute('data-mood');
-                textEl.textContent = 'Need help? Ask NexBot! 🤖';
-            }
+            if (fab) fab.removeAttribute('data-mood');
         }
 
         function render_chat_order_attach_chips() {
@@ -19780,7 +19642,7 @@ function resetVariantEditor(ctx) {
 
             // 👇 Hide the bubble when chat opens
             var bubble = document.getElementById('mascotBubble');
-            if (bubble) bubble.style.setProperty('display', 'none', 'important');
+            if (bubble) bubble.style.display = 'none';
 
             update_chat_online_status_pill();
             render_chat_order_attach_chips();
@@ -19794,9 +19656,9 @@ function resetVariantEditor(ctx) {
             chatIsOpen = false;
             document.getElementById('chatPanelOverlay').classList.remove('open');
 
-            // 👇 Bring the bubble back when chat closes (unless dismissed)
+            // 👇 Bring the bubble back when chat closes
             var bubble = document.getElementById('mascotBubble');
-            if (bubble && !window._mascotBubbleDismissed) bubble.style.setProperty('display', 'flex', 'important');
+            if (bubble) bubble.style.display = 'block';
 
             if (chatPollTimer) { clearInterval(chatPollTimer); chatPollTimer = null; }
         }
@@ -20033,15 +19895,6 @@ function resetVariantEditor(ctx) {
             var fab = document.getElementById('chatFab');
             if (!fab) return;
             fab.addEventListener('click', openChatWidget);
-            var bubbleCloseBtn = document.getElementById('mascotBubbleClose');
-            if (bubbleCloseBtn) {
-                bubbleCloseBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    window._mascotBubbleDismissed = true;
-                    var bubble = document.getElementById('mascotBubble');
-                    if (bubble) bubble.style.setProperty('display', 'none', 'important');
-                });
-            }
             document.querySelectorAll('#nexbotQuickActions .nexbot-chip').forEach(function(chip) {
                 chip.addEventListener('click', function() {
                     handle_nexbot_quick_action(this.getAttribute('data-botaction'));
