@@ -8187,352 +8187,139 @@
         max-height: calc(100dvh - 76px);
         overflow-y: auto;
     }
-}        
-
-// ================================================================
-// 👑 PREMIUM CUSTOMER PROFILE DROPDOWN MENU ENGINE
-// ================================================================
-var _cachedDropdownPoints = null;
-var _cachedIsPartnerAgent = null;
-var _cachedPartnerEmail = '';
-
-function getVipTierInfoByPoints(pts) {
-    var p = parseInt(pts, 10) || 0;
-    if (p >= 1000) return { label: 'Diamond VIP', icon: 'fa-gem' };
-    if (p >= 500)  return { label: 'Gold VIP',    icon: 'fa-crown' };
-    if (p >= 100)  return { label: 'Silver VIP',  icon: 'fa-medal' };
-    return { label: 'Bronze Member', icon: 'fa-shield-alt' };
 }
 
-function syncHeaderProfileToggleAvatar() {
-    if (!profileToggle) return;
-    var badgeEl = document.getElementById('profileBadge');
-    var badgeHtml = badgeEl ? badgeEl.outerHTML : '<span class="profile-badge hidden" id="profileBadge">0</span>';
-
-    if (!IS_ADMIN_MODE && customer && customer.email) {
-        var imgUrl = String(customer.profileImage || '').trim();
-        var dispName = String(customer.name || customer.email || 'U').trim();
-        var initial = dispName.charAt(0).toUpperCase();
-
-        if (imgUrl && (imgUrl.indexOf('http') === 0 || imgUrl.indexOf('data:image') === 0)) {
-            profileToggle.innerHTML =
-                '<img src="' + escapeHtml(imgUrl) + '" alt="' + escapeHtml(dispName) + '" class="nav-user-avatar" ' +
-                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" />' +
-                '<span class="nav-user-initial" style="display:none;">' + escapeHtml(initial) + '</span>' +
-                badgeHtml;
-        } else {
-            profileToggle.innerHTML =
-                '<span class="nav-user-initial">' + escapeHtml(initial) + '</span>' +
-                badgeHtml;
-        }
-    } else {
-        profileToggle.innerHTML =
-            '<i class="fas fa-user-circle"></i>' +
-            badgeHtml;
-    }
+/* ===== PAYMENT SWITCHER, CART REWARDS, ORDER PROGRESS & ROBLOX VERIFY ===== */
+.qr-method-switcher {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 10px 0 12px;
+}
+.qr-ms-btn {
+    background: #0b0e14;
+    border: 1px solid #2a3a52;
+    color: #8aa1c0;
+    padding: 7px 6px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    white-space: nowrap;
+}
+.qr-ms-btn:hover { border-color: #f7d875; color: #e8edf5; }
+.qr-ms-btn.active {
+    background: rgba(247, 216, 117, 0.14);
+    border-color: #f7d875;
+    color: #f7d875;
+}
+.qr-ms-btn[data-qrmethod="sociabuzz"].active {
+    background: rgba(76, 175, 80, 0.16);
+    border-color: #4caf50;
+    color: #66bb6a;
 }
 
-updateProfileDropdown = function () {
-    syncHeaderProfileToggleAvatar();
-    if (typeof refreshHeaderPointsPill === 'function') {
-        refreshHeaderPointsPill();
-    }
+.cart-rewards-preview {
+    background: linear-gradient(135deg, rgba(247, 216, 117, 0.1), rgba(247, 216, 117, 0.03));
+    border: 1px solid rgba(247, 216, 117, 0.25);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin: 0 24px 12px;
+    font-size: 12.5px;
+    color: #b0c8e0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.cart-rewards-preview strong { color: #f7d875; }
 
-    // 1. ADMIN MODE: Preserve existing Admin menu
-    if (IS_ADMIN_MODE) {
-        var adminHtml = '';
-        if (isAdmin) {
-            adminHtml += '<div class="nx-pm-nav">';
-            adminHtml += '<button class="dropdown-item nx-pm-item" id="dropdownAdminPanel">' +
-                '<span class="nx-pm-icon"><i class="fas fa-user-cog"></i></span>' +
-                '<span class="nx-pm-text">Admin Panel<span class="nx-pm-sub">Manage store &amp; inventory</span></span>' +
-                '</button>';
-            adminHtml += '</div>';
-            adminHtml += '<div class="nx-pm-footer">';
-            adminHtml += '<button class="dropdown-item nx-pm-logout" id="dropdownLogoutAdmin">' +
-                '<span class="nx-pm-icon"><i class="fas fa-sign-out-alt"></i></span>' +
-                '<span>Logout Admin</span>' +
-                '</button>';
-            adminHtml += '</div>';
-        } else {
-            adminHtml += '<div class="nx-pm-nav">';
-            adminHtml += '<button class="dropdown-item nx-pm-item" id="dropdownAdminLogin">' +
-                '<span class="nx-pm-icon"><i class="fas fa-lock"></i></span>' +
-                '<span class="nx-pm-text">Admin Login<span class="nx-pm-sub">Access control panel</span></span>' +
-                '</button>';
-            adminHtml += '</div>';
-        }
-        profileDropdownContent.innerHTML = adminHtml;
+.order-progress-track {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
+    margin: 14px 0 10px;
+    padding: 4px 2px;
+    gap: 4px;
+}
+.order-progress-track::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: #1e2a3a;
+    z-index: 0;
+}
+.order-step {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+}
+.order-step-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #121821;
+    border: 2px solid #2a3a52;
+    color: #6a7f9e;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.order-step.done .order-step-dot {
+    background: #4caf50;
+    border-color: #4caf50;
+    color: #0b0e14;
+}
+.order-step.active .order-step-dot {
+    background: #f7d875;
+    border-color: #f7d875;
+    color: #0b0e14;
+    box-shadow: 0 0 0 3px rgba(247, 216, 117, 0.2);
+}
+.order-step-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6a7f9e;
+    line-height: 1.2;
+}
+.order-step.done .order-step-label { color: #81c784; }
+.order-step.active .order-step-label { color: #f7d875; }
 
-        var ap = document.getElementById('dropdownAdminPanel');
-        if (ap) ap.addEventListener('click', function () {
-            sidebar.classList.add('visible');
-            showAdminView();
-            showAdminSection('add-item');
-            closeProfileDropdown();
-        });
-        var lo = document.getElementById('dropdownLogoutAdmin');
-        if (lo) lo.addEventListener('click', function () {
-            logoutAdmin();
-            closeProfileDropdown();
-        });
-        var al = document.getElementById('dropdownAdminLogin');
-        if (al) al.addEventListener('click', function () {
-            closeProfileDropdown();
-            adminLoginOverlay.classList.add('open');
-            adminPassword.value = '';
-            adminLoginError.textContent = '';
-        });
-        return;
-    }
-
-    // 2. GUEST CUSTOMER STATE (Not logged in)
-    if (!customer || !customer.email) {
-        _cachedDropdownPoints = null;
-        _cachedIsPartnerAgent = null;
-        _cachedPartnerEmail = '';
-
-        var guestHtml =
-            '<div class="nx-pm-header">' +
-                '<div class="nx-pm-avatar-wrap">' +
-                    '<div class="nx-pm-avatar-fallback"><i class="fas fa-user"></i></div>' +
-                '</div>' +
-                '<div class="nx-pm-identity">' +
-                    '<div class="nx-pm-name">Welcome, Gamer!</div>' +
-                    '<div class="nx-pm-handle">Sign in to track orders &amp; earn points</div>' +
-                    '<div class="nx-pm-vip-pill"><i class="fas fa-gift"></i> 10% OFF First Order</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="nx-pm-nav">' +
-                '<button class="dropdown-item nx-pm-item" id="dropdownLogin">' +
-                    '<span class="nx-pm-icon"><i class="fas fa-sign-in-alt"></i></span>' +
-                    '<span class="nx-pm-text">Login<span class="nx-pm-sub">Access your Nex4Up account</span></span>' +
-                '</button>' +
-                '<button class="dropdown-item nx-pm-item" id="dropdownRegister">' +
-                    '<span class="nx-pm-icon"><i class="fas fa-user-plus"></i></span>' +
-                    '<span class="nx-pm-text">Create Account<span class="nx-pm-sub">Get instant welcome voucher</span></span>' +
-                '</button>' +
-                '<button class="dropdown-item nx-pm-item" id="dropdownGuestSupport">' +
-                    '<span class="nx-pm-icon"><i class="fas fa-headset"></i></span>' +
-                    '<span class="nx-pm-text">Customer Support<span class="nx-pm-sub">Live chat with our team</span></span>' +
-                '</button>' +
-            '</div>';
-
-        profileDropdownContent.innerHTML = guestHtml;
-
-        var dl = document.getElementById('dropdownLogin');
-        if (dl) dl.addEventListener('click', function () {
-            var sub = loginOverlay.querySelector('.sub');
-            if (sub) sub.textContent = 'Welcome back! Log in to your account.';
-            loginOverlay.classList.add('open');
-            closeProfileDropdown();
-        });
-        var dr = document.getElementById('dropdownRegister');
-        if (dr) dr.addEventListener('click', function () {
-            registerOverlay.classList.add('open');
-            closeProfileDropdown();
-        });
-        var gs = document.getElementById('dropdownGuestSupport');
-        if (gs) gs.addEventListener('click', function () {
-            closeProfileDropdown();
-            if (typeof openChatWidget === 'function') openChatWidget();
-        });
-        return;
-    }
-
-    // 3. AUTHENTICATED CUSTOMER MENU
-    var displayName = String(customer.name || customer.email.split('@')[0] || 'Customer').trim();
-    var usernameHandle = '@' + displayName.toLowerCase().replace(/\s+/g, '');
-    var emailStr = String(customer.email || '').trim();
-    var avatarUrl = String(customer.profileImage || '').trim();
-    var initial = displayName.charAt(0).toUpperCase();
-
-    var pts = (_cachedDropdownPoints !== null) ? _cachedDropdownPoints : (parseInt(customerPointsBalance, 10) || 0);
-    var tierInfo = getVipTierInfoByPoints(pts);
-
-    var avatarInnerHtml = (avatarUrl && (avatarUrl.indexOf('http') === 0 || avatarUrl.indexOf('data:image') === 0))
-        ? '<img src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(displayName) + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" />' +
-          '<div class="nx-pm-avatar-fallback" style="display:none;">' + escapeHtml(initial) + '</div>'
-        : '<div class="nx-pm-avatar-fallback">' + escapeHtml(initial) + '</div>';
-
-    var pendingBadgeEl = document.getElementById('profileBadge');
-    var pendingOrdersCount = (pendingBadgeEl && !pendingBadgeEl.classList.contains('hidden'))
-        ? (parseInt(pendingBadgeEl.textContent, 10) || 0)
-        : 0;
-    var wishCount = wishlistIds ? wishlistIds.size : 0;
-
-    var html =
-        '<!-- 1. User Profile Header -->' +
-        '<div class="nx-pm-header">' +
-            '<div class="nx-pm-avatar-wrap">' + avatarInnerHtml + '</div>' +
-            '<div class="nx-pm-identity">' +
-                '<div class="nx-pm-name" title="' + escapeHtml(displayName) + '">' + escapeHtml(displayName) + '</div>' +
-                '<div class="nx-pm-handle" title="' + escapeHtml(emailStr) + '">' + escapeHtml(usernameHandle) + ' &bull; ' + escapeHtml(emailStr) + '</div>' +
-                '<div class="nx-pm-vip-pill" id="nxPmVipPill"><i class="fas ' + tierInfo.icon + '"></i> <span>' + tierInfo.label + '</span></div>' +
-            '</div>' +
-        '</div>' +
-
-        '<!-- 2. Wallet & Points Shortcut Card -->' +
-        '<div class="nx-pm-wallet-box" id="dropdownWalletCard" title="View Wallet &amp; Points">' +
-            '<div class="nx-pm-wallet-left">' +
-                '<div class="nx-pm-wallet-icon"><i class="fas fa-coins"></i></div>' +
-                '<div>' +
-                    '<div class="nx-pm-wallet-label">Wallet Points</div>' +
-                    '<div class="nx-pm-wallet-pts">' +
-                        '<span id="nxPmPointsVal">' + pts.toLocaleString() + ' Pts</span>' +
-                        '<span class="nx-pm-wallet-rm" id="nxPmPointsRm">(= RM ' + (pts * 0.01).toFixed(2) + ')</span>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="nx-pm-wallet-cta">Details <i class="fas fa-chevron-right"></i></div>' +
-        '</div>' +
-
-        '<!-- 3. Organized Navigation Links -->' +
-        '<div class="nx-pm-nav">' +
-            '<button class="dropdown-item nx-pm-item" id="dropdownMyOrders">' +
-                '<span class="nx-pm-icon"><i class="fas fa-box-open"></i></span>' +
-                '<span class="nx-pm-text">My Orders<span class="nx-pm-sub">Track status, codes &amp; reviews</span></span>' +
-                (pendingOrdersCount > 0 ? '<span class="nx-pm-badge">' + pendingOrdersCount + '</span>' : '') +
-            '</button>' +
-
-            '<button class="dropdown-item nx-pm-item" id="dropdownWalletPoints">' +
-                '<span class="nx-pm-icon"><i class="fas fa-wallet"></i></span>' +
-                '<span class="nx-pm-text">Wallet &amp; Points<span class="nx-pm-sub">Points balance &amp; referral rewards</span></span>' +
-            '</button>' +
-
-            '<button class="dropdown-item nx-pm-item" id="dropdownSupportInbox">' +
-                '<span class="nx-pm-icon"><i class="fas fa-comments"></i></span>' +
-                '<span class="nx-pm-text">Customer Support / Inbox<span class="nx-pm-sub">Chat with us in real time</span></span>' +
-            '</button>' +
-
-            '<button class="dropdown-item nx-pm-item" id="dropdownWishlist">' +
-                '<span class="nx-pm-icon"><i class="fas fa-heart"></i></span>' +
-                '<span class="nx-pm-text">My Wishlist<span class="nx-pm-sub">Saved games &amp; items</span></span>' +
-                (wishCount > 0 ? '<span class="nx-pm-badge">' + wishCount + '</span>' : '') +
-            '</button>' +
-
-            '<button class="dropdown-item nx-pm-item" id="dropdownAgentDashboard" style="display:' + (_cachedIsPartnerAgent ? 'flex' : 'none') + ';">' +
-                '<span class="nx-pm-icon"><i class="fas fa-briefcase"></i></span>' +
-                '<span class="nx-pm-text">Partner Dashboard<span class="nx-pm-sub">Sales &amp; commissions</span></span>' +
-            '</button>' +
-
-            '<button class="dropdown-item nx-pm-item" id="dropdownMyAccount">' +
-                '<span class="nx-pm-icon"><i class="fas fa-user-cog"></i></span>' +
-                '<span class="nx-pm-text">My Account / Profile Settings<span class="nx-pm-sub">Avatar, phone &amp; password</span></span>' +
-            '</button>' +
-        '</div>' +
-
-        '<!-- 4. Separated Logout Button -->' +
-        '<div class="nx-pm-footer">' +
-            '<button class="dropdown-item nx-pm-logout" id="dropdownLogout">' +
-                '<span class="nx-pm-icon"><i class="fas fa-sign-out-alt"></i></span>' +
-                '<span>Logout</span>' +
-            '</button>' +
-        '</div>';
-
-    profileDropdownContent.innerHTML = html;
-
-    // Bind navigation actions
-    var openAccountAndScroll = function (selector) {
-        showMyAccount();
-        closeProfileDropdown();
-        if (selector) {
-            setTimeout(function () {
-                var target = document.querySelector(selector);
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 180);
-        }
-    };
-
-    var walletCard = document.getElementById('dropdownWalletCard');
-    if (walletCard) walletCard.addEventListener('click', function (e) {
-        e.preventDefault();
-        openAccountAndScroll('#nxVipBanner, #profilePoints');
-    });
-
-    var myOrdersBtn = document.getElementById('dropdownMyOrders');
-    if (myOrdersBtn) myOrdersBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        openAccountAndScroll('#orderTabs');
-    });
-
-    var walletBtn = document.getElementById('dropdownWalletPoints');
-    if (walletBtn) walletBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        openAccountAndScroll('#nxVipBanner, #referralLink');
-    });
-
-    var supportBtn = document.getElementById('dropdownSupportInbox');
-    if (supportBtn) supportBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        closeProfileDropdown();
-        if (typeof openChatWidget === 'function') openChatWidget();
-    });
-
-    var wishBtn = document.getElementById('dropdownWishlist');
-    if (wishBtn) wishBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        showWishlist();
-        closeProfileDropdown();
-    });
-
-    var partnerBtn = document.getElementById('dropdownAgentDashboard');
-    if (partnerBtn) partnerBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        showAgentDashboard();
-        closeProfileDropdown();
-    });
-
-    var myAccBtn = document.getElementById('dropdownMyAccount');
-    if (myAccBtn) myAccBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        openAccountAndScroll('#myAccountSection .account-container');
-    });
-
-    var logoutBtn = document.getElementById('dropdownLogout');
-    if (logoutBtn) logoutBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        closeProfileDropdown();
-        logoutCustomer();
-    });
-
-    // Fetch live wallet points & VIP tier from backend
-    google.script.run
-        .withSuccessHandler(function (livePts) {
-            var p = parseInt(livePts, 10) || 0;
-            _cachedDropdownPoints = p;
-            customerPointsBalance = p;
-            var tInfo = getVipTierInfoByPoints(p);
-
-            var ptsEl = document.getElementById('nxPmPointsVal');
-            var rmEl  = document.getElementById('nxPmPointsRm');
-            var vipEl = document.getElementById('nxPmVipPill');
-            if (ptsEl) ptsEl.textContent = p.toLocaleString() + ' Pts';
-            if (rmEl)  rmEl.textContent  = '(= RM ' + (p * 0.01).toFixed(2) + ')';
-            if (vipEl) vipEl.innerHTML   = '<i class="fas ' + tInfo.icon + '"></i> <span>' + tInfo.label + '</span>';
-        })
-        .withFailureHandler(function () {})
-        .getCustomerPoints(customer.email);
-
-    // Check Partner / Sales Team status for this customer email
-    if (_cachedPartnerEmail !== emailStr.toLowerCase()) {
-        _cachedPartnerEmail = emailStr.toLowerCase();
-        google.script.run
-            .withSuccessHandler(function (team) {
-                team = team || [];
-                _cachedIsPartnerAgent = team.some(function (a) {
-                    return a && String(a.email || '').toLowerCase().trim() === _cachedPartnerEmail && a.status === 'Active';
-                });
-                var pBtn = document.getElementById('dropdownAgentDashboard');
-                if (pBtn) pBtn.style.display = _cachedIsPartnerAgent ? 'flex' : 'none';
-            })
-            .withFailureHandler(function () {})
-            .getSalesTeam();
-    }
-};
-
-// Re-render the upgraded dropdown immediately on load
-updateProfileDropdown();
+.roblox-verify-card {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #0b0e14;
+    border: 1px solid #2a3a52;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    color: #b0c8e0;
+}
+.roblox-verify-card.valid { border-color: #4caf50; background: rgba(76, 175, 80, 0.08); }
+.roblox-verify-card.invalid { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.08); color: #ff8a8a; }
+.roblox-verify-card img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #141a24;
+    border: 1px solid #2e7d32;
+    object-fit: cover;
+    flex-shrink: 0;
+}
     </style>
 </head>
 <body>
@@ -10210,6 +9997,7 @@ updateProfileDropdown();
         <div class="cart-panel">
             <div class="cart-header"><h2><i class="fas fa-shopping-cart"></i> Your Cart</h2><button class="cart-close" id="cartClose"><i class="fas fa-times"></i></button></div>
             <div class="cart-items" id="cartItems"></div>
+            <div id="cartRewardsPreview" class="cart-rewards-preview" style="display:none;"></div>
             <div class="cart-footer">
                 <div class="total"><span>Total</span><span class="amount" id="cartTotal">RM 0.00</span></div>
                 <button class="checkout-btn" id="checkoutBtn">Checkout</button>
@@ -10285,6 +10073,13 @@ updateProfileDropdown();
                 <div class="row"><span class="label">Order ID</span><span class="value" id="qrOrderId">-</span></div>
                 <div class="row"><span class="label">Payment Method</span><span class="value" id="qrMethod">-</span></div>
                 <div class="row"><span class="label">Amount</span><span class="value big" id="qrAmount">RM 0.00</span></div>
+            </div>
+
+            <div class="qr-method-switcher" id="qrMethodSwitcher">
+                <button type="button" class="qr-ms-btn" data-qrmethod="mae">MAE</button>
+                <button type="button" class="qr-ms-btn" data-qrmethod="tng">TNG</button>
+                <button type="button" class="qr-ms-btn" data-qrmethod="shopee">ShopeePay</button>
+                <button type="button" class="qr-ms-btn" data-qrmethod="sociabuzz"><i class="fas fa-bolt"></i> SociaBuzz</button>
             </div>
 
             <div class="qr-display" id="qrDisplay">
@@ -10804,6 +10599,16 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
         var SOCIABUZZ_TRIBE_URL = 'https://sociabuzz.com/nex4up/tribe';
         var paymentQRsCache = null;
         var approvalMethodFilter = 'all';
+
+        function optimizeDriveImg(url, width) {
+            if (!url || typeof url !== 'string') return url || PLACEHOLDER_IMG;
+            var u = url.trim();
+            if (!u) return PLACEHOLDER_IMG;
+            if (u.indexOf('lh3.googleusercontent.com/') !== -1 && u.indexOf('?') === -1 && !/=w\d+|=s\d+|=h\d+/i.test(u)) {
+                return u + '=w' + (width || 400);
+            }
+            return u;
+        }
 
 // ================================================================
 // REFERRAL DETECTION (safe for both GAS and GitHub)
@@ -11335,7 +11140,7 @@ var allActive = currentFilter === 'all' ? 'active' : '';
 var allImg = genreImages['All'] || '';
 html += '<div class="genre-card ' + allActive + '" data-filter="all">';
 if (allImg) {
-    html += '<img src="' + allImg + '" alt="All" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
+    html += '<img src="' + optimizeDriveImg(allImg, 400) + '" alt="All" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
 } else {
     html += '<div class="no-image"><i class="fas fa-th"></i><span>All</span></div>';
 }
@@ -11347,7 +11152,7 @@ var hotActive = currentFilter === 'hotselling' ? 'active' : '';
 var hotImg = genreImages['Hot Selling'] || '';
 html += '<div class="genre-card ' + hotActive + '" data-filter="hotselling">';
 if (hotImg) {
-    html += '<img src="' + hotImg + '" alt="Hot Selling" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
+    html += '<img src="' + optimizeDriveImg(hotImg, 400) + '" alt="Hot Selling" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
 } else {
     html += '<div class="no-image"><i class="fas fa-fire"></i><span>Hot</span></div>';
 }
@@ -11361,7 +11166,7 @@ html += '</div>';
                 var imgUrl = genreImages[g] || '';
                 html += '<div class="genre-card ' + active + '" data-filter="' + g + '">';
                 if (imgUrl) {
-                    html += '<img src="' + imgUrl + '" alt="' + g + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
+                    html += '<img src="' + optimizeDriveImg(imgUrl, 400) + '" alt="' + g + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
                 } else {
                     html += '<div class="no-image"><i class="fas fa-tag"></i><span>' + g + '</span></div>';
                 }
@@ -11479,7 +11284,7 @@ html += '</div>';
                 if ((allGames[i].category || 'Other') === genre) count++;
             }
             var html = '<div class="genre-banner">';
-            html += '<img src="' + url + '" alt="' + genre + '" onerror="this.style.display=\'none\'" />';
+            html += '<img src="' + optimizeDriveImg(url, 900) + '" alt="' + genre + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
             html += '<div class="overlay">';
             html += '<h2>' + genre + '</h2>';
             html += '<p>' + count + ' game' + (count !== 1 ? 's' : '') + ' available</p>';
@@ -11544,7 +11349,7 @@ html += '</div>';
 
                 html += '<div class="game-card" data-id="' + game.id + '">';
                 html += '<div class="img-wrap">';
-html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
+html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
                 if (game.badge) html += '<span class="badge-top">' + game.badge + '</span>';
                 if (isAdmin) {
                     html += '<button class="edit-product-btn" data-id="' + game.id + '" title="Edit product"><i class="fas fa-edit"></i></button>';
@@ -11798,7 +11603,7 @@ html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title 
                         CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2) :
                         CURRENCY + ' ' + game.price.toFixed(2);
                     html += '<div class="dropdown-item" data-gameid="' + game.id + '">';
-html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
+html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
                     html += '<div class="info"><div class="name">' + game.title + '</div><div class="price">' + price + '</div></div>';
                     html += '</div>';
                 }
@@ -12007,10 +11812,12 @@ html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title 
         function renderCart() {
             var count = 0;
             for (var i = 0; i < cart.length; i++) count += cart[i].quantity;
+            var rewardsPreviewEl = document.getElementById('cartRewardsPreview');
             cartCount.textContent = count;
             if (cart.length === 0) {
                 cartItemsEl.innerHTML = '<div class="empty"><i class="fas fa-shopping-bag"></i>Your cart is empty.</div>';
                 cartTotal.textContent = CURRENCY + ' 0.00';
+                if (rewardsPreviewEl) rewardsPreviewEl.style.display = 'none';
                 document.getElementById('checkoutBtn').disabled = true;
                 return;
             }
@@ -12023,7 +11830,7 @@ html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title 
                 total += subtotal;
                 var vKey = item.variantKey || '';
                 html += '<div class="cart-item">';
-html += '<img src="' + (item.image || PLACEHOLDER_IMG) + '" alt="' + item.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
+html += '<img src="' + optimizeDriveImg(item.image || PLACEHOLDER_IMG, 400) + '" alt="' + item.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
                 html += '<div class="info">';
                 html += '<h4>' + item.title + '</h4>';
                 if (item.variantLabel) {
@@ -12036,6 +11843,18 @@ html += '<img src="' + (item.image || PLACEHOLDER_IMG) + '" alt="' + item.title 
             }
             cartItemsEl.innerHTML = html;
             cartTotal.textContent = CURRENCY + ' ' + total.toFixed(2);
+            if (rewardsPreviewEl) {
+                var earnPts = Math.floor(total);
+                var availPts = (typeof customerPointsBalance !== 'undefined' && customerPointsBalance > 0) ? customerPointsBalance : 0;
+                var rHtml = '<div><i class="fas fa-coins" style="color:#f7d875;"></i> Earn <strong>+' + earnPts + ' Wallet Point' + (earnPts !== 1 ? 's' : '') + '</strong> (= RM ' + (earnPts * 0.01).toFixed(2) + ') on this order</div>';
+                if (customer && availPts > 0) {
+                    rHtml += '<div style="font-size:11.5px; color:#8aa1c0;"><i class="fas fa-wallet"></i> Available balance: <strong style="color:#4caf50;">' + availPts.toLocaleString() + ' pts</strong> (redeemable at checkout)</div>';
+                } else if (!customer) {
+                    rHtml += '<div style="font-size:11.5px; color:#8aa1c0;">Sign in at checkout to collect &amp; redeem wallet points.</div>';
+                }
+                rewardsPreviewEl.innerHTML = rHtml;
+                rewardsPreviewEl.style.display = 'flex';
+            }
             document.getElementById('checkoutBtn').disabled = false;
             var removeBtns = cartItemsEl.querySelectorAll('.remove-btn');
             for (var r = 0; r < removeBtns.length; r++) {
@@ -12481,11 +12300,64 @@ checkoutBtn.addEventListener('click', function() {
                     html += '<div class="field">';
                     html += '<label for="' + field.id + '">' + field.label + (field.required ? ' *' : '') + '</label>';
                     html += '<input type="text" id="' + field.id + '" placeholder="' + field.placeholder + '" autocomplete="off" />';
+                    if (field.id === 'robloxUsername') {
+                        html += '<div id="robloxVerifyStatus" class="roblox-verify-card" style="display:none;"></div>';
+                    }
                     html += '</div>';
                 }
                 html += '</div>';
             }
             container.innerHTML = html;
+
+            var rbxInput = document.getElementById('robloxUsername');
+            var rbxCard = document.getElementById('robloxVerifyStatus');
+            if (rbxInput && rbxCard) {
+                var rbxTimer = null;
+                var runRobloxVerify = function () {
+                    var rawVal = String(rbxInput.value || '').replace(/^@+/, '').trim();
+                    if (!rawVal) {
+                        rbxCard.style.display = 'none';
+                        return;
+                    }
+                    if (rawVal.length < 3 || !/^[A-Za-z0-9_]+$/.test(rawVal)) {
+                        rbxCard.className = 'roblox-verify-card invalid';
+                        rbxCard.style.display = 'flex';
+                        rbxCard.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Enter a valid Roblox username (letters, numbers, _).</span>';
+                        return;
+                    }
+                    if (typeof google === 'undefined' || !google.script || !google.script.run) return;
+                    rbxCard.className = 'roblox-verify-card';
+                    rbxCard.style.display = 'flex';
+                    rbxCard.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:#f7d875;"></i><span>Checking Roblox profile...</span>';
+                    google.script.run
+                        .withSuccessHandler(function (res) {
+                            var curVal = String(rbxInput.value || '').replace(/^@+/, '').trim();
+                            if (curVal.toLowerCase() !== rawVal.toLowerCase()) return;
+                            if (res && res.found) {
+                                rbxCard.className = 'roblox-verify-card valid';
+                                rbxCard.innerHTML =
+                                    (res.avatarUrl ? '<img src="' + escapeHtml(res.avatarUrl) + '" alt="' + escapeHtml(res.username) + '" />' : '<i class="fas fa-check-circle" style="color:#4caf50;font-size:18px;"></i>') +
+                                    '<div><div style="color:#e8edf5;font-weight:700;">' + escapeHtml(res.displayName || res.username) + ' <span style="color:#66bb6a;font-size:11px;">✓ Verified</span></div>' +
+                                    '<div style="font-size:11px;color:#8aa1c0;">@' + escapeHtml(res.username) + '</div></div>';
+                            } else {
+                                rbxCard.className = 'roblox-verify-card invalid';
+                                rbxCard.innerHTML = '<i class="fas fa-user-times"></i><span>Roblox user <strong>@' + escapeHtml(rawVal) + '</strong> not found. Please double-check spelling.</span>';
+                            }
+                        })
+                        .withFailureHandler(function () {
+                            rbxCard.style.display = 'none';
+                        })
+                        .lookupRobloxUser(rawVal);
+                };
+                rbxInput.addEventListener('input', function () {
+                    clearTimeout(rbxTimer);
+                    rbxTimer = setTimeout(runRobloxVerify, 550);
+                });
+                rbxInput.addEventListener('blur', function () {
+                    clearTimeout(rbxTimer);
+                    runRobloxVerify();
+                });
+            }
         }
 
         checkoutCancel.addEventListener('click', function() { checkoutOverlay.classList.remove('open'); });
@@ -12874,7 +12746,7 @@ var promoData = appliedPromo ? {
             } catch (e) {}
         }
 
-        function openQRModal(orderId, method, amount) {
+        function openQRModal(orderId, method, amount, allowLater) {
             currentQROrderId = orderId;
             currentQRMethodKey = method;
             currentQRMethodLabel = getMethodLabel(method);
@@ -12882,6 +12754,12 @@ var promoData = appliedPromo ? {
             pendingReceiptDataUrl = null;
             pendingReceiptFileName = '';
             sociaBuzzPaymentConfirmed = false;
+            if (allowLater !== undefined) window._qrAllowLater = !!allowLater;
+
+            var swBtns = document.querySelectorAll('#qrMethodSwitcher .qr-ms-btn');
+            for (var sb = 0; sb < swBtns.length; sb++) {
+                swBtns[sb].classList.toggle('active', swBtns[sb].getAttribute('data-qrmethod') === method);
+            }
 
             var doneBtn = document.getElementById('qrDoneBtn');
             if (doneBtn) doneBtn.style.display = 'none';
@@ -12950,7 +12828,7 @@ var promoData = appliedPromo ? {
         }
 
         function closeQRModal() {
-            if (currentQROrderId) {
+            if (currentQROrderId && !window._qrAllowLater) {
                 if (currentQRMethodKey === 'sociabuzz' && !sociaBuzzPaymentConfirmed) {
                     showToast('⚠️ Please click "I Have Completed Payment on SociaBuzz" after paying.');
                     return;
@@ -12966,6 +12844,7 @@ var promoData = appliedPromo ? {
             pendingReceiptDataUrl = null;
             pendingReceiptFileName = '';
             sociaBuzzPaymentConfirmed = false;
+            window._qrAllowLater = false;
         }
 
         function loadQRForMethod(method) {
@@ -13160,17 +13039,29 @@ var promoData = appliedPromo ? {
             var sbzConfirmBtn = document.getElementById('sociaBuzzConfirmBtn');
             var doneBtn = document.getElementById('qrDoneBtn');
 
-            // ✅ Prevent closing by clicking outside before completing payment step
+            // ✅ Prevent closing by clicking outside before completing payment step (unless reopened from My Orders)
             if (qrOverlay) {
                 qrOverlay.addEventListener('click', function(e) {
                     if (e.target === qrOverlay) {
-                        if (currentQRMethodKey === 'sociabuzz' && !sociaBuzzPaymentConfirmed) {
+                        if (window._qrAllowLater) {
+                            closeQRModal();
+                        } else if (currentQRMethodKey === 'sociabuzz' && !sociaBuzzPaymentConfirmed) {
                             showToast('⚠️ Please click "I Have Completed Payment on SociaBuzz" after paying.');
                         } else if (currentQRMethodKey !== 'sociabuzz' && pendingReceiptDataUrl === null) {
                             showToast('⚠️ Please upload your payment receipt to complete the order.');
                         } else {
                             closeQRModal();
                         }
+                    }
+                });
+            }
+
+            var switcherBtns = document.querySelectorAll('#qrMethodSwitcher .qr-ms-btn');
+            for (var sbi = 0; sbi < switcherBtns.length; sbi++) {
+                switcherBtns[sbi].addEventListener('click', function() {
+                    var targetMethod = this.getAttribute('data-qrmethod');
+                    if (currentQROrderId && targetMethod && targetMethod !== currentQRMethodKey) {
+                        openQRModal(currentQROrderId, targetMethod, currentQRAmount, window._qrAllowLater);
                     }
                 });
             }
@@ -14934,13 +14825,13 @@ function loadOrders() {
                 allImages.push(PLACEHOLDER_IMG);
             }
 
-            productModalMainImg.src = allImages[0];
+            productModalMainImg.src = optimizeDriveImg(allImages[0], 900);
             productModalMainImg.alt = game.title;
 
             var thumbHtml = '';
             for (var j = 0; j < allImages.length; j++) {
                 var active = j === 0 ? 'active' : '';
-                thumbHtml += '<img src="' + allImages[j] + '" alt="' + game.title + ' - ' + (j + 1) + '" class="' + active + '" data-index="' + j + '" />';
+                thumbHtml += '<img src="' + optimizeDriveImg(allImages[j], 400) + '" data-fullsrc="' + optimizeDriveImg(allImages[j], 900) + '" alt="' + game.title + ' - ' + (j + 1) + '" class="' + active + '" data-index="' + j + '" loading="lazy" decoding="async" />';
             }
             productModalThumbnails.innerHTML = thumbHtml;
 
@@ -14950,7 +14841,7 @@ function loadOrders() {
                     var allThumbs = productModalThumbnails.querySelectorAll('img');
                     for (var tt = 0; tt < allThumbs.length; tt++) allThumbs[tt].classList.remove('active');
                     this.classList.add('active');
-                    productModalMainImg.src = this.src;
+                    productModalMainImg.src = this.getAttribute('data-fullsrc') || this.src;
                 });
             }
 
@@ -15534,11 +15425,31 @@ function renderOrderList(tab) {
             }
             var img = (game && game.image) ? game.image : PLACEHOLDER_IMG;
             html += '<div class="order-item-row">';
-            html += '<img src="' + img + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
+            html += '<img src="' + optimizeDriveImg(img, 400) + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
             html += '<div class="item-info"><div class="item-name">' + name + '</div><div class="item-qty">Qty: ' + qty + '</div></div>';
             html += '</div>';
         }
         html += '</div>';
+
+        var paySt = String(order['Payment Status'] || '');
+        var fulSt = String(order['Fulfilment Status'] || '');
+        if (paySt !== 'Cancelled' && status !== 'Cancelled' && status !== 'Refunded') {
+            var curStep = 1;
+            if (paySt === 'Awaiting Verification' || String(order['Receipt Number'] || '').trim()) curStep = 2;
+            if (paySt === 'Paid' || status === 'Paid' || status === 'To Ship') curStep = 3;
+            if (fulSt === 'Shipped' || fulSt === 'Delivered' || order['Customer Received At'] || order._tab === 'To Receive' || order._tab === 'To Review') curStep = 4;
+            var stepLabels = ['Order Placed', 'Payment Sent', 'Verified', 'Completed'];
+            html += '<div class="order-progress-track">';
+            for (var sp = 1; sp <= 4; sp++) {
+                var spCls = sp < curStep ? 'done' : (sp === curStep ? 'active' : '');
+                var spIcon = sp < curStep ? '<i class="fas fa-check"></i>' : sp;
+                html += '<div class="order-step ' + spCls + '">' +
+                    '<div class="order-step-dot">' + spIcon + '</div>' +
+                    '<div class="order-step-label">' + stepLabels[sp - 1] + '</div>' +
+                '</div>';
+            }
+            html += '</div>';
+        }
 
         html += '<div class="order-footer">';
         html += '<span class="order-total">RM ' + total + '</span>';
@@ -15580,6 +15491,8 @@ function renderOrderList(tab) {
         html += '<div class="order-actions">';
 
         if (tab === 'To Pay') {
+            html += '<button class="rate-btn" style="background:linear-gradient(135deg,#2e7d32,#4caf50);color:#fff;" onclick="reopenOrderPaymentModal(\'' + escapeHtml(orderId) + '\')">';
+            html += '<i class="fas fa-wallet"></i> Pay Now / Switch Method</button>';
             html += '<button class="rate-btn" style="background:#ff6b6b;color:#fff;" onclick="cancelMyOrder(\'' + orderId + '\')">';
             html += '<i class="fas fa-times"></i> Cancel Order</button>';
         }
@@ -15624,6 +15537,25 @@ function renderOrderList(tab) {
     }
 
     myOrdersList.innerHTML = html;
+}
+
+// ===== Reopen payment modal from My Orders -> To Pay =====
+function reopenOrderPaymentModal(orderId) {
+    var order = null;
+    for (var i = 0; i < myOrdersCache.length; i++) {
+        if (String(myOrdersCache[i]['Order ID'] || '') === String(orderId)) {
+            order = myOrdersCache[i];
+            break;
+        }
+    }
+    var pmRaw = order ? String(order['Payment Method'] || '').toLowerCase() : '';
+    var methodKey = 'mae';
+    if (pmRaw.indexOf('sociabuzz') !== -1) methodKey = 'sociabuzz';
+    else if (pmRaw.indexOf('touch') !== -1 || pmRaw.indexOf('tng') !== -1) methodKey = 'tng';
+    else if (pmRaw.indexOf('shopee') !== -1) methodKey = 'shopee';
+    else if (pmRaw.indexOf('mae') !== -1) methodKey = 'mae';
+    var amount = order ? (parseFloat(order['Total (RM)']) || 0) : 0;
+    openQRModal(orderId, methodKey, amount, true);
 }
 
 // ===== Cancel unpaid order =====
@@ -15923,7 +15855,7 @@ function submitInlineReview() {
                             CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2) + ' <span class="original">' + CURRENCY + ' ' + game.price.toFixed(2) + '</span>' :
                             CURRENCY + ' ' + game.price.toFixed(2);
                         html += '<div class="game-card" data-id="' + game.id + '">';
-                        html += '<div class="img-wrap"><img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;"/>';
+                        html += '<div class="img-wrap"><img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;"/>';
                         if (game.badge) html += '<span class="badge-top">' + game.badge + '</span>';
                         html += '</div><div class="card-body">';
                         html += '<h3>' + game.title + '</h3>';
@@ -19969,7 +19901,7 @@ function renderMarketplaceCategoriesAndGenres(catalog) {
             cHtml += '<div class="mp-category-card" data-cat="' + escapeHtml(cat.name) + '">';
             cHtml += '<div class="mp-category-thumb">';
             if (imgUrl) {
-                cHtml += '<img src="' + imgUrl + '" alt="' + escapeHtml(cat.name) + '" loading="lazy" onerror="this.style.display=\'none\'" />';
+                cHtml += '<img src="' + optimizeDriveImg(imgUrl, 400) + '" alt="' + escapeHtml(cat.name) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
             } else {
                 cHtml += '<i class="fas ' + getCategoryIcon(cat.name) + ' mp-category-icon-fallback"></i>';
             }
@@ -20037,7 +19969,7 @@ function renderMarketplaceCategoriesAndGenres(catalog) {
             gHtml += '<div class="mp-genre-card ' + isActive + '" data-cat="' + escapeHtml(gObj.parentCategory) + '" data-genre="' + escapeHtml(gObj.name) + '">';
             gHtml += '<div class="mp-genre-thumb">';
             if (gImg) {
-                gHtml += '<img src="' + gImg + '" alt="' + escapeHtml(gObj.name) + '" loading="lazy" onerror="this.style.display=\'none\'" />';
+                gHtml += '<img src="' + optimizeDriveImg(gImg, 400) + '" alt="' + escapeHtml(gObj.name) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
             } else {
                 gHtml += '<i class="fas ' + getGenreIcon(gObj.name) + '"></i>';
             }
@@ -20234,7 +20166,7 @@ openProductModal = function (game) {
             related.forEach(function (rg) {
                 var rPrice = (rg.discount && rg.discount > 0) ? rg.price * (1 - rg.discount / 100) : rg.price;
                 rHtml += '<div class="mp-related-card" data-id="' + rg.id + '">' +
-                    '<img src="' + (rg.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(rg.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
+                    '<img src="' + optimizeDriveImg(rg.image || PLACEHOLDER_IMG, 400) + '" alt="' + escapeHtml(rg.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
                     '<div class="r-title">' + escapeHtml(rg.title) + '</div>' +
                     '<div class="r-price">' + CURRENCY + ' ' + (rPrice || 0).toFixed(2) + '</div>' +
                     '</div>';
@@ -20321,7 +20253,7 @@ updateSearchDropdown = function (query) {
                 ? CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2)
                 : CURRENCY + ' ' + game.price.toFixed(2);
             html += '<div class="dropdown-item" data-gameid="' + game.id + '">' +
-                '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(game.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
+                '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '" alt="' + escapeHtml(game.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
                 '<div class="info"><div class="name">' + escapeHtml(game.title) + '</div><div class="price">' + price + '</div></div>' +
                 '</div>';
         });
@@ -20416,21 +20348,320 @@ openEditModal = function (game) {
     if (es) es.value = h.subGenre || '';
 };
 
+// ================================================================
+// 👑 PREMIUM CUSTOMER PROFILE DROPDOWN MENU ENGINE (Moved into <script>)
+// ================================================================
+var _cachedDropdownPoints = null;
+var _cachedIsPartnerAgent = null;
+var _cachedPartnerEmail = '';
+
+function getVipTierInfoByPoints(pts) {
+    var p = parseInt(pts, 10) || 0;
+    if (p >= 1000) return { label: 'Diamond VIP', icon: 'fa-gem' };
+    if (p >= 500)  return { label: 'Gold VIP',    icon: 'fa-crown' };
+    if (p >= 100)  return { label: 'Silver VIP',  icon: 'fa-medal' };
+    return { label: 'Bronze Member', icon: 'fa-shield-alt' };
+}
+
+function syncHeaderProfileToggleAvatar() {
+    if (!profileToggle) return;
+    var badgeEl = document.getElementById('profileBadge');
+    var badgeHtml = badgeEl ? badgeEl.outerHTML : '<span class="profile-badge hidden" id="profileBadge">0</span>';
+
+    if (!IS_ADMIN_MODE && customer && customer.email) {
+        var imgUrl = String(customer.profileImage || '').trim();
+        var dispName = String(customer.name || customer.email || 'U').trim();
+        var initial = dispName.charAt(0).toUpperCase();
+
+        if (imgUrl && (imgUrl.indexOf('http') === 0 || imgUrl.indexOf('data:image') === 0)) {
+            profileToggle.innerHTML =
+                '<img src="' + escapeHtml(optimizeDriveImg(imgUrl, 400)) + '" alt="' + escapeHtml(dispName) + '" class="nav-user-avatar" ' +
+                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" />' +
+                '<span class="nav-user-initial" style="display:none;">' + escapeHtml(initial) + '</span>' +
+                badgeHtml;
+        } else {
+            profileToggle.innerHTML =
+                '<span class="nav-user-initial">' + escapeHtml(initial) + '</span>' +
+                badgeHtml;
+        }
+    } else {
+        profileToggle.innerHTML =
+            '<i class="fas fa-user-circle"></i>' +
+            badgeHtml;
+    }
+}
+
+updateProfileDropdown = function () {
+    syncHeaderProfileToggleAvatar();
+
+    // 1. ADMIN MODE: Preserve existing Admin menu
+    if (IS_ADMIN_MODE) {
+        var adminHtml = '';
+        if (isAdmin) {
+            adminHtml += '<div class="nx-pm-nav">';
+            adminHtml += '<button class="dropdown-item nx-pm-item" id="dropdownAdminPanel">' +
+                '<span class="nx-pm-icon"><i class="fas fa-user-cog"></i></span>' +
+                '<span class="nx-pm-text">Admin Panel<span class="nx-pm-sub">Manage store &amp; inventory</span></span>' +
+                '</button>';
+            adminHtml += '</div>';
+            adminHtml += '<div class="nx-pm-footer">';
+            adminHtml += '<button class="dropdown-item nx-pm-logout" id="dropdownLogoutAdmin">' +
+                '<span class="nx-pm-icon"><i class="fas fa-sign-out-alt"></i></span>' +
+                '<span>Logout Admin</span>' +
+                '</button>';
+            adminHtml += '</div>';
+        } else {
+            adminHtml += '<div class="nx-pm-nav">';
+            adminHtml += '<button class="dropdown-item nx-pm-item" id="dropdownAdminLogin">' +
+                '<span class="nx-pm-icon"><i class="fas fa-lock"></i></span>' +
+                '<span class="nx-pm-text">Admin Login<span class="nx-pm-sub">Access control panel</span></span>' +
+                '</button>';
+            adminHtml += '</div>';
+        }
+        profileDropdownContent.innerHTML = adminHtml;
+
+        var ap = document.getElementById('dropdownAdminPanel');
+        if (ap) ap.addEventListener('click', function () {
+            sidebar.classList.add('visible');
+            showAdminView();
+            showAdminSection('add-item');
+            closeProfileDropdown();
+        });
+        var lo = document.getElementById('dropdownLogoutAdmin');
+        if (lo) lo.addEventListener('click', function () {
+            logoutAdmin();
+            closeProfileDropdown();
+        });
+        var al = document.getElementById('dropdownAdminLogin');
+        if (al) al.addEventListener('click', function () {
+            closeProfileDropdown();
+            adminLoginOverlay.classList.add('open');
+            adminPassword.value = '';
+            adminLoginError.textContent = '';
+        });
+        return;
+    }
+
+    // 2. GUEST CUSTOMER STATE (Not logged in)
+    if (!customer || !customer.email) {
+        _cachedDropdownPoints = null;
+        _cachedIsPartnerAgent = null;
+        _cachedPartnerEmail = '';
+
+        var guestHtml =
+            '<div class="nx-pm-header">' +
+                '<div class="nx-pm-avatar-wrap">' +
+                    '<div class="nx-pm-avatar-fallback"><i class="fas fa-user"></i></div>' +
+                '</div>' +
+                '<div class="nx-pm-identity">' +
+                    '<div class="nx-pm-name">Welcome, Gamer!</div>' +
+                    '<div class="nx-pm-handle">Sign in to track orders &amp; earn points</div>' +
+                    '<div class="nx-pm-vip-pill"><i class="fas fa-gift"></i> 10% OFF First Order</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="nx-pm-nav">' +
+                '<button class="dropdown-item nx-pm-item" id="dropdownLogin">' +
+                    '<span class="nx-pm-icon"><i class="fas fa-sign-in-alt"></i></span>' +
+                    '<span class="nx-pm-text">Login<span class="nx-pm-sub">Access your Nex4Up account</span></span>' +
+                '</button>' +
+                '<button class="dropdown-item nx-pm-item" id="dropdownRegister">' +
+                    '<span class="nx-pm-icon"><i class="fas fa-user-plus"></i></span>' +
+                    '<span class="nx-pm-text">Create Account<span class="nx-pm-sub">Get instant welcome voucher</span></span>' +
+                '</button>' +
+                '<button class="dropdown-item nx-pm-item" id="dropdownGuestSupport">' +
+                    '<span class="nx-pm-icon"><i class="fas fa-headset"></i></span>' +
+                    '<span class="nx-pm-text">Customer Support<span class="nx-pm-sub">Live chat with our team</span></span>' +
+                '</button>' +
+            '</div>';
+
+        profileDropdownContent.innerHTML = guestHtml;
+
+        var dl = document.getElementById('dropdownLogin');
+        if (dl) dl.addEventListener('click', function () {
+            var sub = loginOverlay.querySelector('.sub');
+            if (sub) sub.textContent = 'Welcome back! Log in to your account.';
+            loginOverlay.classList.add('open');
+            closeProfileDropdown();
+        });
+        var dr = document.getElementById('dropdownRegister');
+        if (dr) dr.addEventListener('click', function () {
+            registerOverlay.classList.add('open');
+            closeProfileDropdown();
+        });
+        var gs = document.getElementById('dropdownGuestSupport');
+        if (gs) gs.addEventListener('click', function () {
+            closeProfileDropdown();
+            if (typeof openChatWidget === 'function') openChatWidget();
+        });
+        return;
+    }
+
+    // 3. AUTHENTICATED CUSTOMER MENU
+    var displayName = String(customer.name || customer.email.split('@')[0] || 'Customer').trim();
+    var usernameHandle = '@' + displayName.toLowerCase().replace(/\s+/g, '');
+    var emailStr = String(customer.email || '').trim();
+    var avatarUrl = String(customer.profileImage || '').trim();
+    var initial = displayName.charAt(0).toUpperCase();
+
+    var pts = (_cachedDropdownPoints !== null) ? _cachedDropdownPoints : (parseInt(customerPointsBalance, 10) || 0);
+    var tierInfo = getVipTierInfoByPoints(pts);
+
+    var avatarInnerHtml = (avatarUrl && (avatarUrl.indexOf('http') === 0 || avatarUrl.indexOf('data:image') === 0))
+        ? '<img src="' + escapeHtml(optimizeDriveImg(avatarUrl, 400)) + '" alt="' + escapeHtml(displayName) + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" />' +
+          '<div class="nx-pm-avatar-fallback" style="display:none;">' + escapeHtml(initial) + '</div>'
+        : '<div class="nx-pm-avatar-fallback">' + escapeHtml(initial) + '</div>';
+
+    var pendingBadgeEl = document.getElementById('profileBadge');
+    var pendingOrdersCount = (pendingBadgeEl && !pendingBadgeEl.classList.contains('hidden'))
+        ? (parseInt(pendingBadgeEl.textContent, 10) || 0)
+        : 0;
+    var wishCount = wishlistIds ? wishlistIds.size : 0;
+
+    var html =
+        '<div class="nx-pm-header">' +
+            '<div class="nx-pm-avatar-wrap">' + avatarInnerHtml + '</div>' +
+            '<div class="nx-pm-identity">' +
+                '<div class="nx-pm-name" title="' + escapeHtml(displayName) + '">' + escapeHtml(displayName) + '</div>' +
+                '<div class="nx-pm-handle" title="' + escapeHtml(emailStr) + '">' + escapeHtml(usernameHandle) + ' &bull; ' + escapeHtml(emailStr) + '</div>' +
+                '<div class="nx-pm-vip-pill" id="nxPmVipPill"><i class="fas ' + tierInfo.icon + '"></i> <span>' + tierInfo.label + '</span></div>' +
+            '</div>' +
+        '</div>' +
+        '<div class="nx-pm-wallet-box" id="dropdownWalletCard" title="View Wallet &amp; Points">' +
+            '<div class="nx-pm-wallet-left">' +
+                '<div class="nx-pm-wallet-icon"><i class="fas fa-coins"></i></div>' +
+                '<div>' +
+                    '<div class="nx-pm-wallet-label">Wallet Points</div>' +
+                    '<div class="nx-pm-wallet-pts">' +
+                        '<span id="nxPmPointsVal">' + pts.toLocaleString() + ' Pts</span>' +
+                        '<span class="nx-pm-wallet-rm" id="nxPmPointsRm">(= RM ' + (pts * 0.01).toFixed(2) + ')</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="nx-pm-wallet-cta">Details <i class="fas fa-chevron-right"></i></div>' +
+        '</div>' +
+        '<div class="nx-pm-nav">' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownMyOrders">' +
+                '<span class="nx-pm-icon"><i class="fas fa-box-open"></i></span>' +
+                '<span class="nx-pm-text">My Orders<span class="nx-pm-sub">Track status, codes &amp; reviews</span></span>' +
+                (pendingOrdersCount > 0 ? '<span class="nx-pm-badge">' + pendingOrdersCount + '</span>' : '') +
+            '</button>' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownWalletPoints">' +
+                '<span class="nx-pm-icon"><i class="fas fa-wallet"></i></span>' +
+                '<span class="nx-pm-text">Wallet &amp; Points<span class="nx-pm-sub">Points balance &amp; referral rewards</span></span>' +
+            '</button>' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownSupportInbox">' +
+                '<span class="nx-pm-icon"><i class="fas fa-comments"></i></span>' +
+                '<span class="nx-pm-text">Customer Support / Inbox<span class="nx-pm-sub">Chat with us in real time</span></span>' +
+            '</button>' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownWishlist">' +
+                '<span class="nx-pm-icon"><i class="fas fa-heart"></i></span>' +
+                '<span class="nx-pm-text">My Wishlist<span class="nx-pm-sub">Saved games &amp; items</span></span>' +
+                (wishCount > 0 ? '<span class="nx-pm-badge">' + wishCount + '</span>' : '') +
+            '</button>' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownAgentDashboard" style="display:' + (_cachedIsPartnerAgent ? 'flex' : 'none') + ';">' +
+                '<span class="nx-pm-icon"><i class="fas fa-briefcase"></i></span>' +
+                '<span class="nx-pm-text">Partner Dashboard<span class="nx-pm-sub">Sales &amp; commissions</span></span>' +
+            '</button>' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownMyAccount">' +
+                '<span class="nx-pm-icon"><i class="fas fa-user-cog"></i></span>' +
+                '<span class="nx-pm-text">My Account / Profile Settings<span class="nx-pm-sub">Avatar, phone &amp; password</span></span>' +
+            '</button>' +
+        '</div>' +
+        '<div class="nx-pm-footer">' +
+            '<button class="dropdown-item nx-pm-logout" id="dropdownLogout">' +
+                '<span class="nx-pm-icon"><i class="fas fa-sign-out-alt"></i></span>' +
+                '<span>Logout</span>' +
+            '</button>' +
+        '</div>';
+
+    profileDropdownContent.innerHTML = html;
+
+    var openAccountAndScroll = function (selector) {
+        showMyAccount();
+        closeProfileDropdown();
+        if (selector) {
+            setTimeout(function () {
+                var target = document.querySelector(selector);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 180);
+        }
+    };
+
+    var walletCard = document.getElementById('dropdownWalletCard');
+    if (walletCard) walletCard.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountAndScroll('#nxVipBanner, #profilePoints');
+    });
+    var myOrdersBtn = document.getElementById('dropdownMyOrders');
+    if (myOrdersBtn) myOrdersBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountAndScroll('#orderTabs');
+    });
+    var walletBtn = document.getElementById('dropdownWalletPoints');
+    if (walletBtn) walletBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountAndScroll('#nxVipBanner, #referralLink');
+    });
+    var supportBtn = document.getElementById('dropdownSupportInbox');
+    if (supportBtn) supportBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeProfileDropdown();
+        if (typeof openChatWidget === 'function') openChatWidget();
+    });
+    var wishBtn = document.getElementById('dropdownWishlist');
+    if (wishBtn) wishBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        showWishlist();
+        closeProfileDropdown();
+    });
+    var partnerBtn = document.getElementById('dropdownAgentDashboard');
+    if (partnerBtn) partnerBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        showAgentDashboard();
+        closeProfileDropdown();
+    });
+    var myAccBtn = document.getElementById('dropdownMyAccount');
+    if (myAccBtn) myAccBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountAndScroll('#myAccountSection .account-container');
+    });
+    var logoutBtn = document.getElementById('dropdownLogout');
+    if (logoutBtn) logoutBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeProfileDropdown();
+        logoutCustomer();
+    });
+
+    if (_cachedPartnerEmail !== emailStr.toLowerCase()) {
+        _cachedPartnerEmail = emailStr.toLowerCase();
+        google.script.run
+            .withSuccessHandler(function (team) {
+                team = team || [];
+                _cachedIsPartnerAgent = team.some(function (a) {
+                    return a && String(a.email || '').toLowerCase().trim() === _cachedPartnerEmail && a.status === 'Active';
+                });
+                var pBtn = document.getElementById('dropdownAgentDashboard');
+                if (pBtn) pBtn.style.display = _cachedIsPartnerAgent ? 'flex' : 'none';
+            })
+            .withFailureHandler(function () {})
+            .getSalesTeam();
+    }
+};
+
 var _lastPointsPillFetchAt = 0;
 var _lastPointsPillEmail = '';
 
-// Refresh Header Wallet Points Pill when Customer is Logged In
+// Refresh Header Wallet Points Pill & Profile Dropdown Points when Customer is Logged In
 function refreshHeaderPointsPill(force) {
     var pill = document.getElementById('headerPointsPill');
     var valEl = document.getElementById('headerPointsValue');
-    if (!pill || !valEl) return;
     if (!customer || !customer.email || IS_ADMIN_MODE) {
-        pill.style.display = 'none';
+        if (pill) pill.style.display = 'none';
         _lastPointsPillFetchAt = 0;
         _lastPointsPillEmail = '';
         return;
     }
-    pill.style.display = 'inline-flex';
+    if (pill) pill.style.display = 'inline-flex';
     var emailKey = String(customer.email).toLowerCase().trim();
     var now = Date.now();
     if (!force && _lastPointsPillEmail === emailKey && (now - _lastPointsPillFetchAt) < 4000) {
@@ -20441,8 +20672,17 @@ function refreshHeaderPointsPill(force) {
     google.script.run
         .withSuccessHandler(function (pts) {
             var p = parseInt(pts, 10) || 0;
-            valEl.textContent = p;
+            _cachedDropdownPoints = p;
             if (typeof customerPointsBalance !== 'undefined') customerPointsBalance = p;
+            if (valEl) valEl.textContent = p;
+
+            var tInfo = getVipTierInfoByPoints(p);
+            var ptsEl = document.getElementById('nxPmPointsVal');
+            var rmEl  = document.getElementById('nxPmPointsRm');
+            var vipEl = document.getElementById('nxPmVipPill');
+            if (ptsEl) ptsEl.textContent = p.toLocaleString() + ' Pts';
+            if (rmEl)  rmEl.textContent  = '(= RM ' + (p * 0.01).toFixed(2) + ')';
+            if (vipEl) vipEl.innerHTML   = '<i class="fas ' + tInfo.icon + '"></i> <span>' + tInfo.label + '</span>';
         })
         .withFailureHandler(function () {
             _lastPointsPillFetchAt = 0;
@@ -20455,6 +20695,8 @@ updateProfileDropdown = function () {
     _origUpdateProfileDropdown2();
     refreshHeaderPointsPill();
 };
+
+updateProfileDropdown();
 
 // Wire up Marketplace Navigation & Interactive Controls
 (function setupMarketplaceControls() {
@@ -20761,7 +21003,7 @@ function renderRecentlyViewedSection() {
     recentGames.forEach(function (g) {
         var effPrice = (g.discount && g.discount > 0) ? g.price * (1 - g.discount / 100) : g.price;
         html += '<div class="mp-recent-card" data-id="' + g.id + '">' +
-            '<img src="' + (g.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(g.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;" />' +
+            '<img src="' + optimizeDriveImg(g.image || PLACEHOLDER_IMG, 400) + '" alt="' + escapeHtml(g.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;" />' +
             '<div class="rc-info">' +
             '<div class="rc-title">' + escapeHtml(g.title) + '</div>' +
             '<div class="rc-price">' + CURRENCY + ' ' + (effPrice || 0).toFixed(2) + '</div>' +
