@@ -10886,7 +10886,13 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
                             catch (e) { throw new Error('Bad JSON: ' + text.slice(0, 100)); }
 
                             window._gasFailStreak = 0;
-                            if (success) success(data);
+                            if (success) {
+                                try {
+                                    success(data);
+                                } catch (cbErr) {
+                                    console.error('Callback error (' + prop + '):', cbErr);
+                                }
+                            }
                         })
                         .catch(function (err) {
                             clearTimeout(timeoutId);
@@ -13367,22 +13373,22 @@ var promoData = appliedPromo ? {
                     createdAt: entry.createdAt || Date.now()
                 });
                 localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(list.slice(0, 12)));
-                rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
+                render_pending_receipt_banner();
             } catch (e) {}
         }
 
-        function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(orderId) {
+        function remove_pending_payment_session(orderId) {
             try {
                 if (!orderId) return;
                 var list = getPendingPaymentSessions().filter(function(it) {
                     return String(it.orderId).toUpperCase() !== String(orderId).toUpperCase();
                 });
                 localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(list));
-                rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
+                render_pending_receipt_banner();
             } catch (e) {}
         }
 
-        function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63() {
+        function render_pending_receipt_banner() {
             var banner = document.getElementById('pendingReceiptHistoryBanner');
             var listEl = document.getElementById('pendingReceiptHistoryList');
             var countEl = document.getElementById('pendingReceiptCountBadge');
@@ -13419,7 +13425,7 @@ var promoData = appliedPromo ? {
                         '<button type="button" class="prb-upload-btn" onclick="openQRModal(\'' + safeId + '\', \'' + safeMethod + '\', ' + amt + ', true)">' +
                             '<i class="fas fa-receipt"></i> ' + (item.method === 'sociabuzz' ? 'Pay / Confirm' : 'Upload Receipt') +
                         '</button>' +
-                        '<button type="button" class="prb-dismiss-btn" title="Remove from history" onclick="rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(\'' + safeId + '\')">' +
+                        '<button type="button" class="prb-dismiss-btn" title="Remove from history" onclick="remove_pending_payment_session(\'' + safeId + '\')">' +
                             '<i class="fas fa-times"></i>' +
                         '</button>' +
                     '</div>' +
@@ -13448,7 +13454,7 @@ var promoData = appliedPromo ? {
                         return;
                     }
                     if (res.status === 'Paid' || res.status === 'Shipped' || res.status === 'Cancelled') {
-                        rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.orderId);
+                        remove_pending_payment_session(res.orderId);
                         showToast('Order ' + res.orderId + ' is already "' + res.status + '".');
                         return;
                     }
@@ -13666,7 +13672,7 @@ var promoData = appliedPromo ? {
                 .withSuccessHandler(function(result) {
                     if (result && result.success) {
                         sociaBuzzPaymentConfirmed = true;
-                        rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(currentQROrderId);
+                        remove_pending_payment_session(currentQROrderId);
                         var sbzActions = document.getElementById('sociaBuzzConfirmActions');
                         if (sbzActions) sbzActions.style.display = 'none';
                         var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
@@ -13772,7 +13778,7 @@ var promoData = appliedPromo ? {
             google.script.run
                 .withSuccessHandler(function(result) {
                     if (result && result.success) {
-                        rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(currentQROrderId);
+                        remove_pending_payment_session(currentQROrderId);
                         document.getElementById('receiptActions').style.display = 'none';
                         document.getElementById('receiptPreview').style.display = 'none';
                         var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
@@ -13836,7 +13842,7 @@ var promoData = appliedPromo ? {
                     }
                     window._qrAllowLater = true;
                     closeQRModal();
-                    rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
+                    render_pending_receipt_banner();
                     var banner = document.getElementById('pendingReceiptHistoryBanner');
                     if (banner) banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     showToast('📌 Order saved in Pending Receipt History! Upload your receipt anytime.');
@@ -14309,7 +14315,7 @@ if (cart.length > 0) {
             select.innerHTML = html;
         }
 
-        function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(totalPages, totalItems) {
+        function render_admin_product_pagination(totalPages, totalItems) {
             var container = document.getElementById('adminProductPagination');
             if (!container) return;
 
@@ -14485,7 +14491,7 @@ if (cart.length > 0) {
             }
 
             // Render pagination
-            rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(totalPages, totalItems);
+            render_admin_product_pagination(totalPages, totalItems);
         }
 
         // ===== Event listeners for the admin product toolbar =====
@@ -15034,7 +15040,7 @@ function runBulkOrderAction(checkboxSelector, newStatus, triggerBtn) {
         .bulkUpdateOrderStatuses(ids, newStatus);
 }
 
-function runAutoExpireUnpaidAdmin(triggerBtn) {
+function run_auto_expire_unpaid_admin(triggerBtn) {
     if (!confirm('Cancel all "Awaiting Payment" orders older than 24 hours (with no uploaded receipt) and restore their stock/Robux/points?')) return;
     var origHtml = triggerBtn ? triggerBtn.innerHTML : '';
     if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cleaning...'; }
@@ -15740,8 +15746,8 @@ function loadOrders() {
 
             var cleanOrdBtn = document.getElementById('cleanExpiredOrdersBtn');
             var cleanAppBtn = document.getElementById('cleanExpiredOrdersApprovalBtn');
-            if (cleanOrdBtn) cleanOrdBtn.addEventListener('click', function() { runAutoExpireUnpaidAdmin(cleanOrdBtn); });
-            if (cleanAppBtn) cleanAppBtn.addEventListener('click', function() { runAutoExpireUnpaidAdmin(cleanAppBtn); });
+            if (cleanOrdBtn) cleanOrdBtn.addEventListener('click', function() { run_auto_expire_unpaid_admin(cleanOrdBtn); });
+            if (cleanAppBtn) cleanAppBtn.addEventListener('click', function() { run_auto_expire_unpaid_admin(cleanAppBtn); });
 
             var appSelectAll = document.getElementById('approvalSelectAll');
             if (appSelectAll) {
@@ -16444,10 +16450,10 @@ function loadMyOrders() {
                         createdAt: Date.now()
                     });
                 } else {
-                    rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(moId);
+                    remove_pending_payment_session(moId);
                 }
             }
-            rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
+            render_pending_receipt_banner();
             renderOrderTabCounts();
             renderOrderList(activeOrderTab);
         })
@@ -16823,7 +16829,7 @@ function cancelMyOrder(orderId) {
         .withSuccessHandler(function(res) {
             showToast(res.message || 'Order cancelled.');
             if (res.success) {
-                rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(orderId);
+                remove_pending_payment_session(orderId);
                 loadMyOrders();
             }
         })
@@ -17868,7 +17874,7 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
             }
 
             loadGames();
-            rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
+            render_pending_receipt_banner();
             setTimeout(setupCarouselArrows, 800);
         }
 
@@ -20745,8 +20751,8 @@ function renderRobuxDashboard(res, range) {
 
     // Render the tables safely
     try { renderRobuxPricingTable(res.packages || []); } catch(e) { console.log('Pricing table err', e); }
-    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.purchases || []); } catch(e) { console.log('Purchase table err', e); }
-    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.transactions || []); } catch(e) { console.log('Tx table err', e); }
+    try { render_robux_purchase_history(res.purchases || []); } catch(e) { console.log('Purchase table err', e); }
+    try { render_robux_transaction_history(res.transactions || []); } catch(e) { console.log('Tx table err', e); }
     try { renderRobuxBackorders(res.backorders || []); } catch(e) { console.log('Backorder table err', e); }
 }
 
@@ -20775,7 +20781,7 @@ function setupRobuxTimeFilter() {
 }
 
 function renderRobuxPricingTable(packages) {
-    if (!packages.length) {
+    if (!Array.isArray(packages) || !packages.length) {
         document.getElementById('robuxPricingTable').innerHTML = '<div class="empty-msg">No packages found.</div>';
         return;
     }
@@ -20796,8 +20802,8 @@ function renderRobuxPricingTable(packages) {
     document.getElementById('robuxPricingTable').innerHTML = html;
 }
 
-function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
-    if (!rows.length) {
+function render_robux_purchase_history(rows) {
+    if (!Array.isArray(rows) || !rows.length) {
         document.getElementById('robuxPurchaseHistory').innerHTML = '<div class="empty-msg">No purchases recorded yet.</div>';
         return;
     }
@@ -20817,8 +20823,8 @@ function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
     document.getElementById('robuxPurchaseHistory').innerHTML = html;
 }
 
-function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
-    if (!rows.length) {
+function render_robux_transaction_history(rows) {
+    if (!Array.isArray(rows) || !rows.length) {
         document.getElementById('robuxTransactionHistory').innerHTML = '<div class="empty-msg">No transactions yet.</div>';
         return;
     }
@@ -20842,7 +20848,7 @@ function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
 }
 
 function renderRobuxBackorders(rows) {
-    if (!rows.length) {
+    if (!Array.isArray(rows) || !rows.length) {
         document.getElementById('robuxBackorderList').innerHTML = '<div class="empty-msg">No backorders.</div>';
         return;
     }
@@ -22415,8 +22421,8 @@ renderRobuxDashboard = function (res, range) {
     if (elLowStock) elLowStock.value = st.lowStockThreshold || 2000;
 
     try { renderRobuxPricingTable(res.packages || []); } catch (e) {}
-    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.purchases || []); } catch (e) {}
-    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.transactions || []); } catch (e) {}
+    try { render_robux_purchase_history(res.purchases || []); } catch (e) {}
+    try { render_robux_transaction_history(res.transactions || []); } catch (e) {}
     try { renderRobuxBackorders(res.backorders || []); } catch (e) {}
 };
 
