@@ -8320,6 +8320,232 @@
     object-fit: cover;
     flex-shrink: 0;
 }
+
+/* ===== PENDING RECEIPT HISTORY BANNER (REFRESH-PROOF) ===== */
+.pending-receipt-banner {
+    background: linear-gradient(135deg, rgba(247, 216, 117, 0.12), rgba(18, 24, 33, 0.96));
+    border: 1px solid rgba(247, 216, 117, 0.45);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin: 0 0 18px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+}
+.prb-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.prb-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #f7d875;
+}
+.prb-count {
+    background: #f7d875;
+    color: #0b0e14;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+.prb-sub {
+    font-size: 12.5px;
+    color: #b0c8e0;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+.prb-lookup-toggle {
+    background: rgba(11, 14, 20, 0.75);
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    padding: 7px 12px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+}
+.prb-lookup-toggle:hover { border-color: #f7d875; color: #f7d875; }
+.prb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+.prb-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: rgba(11, 14, 20, 0.85);
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+.prb-item-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.prb-item-id {
+    font-family: monospace;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #f7d875;
+}
+.prb-item-detail {
+    font-size: 12px;
+    color: #8aa1c0;
+}
+.prb-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.prb-upload-btn {
+    background: linear-gradient(135deg, #2e7d32, #4caf50);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.prb-upload-btn:hover { filter: brightness(1.08); }
+.prb-dismiss-btn {
+    background: transparent;
+    border: 1px solid #2a3a52;
+    color: #6a7f9e;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.prb-dismiss-btn:hover { color: #ff6b6b; border-color: #ff6b6b; }
+.prb-lookup-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+.prb-lookup-row input {
+    flex: 1;
+    min-width: 210px;
+    background: #0b0e14;
+    border: 1px solid #2a3a52;
+    border-radius: 10px;
+    padding: 9px 13px;
+    color: #e8edf5;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+}
+.prb-lookup-row button {
+    background: #f7d875;
+    color: #0b0e14;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.qr-save-later-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed #3d5a7a;
+    border-radius: 12px;
+    color: #b0c8e0;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+.qr-save-later-btn:hover { border-color: #f7d875; color: #f7d875; background: rgba(247, 216, 117, 0.06); }
+
+.saved-gameid-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.35);
+    color: #81c784;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.saved-gameid-clear {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #b0c8e0;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    cursor: pointer;
+}
+.saved-gameid-clear:hover { color: #ff6b6b; border-color: #ff6b6b; }
+
+.low-stock-pill {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(255, 107, 107, 0.16);
+    border: 1px solid rgba(255, 107, 107, 0.45);
+    color: #ff8a8a;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.digital-receipt-modal {
+    background: #121821;
+    border: 1px solid #2a3a52;
+    border-radius: 18px;
+    max-width: 460px;
+    width: 92%;
+    padding: 24px;
+    color: #e8edf5;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    max-height: 88vh;
+    overflow-y: auto;
+}
+.dr-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px dashed #1e2a3a;
+    font-size: 13px;
+}
+.dr-row:last-child { border-bottom: none; }
+@media print {
+    body * { visibility: hidden !important; }
+    #digitalReceiptOverlay, #digitalReceiptOverlay * { visibility: visible !important; }
+    #digitalReceiptOverlay { position: fixed !important; inset: 0 !important; background: #fff !important; }
+    .digital-receipt-modal { background: #fff !important; color: #111 !important; border: 1px solid #ccc !important; box-shadow: none !important; }
+}
     </style>
 </head>
 <body>
@@ -8440,6 +8666,26 @@
                     <button type="button" class="mp-back-btn" id="mpBackBtn">
                         <i class="fas fa-arrow-left"></i> Back
                     </button>
+                </div>
+
+                <!-- ===== REFRESH-PROOF PENDING RECEIPT / PAYMENT HISTORY BANNER ===== -->
+                <div id="pendingReceiptHistoryBanner" class="pending-receipt-banner" style="display:none;">
+                    <div class="prb-header">
+                        <div class="prb-title">
+                            <i class="fas fa-history"></i>
+                            <span>Unfinished Payment / Pending Receipt History</span>
+                            <span class="prb-count" id="pendingReceiptCountBadge">0</span>
+                        </div>
+                        <button type="button" class="prb-lookup-toggle" id="prbToggleLookupBtn">
+                            <i class="fas fa-search"></i> Have an Order ID? Upload Receipt
+                        </button>
+                    </div>
+                    <div class="prb-sub">Refreshed the page or switched to your banking app? Click <strong>Upload Receipt / Pay Now</strong> below to finish submitting your payment.</div>
+                    <div id="pendingReceiptHistoryList" class="prb-list"></div>
+                    <div id="prbLookupRow" class="prb-lookup-row" style="display:none;">
+                        <input type="text" id="prbOrderIdInput" placeholder="Enter Order ID (e.g. ORD-20261118-1234)" autocomplete="off" />
+                        <button type="button" id="prbLookupBtn"><i class="fas fa-upload"></i> Open &amp; Upload Receipt</button>
+                    </div>
                 </div>
 
                 <!-- Marketplace Hero & Promo Split Section -->
@@ -10126,11 +10372,30 @@
                     <p id="receiptSuccessSub" style="font-size:12px; color:#6a7f9e; margin-top:10px;">Admin will verify and process your order shortly.</p>
                 </div>
                 
+                <button type="button" class="qr-save-later-btn" id="qrSaveForLaterBtn">
+                    <i class="fas fa-bookmark"></i> Save to History &amp; Upload Receipt Later
+                </button>
+
                 <!-- ✅ THE NEW DONE BUTTON (Place it here) -->
                 <button type="button" id="qrDoneBtn">
                     <i class="fas fa-check"></i> Done, Close Window
                 </button>
                 
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== OFFICIAL DIGITAL RECEIPT MODAL ===== -->
+    <div class="confirm-overlay" id="digitalReceiptOverlay">
+        <div class="digital-receipt-modal">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                <h3 style="margin:0; font-size:17px; color:#f7d875;"><i class="fas fa-receipt"></i> Official Order Receipt</h3>
+                <button type="button" id="digitalReceiptCloseBtn" style="background:none;border:none;color:#8aa1c0;font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="digitalReceiptBody"></div>
+            <div style="display:flex; gap:10px; margin-top:16px;">
+                <button type="button" id="digitalReceiptCopyBtn" class="rate-btn" style="flex:1; justify-content:center;"><i class="fas fa-copy"></i> Copy</button>
+                <button type="button" id="digitalReceiptPrintBtn" class="rate-btn" style="flex:1; justify-content:center; background:#f7d875; color:#0b0e14;"><i class="fas fa-print"></i> Print / PDF</button>
             </div>
         </div>
     </div>
@@ -11380,11 +11645,14 @@ html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '"
                 var preOrderBadge = (game.productType === 'physical')
                     ? ' <span style="color:#f7d875; font-weight:600;">· Pre-Order (Ships 13th)</span>'
                     : '';
+                 var lowStockPill = (!isRobuxProduct && !outOfStock && stock >= 1 && stock <= 5)
+                    ? ' <span class="low-stock-pill">🔥 Only ' + stock + ' left!</span>'
+                    : '';
                  html += '<div class="stock-info ' + (outOfStock ? 'out-of-stock' : '') + '">' +
                     (isRobuxProduct
                         ? 'Central Robux stock · Sold: ' + sold
                         : (outOfStock ? 'Out of Stock' : 'Stock: ' + stock) + ' | Sold: ' + sold) +
-                    preOrderBadge + '</div>';
+                    lowStockPill + preOrderBadge + '</div>';
                 html += '<div class="card-footer">';
                 html += '<div class="price">' + priceDisplay + '</div>';
 
@@ -12265,6 +12533,43 @@ checkoutBtn.addEventListener('click', function() {
     }
 });
 
+        var SAVED_GAME_IDS_KEY = 'nex4up_saved_game_ids_v1';
+
+        function getSavedGameIds() {
+            try {
+                var raw = localStorage.getItem(SAVED_GAME_IDS_KEY);
+                return raw ? (JSON.parse(raw) || {}) : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveGameIdsToStorage(gameIdsObj) {
+            try {
+                if (!gameIdsObj || typeof gameIdsObj !== 'object') return;
+                var merged = getSavedGameIds();
+                var keys = Object.keys(gameIdsObj);
+                for (var i = 0; i < keys.length; i++) {
+                    var val = gameIdsObj[keys[i]];
+                    if (val && typeof val === 'object') {
+                        var subKeys = Object.keys(val);
+                        for (var j = 0; j < subKeys.length; j++) {
+                            var subVal = String(val[subKeys[j]] || '').trim();
+                            if (subVal) merged[subKeys[j]] = subVal;
+                        }
+                    } else if (typeof val === 'string') {
+                        var flatVal = val.trim();
+                        if (flatVal) merged[keys[i]] = flatVal;
+                    }
+                }
+                localStorage.setItem(SAVED_GAME_IDS_KEY, JSON.stringify(merged));
+            } catch (e) {}
+        }
+
+        function clearSavedGameIds() {
+            try { localStorage.removeItem(SAVED_GAME_IDS_KEY); } catch (e) {}
+        }
+
         function buildGameIdFields() {
             var container = document.getElementById('gameIdFields');
             if (!container) return;
@@ -12287,6 +12592,8 @@ checkoutBtn.addEventListener('click', function() {
                 return;
             }
 
+            var savedIds = getSavedGameIds();
+            var hasSavedMatch = false;
             var html = '';
             var order = ['roblox', 'ml', 'pubg', 'other'];
             for (var k = 0; k < order.length; k++) {
@@ -12297,6 +12604,7 @@ checkoutBtn.addEventListener('click', function() {
                 html += '<div class="game-id-header"><i class="fas ' + config.icon + '"></i> ' + config.label + ' Account</div>';
                 for (var f = 0; f < config.fields.length; f++) {
                     var field = config.fields[f];
+                    if (savedIds[field.id]) hasSavedMatch = true;
                     html += '<div class="field">';
                     html += '<label for="' + field.id + '">' + field.label + (field.required ? ' *' : '') + '</label>';
                     html += '<input type="text" id="' + field.id + '" placeholder="' + field.placeholder + '" autocomplete="off" />';
@@ -12307,7 +12615,41 @@ checkoutBtn.addEventListener('click', function() {
                 }
                 html += '</div>';
             }
+
+            if (hasSavedMatch) {
+                html = '<div class="saved-gameid-bar" id="savedGameIdBar">' +
+                    '<span><i class="fas fa-magic"></i> Auto-filled your saved Game IDs</span>' +
+                    '<button type="button" class="saved-gameid-clear" id="clearSavedGameIdsBtn">Clear</button>' +
+                '</div>' + html;
+            }
             container.innerHTML = html;
+
+            // Safely set saved values & auto-save on input
+            var allGameInputs = container.querySelectorAll('.game-id-section input');
+            for (var ai = 0; ai < allGameInputs.length; ai++) {
+                var inp = allGameInputs[ai];
+                if (savedIds[inp.id]) inp.value = savedIds[inp.id];
+                inp.addEventListener('input', function () {
+                    var patch = {};
+                    patch[this.id] = this.value.trim();
+                    saveGameIdsToStorage(patch);
+                });
+            }
+
+            var clrBtn = document.getElementById('clearSavedGameIdsBtn');
+            if (clrBtn) {
+                clrBtn.addEventListener('click', function () {
+                    clearSavedGameIds();
+                    for (var ci = 0; ci < allGameInputs.length; ci++) {
+                        allGameInputs[ci].value = '';
+                    }
+                    var rbxCardEl = document.getElementById('robloxVerifyStatus');
+                    if (rbxCardEl) rbxCardEl.style.display = 'none';
+                    var barEl = document.getElementById('savedGameIdBar');
+                    if (barEl) barEl.style.display = 'none';
+                    showToast('Saved Game IDs cleared.');
+                });
+            }
 
             var rbxInput = document.getElementById('robloxUsername');
             var rbxCard = document.getElementById('robloxVerifyStatus');
@@ -12357,6 +12699,9 @@ checkoutBtn.addEventListener('click', function() {
                     clearTimeout(rbxTimer);
                     runRobloxVerify();
                 });
+                if (rbxInput.value.trim()) {
+                    setTimeout(runRobloxVerify, 120);
+                }
             }
         }
 
@@ -12617,6 +12962,18 @@ var promoData = appliedPromo ? {
                         showToast('✅ Order placed! Order ID: ' + orderId);
                         var paidAmount = finalTotal;
                         var paidMethod = selectedPaymentMethod;
+                        var itemsSummary = items.map(function(it) {
+                            return it.title + (it.variantLabel ? ' (' + it.variantLabel + ')' : '') + ' × ' + it.quantity;
+                        }).join(', ');
+                        saveGameIdsToStorage(gameIds);
+                        savePendingPaymentSession({
+                            orderId: orderId,
+                            method: paidMethod,
+                            amount: paidAmount,
+                            items: itemsSummary,
+                            email: customerData.email || '',
+                            createdAt: Date.now()
+                        });
                         cart = [];
                         appliedPromo = null;
                         renderCart();
@@ -12746,6 +13103,142 @@ var promoData = appliedPromo ? {
             } catch (e) {}
         }
 
+        var PENDING_PAYMENTS_KEY = 'nex4up_pending_payments_v1';
+
+        function getPendingPaymentSessions() {
+            try {
+                var raw = localStorage.getItem(PENDING_PAYMENTS_KEY);
+                var list = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(list)) return [];
+                var cutoff = Date.now() - (72 * 60 * 60 * 1000);
+                var valid = list.filter(function(item) {
+                    return item && item.orderId && (!item.createdAt || item.createdAt >= cutoff);
+                });
+                if (valid.length !== list.length) {
+                    localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(valid));
+                }
+                return valid;
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function savePendingPaymentSession(entry) {
+            try {
+                if (!entry || !entry.orderId) return;
+                var list = getPendingPaymentSessions().filter(function(it) {
+                    return String(it.orderId) !== String(entry.orderId);
+                });
+                list.unshift({
+                    orderId: String(entry.orderId),
+                    method: entry.method || 'mae',
+                    amount: parseFloat(entry.amount) || 0,
+                    items: String(entry.items || ''),
+                    email: String(entry.email || ''),
+                    createdAt: entry.createdAt || Date.now()
+                });
+                localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(list.slice(0, 12)));
+                renderPendingReceiptHistoryBanner();
+            } catch (e) {}
+        }
+
+        function removePendingPaymentSession(orderId) {
+            try {
+                if (!orderId) return;
+                var list = getPendingPaymentSessions().filter(function(it) {
+                    return String(it.orderId).toUpperCase() !== String(orderId).toUpperCase();
+                });
+                localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(list));
+                renderPendingReceiptHistoryBanner();
+            } catch (e) {}
+        }
+
+        function renderPendingReceiptHistoryBanner() {
+            var banner = document.getElementById('pendingReceiptHistoryBanner');
+            var listEl = document.getElementById('pendingReceiptHistoryList');
+            var countEl = document.getElementById('pendingReceiptCountBadge');
+            if (!banner || !listEl) return;
+
+            var list = getPendingPaymentSessions();
+            if (countEl) countEl.textContent = list.length;
+
+            if (list.length === 0) {
+                banner.style.display = 'none';
+                listEl.innerHTML = '';
+                return;
+            }
+
+            banner.style.display = 'block';
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var item = list[i];
+                var mLabel = getMethodLabel(item.method);
+                var safeId = escapeHtml(item.orderId);
+                var safeMethod = escapeHtml(item.method || 'mae');
+                var amt = (parseFloat(item.amount) || 0).toFixed(2);
+                var agoStr = '';
+                if (item.createdAt) {
+                    var mins = Math.max(0, Math.floor((Date.now() - item.createdAt) / 60000));
+                    agoStr = mins < 1 ? 'Just now' : (mins < 60 ? mins + 'm ago' : Math.floor(mins / 60) + 'h ago');
+                }
+                html += '<div class="prb-item">' +
+                    '<div class="prb-item-meta">' +
+                        '<div class="prb-item-id">' + safeId + ' <span style="color:#8aa1c0;font-family:Inter,sans-serif;font-weight:600;font-size:12px;">• ' + CURRENCY + ' ' + amt + ' (' + escapeHtml(mLabel) + ')' + (agoStr ? ' • ' + agoStr : '') + '</span></div>' +
+                        (item.items ? '<div class="prb-item-detail">' + escapeHtml(item.items) + '</div>' : '') +
+                    '</div>' +
+                    '<div class="prb-item-actions">' +
+                        '<button type="button" class="prb-upload-btn" onclick="openQRModal(\'' + safeId + '\', \'' + safeMethod + '\', ' + amt + ', true)">' +
+                            '<i class="fas fa-receipt"></i> ' + (item.method === 'sociabuzz' ? 'Pay / Confirm' : 'Upload Receipt') +
+                        '</button>' +
+                        '<button type="button" class="prb-dismiss-btn" title="Remove from history" onclick="removePendingPaymentSession(\'' + safeId + '\')">' +
+                            '<i class="fas fa-times"></i>' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+            }
+            listEl.innerHTML = html;
+        }
+
+        function lookupOrderAndOpenReceiptModal(orderIdInputVal, triggerBtn) {
+            var oid = String(orderIdInputVal || '').trim().toUpperCase();
+            if (!oid) {
+                showToast('Please enter your Order ID (e.g. ORD-20261118-1234).');
+                return;
+            }
+            if (typeof google === 'undefined' || !google.script || !google.script.run) return;
+            var origHtml = triggerBtn ? triggerBtn.innerHTML : '';
+            if (triggerBtn) {
+                triggerBtn.disabled = true;
+                triggerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            }
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerHTML = origHtml; }
+                    if (!res || !res.success) {
+                        showToast((res && res.message) || 'Order ID not found.');
+                        return;
+                    }
+                    if (res.status === 'Paid' || res.status === 'Shipped' || res.status === 'Cancelled') {
+                        removePendingPaymentSession(res.orderId);
+                        showToast('Order ' + res.orderId + ' is already "' + res.status + '".');
+                        return;
+                    }
+                    savePendingPaymentSession({
+                        orderId: res.orderId,
+                        method: res.methodKey || 'mae',
+                        amount: res.amount || 0,
+                        items: res.items || '',
+                        createdAt: Date.now()
+                    });
+                    openQRModal(res.orderId, res.methodKey || 'mae', res.amount || 0, true);
+                })
+                .withFailureHandler(function(err) {
+                    if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerHTML = origHtml; }
+                    showToast('Lookup error: ' + err.message);
+                })
+                .getOrderForReceiptUpload(oid, (customer && customer.email) ? customer.email : '');
+        }
+
         function openQRModal(orderId, method, amount, allowLater) {
             currentQROrderId = orderId;
             currentQRMethodKey = method;
@@ -12761,6 +13254,8 @@ var promoData = appliedPromo ? {
                 swBtns[sb].classList.toggle('active', swBtns[sb].getAttribute('data-qrmethod') === method);
             }
 
+            var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
+            if (saveLaterBtn) saveLaterBtn.style.display = 'flex';
             var doneBtn = document.getElementById('qrDoneBtn');
             if (doneBtn) doneBtn.style.display = 'none';
 
@@ -12942,8 +13437,11 @@ var promoData = appliedPromo ? {
                 .withSuccessHandler(function(result) {
                     if (result && result.success) {
                         sociaBuzzPaymentConfirmed = true;
+                        removePendingPaymentSession(currentQROrderId);
                         var sbzActions = document.getElementById('sociaBuzzConfirmActions');
                         if (sbzActions) sbzActions.style.display = 'none';
+                        var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
+                        if (saveLaterBtn) saveLaterBtn.style.display = 'none';
                         document.getElementById('receiptNumberDisplay').textContent = result.receiptNumber || ('SBZ-' + currentQROrderId);
                         document.getElementById('receiptSuccess').style.display = 'block';
                         var doneBtn = document.getElementById('qrDoneBtn');
@@ -12966,32 +13464,69 @@ var promoData = appliedPromo ? {
 
         function handleReceiptFileSelect(file) {
             if (!file) return;
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('File is too large (max 5 MB).');
+            if (file.size > 12 * 1024 * 1024) {
+                showToast('File is too large (max 12 MB).');
                 return;
             }
-            var reader = new FileReader();
-            reader.onload = function(ev) {
-                pendingReceiptDataUrl = ev.target.result;
-                pendingReceiptFileName = file.name;
+            var applyReceiptPreview = function(dataUrl, fileName, isImg) {
+                pendingReceiptDataUrl = dataUrl;
+                pendingReceiptFileName = fileName;
 
                 var preview = document.getElementById('receiptPreview');
                 var previewImg = document.getElementById('receiptPreviewImg');
                 var previewName = document.getElementById('receiptPreviewName');
                 var uploadArea = document.getElementById('uploadArea');
 
-                if (file.type.indexOf('image/') === 0) {
+                if (isImg) {
                     previewImg.src = pendingReceiptDataUrl;
                     previewImg.style.display = 'block';
                 } else {
                     previewImg.style.display = 'none';
                 }
-                previewName.textContent = file.name;
+                previewName.textContent = fileName;
                 preview.style.display = 'flex';
                 if (uploadArea) uploadArea.style.display = 'none';
 
                 var uploadBtn = document.getElementById('receiptUploadBtn');
                 if (uploadBtn) uploadBtn.disabled = false;
+            };
+
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                var rawDataUrl = ev.target.result;
+                var isImage = file.type.indexOf('image/') === 0;
+                // Auto-compress large mobile receipt photos/screenshots (>900KB) for faster reliable upload
+                if (isImage && file.size > 900 * 1024) {
+                    var imgEl = new Image();
+                    imgEl.onload = function() {
+                        try {
+                            var maxDim = 1600;
+                            var w = imgEl.naturalWidth || imgEl.width;
+                            var h = imgEl.naturalHeight || imgEl.height;
+                            if (w > maxDim || h > maxDim) {
+                                var ratio = Math.min(maxDim / w, maxDim / h);
+                                w = Math.round(w * ratio);
+                                h = Math.round(h * ratio);
+                            }
+                            var canvas = document.createElement('canvas');
+                            canvas.width = w;
+                            canvas.height = h;
+                            var ctx = canvas.getContext('2d');
+                            ctx.drawImage(imgEl, 0, 0, w, h);
+                            var compressed = canvas.toDataURL('image/jpeg', 0.82);
+                            var baseName = String(file.name || 'receipt.jpg').replace(/\.[^.]+$/, '') + '.jpg';
+                            applyReceiptPreview(compressed, baseName, true);
+                        } catch (cErr) {
+                            applyReceiptPreview(rawDataUrl, file.name, true);
+                        }
+                    };
+                    imgEl.onerror = function() {
+                        applyReceiptPreview(rawDataUrl, file.name, true);
+                    };
+                    imgEl.src = rawDataUrl;
+                    return;
+                }
+                applyReceiptPreview(rawDataUrl, file.name, isImage);
             };
             reader.readAsDataURL(file);
         }
@@ -13008,8 +13543,11 @@ var promoData = appliedPromo ? {
             google.script.run
                 .withSuccessHandler(function(result) {
                     if (result && result.success) {
+                        removePendingPaymentSession(currentQROrderId);
                         document.getElementById('receiptActions').style.display = 'none';
                         document.getElementById('receiptPreview').style.display = 'none';
+                        var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
+                        if (saveLaterBtn) saveLaterBtn.style.display = 'none';
                         document.getElementById('receiptNumberDisplay').textContent = result.receiptNumber;
                         document.getElementById('receiptSuccess').style.display = 'block';
                         var doneBtn = document.getElementById('qrDoneBtn');
@@ -13037,24 +13575,77 @@ var promoData = appliedPromo ? {
             var fileInput = document.getElementById('receiptFileInput');
             var uploadBtn = document.getElementById('receiptUploadBtn');
             var sbzConfirmBtn = document.getElementById('sociaBuzzConfirmBtn');
+            var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
             var doneBtn = document.getElementById('qrDoneBtn');
 
-            // ✅ Prevent closing by clicking outside before completing payment step (unless reopened from My Orders)
+            // ✅ Prevent closing by clicking outside before completing payment step (unless reopened / saved)
             if (qrOverlay) {
                 qrOverlay.addEventListener('click', function(e) {
                     if (e.target === qrOverlay) {
                         if (window._qrAllowLater) {
                             closeQRModal();
                         } else if (currentQRMethodKey === 'sociabuzz' && !sociaBuzzPaymentConfirmed) {
-                            showToast('⚠️ Please click "I Have Completed Payment on SociaBuzz" after paying.');
+                            showToast('⚠️ Click "Save to History & Upload Receipt Later" below if you want to upload later.');
                         } else if (currentQRMethodKey !== 'sociabuzz' && pendingReceiptDataUrl === null) {
-                            showToast('⚠️ Please upload your payment receipt to complete the order.');
+                            showToast('⚠️ Click "Save to History & Upload Receipt Later" below if you want to upload later.');
                         } else {
                             closeQRModal();
                         }
                     }
                 });
             }
+
+            if (saveLaterBtn) {
+                saveLaterBtn.addEventListener('click', function() {
+                    if (currentQROrderId) {
+                        savePendingPaymentSession({
+                            orderId: currentQROrderId,
+                            method: currentQRMethodKey || 'mae',
+                            amount: currentQRAmount || 0,
+                            createdAt: Date.now()
+                        });
+                    }
+                    window._qrAllowLater = true;
+                    closeQRModal();
+                    renderPendingReceiptHistoryBanner();
+                    var banner = document.getElementById('pendingReceiptHistoryBanner');
+                    if (banner) banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    showToast('📌 Order saved in Pending Receipt History! Upload your receipt anytime.');
+                });
+            }
+
+            var prbToggle = document.getElementById('prbToggleLookupBtn');
+            var prbLookupRow = document.getElementById('prbLookupRow');
+            var prbLookupBtn = document.getElementById('prbLookupBtn');
+            var prbInput = document.getElementById('prbOrderIdInput');
+            if (prbToggle && prbLookupRow) {
+                prbToggle.addEventListener('click', function() {
+                    prbLookupRow.style.display = prbLookupRow.style.display === 'none' ? 'flex' : 'none';
+                    if (prbLookupRow.style.display === 'flex' && prbInput) prbInput.focus();
+                });
+            }
+            if (prbLookupBtn && prbInput) {
+                prbLookupBtn.addEventListener('click', function() {
+                    lookupOrderAndOpenReceiptModal(prbInput.value, prbLookupBtn);
+                });
+                prbInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        lookupOrderAndOpenReceiptModal(prbInput.value, prbLookupBtn);
+                    }
+                });
+            }
+
+            var drOverlay = document.getElementById('digitalReceiptOverlay');
+            var drClose = document.getElementById('digitalReceiptCloseBtn');
+            var drCopy = document.getElementById('digitalReceiptCopyBtn');
+            var drPrint = document.getElementById('digitalReceiptPrintBtn');
+            if (drClose && drOverlay) drClose.addEventListener('click', function() { drOverlay.classList.remove('open'); });
+            if (drOverlay) drOverlay.addEventListener('click', function(e) { if (e.target === drOverlay) drOverlay.classList.remove('open'); });
+            if (drPrint) drPrint.addEventListener('click', function() { window.print(); });
+            if (drCopy) drCopy.addEventListener('click', function() {
+                if (window._currentDigitalReceiptText) _copyQuickText(window._currentDigitalReceiptText, '📋 Receipt details copied!');
+            });
 
             var switcherBtns = document.querySelectorAll('#qrMethodSwitcher .qr-ms-btn');
             for (var sbi = 0; sbi < switcherBtns.length; sbi++) {
@@ -13488,7 +14079,7 @@ if (cart.length > 0) {
             select.innerHTML = html;
         }
 
-        function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(totalPages, totalItems) {
+        function renderAdminProductPagination(totalPages, totalItems) {
             var container = document.getElementById('adminProductPagination');
             if (!container) return;
 
@@ -13664,7 +14255,7 @@ if (cart.length > 0) {
             }
 
             // Render pagination
-            rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(totalPages, totalItems);
+            renderAdminProductPagination(totalPages, totalItems);
         }
 
         // ===== Event listeners for the admin product toolbar =====
@@ -15345,6 +15936,31 @@ function loadMyOrders() {
                 return;
             }
             myOrdersCache = res.orders || [];
+            // Sync Pending Receipt History across devices / refreshes
+            for (var si = 0; si < myOrdersCache.length; si++) {
+                var mo = myOrdersCache[si];
+                var moId = mo['Order ID'] || '';
+                var moPay = String(mo['Payment Status'] || '');
+                var moRec = String(mo['Receipt Number'] || '').trim();
+                var moPmRaw = String(mo['Payment Method'] || '').toLowerCase();
+                var moKey = 'mae';
+                if (moPmRaw.indexOf('sociabuzz') !== -1) moKey = 'sociabuzz';
+                else if (moPmRaw.indexOf('touch') !== -1 || moPmRaw.indexOf('tng') !== -1) moKey = 'tng';
+                else if (moPmRaw.indexOf('shopee') !== -1) moKey = 'shopee';
+                if (moPay === 'Awaiting Payment' && !moRec) {
+                    savePendingPaymentSession({
+                        orderId: moId,
+                        method: moKey,
+                        amount: parseFloat(mo['Total (RM)']) || 0,
+                        items: String(mo['Items'] || ''),
+                        email: customer.email || '',
+                        createdAt: Date.now()
+                    });
+                } else {
+                    removePendingPaymentSession(moId);
+                }
+            }
+            renderPendingReceiptHistoryBanner();
             renderOrderTabCounts();
             renderOrderList(activeOrderTab);
         })
@@ -15379,6 +15995,17 @@ function renderOrderList(tab) {
 
     var filtered = myOrdersCache.filter(function(o) { return (o._tab || 'All') === tab; });
 
+    var topLookupHtml = '';
+    if (tab === 'To Pay') {
+        topLookupHtml = '<div class="pending-receipt-banner" style="margin-bottom:14px;padding:12px 14px;">' +
+            '<div style="font-size:12.5px;font-weight:700;color:#f7d875;margin-bottom:8px;"><i class="fas fa-search"></i> Missing an order or checked out before signing in? Upload Receipt by Order ID:</div>' +
+            '<div class="prb-lookup-row" style="margin-top:0;">' +
+                '<input type="text" id="myOrdersLookupInput" placeholder="Enter Order ID (e.g. ORD-20261118-1234)" autocomplete="off" />' +
+                '<button type="button" id="myOrdersLookupBtn"><i class="fas fa-upload"></i> Open &amp; Upload Receipt</button>' +
+            '</div>' +
+        '</div>';
+    }
+
     if (filtered.length === 0) {
         var emptyMsg = {
             'All': 'You haven\'t placed any orders yet.',
@@ -15387,11 +16014,19 @@ function renderOrderList(tab) {
             'To Receive': 'No orders currently in transit.',
             'To Review': 'You have no pending reviews. Thank you for shopping with Nex4UpStore!'
         }[tab] || 'No orders found.';
-        myOrdersList.innerHTML = '<div class="order-empty-state"><i class="fas fa-box-open"></i><p>' + emptyMsg + '</p></div>';
+        myOrdersList.innerHTML = topLookupHtml + '<div class="order-empty-state"><i class="fas fa-box-open"></i><p>' + emptyMsg + '</p></div>';
+        if (tab === 'To Pay') {
+            var mlBtnEmpty = document.getElementById('myOrdersLookupBtn');
+            var mlInpEmpty = document.getElementById('myOrdersLookupInput');
+            if (mlBtnEmpty && mlInpEmpty) {
+                mlBtnEmpty.addEventListener('click', function() { lookupOrderAndOpenReceiptModal(mlInpEmpty.value, mlBtnEmpty); });
+                mlInpEmpty.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); lookupOrderAndOpenReceiptModal(mlInpEmpty.value, mlBtnEmpty); } });
+            }
+        }
         return;
     }
 
-    var html = '';
+    var html = topLookupHtml;
     for (var i = 0; i < filtered.length; i++) {
         var order = filtered[i];
         var orderId = order['Order ID'] || '';
@@ -15489,6 +16124,8 @@ function renderOrderList(tab) {
         }
 
         html += '<div class="order-actions">';
+        html += '<button class="rate-btn" style="background:#1e2a3a;color:#e8edf5;border:1px solid #2a3a52;" onclick="openDigitalReceiptModal(\'' + escapeHtml(orderId) + '\')">';
+        html += '<i class="fas fa-receipt"></i> Receipt</button>';
 
         if (tab === 'To Pay') {
             html += '<button class="rate-btn" style="background:linear-gradient(135deg,#2e7d32,#4caf50);color:#fff;" onclick="reopenOrderPaymentModal(\'' + escapeHtml(orderId) + '\')">';
@@ -15537,6 +16174,71 @@ function renderOrderList(tab) {
     }
 
     myOrdersList.innerHTML = html;
+    if (tab === 'To Pay') {
+        var mlBtn = document.getElementById('myOrdersLookupBtn');
+        var mlInp = document.getElementById('myOrdersLookupInput');
+        if (mlBtn && mlInp) {
+            mlBtn.addEventListener('click', function() { lookupOrderAndOpenReceiptModal(mlInp.value, mlBtn); });
+            mlInp.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); lookupOrderAndOpenReceiptModal(mlInp.value, mlBtn); } });
+        }
+    }
+}
+
+// ===== Official Digital Receipt Modal =====
+function openDigitalReceiptModal(orderId) {
+    var order = null;
+    for (var i = 0; i < myOrdersCache.length; i++) {
+        if (String(myOrdersCache[i]['Order ID'] || '') === String(orderId)) {
+            order = myOrdersCache[i];
+            break;
+        }
+    }
+    if (!order) {
+        showToast('Order details not loaded yet.');
+        return;
+    }
+    var dateStr = String(order['Date'] || '-');
+    var payMethod = String(order['Payment Method'] || '-');
+    var payStatus = String(order['Payment Status'] || '-');
+    var fulStatus = String(order['Fulfilment Status'] || order._customerStatus || '-');
+    var totalRm = (parseFloat(order['Total (RM)']) || 0).toFixed(2);
+    var recNum = String(order['Receipt Number'] || '-');
+    var itemsStr = String(order['Items'] || '-');
+    var ptsUsed = parseInt(order['Points Used'], 10) || 0;
+    var ptsEarned = parseInt(order['Points Earned'], 10) || 0;
+
+    var bodyHtml =
+        '<div style="text-align:center;padding-bottom:12px;border-bottom:1px solid #1e2a3a;margin-bottom:12px;">' +
+            '<div style="font-size:16px;font-weight:800;color:#e8edf5;">NEX<span style="color:#f7d875;">4</span>UP STORE</div>' +
+            '<div style="font-size:11.5px;color:#8aa1c0;">Official Order Summary</div>' +
+        '</div>' +
+        '<div class="dr-row"><span style="color:#8aa1c0;">Order ID</span><strong style="font-family:monospace;color:#f7d875;">' + escapeHtml(orderId) + '</strong></div>' +
+        '<div class="dr-row"><span style="color:#8aa1c0;">Date</span><span>' + escapeHtml(dateStr) + '</span></div>' +
+        '<div class="dr-row"><span style="color:#8aa1c0;">Payment Method</span><span>' + escapeHtml(payMethod) + '</span></div>' +
+        '<div class="dr-row"><span style="color:#8aa1c0;">Payment Ref #</span><span style="font-family:monospace;">' + escapeHtml(recNum) + '</span></div>' +
+        '<div class="dr-row"><span style="color:#8aa1c0;">Payment Status</span><strong>' + escapeHtml(payStatus) + '</strong></div>' +
+        '<div class="dr-row"><span style="color:#8aa1c0;">Fulfilment</span><span>' + escapeHtml(fulStatus) + '</span></div>' +
+        '<div style="margin:10px 0;padding:10px;background:#0b0e14;border:1px solid #1e2a3a;border-radius:10px;font-size:12.5px;">' +
+            '<div style="color:#8aa1c0;margin-bottom:4px;">Items</div>' +
+            '<div style="color:#e8edf5;line-height:1.5;">' + escapeHtml(itemsStr) + '</div>' +
+        '</div>' +
+        (ptsUsed > 0 ? '<div class="dr-row"><span style="color:#8aa1c0;">Points Redeemed</span><span>' + ptsUsed + ' pts</span></div>' : '') +
+        (ptsEarned > 0 ? '<div class="dr-row"><span style="color:#8aa1c0;">Points Earned</span><span style="color:#4caf50;">+' + ptsEarned + ' pts</span></div>' : '') +
+        '<div class="dr-row" style="font-size:15px;font-weight:800;padding-top:10px;"><span>Total Paid</span><span style="color:#f7d875;">' + CURRENCY + ' ' + totalRm + '</span></div>';
+
+    window._currentDigitalReceiptText =
+        'NEX4UP STORE RECEIPT\n' +
+        'Order ID: ' + orderId + '\n' +
+        'Date: ' + dateStr + '\n' +
+        'Items: ' + itemsStr + '\n' +
+        'Method: ' + payMethod + ' (' + recNum + ')\n' +
+        'Status: ' + payStatus + ' / ' + fulStatus + '\n' +
+        'Total: ' + CURRENCY + ' ' + totalRm;
+
+    var bodyEl = document.getElementById('digitalReceiptBody');
+    var overlayEl = document.getElementById('digitalReceiptOverlay');
+    if (bodyEl) bodyEl.innerHTML = bodyHtml;
+    if (overlayEl) overlayEl.classList.add('open');
 }
 
 // ===== Reopen payment modal from My Orders -> To Pay =====
@@ -15565,7 +16267,10 @@ function cancelMyOrder(orderId) {
     google.script.run
         .withSuccessHandler(function(res) {
             showToast(res.message || 'Order cancelled.');
-            if (res.success) loadMyOrders();
+            if (res.success) {
+                removePendingPaymentSession(orderId);
+                loadMyOrders();
+            }
         })
         .withFailureHandler(function(err) {
             showToast('Error: ' + err.message);
@@ -16608,6 +17313,7 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
             }
 
             loadGames();
+            renderPendingReceiptHistoryBanner();
             setTimeout(setupCarouselArrows, 800);
         }
 
@@ -19255,8 +19961,8 @@ function renderRobuxDashboard(res, range) {
 
     // Render the tables safely
     try { renderRobuxPricingTable(res.packages || []); } catch(e) { console.log('Pricing table err', e); }
-    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.purchases || []); } catch(e) { console.log('Purchase table err', e); }
-    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.transactions || []); } catch(e) { console.log('Tx table err', e); }
+    try { renderRobuxPurchaseHistory(res.purchases || []); } catch(e) { console.log('Purchase table err', e); }
+    try { renderRobuxTransactionHistory(res.transactions || []); } catch(e) { console.log('Tx table err', e); }
     try { renderRobuxBackorders(res.backorders || []); } catch(e) { console.log('Backorder table err', e); }
 }
 
@@ -19306,7 +20012,7 @@ function renderRobuxPricingTable(packages) {
     document.getElementById('robuxPricingTable').innerHTML = html;
 }
 
-function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
+function renderRobuxPurchaseHistory(rows) {
     if (!rows.length) {
         document.getElementById('robuxPurchaseHistory').innerHTML = '<div class="empty-msg">No purchases recorded yet.</div>';
         return;
@@ -19327,7 +20033,7 @@ function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
     document.getElementById('robuxPurchaseHistory').innerHTML = html;
 }
 
-function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
+function renderRobuxTransactionHistory(rows) {
     if (!rows.length) {
         document.getElementById('robuxTransactionHistory').innerHTML = '<div class="empty-msg">No transactions yet.</div>';
         return;
@@ -20925,8 +21631,8 @@ renderRobuxDashboard = function (res, range) {
     if (elLowStock) elLowStock.value = st.lowStockThreshold || 2000;
 
     try { renderRobuxPricingTable(res.packages || []); } catch (e) {}
-    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.purchases || []); } catch (e) {}
-    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.transactions || []); } catch (e) {}
+    try { renderRobuxPurchaseHistory(res.purchases || []); } catch (e) {}
+    try { renderRobuxTransactionHistory(res.transactions || []); } catch (e) {}
     try { renderRobuxBackorders(res.backorders || []); } catch (e) {}
 };
 
