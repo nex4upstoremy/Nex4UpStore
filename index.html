@@ -7,13 +7,15 @@
         <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1kmjuyfdgwMT30GV-yV1nOtwCv2FfEbSD" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://script.google.com" crossorigin />
+    <link rel="dns-prefetch" href="https://script.google.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
     <!-- ✅ Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <!-- ✅ Image Cropper -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js" defer></script>
     <style>
         /* ============================================================
            IMAGE UPLOAD UI (Admin Add/Edit Game)
@@ -5198,8 +5200,107 @@
         }
         .pm-options {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+        }
+        .payment-method-option .pm-logo-sbz {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #00c853, #1b5e20);
+            color: #fff;
+            font-size: 20px;
+        }
+        .sbz-pay-card {
+            width: 100%;
+            background: #0b0e14;
+            border: 1px solid #2e7d32;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: #e8edf5;
+        }
+        .sbz-pay-card.qr-display-override {
+            background: transparent;
+            padding: 0;
+            max-width: 100%;
+            box-shadow: none;
+        }
+        .sbz-copy-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: #121821;
+            border: 1px solid #1e2a3a;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 13px;
+        }
+        .sbz-copy-btn {
+            background: #1e2a3a;
+            color: #f7d875;
+            border: 1px solid #2a3a52;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .sbz-copy-btn:hover { background: #2a3a52; }
+        .sbz-pay-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: #fff !important;
+            text-decoration: none;
+            padding: 13px 18px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 6px 20px rgba(40,167,69,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .sbz-pay-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(40,167,69,0.45); }
+        .sbz-confirm-btn {
+            width: 100%;
+            background: #f7d875;
+            color: #0b0e14;
+            border: none;
+            border-radius: 30px;
+            padding: 13px 18px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .sbz-confirm-btn:hover:not(:disabled) { background: #ffe08a; transform: translateY(-1px); }
+        .sbz-confirm-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+        .sbz-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(76,175,80,0.14);
+            color: #4caf50;
+            border: 1px solid rgba(76,175,80,0.35);
+            white-space: nowrap;
         }
         .payment-method-option {
             position: relative;
@@ -5568,7 +5669,7 @@
                 max-height: 95dvh;
             }
             .payment-method-section .pm-options {
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
             }
             .payment-method-option { padding: 10px 6px; }
@@ -6290,9 +6391,10 @@
                 grid-template-columns: 1fr !important;
             }
 
-            /* --- Payment options on checkout: 3 in row but tiny --- */
+            /* --- Payment options on checkout: 2x2 grid on narrow phones --- */
             .pm-options {
-                gap: 6px !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
             }
             .payment-method-option {
                 padding: 10px 4px !important;
@@ -8598,7 +8700,7 @@ updateProfileDropdown();
                         </div>
                         <div class="mp-trust-item">
                             <div class="mp-trust-icon"><i class="fas fa-shield-alt"></i></div>
-                            <div class="mp-trust-text"><strong>100% Secure Payment</strong><span>MAE, TNG &amp; ShopeePay QR</span></div>
+                            <div class="mp-trust-text"><strong>100% Secure Payment</strong><span>MAE, TNG, ShopeePay &amp; SociaBuzz</span></div>
                         </div>
                         <div class="mp-trust-item">
                             <div class="mp-trust-icon"><i class="fas fa-coins"></i></div>
@@ -8695,6 +8797,9 @@ updateProfileDropdown();
                         <div class="pm-item" title="ShopeePay">
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" loading="lazy" />
                             <span class="pm-name">ShopeePay</span>
+                        </div>
+                        <div class="pm-item" title="SociaBuzz (Instant Payment)">
+                            <span class="sbz-badge-pill" style="padding:7px 10px; font-size:12px;"><i class="fas fa-bolt"></i> SociaBuzz</span>
                         </div>
                     </div>
                     <div class="pm-secure">
@@ -9005,6 +9110,31 @@ updateProfileDropdown();
                         <div class="stat-card" style="border-bottom: 3px solid #4caf50; background: rgba(76,175,80,0.05);"><div class="stat-number profit" id="dashNetProfit" style="font-size:24px;">RM 0.00</div><div class="stat-label">Net Profit</div></div>
                     </div>
 
+                    <div id="sociaBuzzSummaryCard" style="background:#121821; border:1px solid #2e7d32; border-radius:16px; padding:18px 20px; margin:18px 0 24px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                            <h3 style="margin:0; font-size:15px; color:#4caf50;"><i class="fas fa-bolt"></i> SociaBuzz Payout &amp; RM 1.50 Withdrawal Cut</h3>
+                            <span id="sbzDashOrdersBadge" class="sbz-badge-pill">0 Orders</span>
+                        </div>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:12px;">
+                            <div style="background:#0b0e14; border:1px solid #1e2a3a; border-radius:12px; padding:12px 14px;">
+                                <div style="font-size:11px; color:#6a7f9e; text-transform:uppercase;">SociaBuzz Gross</div>
+                                <div id="sbzDashGross" style="font-size:18px; font-weight:800; color:#e8edf5; margin-top:4px;">RM 0.00</div>
+                            </div>
+                            <div style="background:#0b0e14; border:1px solid #1e2a3a; border-radius:12px; padding:12px 14px;">
+                                <div style="font-size:11px; color:#6a7f9e; text-transform:uppercase;">SociaBuzz Gateway Fee</div>
+                                <div id="sbzDashGwFee" style="font-size:18px; font-weight:800; color:#ffa726; margin-top:4px;">- RM 0.00</div>
+                            </div>
+                            <div style="background:#0b0e14; border:1px solid #1e2a3a; border-radius:12px; padding:12px 14px;">
+                                <div id="sbzDashCutLabel" style="font-size:11px; color:#6a7f9e; text-transform:uppercase;">Withdrawal Cut (RM 1.50 × 1)</div>
+                                <div id="sbzDashWithdrawalCut" style="font-size:18px; font-weight:800; color:#ff6b6b; margin-top:4px;">- RM 0.00</div>
+                            </div>
+                            <div style="background:#0b0e14; border:1px solid #2e7d32; border-radius:12px; padding:12px 14px;">
+                                <div style="font-size:11px; color:#8aa1c0; text-transform:uppercase;">Net Receivable</div>
+                                <div id="sbzDashNet" style="font-size:18px; font-weight:800; color:#4caf50; margin-top:4px;">RM 0.00</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="extra-sections">
                         <div class="extra-card" id="lowStockCard">
                             <h3><i class="fas fa-exclamation-triangle" style="color:#ff6b6b;"></i> Low Stock (≤ 5)</h3>
@@ -9036,13 +9166,20 @@ updateProfileDropdown();
                         <button class="submit-btn" id="refreshApprovalBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
                     </div>
 
-                    <!-- ✅ NEW: Receipt search bar -->
-                    <div class="product-toolbar" style="grid-template-columns: 1fr auto;">
+                    <!-- ✅ NEW: Receipt search bar + Payment Method Filter -->
+                    <div class="product-toolbar" style="grid-template-columns: 1fr auto auto;">
                         <div class="toolbar-search" id="approvalSearchWrapper">
                             <i class="fas fa-receipt"></i>
-                            <input type="text" id="approvalSearchInput" placeholder="Search by Receipt Number or Order ID..." autocomplete="off" />
+                            <input type="text" id="approvalSearchInput" placeholder="Search by Receipt Number, SociaBuzz Ref, or Order ID..." autocomplete="off" />
                             <button type="button" id="approvalSearchClear" title="Clear"><i class="fas fa-times"></i></button>
                         </div>
+                        <select id="approvalMethodFilter" style="background:#0b0e14; border:1px solid #2a3a52; color:#e8edf5; padding:10px 14px; border-radius:10px; font-family:'Inter',sans-serif; font-size:13px; font-weight:600; outline:none; cursor:pointer;">
+                            <option value="all">All Payment Methods</option>
+                            <option value="sociabuzz">⚡ SociaBuzz</option>
+                            <option value="mae">MAE</option>
+                            <option value="tng">Touch 'n Go</option>
+                            <option value="shopee">ShopeePay</option>
+                        </select>
                         <span id="approvalSearchCount" class="toolbar-count">0 orders</span>
                     </div>
 
@@ -9247,10 +9384,13 @@ updateProfileDropdown();
     
     <div style="background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:24px; margin-bottom:24px;">
         <h3 style="margin-bottom:12px;">Global Cost Settings</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:16px; margin-bottom:16px;">
             <div class="field"><label>Default Commission Rate (%)</label><input type="number" id="cfgDefaultComm" /></div>
             <div class="field"><label>Payment Gateway Fee (%)</label><input type="number" id="cfgGwFee" step="0.1" /></div>
             <div class="field"><label>Platform Fee (RM)</label><input type="number" id="cfgPlatformFee" step="0.01" /></div>
+            <div class="field"><label>SociaBuzz Fee (%)</label><input type="number" id="cfgSociaBuzzFee" step="0.1" /></div>
+            <div class="field"><label>SociaBuzz Withdrawal Fee (RM)</label><input type="number" id="cfgSociaBuzzWithdrawalFee" step="0.01" /></div>
+            <div class="field"><label>SociaBuzz Withdrawals Count</label><input type="number" id="cfgSociaBuzzWithdrawalsCount" step="1" min="0" /></div>
         </div>
         <button class="submit-btn" id="saveCostSettingsBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-save"></i> Save Settings</button>
     </div>
@@ -10015,6 +10155,12 @@ updateProfileDropdown();
                             <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" />
                             <span class="pm-name">ShopeePay</span>
                         </label>
+                        <label class="payment-method-option" data-method="sociabuzz">
+                            <input type="radio" name="paymentMethod" value="sociabuzz" />
+                            <span class="pm-check"><i class="fas fa-check"></i></span>
+                            <span class="pm-logo pm-logo-sbz" aria-hidden="true"><i class="fas fa-bolt"></i></span>
+                            <span class="pm-name">SociaBuzz</span>
+                        </label>
                     </div>
                     <div id="paymentMethodError" style="color:#ff6b6b; font-size:13px; margin-top:6px; min-height:18px;"></div>
                 </div>
@@ -10153,7 +10299,7 @@ updateProfileDropdown();
             </div>
 
             <div class="receipt-upload-section" id="receiptUploadSection">
-                <h4><i class="fas fa-receipt"></i> Upload Payment Receipt</h4>
+                <h4 id="receiptSectionTitle"><i class="fas fa-receipt"></i> Upload Payment Receipt</h4>
                 <label class="upload-area" id="uploadArea" for="receiptFileInput">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <span class="upload-text">Tap to upload receipt</span>
@@ -10169,12 +10315,20 @@ updateProfileDropdown();
                         <i class="fas fa-upload"></i> Submit Receipt
                     </button>
                 </div>
+                <div id="sociaBuzzConfirmActions" style="display:none; flex-direction:column; gap:10px; margin-top:8px;">
+                    <button type="button" class="sbz-confirm-btn" id="sociaBuzzConfirmBtn">
+                        <i class="fas fa-check-circle"></i> I Have Completed Payment on SociaBuzz
+                    </button>
+                    <p style="font-size:12px; color:#8aa1c0; text-align:center; margin:0;">
+                        No receipt upload required for SociaBuzz. Clicking above notifies Admin on Telegram immediately.
+                    </p>
+                </div>
                 <div class="receipt-success" id="receiptSuccess">
                     <i class="fas fa-check-circle"></i>
-                    <h4>Receipt Submitted!</h4>
-                    <p style="font-size:12px; color:#8aa1c0; margin-top:4px;">Your receipt number:</p>
+                    <h4 id="receiptSuccessHeading">Receipt Submitted!</h4>
+                    <p style="font-size:12px; color:#8aa1c0; margin-top:4px;">Your reference number:</p>
                     <span class="receipt-num" id="receiptNumberDisplay">RCT-XXXXXXXX-XXXX</span>
-                    <p style="font-size:12px; color:#6a7f9e; margin-top:10px;">Admin will verify and process your order shortly.</p>
+                    <p id="receiptSuccessSub" style="font-size:12px; color:#6a7f9e; margin-top:10px;">Admin will verify and process your order shortly.</p>
                 </div>
                 
                 <!-- ✅ THE NEW DONE BUTTON (Place it here) -->
@@ -10361,10 +10515,11 @@ updateProfileDropdown();
                 <p style="margin-bottom: 12px;">
                     All transactions are verified manually by our team. We accept:
                 </p>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 14px;">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHOYpS3G_bIUHBJNp_xKD1_7NxSF3J66qxMX1VzWrq5g&s=10" alt="MAE" style="width:40px; height:28px; object-fit:contain; background:#fff; border-radius:6px; padding:3px;" />
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPQhtet5iK5zwJYL00UIrGJUvz3_NlK4y5urak093NHg&s=10" alt="TNG" style="width:40px; height:28px; object-fit:contain; background:#fff; border-radius:6px; padding:3px;" />
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" style="width:40px; height:28px; object-fit:contain; background:#fff; border-radius:6px; padding:3px;" />
+                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom: 14px;">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHOYpS3G_bIUHBJNp_xKD1_7NxSF3J66qxMX1VzWrq5g&s=10" alt="MAE" loading="lazy" style="width:40px; height:28px; object-fit:contain; background:#fff; border-radius:6px; padding:3px;" />
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPQhtet5iK5zwJYL00UIrGJUvz3_NlK4y5urak093NHg&s=10" alt="TNG" loading="lazy" style="width:40px; height:28px; object-fit:contain; background:#fff; border-radius:6px; padding:3px;" />
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" loading="lazy" style="width:40px; height:28px; object-fit:contain; background:#fff; border-radius:6px; padding:3px;" />
+                    <span class="sbz-badge-pill"><i class="fas fa-bolt"></i> SociaBuzz</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#4caf50; background:rgba(76,175,80,0.08); border:1px solid rgba(76,175,80,0.25); border-radius:8px; padding:8px 12px;">
                     <i class="fas fa-check-circle" style="color:#4caf50;"></i>
@@ -10640,11 +10795,15 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
         // ===== PAYMENT FLOW STATE (NEW) =====
         var selectedPaymentMethod = null;
         var currentQROrderId = null;
+        var currentQRMethodKey = '';
         var currentQRMethodLabel = '';
         var currentQRAmount = 0;
         var pendingReceiptDataUrl = null;
         var pendingReceiptFileName = '';
+        var sociaBuzzPaymentConfirmed = false;
+        var SOCIABUZZ_TRIBE_URL = 'https://sociabuzz.com/nex4up/tribe';
         var paymentQRsCache = null;
+        var approvalMethodFilter = 'all';
 
 // ================================================================
 // REFERRAL DETECTION (safe for both GAS and GitHub)
@@ -11001,34 +11160,117 @@ function showStoreView() {
         // ================================================================
         // 5. LOAD GAMES
         // ================================================================
+var STORE_LOCAL_GAMES_KEY = 'nex4up_games_cache_v1';
+var STORE_LOCAL_GENRES_KEY = 'nex4up_genres_cache_v1';
+
+function _saveStoreLocalCache(games, genres) {
+    try {
+        if (Array.isArray(games) && games.length > 0) {
+            localStorage.setItem(STORE_LOCAL_GAMES_KEY, JSON.stringify(games));
+        }
+        if (genres && typeof genres === 'object') {
+            localStorage.setItem(STORE_LOCAL_GENRES_KEY, JSON.stringify(genres));
+        }
+    } catch (e) {}
+}
+
+function _loadStoreLocalCache() {
+    try {
+        var gRaw = localStorage.getItem(STORE_LOCAL_GAMES_KEY);
+        var iRaw = localStorage.getItem(STORE_LOCAL_GENRES_KEY);
+        if (!gRaw) return null;
+        var games = JSON.parse(gRaw);
+        var genres = iRaw ? JSON.parse(iRaw) : {};
+        if (!Array.isArray(games) || games.length === 0) return null;
+        return { games: games, genreImages: genres || {} };
+    } catch (e) {
+        return null;
+    }
+}
+
 function loadGames() {
-    grid.innerHTML = createSkeletonCards(6);
+    var cached = _loadStoreLocalCache();
+    if (cached) {
+        allGames = cached.games;
+        genreImages = cached.genreImages;
+        renderAll();
+        renderAdminList();
+    } else {
+        grid.innerHTML = createSkeletonCards(6);
+    }
+
+    function applyFreshData(gamesData, genresData) {
+        allGames = Array.isArray(gamesData) ? gamesData : [];
+        genreImages = genresData || {};
+        _saveStoreLocalCache(allGames, genreImages);
+        renderAll();
+        renderAdminList();
+        if (isAdmin) {
+            loadOrders();
+            loadAdvancedDashboard();
+            loadPendingOrders();
+        }
+    }
+
+    function loadGamesParallelFallback() {
+        var pending = 2;
+        var freshGames = null;
+        var freshGenres = {};
+        var gamesFailed = false;
+
+        function onPartDone() {
+            pending--;
+            if (pending > 0) return;
+            if (gamesFailed) {
+                if (!cached) {
+                    allGames = getSampleGames();
+                    genreImages = {};
+                    renderAll();
+                    renderAdminList();
+                }
+                return;
+            }
+            applyFreshData(freshGames, freshGenres);
+        }
+
+        google.script.run
+            .withSuccessHandler(function (data) {
+                freshGames = data || [];
+                onPartDone();
+            })
+            .withFailureHandler(function (err) {
+                console.error('❌ Failed to load games:', err);
+                gamesFailed = true;
+                if (!cached) showBackendError(err);
+                onPartDone();
+            })
+            .getGamesData();
+
+        google.script.run
+            .withSuccessHandler(function (images) {
+                freshGenres = images || {};
+                onPartDone();
+            })
+            .withFailureHandler(function () {
+                freshGenres = {};
+                onPartDone();
+            })
+            .getGenreImages();
+    }
 
     google.script.run
-        .withSuccessHandler(function (data) {
-            allGames = data || [];
-            loadPublicGenreImages(function () {
-                renderAll();
-                renderAdminList();
-                if (isAdmin) {
-                    loadOrders();
-                    loadAdvancedDashboard();
-                    loadPendingOrders();
-                }
-            });
+        .withSuccessHandler(function (res) {
+            if (res && Array.isArray(res.games)) {
+                applyFreshData(res.games, res.genreImages || {});
+            } else {
+                // Backward compatibility if GAS hasn't deployed getStoreBootstrapData yet
+                loadGamesParallelFallback();
+            }
         })
-        .withFailureHandler(function (err) {
-            console.error('❌ Failed to load games:', err);
-
-            // ⛔ DO NOT call loadPublicGenreImages() here — the backend is down.
-            // Just render fallback data and stop.
-            allGames = getSampleGames();
-            genreImages = {};
-            renderAll();
-            renderAdminList();
-            showBackendError(err);
+        .withFailureHandler(function () {
+            loadGamesParallelFallback();
         })
-        .getGamesData();
+        .getStoreBootstrapData();
 }
 
         function loadPublicGenreImages(callback) {
@@ -11093,7 +11335,7 @@ var allActive = currentFilter === 'all' ? 'active' : '';
 var allImg = genreImages['All'] || '';
 html += '<div class="genre-card ' + allActive + '" data-filter="all">';
 if (allImg) {
-    html += '<img src="' + allImg + '" alt="All" onerror="this.style.display=\'none\'" />';
+    html += '<img src="' + allImg + '" alt="All" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
 } else {
     html += '<div class="no-image"><i class="fas fa-th"></i><span>All</span></div>';
 }
@@ -11105,7 +11347,7 @@ var hotActive = currentFilter === 'hotselling' ? 'active' : '';
 var hotImg = genreImages['Hot Selling'] || '';
 html += '<div class="genre-card ' + hotActive + '" data-filter="hotselling">';
 if (hotImg) {
-    html += '<img src="' + hotImg + '" alt="Hot Selling" onerror="this.style.display=\'none\'" />';
+    html += '<img src="' + hotImg + '" alt="Hot Selling" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
 } else {
     html += '<div class="no-image"><i class="fas fa-fire"></i><span>Hot</span></div>';
 }
@@ -11119,7 +11361,7 @@ html += '</div>';
                 var imgUrl = genreImages[g] || '';
                 html += '<div class="genre-card ' + active + '" data-filter="' + g + '">';
                 if (imgUrl) {
-                    html += '<img src="' + imgUrl + '" alt="' + g + '" onerror="this.style.display=\'none\'" />';
+                    html += '<img src="' + imgUrl + '" alt="' + g + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
                 } else {
                     html += '<div class="no-image"><i class="fas fa-tag"></i><span>' + g + '</span></div>';
                 }
@@ -11302,7 +11544,7 @@ html += '</div>';
 
                 html += '<div class="game-card" data-id="' + game.id + '">';
                 html += '<div class="img-wrap">';
-html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" loading="lazy" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
+html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
                 if (game.badge) html += '<span class="badge-top">' + game.badge + '</span>';
                 if (isAdmin) {
                     html += '<button class="edit-product-btn" data-id="' + game.id + '" title="Edit product"><i class="fas fa-edit"></i></button>';
@@ -11556,7 +11798,7 @@ html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title 
                         CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2) :
                         CURRENCY + ' ' + game.price.toFixed(2);
                     html += '<div class="dropdown-item" data-gameid="' + game.id + '">';
-html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
+html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
                     html += '<div class="info"><div class="name">' + game.title + '</div><div class="price">' + price + '</div></div>';
                     html += '</div>';
                 }
@@ -11781,7 +12023,7 @@ html += '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title 
                 total += subtotal;
                 var vKey = item.variantKey || '';
                 html += '<div class="cart-item">';
-html += '<img src="' + (item.image || PLACEHOLDER_IMG) + '" alt="' + item.title + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
+html += '<img src="' + (item.image || PLACEHOLDER_IMG) + '" alt="' + item.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />';
                 html += '<div class="info">';
                 html += '<h4>' + item.title + '</h4>';
                 if (item.variantLabel) {
@@ -12606,57 +12848,173 @@ var promoData = appliedPromo ? {
             if (method === 'mae') return 'MAE';
             if (method === 'tng') return "Touch 'n Go";
             if (method === 'shopee') return 'ShopeePay';
+            if (method === 'sociabuzz') return 'SociaBuzz';
             return 'Payment';
         }
 
-            function openQRModal(orderId, method, amount) {
+        function _copyQuickText(txt, toastMessage) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(String(txt)).then(function() {
+                        if (toastMessage) showToast(toastMessage);
+                    }).catch(function() {
+                        if (toastMessage) showToast(toastMessage);
+                    });
+                    return;
+                }
+                var ta = document.createElement('textarea');
+                ta.value = String(txt);
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                if (toastMessage) showToast(toastMessage);
+            } catch (e) {}
+        }
+
+        function openQRModal(orderId, method, amount) {
             currentQROrderId = orderId;
+            currentQRMethodKey = method;
             currentQRMethodLabel = getMethodLabel(method);
-            currentQRAmount = amount;
+            currentQRAmount = parseFloat(amount) || 0;
             pendingReceiptDataUrl = null;
             pendingReceiptFileName = '';
+            sociaBuzzPaymentConfirmed = false;
 
-            // ✅ ADD THESE 2 LINES HERE:
             var doneBtn = document.getElementById('qrDoneBtn');
-            if (doneBtn) doneBtn.style.display = 'none'; 
+            if (doneBtn) doneBtn.style.display = 'none';
 
             document.getElementById('qrOrderId').textContent = orderId;
-            // ... rest of the function ...
             document.getElementById('qrMethod').textContent = currentQRMethodLabel;
-            document.getElementById('qrAmount').textContent = CURRENCY + ' ' + amount.toFixed(2);
-            document.getElementById('qrInstructionsMethod').textContent = currentQRMethodLabel + ' app';
+            document.getElementById('qrAmount').textContent = CURRENCY + ' ' + currentQRAmount.toFixed(2);
 
+            var display = document.getElementById('qrDisplay');
+            var instrEl = document.getElementById('qrInstructions');
+            var secTitle = document.getElementById('receiptSectionTitle');
             var preview = document.getElementById('receiptPreview');
-            if (preview) preview.style.display = 'none';
             var uploadArea = document.getElementById('uploadArea');
-            if (uploadArea) uploadArea.style.display = 'flex';
             var actions = document.getElementById('receiptActions');
-            if (actions) actions.style.display = 'flex';
+            var sbzActions = document.getElementById('sociaBuzzConfirmActions');
+            var sbzBtn = document.getElementById('sociaBuzzConfirmBtn');
             var success = document.getElementById('receiptSuccess');
-            if (success) success.style.display = 'none';
+            var successHead = document.getElementById('receiptSuccessHeading');
+            var successSub = document.getElementById('receiptSuccessSub');
             var uploadBtn = document.getElementById('receiptUploadBtn');
-            if (uploadBtn) { uploadBtn.disabled = true; uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Submit Receipt'; }
             var fileInput = document.getElementById('receiptFileInput');
+
+            if (preview) preview.style.display = 'none';
+            if (success) success.style.display = 'none';
             if (fileInput) fileInput.value = '';
+
+            if (method === 'sociabuzz') {
+                if (display) display.classList.add('sbz-pay-card', 'qr-display-override');
+                if (uploadArea) uploadArea.style.display = 'none';
+                if (actions) actions.style.display = 'none';
+                if (sbzActions) sbzActions.style.display = 'flex';
+                if (sbzBtn) {
+                    sbzBtn.disabled = false;
+                    sbzBtn.innerHTML = '<i class="fas fa-check-circle"></i> I Have Completed Payment on SociaBuzz';
+                }
+                if (secTitle) secTitle.innerHTML = '<i class="fas fa-bolt" style="color:#4caf50;"></i> Confirm SociaBuzz Payment (No Receipt Needed)';
+                if (instrEl) {
+                    instrEl.innerHTML =
+                        '<strong>How to pay via SociaBuzz:</strong><br />' +
+                        '1. Click <strong>Pay ' + CURRENCY + ' ' + currentQRAmount.toFixed(2) + ' on SociaBuzz</strong> above<br />' +
+                        '2. Enter amount <strong>' + CURRENCY + ' ' + currentQRAmount.toFixed(2) + '</strong> &amp; paste Order ID <code>' + escapeHtml(orderId) + '</code> in message<br />' +
+                        '3. Return here and click <strong>I Have Completed Payment on SociaBuzz</strong> (no receipt upload required!)';
+                }
+                if (successHead) successHead.textContent = 'SociaBuzz Payment Submitted!';
+                if (successSub) successSub.textContent = 'Telebot notified! Admin will verify on SociaBuzz and approve your order shortly.';
+            } else {
+                if (display) display.classList.remove('sbz-pay-card', 'qr-display-override');
+                if (uploadArea) uploadArea.style.display = 'flex';
+                if (actions) actions.style.display = 'flex';
+                if (sbzActions) sbzActions.style.display = 'none';
+                if (secTitle) secTitle.innerHTML = '<i class="fas fa-receipt"></i> Upload Payment Receipt';
+                if (instrEl) {
+                    instrEl.innerHTML =
+                        '<strong>How to pay:</strong><br />' +
+                        '1. Open your <span id="qrInstructionsMethod">' + escapeHtml(currentQRMethodLabel) + ' app</span><br />' +
+                        '2. Scan the QR code above<br />' +
+                        '3. Pay the exact amount shown';
+                }
+                if (uploadBtn) { uploadBtn.disabled = true; uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Submit Receipt'; }
+                if (successHead) successHead.textContent = 'Receipt Submitted!';
+                if (successSub) successSub.textContent = 'Admin will verify and process your order shortly.';
+            }
 
             document.getElementById('qrOverlay').classList.add('open');
             loadQRForMethod(method);
         }
 
         function closeQRModal() {
-            // ✅ Prevent closing if a receipt hasn't been uploaded yet
-            if (pendingReceiptDataUrl === null && currentQROrderId) {
-                showToast('⚠️ Please upload your payment receipt to complete the order.');
-                return;
+            if (currentQROrderId) {
+                if (currentQRMethodKey === 'sociabuzz' && !sociaBuzzPaymentConfirmed) {
+                    showToast('⚠️ Please click "I Have Completed Payment on SociaBuzz" after paying.');
+                    return;
+                }
+                if (currentQRMethodKey !== 'sociabuzz' && pendingReceiptDataUrl === null) {
+                    showToast('⚠️ Please upload your payment receipt to complete the order.');
+                    return;
+                }
             }
             document.getElementById('qrOverlay').classList.remove('open');
             currentQROrderId = null;
+            currentQRMethodKey = '';
             pendingReceiptDataUrl = null;
             pendingReceiptFileName = '';
+            sociaBuzzPaymentConfirmed = false;
         }
 
         function loadQRForMethod(method) {
             var display = document.getElementById('qrDisplay');
+            if (method === 'sociabuzz') {
+                var amtStr = currentQRAmount.toFixed(2);
+                var sbzPayUrl = SOCIABUZZ_TRIBE_URL +
+                    '?amount=' + encodeURIComponent(amtStr) +
+                    '&message=' + encodeURIComponent(currentQROrderId || '');
+                display.innerHTML =
+                    '<div class="sbz-pay-card">' +
+                        '<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">' +
+                            '<span class="sbz-badge-pill"><i class="fas fa-bolt"></i> SociaBuzz Tribe</span>' +
+                            '<span style="font-size:11px; color:#8aa1c0;">No receipt upload needed</span>' +
+                        '</div>' +
+                        '<div class="sbz-copy-row">' +
+                            '<div><span style="color:#8aa1c0; font-size:11px; display:block;">Exact Amount</span><strong style="color:#f7d875; font-size:16px;">' + CURRENCY + ' ' + amtStr + '</strong></div>' +
+                            '<button type="button" class="sbz-copy-btn" id="sbzCopyAmountBtn"><i class="fas fa-copy"></i> Copy Amount</button>' +
+                        '</div>' +
+                        '<div class="sbz-copy-row">' +
+                            '<div><span style="color:#8aa1c0; font-size:11px; display:block;">Order ID (paste in message)</span><strong style="color:#e8edf5; font-family:monospace;">' + escapeHtml(currentQROrderId || '') + '</strong></div>' +
+                            '<button type="button" class="sbz-copy-btn" id="sbzCopyOrderBtn"><i class="fas fa-copy"></i> Copy ID</button>' +
+                        '</div>' +
+                        '<a class="sbz-pay-btn" id="sociaBuzzPayLink" href="' + sbzPayUrl + '" target="_blank" rel="noopener noreferrer">' +
+                            '<i class="fas fa-external-link-alt"></i> Pay ' + CURRENCY + ' ' + amtStr + ' on SociaBuzz' +
+                        '</a>' +
+                    '</div>';
+
+                var copyAmtBtn = document.getElementById('sbzCopyAmountBtn');
+                if (copyAmtBtn) {
+                    copyAmtBtn.addEventListener('click', function() {
+                        _copyQuickText(amtStr, '📋 Amount ' + CURRENCY + ' ' + amtStr + ' copied!');
+                    });
+                }
+                var copyOrdBtn = document.getElementById('sbzCopyOrderBtn');
+                if (copyOrdBtn) {
+                    copyOrdBtn.addEventListener('click', function() {
+                        _copyQuickText(currentQROrderId || '', '📋 Order ID copied! Paste it into the SociaBuzz message.');
+                    });
+                }
+                var payLink = document.getElementById('sociaBuzzPayLink');
+                if (payLink) {
+                    payLink.addEventListener('click', function() {
+                        _copyQuickText(amtStr, '📋 Amount ' + CURRENCY + ' ' + amtStr + ' copied! Order ID: ' + (currentQROrderId || ''));
+                    });
+                }
+                return;
+            }
+
             display.innerHTML = '<div class="qr-loading"><i class="fas fa-spinner fa-spin"></i><br />Loading QR code...</div>';
 
             var renderFn = function(qrs) {
@@ -12689,6 +13047,42 @@ var promoData = appliedPromo ? {
             } else {
                 display.innerHTML = '<div class="qr-loading" style="color:#ff6b6b;">QR system not available.</div>';
             }
+        }
+
+        function confirmSociaBuzzPaymentClient() {
+            if (!currentQROrderId) return;
+            var btn = document.getElementById('sociaBuzzConfirmBtn');
+            var originalHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Notifying Admin...';
+            }
+            var email = (customer && customer.email) ? customer.email : '';
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result && result.success) {
+                        sociaBuzzPaymentConfirmed = true;
+                        var sbzActions = document.getElementById('sociaBuzzConfirmActions');
+                        if (sbzActions) sbzActions.style.display = 'none';
+                        document.getElementById('receiptNumberDisplay').textContent = result.receiptNumber || ('SBZ-' + currentQROrderId);
+                        document.getElementById('receiptSuccess').style.display = 'block';
+                        var doneBtn = document.getElementById('qrDoneBtn');
+                        if (doneBtn) doneBtn.style.display = 'flex';
+                        showToast('⚡ SociaBuzz payment submitted! Admin notified on Telegram.');
+
+                        if (isAdmin) { loadOrders(); loadAdvancedDashboard(); loadPendingOrders(); }
+                        if (customer) loadMyOrders();
+                    } else {
+                        if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
+                        showToast((result && result.message) || 'Could not record SociaBuzz confirmation.');
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
+                    showToast('Error: ' + err.message);
+                })
+                .confirmSociaBuzzPayment(currentQROrderId, email, 'Paid via SociaBuzz');
         }
 
         function handleReceiptFileSelect(file) {
@@ -12763,13 +13157,20 @@ var promoData = appliedPromo ? {
             var qrOverlay = document.getElementById('qrOverlay');
             var fileInput = document.getElementById('receiptFileInput');
             var uploadBtn = document.getElementById('receiptUploadBtn');
+            var sbzConfirmBtn = document.getElementById('sociaBuzzConfirmBtn');
             var doneBtn = document.getElementById('qrDoneBtn');
 
-            // ✅ Prevent closing by clicking outside
+            // ✅ Prevent closing by clicking outside before completing payment step
             if (qrOverlay) {
                 qrOverlay.addEventListener('click', function(e) {
                     if (e.target === qrOverlay) {
-                        showToast('⚠️ Please upload your payment receipt to complete the order.');
+                        if (currentQRMethodKey === 'sociabuzz' && !sociaBuzzPaymentConfirmed) {
+                            showToast('⚠️ Please click "I Have Completed Payment on SociaBuzz" after paying.');
+                        } else if (currentQRMethodKey !== 'sociabuzz' && pendingReceiptDataUrl === null) {
+                            showToast('⚠️ Please upload your payment receipt to complete the order.');
+                        } else {
+                            closeQRModal();
+                        }
                     }
                 });
             }
@@ -12781,6 +13182,7 @@ var promoData = appliedPromo ? {
             }
 
             if (uploadBtn) uploadBtn.addEventListener('click', submitReceiptUpload);
+            if (sbzConfirmBtn) sbzConfirmBtn.addEventListener('click', confirmSociaBuzzPaymentClient);
             
             // ✅ New Done button closes the modal
             if (doneBtn) doneBtn.addEventListener('click', closeQRModal);
@@ -13195,7 +13597,7 @@ if (cart.length > 0) {
             select.innerHTML = html;
         }
 
-        function renderAdminProductPagination(totalPages, totalItems) {
+        function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(totalPages, totalItems) {
             var container = document.getElementById('adminProductPagination');
             if (!container) return;
 
@@ -13371,7 +13773,7 @@ if (cart.length > 0) {
             }
 
             // Render pagination
-            renderAdminProductPagination(totalPages, totalItems);
+            rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(totalPages, totalItems);
         }
 
         // ===== Event listeners for the admin product toolbar =====
@@ -14104,24 +14506,45 @@ function loadOrders() {
                 .getOrdersData();
         }
 
-        // ✅ Render the pending orders list, applying current search filter
+        function _isSociaBuzzOrder(order) {
+            if (!order) return false;
+            var pm = String(order['Payment Method'] || '').toLowerCase();
+            var rUrl = String(order['Receipt URL'] || '');
+            var rNum = String(order['Receipt Number'] || '');
+            return pm.indexOf('sociabuzz') !== -1 || rUrl.indexOf('SOCIABUZZ://') === 0 || rNum.indexOf('SBZ-') === 0;
+        }
+
+        function _matchesApprovalFilter(order, q, methodFilter) {
+            if (methodFilter && methodFilter !== 'all') {
+                var pm = String(order['Payment Method'] || '').toLowerCase();
+                if (methodFilter === 'sociabuzz' && !_isSociaBuzzOrder(order)) return false;
+                if (methodFilter === 'mae' && pm.indexOf('mae') === -1) return false;
+                if (methodFilter === 'tng' && pm.indexOf('tng') === -1 && pm.indexOf('touch') === -1) return false;
+                if (methodFilter === 'shopee' && pm.indexOf('shopee') === -1) return false;
+            }
+            if (q) {
+                var receiptNum = String(order['Receipt Number'] || '').toLowerCase();
+                var orderId = String(order['Order ID'] || '').toLowerCase();
+                var customerName = String(order['Customer Name'] || '').toLowerCase();
+                var email = String(order['Email'] || '').toLowerCase();
+                var pmStr = String(order['Payment Method'] || '').toLowerCase();
+                return receiptNum.indexOf(q) !== -1
+                    || orderId.indexOf(q) !== -1
+                    || customerName.indexOf(q) !== -1
+                    || email.indexOf(q) !== -1
+                    || pmStr.indexOf(q) !== -1;
+            }
+            return true;
+        }
+
+        // ✅ Render the pending orders list, applying current search + method filter
         function renderApprovalList() {
             // Apply filter on cached orders
-            var filtered = approvalAllOrders.slice(0);
             var q = approvalSearchQuery.trim().toLowerCase();
-
-            if (q) {
-                filtered = filtered.filter(function(o) {
-                    var receiptNum = String(o['Receipt Number'] || '').toLowerCase();
-                    var orderId = String(o['Order ID'] || '').toLowerCase();
-                    var customerName = String(o['Customer Name'] || '').toLowerCase();
-                    var email = String(o['Email'] || '').toLowerCase();
-                    return receiptNum.indexOf(q) !== -1
-                        || orderId.indexOf(q) !== -1
-                        || customerName.indexOf(q) !== -1
-                        || email.indexOf(q) !== -1;
-                });
-            }
+            var methodFilter = approvalMethodFilter || 'all';
+            var filtered = approvalAllOrders.filter(function(o) {
+                return _matchesApprovalFilter(o, q, methodFilter);
+            });
 
             updateApprovalCount();
 
@@ -14129,13 +14552,13 @@ function loadOrders() {
                 if (approvalAllOrders.length === 0) {
                     approvalList.innerHTML = '<div class="empty-msg">No pending orders to verify.</div>';
                 } else {
-                    approvalList.innerHTML = '<div class="empty-msg">No orders match "<b>' +
-                        escapeApprovalHtml(approvalSearchQuery) + '</b>".</div>';
+                    approvalList.innerHTML = '<div class="empty-msg">No orders match the current filter' +
+                        (q ? ' ("<b>' + escapeApprovalHtml(approvalSearchQuery) + '</b>")' : '') + '.</div>';
                 }
                 return;
             }
 
-            var html2 = '<table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Payment</th><th>Total</th><th>Receipt Number</th><th>Receipt Image</th><th>Actions</th></tr></thead><tbody>';
+            var html2 = '<table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Payment</th><th>Total</th><th>Receipt / Tx Ref</th><th>Receipt / Verification</th><th>Actions</th></tr></thead><tbody>';
 
             for (var pi = 0; pi < filtered.length; pi++) {
                 var order = filtered[pi];
@@ -14143,6 +14566,7 @@ function loadOrders() {
                 var receiptUrl = order['Receipt URL'] || '';
                 var receiptNum = order['Receipt Number'] || '';
                 var pm = order['Payment Method'] || 'N/A';
+                var isSociaBuzz = _isSociaBuzzOrder(order);
 
                 // Highlight matches
                 var hlOrderId = highlightApproval(orderId, q);
@@ -14154,7 +14578,11 @@ function loadOrders() {
                 html2 += '<td>' + hlOrderId + '</td>';
                 html2 += '<td>' + (order['Date'] || '') + '</td>';
                 html2 += '<td>' + hlName + '<br><small style="color:#6a7f9e;">' + hlEmail + '</small></td>';
-                html2 += '<td>' + pm + '</td>';
+                if (isSociaBuzz) {
+                    html2 += '<td><span class="sbz-badge-pill"><i class="fas fa-bolt"></i> SociaBuzz</span></td>';
+                } else {
+                    html2 += '<td>' + escapeApprovalHtml(pm) + '</td>';
+                }
                 html2 += '<td>' + CURRENCY + ' ' + parseFloat(order['Total (RM)'] || 0).toFixed(2) + '</td>';
 
                 if (receiptNum) {
@@ -14163,11 +14591,20 @@ function loadOrders() {
                     html2 += '<td style="color:#6a7f9e;">-</td>';
                 }
 
-                if (receiptUrl) {
+                if (isSociaBuzz) {
+                    var sbzSource = receiptUrl.indexOf('SOCIABUZZ://webhook/') === 0
+                        ? 'Webhook Auto-Verified'
+                        : (receiptUrl.indexOf('SOCIABUZZ://confirmed/') === 0 ? 'Customer Confirmed' : 'Awaiting SociaBuzz Pay');
+                    html2 += '<td>' +
+                        '<div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">' +
+                            '<span class="sbz-badge-pill"><i class="fas fa-bolt"></i> ' + sbzSource + '</span>' +
+                            '<span style="font-size:11px; color:#8aa1c0;">No receipt needed &bull; <a href="https://sociabuzz.com/nex4up/tribe" target="_blank" rel="noopener noreferrer" style="color:#f7d875;">SociaBuzz</a></span>' +
+                        '</div></td>';
+                } else if (receiptUrl) {
                     var isImage = receiptUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
                     if (isImage) {
                         html2 += '<td><a href="' + receiptUrl + '" target="_blank" title="Click to view full receipt">' +
-                                 '<img src="' + receiptUrl + '" style="width:60px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #2a3a52; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1)\'" onmouseout="this.style.transform=\'scale(1)\'" />' +
+                                 '<img src="' + receiptUrl + '" loading="lazy" style="width:60px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #2a3a52; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.1)\'" onmouseout="this.style.transform=\'scale(1)\'" />' +
                                  '</a></td>';
                     } else {
                         html2 += '<td><a href="' + receiptUrl + '" target="_blank" style="color:#f7d875; font-weight:600; display:flex; align-items:center; gap:6px;"><i class="fas fa-file-pdf" style="font-size:18px;"></i> View PDF</a></td>';
@@ -14176,8 +14613,9 @@ function loadOrders() {
                     html2 += '<td><span style="color:#ff6b6b; font-size:12px; font-weight:600; background:rgba(255,107,107,0.1); padding:4px 8px; border-radius:20px; border:1px solid rgba(255,107,107,0.3); white-space:nowrap;"><i class="fas fa-exclamation-circle"></i> No Receipt</span></td>';
                 }
 
-                var approveDisabled = receiptUrl ? '' : 'disabled';
-                var approveTitle = receiptUrl ? 'Approve Order' : 'Cannot approve without a receipt';
+                var canApprove = !!(receiptUrl || isSociaBuzz);
+                var approveDisabled = canApprove ? '' : 'disabled';
+                var approveTitle = canApprove ? 'Approve Order' : 'Cannot approve without a receipt';
                 html2 += '<td>' +
                          '<button class="approve-btn" data-orderid="' + orderId + '" ' + approveDisabled + ' title="' + approveTitle + '"><i class="fas fa-check"></i> Approve</button> ' +
                          '<button class="cancel-btn" data-orderid="' + orderId + '"><i class="fas fa-times"></i> Reject</button>' +
@@ -14208,15 +14646,11 @@ function loadOrders() {
             var countEl = document.getElementById('approvalSearchCount');
             if (!countEl) return;
             var total = approvalAllOrders.length;
-            var q = approvalSearchQuery.trim();
-            if (q) {
-                // Count filtered
+            var q = approvalSearchQuery.trim().toLowerCase();
+            var mf = approvalMethodFilter || 'all';
+            if (q || mf !== 'all') {
                 var filtered = approvalAllOrders.filter(function(o) {
-                    var ql = q.toLowerCase();
-                    return String(o['Receipt Number'] || '').toLowerCase().indexOf(ql) !== -1
-                        || String(o['Order ID'] || '').toLowerCase().indexOf(ql) !== -1
-                        || String(o['Customer Name'] || '').toLowerCase().indexOf(ql) !== -1
-                        || String(o['Email'] || '').toLowerCase().indexOf(ql) !== -1;
+                    return _matchesApprovalFilter(o, q, mf);
                 });
                 countEl.textContent = filtered.length + ' of ' + total + ' orders';
             } else {
@@ -14271,6 +14705,14 @@ function loadOrders() {
                 renderApprovalList();
                 input.focus();
             });
+
+            var methodFilterEl = document.getElementById('approvalMethodFilter');
+            if (methodFilterEl) {
+                methodFilterEl.addEventListener('change', function() {
+                    approvalMethodFilter = this.value || 'all';
+                    renderApprovalList();
+                });
+            }
         })();
 
         function showConfirmModal(type, orderId) {
@@ -14345,6 +14787,20 @@ function loadOrders() {
                     document.getElementById('dashNetRev').textContent = 'RM ' + (summary.netRevenue || 0).toFixed(2);
                     document.getElementById('dashTotalCost').textContent = 'RM ' + (summary.totalCost || 0).toFixed(2);
                     document.getElementById('dashNetProfit').textContent = 'RM ' + (summary.netProfit || 0).toFixed(2);
+
+                    var sbz = summary.sociaBuzzSummary || {};
+                    var sbzOrdersEl = document.getElementById('sbzDashOrdersBadge');
+                    var sbzGrossEl = document.getElementById('sbzDashGross');
+                    var sbzGwEl = document.getElementById('sbzDashGwFee');
+                    var sbzCutLabelEl = document.getElementById('sbzDashCutLabel');
+                    var sbzCutEl = document.getElementById('sbzDashWithdrawalCut');
+                    var sbzNetEl = document.getElementById('sbzDashNet');
+                    if (sbzOrdersEl) sbzOrdersEl.textContent = (sbz.orders || 0) + ' Order' + ((sbz.orders || 0) === 1 ? '' : 's');
+                    if (sbzGrossEl) sbzGrossEl.textContent = 'RM ' + (sbz.grossRevenue || 0).toFixed(2);
+                    if (sbzGwEl) sbzGwEl.textContent = '- RM ' + (sbz.gatewayFees || 0).toFixed(2);
+                    if (sbzCutLabelEl) sbzCutLabelEl.textContent = 'Withdrawal Cut (RM ' + (sbz.withdrawalFeePerTx !== undefined ? sbz.withdrawalFeePerTx : 1.5).toFixed(2) + ' × ' + (sbz.withdrawalsCount !== undefined ? sbz.withdrawalsCount : 1) + ')';
+                    if (sbzCutEl) sbzCutEl.textContent = '- RM ' + (sbz.totalWithdrawalCut || 0).toFixed(2);
+                    if (sbzNetEl) sbzNetEl.textContent = 'RM ' + (sbz.netReceivable || 0).toFixed(2);
 
                     var counts = summary.statusCounts || {};
                     if (statusAwaitingPaymentEl) statusAwaitingPaymentEl.textContent = counts['Awaiting Payment'] || 0;
@@ -14713,7 +15169,7 @@ function renderReviews(reviews) {
             var avatarHtml;
             if (imgSrc) {
                 avatarHtml =
-                    '<img src="' + imgSrc + '" alt="' + displayName + '" class="review-avatar"' +
+                    '<img src="' + imgSrc + '" alt="' + displayName + '" class="review-avatar" loading="lazy" decoding="async"' +
                     ' onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />' +
                     '<div class="review-avatar-placeholder" style="display:none;">' + initial + '</div>';
             } else {
@@ -15467,7 +15923,7 @@ function submitInlineReview() {
                             CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2) + ' <span class="original">' + CURRENCY + ' ' + game.price.toFixed(2) + '</span>' :
                             CURRENCY + ' ' + game.price.toFixed(2);
                         html += '<div class="game-card" data-id="' + game.id + '">';
-                        html += '<div class="img-wrap"><img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" loading="lazy" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;"/>';
+                        html += '<div class="img-wrap"><img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;"/>';
                         if (game.badge) html += '<span class="badge-top">' + game.badge + '</span>';
                         html += '</div><div class="card-body">';
                         html += '<h3>' + game.title + '</h3>';
@@ -16210,10 +16666,13 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
                 updateProfileDropdown();
             } else if (customer) {
                 updateProfileDropdown();
-                loadMyAccount();
-                loadMyOrders();
-                loadReferralData();
-                loadWishlistIds();
+                // Defer secondary customer RPCs so catalog loads without contention
+                setTimeout(function () {
+                    loadMyAccount();
+                    loadMyOrders();
+                    loadReferralData();
+                    loadWishlistIds();
+                }, 750);
             }
 
             loadGames();
@@ -18286,7 +18745,7 @@ function resetVariantEditor(ctx) {
                     <h3><i class="fas fa-share-alt"></i> 4. Third-Party Sharing</h3>
                     <p>We only share information with:</p>
                     <ul>
-                        <li><strong>Payment providers</strong> (MAE, TNG, ShopeePay) — to verify your payment</li>
+                        <li><strong>Payment providers</strong> (MAE, TNG, ShopeePay, SociaBuzz) — to verify your payment</li>
                         <li><strong>Courier services</strong> (J&T, Ninja Van, etc.) — to deliver physical orders</li>
                         <li><strong>Legal authorities</strong> — if required by law</li>
                     </ul>
@@ -18402,7 +18861,7 @@ function resetVariantEditor(ctx) {
                     <p>Usually <strong>1–2 hours during working hours (9:00 AM – 12:00 PM daily)</strong>. Orders placed outside working hours will be processed on the next working day.</p>
 
                     <h3><i class="fas fa-credit-card"></i> What payment methods do you accept?</h3>
-                    <p>We accept <strong>MAE (Maybank), Touch 'n Go eWallet, and ShopeePay</strong>. Scan the QR code at checkout and upload your receipt to confirm your order.</p>
+                    <p>We accept <strong>MAE (Maybank), Touch 'n Go eWallet, ShopeePay, and SociaBuzz</strong>. For QR wallets, scan the QR code at checkout and upload your receipt; for <strong>SociaBuzz</strong>, pay via the SociaBuzz link at checkout and click confirm (no receipt upload required).</p>
 
                     <h3><i class="fas fa-user-plus"></i> Do I need an account to order?</h3>
                     <p>Yes. Registering lets you <strong>track your orders, earn loyalty points, and checkout faster</strong> next time. It only takes 30 seconds.</p>
@@ -18433,18 +18892,43 @@ function resetVariantEditor(ctx) {
         // ================================================================
         function loadGamesForAdminMode() {
             google.script.run
-                .withSuccessHandler(function (data) {
-                    allGames = data || [];
-                    loadPublicGenreImages(function () {
+                .withSuccessHandler(function (res) {
+                    if (res && Array.isArray(res.games)) {
+                        allGames = res.games;
+                        genreImages = res.genreImages || {};
                         renderAdminList();
-                    });
+                        return;
+                    }
+                    google.script.run
+                        .withSuccessHandler(function (data) {
+                            allGames = data || [];
+                            loadPublicGenreImages(function () {
+                                renderAdminList();
+                            });
+                        })
+                        .withFailureHandler(function (err) {
+                            console.error('Admin games load failed:', err);
+                            allGames = [];
+                            renderAdminList();
+                        })
+                        .getGamesData();
                 })
-                .withFailureHandler(function (err) {
-                    console.error('Admin games load failed:', err);
-                    allGames = [];
-                    renderAdminList();
+                .withFailureHandler(function () {
+                    google.script.run
+                        .withSuccessHandler(function (data) {
+                            allGames = data || [];
+                            loadPublicGenreImages(function () {
+                                renderAdminList();
+                            });
+                        })
+                        .withFailureHandler(function (err) {
+                            console.error('Admin games load failed:', err);
+                            allGames = [];
+                            renderAdminList();
+                        })
+                        .getGamesData();
                 })
-                .getGamesData();
+                .getStoreBootstrapData();
         }
 
         function openPolicy(key) {
@@ -18617,10 +19101,20 @@ function loadAdminSalesTeam() {
     
     // Load Settings
     google.script.run.withSuccessHandler(function(settings) {
+        settings = settings || {};
         if (document.getElementById('cfgDefaultComm')) {
-            document.getElementById('cfgDefaultComm').value = settings['Default Commission Rate'] || 20;
-            document.getElementById('cfgGwFee').value = settings['Payment Gateway Fee (%)'] || 2;
-            document.getElementById('cfgPlatformFee').value = settings['Platform Fee (RM)'] || 0.50;
+            document.getElementById('cfgDefaultComm').value = settings['Default Commission Rate'] !== undefined ? settings['Default Commission Rate'] : 20;
+            document.getElementById('cfgGwFee').value = settings['Payment Gateway Fee (%)'] !== undefined ? settings['Payment Gateway Fee (%)'] : 2;
+            document.getElementById('cfgPlatformFee').value = settings['Platform Fee (RM)'] !== undefined ? settings['Platform Fee (RM)'] : 0.50;
+            if (document.getElementById('cfgSociaBuzzFee')) {
+                document.getElementById('cfgSociaBuzzFee').value = settings['SociaBuzz Fee (%)'] !== undefined ? settings['SociaBuzz Fee (%)'] : 5;
+            }
+            if (document.getElementById('cfgSociaBuzzWithdrawalFee')) {
+                document.getElementById('cfgSociaBuzzWithdrawalFee').value = settings['SociaBuzz Withdrawal Fee (RM)'] !== undefined ? settings['SociaBuzz Withdrawal Fee (RM)'] : 1.50;
+            }
+            if (document.getElementById('cfgSociaBuzzWithdrawalsCount')) {
+                document.getElementById('cfgSociaBuzzWithdrawalsCount').value = settings['SociaBuzz Withdrawals Count'] !== undefined ? settings['SociaBuzz Withdrawals Count'] : 1;
+            }
         }
     }).getCostSettings();
 
@@ -18673,6 +19167,15 @@ document.getElementById('saveCostSettingsBtn')?.addEventListener('click', functi
         'Payment Gateway Fee (%)': document.getElementById('cfgGwFee').value,
         'Platform Fee (RM)': document.getElementById('cfgPlatformFee').value
     };
+    if (document.getElementById('cfgSociaBuzzFee')) {
+        settings['SociaBuzz Fee (%)'] = document.getElementById('cfgSociaBuzzFee').value;
+    }
+    if (document.getElementById('cfgSociaBuzzWithdrawalFee')) {
+        settings['SociaBuzz Withdrawal Fee (RM)'] = document.getElementById('cfgSociaBuzzWithdrawalFee').value;
+    }
+    if (document.getElementById('cfgSociaBuzzWithdrawalsCount')) {
+        settings['SociaBuzz Withdrawals Count'] = document.getElementById('cfgSociaBuzzWithdrawalsCount').value;
+    }
     google.script.run.withSuccessHandler(function(res) {
         showToast(res.message);
     }).updateCostSettings(settings);
@@ -18820,8 +19323,8 @@ function renderRobuxDashboard(res, range) {
 
     // Render the tables safely
     try { renderRobuxPricingTable(res.packages || []); } catch(e) { console.log('Pricing table err', e); }
-    try { renderRobuxPurchaseHistory(res.purchases || []); } catch(e) { console.log('Purchase table err', e); }
-    try { renderRobuxTransactionHistory(res.transactions || []); } catch(e) { console.log('Tx table err', e); }
+    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.purchases || []); } catch(e) { console.log('Purchase table err', e); }
+    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.transactions || []); } catch(e) { console.log('Tx table err', e); }
     try { renderRobuxBackorders(res.backorders || []); } catch(e) { console.log('Backorder table err', e); }
 }
 
@@ -18871,7 +19374,7 @@ function renderRobuxPricingTable(packages) {
     document.getElementById('robuxPricingTable').innerHTML = html;
 }
 
-function renderRobuxPurchaseHistory(rows) {
+function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
     if (!rows.length) {
         document.getElementById('robuxPurchaseHistory').innerHTML = '<div class="empty-msg">No purchases recorded yet.</div>';
         return;
@@ -18892,7 +19395,7 @@ function renderRobuxPurchaseHistory(rows) {
     document.getElementById('robuxPurchaseHistory').innerHTML = html;
 }
 
-function renderRobuxTransactionHistory(rows) {
+function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
     if (!rows.length) {
         document.getElementById('robuxTransactionHistory').innerHTML = '<div class="empty-msg">No transactions yet.</div>';
         return;
@@ -19731,7 +20234,7 @@ openProductModal = function (game) {
             related.forEach(function (rg) {
                 var rPrice = (rg.discount && rg.discount > 0) ? rg.price * (1 - rg.discount / 100) : rg.price;
                 rHtml += '<div class="mp-related-card" data-id="' + rg.id + '">' +
-                    '<img src="' + (rg.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(rg.title) + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
+                    '<img src="' + (rg.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(rg.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
                     '<div class="r-title">' + escapeHtml(rg.title) + '</div>' +
                     '<div class="r-price">' + CURRENCY + ' ' + (rPrice || 0).toFixed(2) + '</div>' +
                     '</div>';
@@ -19818,7 +20321,7 @@ updateSearchDropdown = function (query) {
                 ? CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2)
                 : CURRENCY + ' ' + game.price.toFixed(2);
             html += '<div class="dropdown-item" data-gameid="' + game.id + '">' +
-                '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(game.title) + '" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
+                '<img src="' + (game.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(game.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" />' +
                 '<div class="info"><div class="name">' + escapeHtml(game.title) + '</div><div class="price">' + price + '</div></div>' +
                 '</div>';
         });
@@ -19913,21 +20416,37 @@ openEditModal = function (game) {
     if (es) es.value = h.subGenre || '';
 };
 
+var _lastPointsPillFetchAt = 0;
+var _lastPointsPillEmail = '';
+
 // Refresh Header Wallet Points Pill when Customer is Logged In
-function refreshHeaderPointsPill() {
+function refreshHeaderPointsPill(force) {
     var pill = document.getElementById('headerPointsPill');
     var valEl = document.getElementById('headerPointsValue');
     if (!pill || !valEl) return;
     if (!customer || !customer.email || IS_ADMIN_MODE) {
         pill.style.display = 'none';
+        _lastPointsPillFetchAt = 0;
+        _lastPointsPillEmail = '';
         return;
     }
     pill.style.display = 'inline-flex';
+    var emailKey = String(customer.email).toLowerCase().trim();
+    var now = Date.now();
+    if (!force && _lastPointsPillEmail === emailKey && (now - _lastPointsPillFetchAt) < 4000) {
+        return;
+    }
+    _lastPointsPillEmail = emailKey;
+    _lastPointsPillFetchAt = now;
     google.script.run
         .withSuccessHandler(function (pts) {
-            valEl.textContent = parseInt(pts, 10) || 0;
+            var p = parseInt(pts, 10) || 0;
+            valEl.textContent = p;
+            if (typeof customerPointsBalance !== 'undefined') customerPointsBalance = p;
         })
-        .withFailureHandler(function () {})
+        .withFailureHandler(function () {
+            _lastPointsPillFetchAt = 0;
+        })
         .getCustomerPoints(customer.email);
 }
 
@@ -20164,8 +20683,8 @@ renderRobuxDashboard = function (res, range) {
     if (elLowStock) elLowStock.value = st.lowStockThreshold || 2000;
 
     try { renderRobuxPricingTable(res.packages || []); } catch (e) {}
-    try { renderRobuxPurchaseHistory(res.purchases || []); } catch (e) {}
-    try { renderRobuxTransactionHistory(res.transactions || []); } catch (e) {}
+    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.purchases || []); } catch (e) {}
+    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.transactions || []); } catch (e) {}
     try { renderRobuxBackorders(res.backorders || []); } catch (e) {}
 };
 
@@ -20242,7 +20761,7 @@ function renderRecentlyViewedSection() {
     recentGames.forEach(function (g) {
         var effPrice = (g.discount && g.discount > 0) ? g.price * (1 - g.discount / 100) : g.price;
         html += '<div class="mp-recent-card" data-id="' + g.id + '">' +
-            '<img src="' + (g.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(g.title) + '" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;" />' +
+            '<img src="' + (g.image || PLACEHOLDER_IMG) + '" alt="' + escapeHtml(g.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;" />' +
             '<div class="rc-info">' +
             '<div class="rc-title">' + escapeHtml(g.title) + '</div>' +
             '<div class="rc-price">' + CURRENCY + ' ' + (effPrice || 0).toFixed(2) + '</div>' +
