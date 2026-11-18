@@ -8546,6 +8546,128 @@
     #digitalReceiptOverlay { position: fixed !important; inset: 0 !important; background: #fff !important; }
     .digital-receipt-modal { background: #fff !important; color: #111 !important; border: 1px solid #ccc !important; box-shadow: none !important; }
 }
+
+/* ===== PHASE 4 ADMIN AUTOMATION, COMMISSION PAYOUTS & CUSTOMER CONVERSION STYLES ===== */
+.admin-bulk-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+}
+.admin-bulk-left { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #b0c8e0; font-weight: 600; }
+.admin-bulk-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.bulk-btn {
+    border: none;
+    border-radius: 9px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.bulk-btn.approve { background: #2e7d32; color: #fff; }
+.bulk-btn.ship    { background: #1976d2; color: #fff; }
+.bulk-btn.cancel  { background: rgba(255, 107, 107, 0.16); border: 1px solid rgba(255, 107, 107, 0.45); color: #ff8a8a; }
+
+.wa-mini-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(37, 211, 102, 0.14);
+    border: 1px solid rgba(37, 211, 102, 0.45);
+    color: #4ade80;
+    padding: 5px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.wa-mini-btn:hover { background: rgba(37, 211, 102, 0.25); }
+
+.comm-filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px 0 12px;
+}
+.comm-filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.comm-filter-pill {
+    background: #121821;
+    border: 1px solid #2a3a52;
+    color: #8aa1c0;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+.comm-filter-pill.active { background: rgba(247, 216, 117, 0.16); border-color: #f7d875; color: #f7d875; }
+
+.comm-progress-wrap { min-width: 130px; }
+.comm-progress-bar {
+    height: 7px;
+    background: #0b0e14;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #1e2a3a;
+    margin-top: 4px;
+}
+.comm-progress-fill { height: 100%; background: linear-gradient(90deg, #f7d875, #4caf50); border-radius: 999px; }
+.ready-pay-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(76, 175, 80, 0.18);
+    border: 1px solid #4caf50;
+    color: #66bb6a;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.parcel-tracking-box {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(33, 150, 243, 0.08);
+    border: 1px solid rgba(33, 150, 243, 0.35);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #b0c8e0;
+}
+.verified-activity-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(247, 216, 117, 0.1);
+    border: 1px solid rgba(247, 216, 117, 0.35);
+    color: #f7d875;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    margin-left: 8px;
+}
     </style>
 </head>
 <body>
@@ -9131,6 +9253,8 @@
                             <!-- Months will be generated here -->
                         </select>
                         <button class="filter-btn" id="refreshDashboardBtn" style="padding:10px 20px; border-radius:8px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        <button class="filter-btn" id="exportDashboardCsvBtn" style="padding:10px 16px; border-radius:8px; background:#1b2838; color:#4caf50; border:1px solid #2e7d32;"><i class="fas fa-file-csv"></i> Export CSV</button>
+                        <button class="filter-btn" id="sendDashTelegramBtn" style="padding:10px 16px; border-radius:8px; background:#1b2838; color:#38bdf8; border:1px solid #0284c7;"><i class="fab fa-telegram-plane"></i> Send to Telegram</button>
                     </div>
 
                     <div class="dashboard-stats" id="dashboardStats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
@@ -9196,7 +9320,10 @@
                 <div class="admin-section" id="section-payment-approval">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
                         <h2><i class="fas fa-check-double"></i> Payment Approval</h2>
-                        <button class="submit-btn" id="refreshApprovalBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="submit-btn" id="cleanExpiredOrdersApprovalBtn" style="padding:8px 14px; font-size:13px; background:#2a1f16; color:#ffa726; border:1px solid #ff9800;"><i class="fas fa-broom"></i> Clean 24h+ Unpaid</button>
+                            <button class="submit-btn" id="refreshApprovalBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
                     </div>
 
                     <!-- ✅ NEW: Receipt search bar + Payment Method Filter -->
@@ -9216,6 +9343,17 @@
                         <span id="approvalSearchCount" class="toolbar-count">0 orders</span>
                     </div>
 
+                    <div class="admin-bulk-bar" id="approvalBulkBar">
+                        <label class="admin-bulk-left" style="cursor:pointer;">
+                            <input type="checkbox" id="approvalSelectAll" /> Select All Visible
+                            <span id="approvalSelectedCount" style="color:#f7d875;">(0)</span>
+                        </label>
+                        <div class="admin-bulk-actions">
+                            <button type="button" class="bulk-btn approve" id="bulkApproveBtn"><i class="fas fa-check"></i> Approve Selected</button>
+                            <button type="button" class="bulk-btn cancel" id="bulkRejectApprovalBtn"><i class="fas fa-times"></i> Cancel Selected</button>
+                        </div>
+                    </div>
+
                     <div class="orders-container">
                         <div id="approvalList">
                             <p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading pending orders...</p>
@@ -9225,9 +9363,24 @@
 
                 <!-- Orders -->
                 <div class="admin-section" id="section-orders">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                         <h2><i class="fas fa-box"></i> Orders</h2>
-                        <button class="submit-btn" id="refreshOrdersBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="submit-btn" id="cleanExpiredOrdersBtn" style="padding:8px 14px; font-size:13px; background:#2a1f16; color:#ffa726; border:1px solid #ff9800;"><i class="fas fa-broom"></i> Clean 24h+ Unpaid</button>
+                            <button class="submit-btn" id="exportOrdersCsvBtn" style="padding:8px 14px; font-size:13px; background:#16291b; color:#4caf50; border:1px solid #2e7d32;"><i class="fas fa-file-csv"></i> Export CSV</button>
+                            <button class="submit-btn" id="refreshOrdersBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+                    <div class="admin-bulk-bar" id="ordersBulkBar">
+                        <label class="admin-bulk-left" style="cursor:pointer;">
+                            <input type="checkbox" id="ordersSelectAll" /> Select All
+                            <span id="ordersSelectedCount" style="color:#f7d875;">(0)</span>
+                        </label>
+                        <div class="admin-bulk-actions">
+                            <button type="button" class="bulk-btn approve" id="bulkOrdersPaidBtn"><i class="fas fa-check"></i> Mark Paid</button>
+                            <button type="button" class="bulk-btn ship" id="bulkOrdersShipBtn"><i class="fas fa-truck"></i> Mark Shipped</button>
+                            <button type="button" class="bulk-btn cancel" id="bulkOrdersCancelBtn"><i class="fas fa-times"></i> Cancel Selected</button>
+                        </div>
                     </div>
                     <div class="orders-container">
                         <div id="ordersList"><p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading orders...</p></div>
@@ -9404,21 +9557,52 @@
 
                 <!-- Referral Settings (Admin) -->
                 <div class="admin-section" id="section-referral-settings">
-                    <h2 style="margin-bottom:20px;"><i class="fas fa-share-alt"></i> Referral Settings</h2>
-                    <p style="color:#8aa1c0; margin-bottom:20px;">Configure referral rewards, friend coupons, and tier thresholds.</p>
+                    <h2 style="margin-bottom:20px;"><i class="fas fa-share-alt"></i> Referral Settings &amp; Promo Vouchers</h2>
+                    <p style="color:#8aa1c0; margin-bottom:20px;">Configure referral rewards, friend coupons, tier thresholds, and store-wide promo codes.</p>
                     <div id="referralConfigContainer">
                         <p style="color:#6a7f9e;">Loading settings...</p>
+                    </div>
+
+                    <div id="adminPromoManagerContainer" style="margin-top:28px; background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:22px;">
+                        <h3 style="margin:0 0 14px; color:#f7d875;"><i class="fas fa-tags"></i> Promo Code Manager</h3>
+                        <form id="adminPromoForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:12px; align-items:end; margin-bottom:18px;">
+                            <div class="field"><label>Code *</label><input type="text" id="promoMgrCode" required placeholder="e.g. RAYAFREE" style="text-transform:uppercase;" /></div>
+                            <div class="field"><label>Type</label><select id="promoMgrType"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed (RM)</option></select></div>
+                            <div class="field"><label>Discount Value *</label><input type="number" id="promoMgrValue" step="0.01" min="0.01" required placeholder="10" /></div>
+                            <div class="field"><label>Min Order (RM)</label><input type="number" id="promoMgrMinOrder" step="0.01" min="0" value="0" /></div>
+                            <div class="field"><label>Usage Limit (0=Off)</label><input type="number" id="promoMgrLimit" step="1" min="0" value="100" /></div>
+                            <div class="field"><label>Expiry Date</label><input type="date" id="promoMgrExpiry" /></div>
+                            <button type="submit" class="submit-btn" id="promoMgrSaveBtn" style="height:42px; justify-content:center;"><i class="fas fa-plus"></i> Save Promo</button>
+                        </form>
+                        <div class="orders-container" id="adminPromoList"><p style="color:#6a7f9e; text-align:center; padding:16px;">Loading promo codes...</p></div>
                     </div>
                 </div>
 
                 <!-- Sales Team Settings -->
 <div class="admin-section" id="section-sales-team">
-    <h2 style="margin-bottom:20px;"><i class="fas fa-users-cog"></i> Sales Team & Commissions</h2>
-    
+    <h2 style="margin-bottom:20px;"><i class="fas fa-users-cog"></i> Sales Team &amp; Commission Payouts</h2>
+
+    <!-- Commission Payout Summary Row -->
+    <div class="dashboard-stats" style="margin-bottom:22px;">
+        <div class="stat-card" style="border-bottom:3px solid #4caf50; background:rgba(76,175,80,0.06);">
+            <div class="stat-number" id="commReadyAgentsCount" style="color:#4caf50;">0</div>
+            <div class="stat-label">🔥 Agents Ready to Pay (Reached Target)</div>
+        </div>
+        <div class="stat-card" style="border-bottom:3px solid #f7d875;">
+            <div class="stat-number" id="commTotalUnpaid" style="color:#f7d875;">RM 0.00</div>
+            <div class="stat-label">Total Unpaid Approved Commission</div>
+        </div>
+        <div class="stat-card" style="border-bottom:3px solid #38bdf8;">
+            <div class="stat-number" id="commTotalPaidOut" style="color:#38bdf8;">RM 0.00</div>
+            <div class="stat-label">Total Already Paid Out</div>
+        </div>
+    </div>
+
     <div style="background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:24px; margin-bottom:24px;">
-        <h3 style="margin-bottom:12px;">Global Cost Settings</h3>
+        <h3 style="margin-bottom:12px;">Global Cost &amp; Payout Settings</h3>
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:16px; margin-bottom:16px;">
             <div class="field"><label>Default Commission Rate (%)</label><input type="number" id="cfgDefaultComm" /></div>
+            <div class="field"><label>Minimum Commission Payout (RM)</label><input type="number" id="cfgMinCommissionPayout" step="1" min="1" /></div>
             <div class="field"><label>Payment Gateway Fee (%)</label><input type="number" id="cfgGwFee" step="0.1" /></div>
             <div class="field"><label>Platform Fee (RM)</label><input type="number" id="cfgPlatformFee" step="0.01" /></div>
             <div class="field"><label>SociaBuzz Fee (%)</label><input type="number" id="cfgSociaBuzzFee" step="0.1" /></div>
@@ -9430,16 +9614,24 @@
 
     <div style="background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:24px;">
         <h3 style="margin-bottom:12px;">Add Salesperson</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap:16px; align-items:end;">
-            <div class="field"><label>Email</label><input type="email" id="newAgentEmail" placeholder="agent@example.com" /></div>
-            <div class="field"><label>Name</label><input type="text" id="newAgentName" placeholder="Name" /></div>
-            <div class="field"><label>Agent Code</label><input type="text" id="newAgentCode" placeholder="e.g. ALI20" /></div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:14px; align-items:end;">
+            <div class="field"><label>Email *</label><input type="email" id="newAgentEmail" placeholder="agent@example.com" /></div>
+            <div class="field"><label>Name *</label><input type="text" id="newAgentName" placeholder="Name" /></div>
+            <div class="field"><label>Agent Code *</label><input type="text" id="newAgentCode" placeholder="e.g. ALI20" /></div>
             <div class="field"><label>Commission Rate (%)</label><input type="number" id="newAgentRate" value="20" /></div>
-            <button class="submit-btn" id="addAgentBtn" style="padding:10px 20px; height:42px;"><i class="fas fa-plus"></i> Add</button>
+            <div class="field"><label>Bank / TNG / DuitNow Account</label><input type="text" id="newAgentPayoutInfo" placeholder="e.g. TNG 0123456789 / Maybank..." /></div>
+            <button class="submit-btn" id="addAgentBtn" style="padding:10px 20px; height:42px; justify-content:center;"><i class="fas fa-plus"></i> Add</button>
         </div>
     </div>
-    
-    <h3 style="margin-top:24px; margin-bottom:16px;">Active Sales Team</h3>
+
+    <div class="comm-filter-row">
+        <h3 style="margin:0;">Sales Team Commission Leaderboard</h3>
+        <div class="comm-filter-pills" id="commFilterPills">
+            <button type="button" class="comm-filter-pill active" data-commfilter="all">All Agents</button>
+            <button type="button" class="comm-filter-pill" data-commfilter="ready">🔥 Ready to Pay</button>
+            <button type="button" class="comm-filter-pill" data-commfilter="below">⏳ Below Target</button>
+        </div>
+    </div>
     <div class="orders-container" id="salesTeamList">
         <!-- Table loads here -->
     </div>
@@ -9650,18 +9842,30 @@
             <button class="back-btn" id="backToStoreFromAgentBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
         </div>
         
-        <div class="dashboard-stats" style="margin-bottom: 24px;">
+        <div class="dashboard-stats" style="margin-bottom: 18px;">
             <div class="stat-card" style="border-bottom: 3px solid #f7d875;">
                 <div class="stat-number" id="agentTotalSales">RM 0.00</div>
-                <div class="stat-label">Total Sales Generated</div>
+                <div class="stat-label">Total Approved Sales</div>
             </div>
-            <div class="stat-card" style="border-bottom: 3px solid #4caf50; background: rgba(76,175,80,0.05);">
-                <div class="stat-number profit" id="agentTotalCommission">RM 0.00</div>
-                <div class="stat-label">Total Commission Earned</div>
+            <div class="stat-card" style="border-bottom: 3px solid #4caf50; background: rgba(76,175,80,0.06);">
+                <div class="stat-number profit" id="agentUnpaidCommission">RM 0.00</div>
+                <div class="stat-label">Unpaid Balance (Ready for Payout)</div>
+            </div>
+            <div class="stat-card" style="border-bottom: 3px solid #38bdf8;">
+                <div class="stat-number" id="agentPaidOutCommission" style="color:#38bdf8;">RM 0.00</div>
+                <div class="stat-label">Total Already Paid Out</div>
+            </div>
+            <div class="stat-card" style="display:none;">
+                <div class="stat-number" id="agentTotalCommission">RM 0.00</div>
             </div>
         </div>
 
-        <h3 style="margin-bottom: 16px;">Your Orders & Commissions</h3>
+        <div id="agentPayoutProgressBox" style="background:#121821; border:1px solid #1e2a3a; border-radius:14px; padding:14px 18px; margin-bottom:20px; display:none;"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+            <h3 style="margin:0;">Your Orders &amp; Commissions</h3>
+            <button type="button" id="copyAgentLinkBtn" class="submit-btn" style="padding:8px 16px; font-size:12.5px; display:none;"><i class="fas fa-link"></i> Copy My Agent Promo Link</button>
+        </div>
         <div class="orders-container">
             <div id="agentOrderHistory">Loading history...</div>
         </div>
@@ -9850,9 +10054,9 @@
                 <h2><i class="fas fa-search"></i> Track Your Orders</h2>
                 <button class="close-edit" id="trackClose" style="background:transparent; border:none; color:#8aa1c0; font-size:28px; cursor:pointer;"><i class="fas fa-times"></i></button>
             </div>
-            <p class="sub">Enter your email to see all your orders and their current status.</p>
+            <p class="sub">Enter your <strong>Order ID</strong> (e.g. ORD-20261118-1234) or <strong>Email</strong> to check live status &amp; upload receipts.</p>
             <div class="track-form">
-                <input type="email" id="trackEmail" placeholder="you@example.com" required />
+                <input type="text" id="trackEmail" placeholder="ORD-20261118-1234 or you@example.com" required />
                 <button id="trackSubmit"><i class="fas fa-search"></i> Find</button>
             </div>
             <div class="track-results" id="trackResults"></div>
@@ -12433,6 +12637,24 @@ function updatePointsPreview() {
     updateCheckoutSummary();
 }
 
+var SAVED_CONTACT_KEY = 'nex4up_saved_checkout_contact_v1';
+
+function getSavedCheckoutContact() {
+    try {
+        var raw = localStorage.getItem(SAVED_CONTACT_KEY);
+        return raw ? (JSON.parse(raw) || {}) : {};
+    } catch (e) { return {}; }
+}
+
+function saveCheckoutContact(info) {
+    try {
+        if (!info || typeof info !== 'object') return;
+        var prev = getSavedCheckoutContact();
+        var merged = Object.assign({}, prev, info);
+        localStorage.setItem(SAVED_CONTACT_KEY, JSON.stringify(merged));
+    } catch (e) {}
+}
+
 checkoutBtn.addEventListener('click', function() {
     if (cart.length === 0) return;
 
@@ -12451,10 +12673,9 @@ checkoutBtn.addEventListener('click', function() {
         return;
     }
 
-    if (customer) {
-        checkoutPhone.value = customer.phone || '';
-        checkoutEmail.value = customer.email || '';
-    }
+    var savedContact = getSavedCheckoutContact();
+    checkoutPhone.value = (customer && customer.phone) ? customer.phone : (savedContact.phone || '');
+    checkoutEmail.value = (customer && customer.email) ? customer.email : (savedContact.email || '');
 
     appliedPromo = null;
     document.getElementById('promoCode').value = '';
@@ -12474,14 +12695,12 @@ checkoutBtn.addEventListener('click', function() {
     var shippingContainer = document.getElementById('shippingFormContainer');
     if (cartHasPhysicalItems()) {
         shippingContainer.style.display = 'block';
-        // Pre-fill with customer data if logged in
-        if (customer) {
-            document.getElementById('shippingName').value = customer.name || '';
-            document.getElementById('shippingPhone').value = customer.phone || '';
-        } else {
-            document.getElementById('shippingName').value = '';
-            document.getElementById('shippingPhone').value = '';
-        }
+        document.getElementById('shippingName').value = savedContact.shippingName || (customer ? (customer.name || '') : '');
+        document.getElementById('shippingPhone').value = savedContact.shippingPhone || (customer ? (customer.phone || '') : '');
+        document.getElementById('shippingAddress').value = savedContact.shippingAddress || '';
+        document.getElementById('shippingCity').value = savedContact.shippingCity || '';
+        document.getElementById('shippingState').value = savedContact.shippingState || '';
+        document.getElementById('shippingPostcode').value = savedContact.shippingPostcode || '';
     } else {
         shippingContainer.style.display = 'none';
         // Clear fields (so they don't accidentally submit old data)
@@ -12966,6 +13185,16 @@ var promoData = appliedPromo ? {
                             return it.title + (it.variantLabel ? ' (' + it.variantLabel + ')' : '') + ' × ' + it.quantity;
                         }).join(', ');
                         saveGameIdsToStorage(gameIds);
+                        var contactToSave = { phone: customerData.phone || '', email: customerData.email || '' };
+                        if (hasPhysicalItem && shippingData) {
+                            contactToSave.shippingName = shippingData.name || '';
+                            contactToSave.shippingPhone = shippingData.phone || '';
+                            contactToSave.shippingAddress = shippingData.address || '';
+                            contactToSave.shippingCity = shippingData.city || '';
+                            contactToSave.shippingState = shippingData.state || '';
+                            contactToSave.shippingPostcode = shippingData.postcode || '';
+                        }
+                        saveCheckoutContact(contactToSave);
                         savePendingPaymentSession({
                             orderId: orderId,
                             method: paidMethod,
@@ -13138,22 +13367,22 @@ var promoData = appliedPromo ? {
                     createdAt: entry.createdAt || Date.now()
                 });
                 localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(list.slice(0, 12)));
-                renderPendingReceiptHistoryBanner();
+                rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
             } catch (e) {}
         }
 
-        function removePendingPaymentSession(orderId) {
+        function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(orderId) {
             try {
                 if (!orderId) return;
                 var list = getPendingPaymentSessions().filter(function(it) {
                     return String(it.orderId).toUpperCase() !== String(orderId).toUpperCase();
                 });
                 localStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(list));
-                renderPendingReceiptHistoryBanner();
+                rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
             } catch (e) {}
         }
 
-        function renderPendingReceiptHistoryBanner() {
+        function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63() {
             var banner = document.getElementById('pendingReceiptHistoryBanner');
             var listEl = document.getElementById('pendingReceiptHistoryList');
             var countEl = document.getElementById('pendingReceiptCountBadge');
@@ -13190,7 +13419,7 @@ var promoData = appliedPromo ? {
                         '<button type="button" class="prb-upload-btn" onclick="openQRModal(\'' + safeId + '\', \'' + safeMethod + '\', ' + amt + ', true)">' +
                             '<i class="fas fa-receipt"></i> ' + (item.method === 'sociabuzz' ? 'Pay / Confirm' : 'Upload Receipt') +
                         '</button>' +
-                        '<button type="button" class="prb-dismiss-btn" title="Remove from history" onclick="removePendingPaymentSession(\'' + safeId + '\')">' +
+                        '<button type="button" class="prb-dismiss-btn" title="Remove from history" onclick="rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(\'' + safeId + '\')">' +
                             '<i class="fas fa-times"></i>' +
                         '</button>' +
                     '</div>' +
@@ -13219,7 +13448,7 @@ var promoData = appliedPromo ? {
                         return;
                     }
                     if (res.status === 'Paid' || res.status === 'Shipped' || res.status === 'Cancelled') {
-                        removePendingPaymentSession(res.orderId);
+                        rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.orderId);
                         showToast('Order ' + res.orderId + ' is already "' + res.status + '".');
                         return;
                     }
@@ -13437,7 +13666,7 @@ var promoData = appliedPromo ? {
                 .withSuccessHandler(function(result) {
                     if (result && result.success) {
                         sociaBuzzPaymentConfirmed = true;
-                        removePendingPaymentSession(currentQROrderId);
+                        rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(currentQROrderId);
                         var sbzActions = document.getElementById('sociaBuzzConfirmActions');
                         if (sbzActions) sbzActions.style.display = 'none';
                         var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
@@ -13543,7 +13772,7 @@ var promoData = appliedPromo ? {
             google.script.run
                 .withSuccessHandler(function(result) {
                     if (result && result.success) {
-                        removePendingPaymentSession(currentQROrderId);
+                        rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(currentQROrderId);
                         document.getElementById('receiptActions').style.display = 'none';
                         document.getElementById('receiptPreview').style.display = 'none';
                         var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
@@ -13607,7 +13836,7 @@ var promoData = appliedPromo ? {
                     }
                     window._qrAllowLater = true;
                     closeQRModal();
-                    renderPendingReceiptHistoryBanner();
+                    rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
                     var banner = document.getElementById('pendingReceiptHistoryBanner');
                     if (banner) banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     showToast('📌 Order saved in Pending Receipt History! Upload your receipt anytime.');
@@ -13953,6 +14182,7 @@ if (cart.length > 0) {
                         loadGenreImages();
                     } else if (section === 'referral-settings') {
                         loadReferralConfig();
+                        if (typeof loadAdminPromoCodes === 'function') loadAdminPromoCodes();
                     } else if (section === 'backup') {
                         loadBackupHistory();
                     } else if (section === 'inbox') {
@@ -14079,7 +14309,7 @@ if (cart.length > 0) {
             select.innerHTML = html;
         }
 
-        function renderAdminProductPagination(totalPages, totalItems) {
+        function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(totalPages, totalItems) {
             var container = document.getElementById('adminProductPagination');
             if (!container) return;
 
@@ -14255,7 +14485,7 @@ if (cart.length > 0) {
             }
 
             // Render pagination
-            renderAdminProductPagination(totalPages, totalItems);
+            rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(totalPages, totalItems);
         }
 
         // ===== Event listeners for the admin product toolbar =====
@@ -14756,12 +14986,124 @@ if (!hasVariants) {
         });
 
         // ================================================================
-        // 21. LOAD ORDERS
+        // 21. LOAD ORDERS + BULK ACTIONS + WHATSAPP + ACCOUNTING CSV EXPORT
         // ================================================================
+function buildAdminWhatsAppLink(rawPhone, orderId, customerName, payStatus) {
+    var digits = String(rawPhone || '').replace(/[^\d]/g, '');
+    if (!digits) return '';
+    if (digits.charAt(0) === '0') digits = '60' + digits.slice(1);
+    else if (digits.indexOf('60') !== 0 && digits.length <= 10) digits = '60' + digits;
+    var greetingName = customerName ? String(customerName).trim() : 'there';
+    var msgText = (payStatus === 'Awaiting Payment' || payStatus === 'Pending')
+        ? ('Hi ' + greetingName + ', kindly complete / upload your payment receipt for Nex4UpStore order ' + orderId + ' so we can process it right away!')
+        : ('Hi ' + greetingName + ', update on your Nex4UpStore order ' + orderId + ' (' + payStatus + '). Thank you for shopping with us!');
+    return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(msgText);
+}
+
+function _updateBulkCheckboxCounter(checkboxSelector, countSpanId) {
+    var checked = document.querySelectorAll(checkboxSelector + ':checked').length;
+    var span = document.getElementById(countSpanId);
+    if (span) span.textContent = '(' + checked + ')';
+}
+
+function runBulkOrderAction(checkboxSelector, newStatus, triggerBtn) {
+    var boxes = document.querySelectorAll(checkboxSelector + ':checked');
+    var ids = [];
+    for (var i = 0; i < boxes.length; i++) {
+        if (boxes[i].dataset.orderid) ids.push(boxes[i].dataset.orderid);
+    }
+    if (ids.length === 0) {
+        showToast('⚠️ Select at least one order first.');
+        return;
+    }
+    if (!confirm('Update ' + ids.length + ' selected order(s) to "' + newStatus + '"?')) return;
+    var origHtml = triggerBtn ? triggerBtn.innerHTML : '';
+    if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...'; }
+    google.script.run
+        .withSuccessHandler(function(res) {
+            if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerHTML = origHtml; }
+            showToast((res && res.message) || ('Updated ' + ids.length + ' order(s).'));
+            loadOrders();
+            loadPendingOrders();
+            loadAdvancedDashboard();
+        })
+        .withFailureHandler(function(err) {
+            if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerHTML = origHtml; }
+            showToast('Bulk update error: ' + err.message);
+        })
+        .bulkUpdateOrderStatuses(ids, newStatus);
+}
+
+function runAutoExpireUnpaidAdmin(triggerBtn) {
+    if (!confirm('Cancel all "Awaiting Payment" orders older than 24 hours (with no uploaded receipt) and restore their stock/Robux/points?')) return;
+    var origHtml = triggerBtn ? triggerBtn.innerHTML : '';
+    if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cleaning...'; }
+    google.script.run
+        .withSuccessHandler(function(res) {
+            if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerHTML = origHtml; }
+            showToast((res && res.message) || 'Cleanup complete.');
+            loadOrders();
+            loadPendingOrders();
+            loadAdvancedDashboard();
+            loadGames();
+        })
+        .withFailureHandler(function(err) {
+            if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerHTML = origHtml; }
+            showToast('Cleanup error: ' + err.message);
+        })
+        .autoExpireUnpaidOrders(24);
+}
+
+function exportOrdersAccountingCsv() {
+    var downloadFromOrders = function(orders) {
+        if (!orders || orders.length === 0) {
+            showToast('No orders to export.');
+            return;
+        }
+        var cols = [
+            'Order ID', 'Date', 'Customer Name', 'Email', 'Phone',
+            'Payment Method', 'Items', 'Total (RM)', 'Total Cost (RM)',
+            'Gateway Fee (RM)', 'Platform Fee (RM)', 'Actual Net Profit (RM)',
+            'Payment Status', 'Fulfilment Status', 'Receipt Number',
+            'Agent Email', 'Commission Amount (RM)'
+        ];
+        var escCsv = function(v) {
+            var s = String(v === undefined || v === null ? '' : v);
+            if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+            return s;
+        };
+        var lines = [cols.map(escCsv).join(',')];
+        orders.forEach(function(o) {
+            lines.push(cols.map(function(c) { return escCsv(o[c]); }).join(','));
+        });
+        var blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'nex4up-orders-accounting-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('📥 Exported ' + orders.length + ' orders to CSV.');
+    };
+
+    if (window._adminAllOrdersCache && window._adminAllOrdersCache.length > 0) {
+        downloadFromOrders(window._adminAllOrdersCache);
+    } else {
+        showToast('Preparing CSV...');
+        google.script.run.withSuccessHandler(function(orders) {
+            window._adminAllOrdersCache = orders || [];
+            downloadFromOrders(window._adminAllOrdersCache);
+        }).getOrdersData();
+    }
+}
+
 function loadOrders() {
     ordersList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Payment</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Fulfilment</th></tr></thead><tbody>' + createSkeletonTableRows(5) + '</tbody></table></div>';
     google.script.run
         .withSuccessHandler(function(orders) {
+            window._adminAllOrdersCache = orders || [];
             if (!orders || orders.length === 0) {
                 ordersList.innerHTML = '<div class="empty-msg">No orders yet.</div>';
                 return;
@@ -14779,46 +15121,41 @@ function loadOrders() {
                 { key: 'Total (RM)', label: 'Total' }
             ].filter(c => allKeys.indexOf(c.key) !== -1);
 
-            var html = '<table><thead><tr>';
+            var html = '<table><thead><tr><th style="width:32px;"></th>';
             cols.forEach(c => { html += '<th>' + c.label + '</th>'; });
-            html += '<th>Payment Status</th><th>Fulfilment</th><th>Robux</th></tr></thead><tbody>';
+            html += '<th>Payment Status</th><th>Fulfilment &amp; Quick Contact</th><th>Robux</th></tr></thead><tbody>';
 
             for (var i = 0; i < orders.length; i++) {
                 var o = orders[i];
+                var oid = o['Order ID'] || '';
                 html += '<tr>';
+                html += '<td><input type="checkbox" class="admin-order-check" data-orderid="' + escapeHtml(oid) + '" /></td>';
                 cols.forEach(c => {
                     var v = o[c.key] || '';
                     if (c.key === 'Total (RM)') v = CURRENCY + ' ' + parseFloat(v || 0).toFixed(2);
                     html += '<td>' + v + '</td>';
                 });
 
-                // Payment Status dropdown (unchanged behavior)
-                // ✅ Payment Status dropdown — now mirrors the actual Payment Status field
                 var payStatusRaw = String(o['Payment Status'] || 'Awaiting Payment').trim();
                 var fulfilStatusRaw = String(o['Fulfilment Status'] || '').trim();
-                html += '<td><select class="order-status-select" data-orderid="' + (o['Order ID'] || '') + '">';
+                html += '<td><select class="order-status-select" data-orderid="' + oid + '">';
                 var pStatuses = ['Awaiting Payment', 'Awaiting Verification', 'Pending', 'Paid', 'Cancelled'];
                 pStatuses.forEach(function(s) {
                     html += '<option value="' + s + '"' + (payStatusRaw === s ? ' selected' : '') + '>' + s + '</option>';
                 });
                 html += '</select></td>';
 
-                // ✅ Fulfilment column — separate from Payment Status
-                html += '<td>';
-                
-                // 👇 NEW: Only show button if order has Gift Codes 👇
+                // ✅ Fulfilment + WhatsApp Quick Contact column
+                html += '<td><div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">';
                 var orderItems = String(o['Items'] || '').toLowerCase();
                 var hasGiftCode = allGames.some(function(g) {
                     return g.productType === 'gift_code' && orderItems.includes(g.title.toLowerCase());
                 });
-                
                 if (hasGiftCode) {
-                    html += '<button class="manage-codes-btn" data-orderid="' + (o['Order ID'] || '') + '" data-items="' + (o['Items'] || '').replace(/"/g, '&quot;') + '" style="margin-bottom: 5px; background:#f7d875;color:#0b0e14;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-weight:700;width:100%;"><i class="fas fa-gift"></i> Manage Codes</button>';
+                    html += '<button class="manage-codes-btn" data-orderid="' + oid + '" data-items="' + (o['Items'] || '').replace(/"/g, '&quot;') + '" style="background:#f7d875;color:#0b0e14;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-weight:700;width:100%;"><i class="fas fa-gift"></i> Manage Codes</button>';
                 }
-                // 👆 END NEW 👆
-                
                 if (payStatusRaw === 'Paid' && fulfilStatusRaw !== 'Shipped' && fulfilStatusRaw !== 'Delivered') {
-                    html += '<button class="mark-shipped-btn" data-orderid="' + (o['Order ID'] || '') + '" '
+                    html += '<button class="mark-shipped-btn" data-orderid="' + oid + '" '
                           + 'style="background:#2196f3;color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:Inter;font-weight:700;white-space:nowrap;">'
                           + '<i class="fas fa-truck"></i> Mark as Shipped</button>';
                 } else if (fulfilStatusRaw) {
@@ -14828,7 +15165,11 @@ function loadOrders() {
                 } else {
                     html += '<span style="color:#6a7f9e;font-size:12px;">—</span>';
                 }
-                html += '</td>';
+                var waHref = buildAdminWhatsAppLink(o['Phone'], oid, o['Customer Name'], payStatusRaw);
+                if (waHref) {
+                    html += '<a href="' + waHref + '" target="_blank" rel="noopener noreferrer" class="wa-mini-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>';
+                }
+                html += '</div></td>';
 
                 var rbReq = parseInt(o['Robux Required'], 10) || 0;
                 var rbBack = parseInt(o['Robux Backorder'], 10) || 0;
@@ -14843,6 +15184,15 @@ function loadOrders() {
             }
             html += '</tbody></table>';
             ordersList.innerHTML = html;
+
+            var selAllEl = document.getElementById('ordersSelectAll');
+            if (selAllEl) selAllEl.checked = false;
+            _updateBulkCheckboxCounter('.admin-order-check', 'ordersSelectedCount');
+            ordersList.querySelectorAll('.admin-order-check').forEach(function(cb) {
+                cb.addEventListener('change', function() {
+                    _updateBulkCheckboxCounter('.admin-order-check', 'ordersSelectedCount');
+                });
+            });
 
             // Payment status change
             var selects = ordersList.querySelectorAll('.order-status-select');
@@ -15040,7 +15390,7 @@ function loadOrders() {
                 return;
             }
 
-            var html2 = '<table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Payment</th><th>Total</th><th>Receipt / Tx Ref</th><th>Receipt / Verification</th><th>Actions</th></tr></thead><tbody>';
+            var html2 = '<table><thead><tr><th style="width:32px;"></th><th>Order ID</th><th>Date</th><th>Customer</th><th>Payment</th><th>Total</th><th>Receipt / Tx Ref</th><th>Receipt / Verification</th><th>Actions</th></tr></thead><tbody>';
 
             for (var pi = 0; pi < filtered.length; pi++) {
                 var order = filtered[pi];
@@ -15057,6 +15407,7 @@ function loadOrders() {
                 var hlEmail = highlightApproval(order['Email'] || '', q);
 
                 html2 += '<tr>';
+                html2 += '<td><input type="checkbox" class="approval-order-check" data-orderid="' + escapeApprovalHtml(orderId) + '" /></td>';
                 html2 += '<td>' + hlOrderId + '</td>';
                 html2 += '<td>' + (order['Date'] || '') + '</td>';
                 html2 += '<td>' + hlName + '<br><small style="color:#6a7f9e;">' + hlEmail + '</small></td>';
@@ -15098,14 +15449,25 @@ function loadOrders() {
                 var canApprove = !!(receiptUrl || isSociaBuzz);
                 var approveDisabled = canApprove ? '' : 'disabled';
                 var approveTitle = canApprove ? 'Approve Order' : 'Cannot approve without a receipt';
-                html2 += '<td>' +
-                         '<button class="approve-btn" data-orderid="' + orderId + '" ' + approveDisabled + ' title="' + approveTitle + '"><i class="fas fa-check"></i> Approve</button> ' +
+                var waAppHref = buildAdminWhatsAppLink(order['Phone'], orderId, order['Customer Name'], order['Payment Status'] || 'Awaiting Payment');
+                html2 += '<td><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">' +
+                         '<button class="approve-btn" data-orderid="' + orderId + '" ' + approveDisabled + ' title="' + approveTitle + '"><i class="fas fa-check"></i> Approve</button>' +
                          '<button class="cancel-btn" data-orderid="' + orderId + '"><i class="fas fa-times"></i> Reject</button>' +
-                         '</td>';
+                         (waAppHref ? '<a href="' + waAppHref + '" target="_blank" rel="noopener noreferrer" class="wa-mini-btn"><i class="fab fa-whatsapp"></i> WA</a>' : '') +
+                         '</div></td>';
                 html2 += '</tr>';
             }
             html2 += '</tbody></table>';
             approvalList.innerHTML = html2;
+
+            var appSelAll = document.getElementById('approvalSelectAll');
+            if (appSelAll) appSelAll.checked = false;
+            _updateBulkCheckboxCounter('.approval-order-check', 'approvalSelectedCount');
+            approvalList.querySelectorAll('.approval-order-check').forEach(function(cb) {
+                cb.addEventListener('change', function() {
+                    _updateBulkCheckboxCounter('.approval-order-check', 'approvalSelectedCount');
+                });
+            });
 
             var approveBtns = approvalList.querySelectorAll('.approve-btn');
             for (var ab = 0; ab < approveBtns.length; ab++) {
@@ -15347,8 +15709,71 @@ function loadOrders() {
             if (refreshBtn) refreshBtn.addEventListener('click', loadAdvancedDashboard);
         })();
 
+        (function setupAdminAutomationTools() {
+            var expDashBtn = document.getElementById('exportDashboardCsvBtn');
+            var expOrdBtn = document.getElementById('exportOrdersCsvBtn');
+            if (expDashBtn) expDashBtn.addEventListener('click', exportOrdersAccountingCsv);
+            if (expOrdBtn) expOrdBtn.addEventListener('click', exportOrdersAccountingCsv);
+
+            var tgSnapBtn = document.getElementById('sendDashTelegramBtn');
+            if (tgSnapBtn) {
+                tgSnapBtn.addEventListener('click', function() {
+                    var filterEl = document.getElementById('dashboardTimeFilter');
+                    var range = filterEl ? filterEl.value : 'month';
+                    var orig = tgSnapBtn.innerHTML;
+                    tgSnapBtn.disabled = true;
+                    tgSnapBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                    google.script.run
+                        .withSuccessHandler(function(res) {
+                            tgSnapBtn.disabled = false;
+                            tgSnapBtn.innerHTML = orig;
+                            showToast((res && res.message) || 'Sent to Telegram!');
+                        })
+                        .withFailureHandler(function(err) {
+                            tgSnapBtn.disabled = false;
+                            tgSnapBtn.innerHTML = orig;
+                            showToast('Error: ' + err.message);
+                        })
+                        .sendDashboardTelegramSnapshot(range);
+                });
+            }
+
+            var cleanOrdBtn = document.getElementById('cleanExpiredOrdersBtn');
+            var cleanAppBtn = document.getElementById('cleanExpiredOrdersApprovalBtn');
+            if (cleanOrdBtn) cleanOrdBtn.addEventListener('click', function() { runAutoExpireUnpaidAdmin(cleanOrdBtn); });
+            if (cleanAppBtn) cleanAppBtn.addEventListener('click', function() { runAutoExpireUnpaidAdmin(cleanAppBtn); });
+
+            var appSelectAll = document.getElementById('approvalSelectAll');
+            if (appSelectAll) {
+                appSelectAll.addEventListener('change', function() {
+                    var boxes = document.querySelectorAll('.approval-order-check');
+                    for (var i = 0; i < boxes.length; i++) boxes[i].checked = this.checked;
+                    _updateBulkCheckboxCounter('.approval-order-check', 'approvalSelectedCount');
+                });
+            }
+            var ordSelectAll = document.getElementById('ordersSelectAll');
+            if (ordSelectAll) {
+                ordSelectAll.addEventListener('change', function() {
+                    var boxes = document.querySelectorAll('.admin-order-check');
+                    for (var i = 0; i < boxes.length; i++) boxes[i].checked = this.checked;
+                    _updateBulkCheckboxCounter('.admin-order-check', 'ordersSelectedCount');
+                });
+            }
+
+            var bulkAppBtn = document.getElementById('bulkApproveBtn');
+            var bulkRejBtn = document.getElementById('bulkRejectApprovalBtn');
+            var bulkPaidBtn = document.getElementById('bulkOrdersPaidBtn');
+            var bulkShipBtn = document.getElementById('bulkOrdersShipBtn');
+            var bulkCancelBtn = document.getElementById('bulkOrdersCancelBtn');
+            if (bulkAppBtn) bulkAppBtn.addEventListener('click', function() { runBulkOrderAction('.approval-order-check', 'Paid', bulkAppBtn); });
+            if (bulkRejBtn) bulkRejBtn.addEventListener('click', function() { runBulkOrderAction('.approval-order-check', 'Cancelled', bulkRejBtn); });
+            if (bulkPaidBtn) bulkPaidBtn.addEventListener('click', function() { runBulkOrderAction('.admin-order-check', 'Paid', bulkPaidBtn); });
+            if (bulkShipBtn) bulkShipBtn.addEventListener('click', function() { runBulkOrderAction('.admin-order-check', 'Shipped', bulkShipBtn); });
+            if (bulkCancelBtn) bulkCancelBtn.addEventListener('click', function() { runBulkOrderAction('.admin-order-check', 'Cancelled', bulkCancelBtn); });
+        })();
+
         // ================================================================
-        // 23. TRACK ORDER MODAL
+        // 23. TRACK ORDER MODAL (Order ID OR Email + Upload Receipt)
         // ================================================================
         trackBtn.addEventListener('click', function() {
             trackOverlay.classList.add('open');
@@ -15363,12 +15788,61 @@ function loadOrders() {
         trackOverlay.addEventListener('click', function(e) { if (e.target === trackOverlay) trackOverlay.classList.remove('open'); });
 
         trackSubmit.addEventListener('click', function() {
-            var email = trackEmail.value.trim();
-            if (!email) {
-                trackResults.innerHTML = '<p style="color:#ff6b6b;">Please enter your email.</p>';
+            var queryVal = trackEmail.value.trim();
+            if (!queryVal) {
+                trackResults.innerHTML = '<p style="color:#ff6b6b;">Please enter an Order ID (ORD-...) or your email.</p>';
                 return;
             }
-            trackResults.innerHTML = '<p style="color:#6a7f9e;">Searching...</p>';
+            trackResults.innerHTML = '<p style="color:#6a7f9e;"><i class="fas fa-spinner fa-spin"></i> Searching...</p>';
+
+            // 1. Direct Order ID Lookup (Works without logging in!)
+            if (queryVal.toUpperCase().indexOf('ORD-') === 0) {
+                google.script.run
+                    .withSuccessHandler(function(res) {
+                        if (!res || !res.success) {
+                            trackResults.innerHTML = '<div class="empty-msg">' + escapeHtml((res && res.message) || 'Order ID not found.') + '</div>';
+                            return;
+                        }
+                        var st = String(res.status || 'Awaiting Payment');
+                        var statusClass = st.toLowerCase().replace(/\s+/g, '-');
+                        var curStep = 1;
+                        if (st === 'Awaiting Verification' || res.receiptNumber) curStep = 2;
+                        if (st === 'Paid') curStep = 3;
+                        if (st === 'Shipped' || st === 'Delivered') curStep = 4;
+                        var stepsHtml = '';
+                        if (st !== 'Cancelled' && st !== 'Refunded') {
+                            var sLabels = ['Placed', 'Payment Sent', 'Verified', 'Completed'];
+                            stepsHtml = '<div class="order-progress-track" style="margin:10px 0 8px;">';
+                            for (var sp = 1; sp <= 4; sp++) {
+                                var cls = sp < curStep ? 'done' : (sp === curStep ? 'active' : '');
+                                stepsHtml += '<div class="order-step ' + cls + '"><div class="order-step-dot">' + (sp < curStep ? '<i class="fas fa-check"></i>' : sp) + '</div><div class="order-step-label">' + sLabels[sp - 1] + '</div></div>';
+                            }
+                            stepsHtml += '</div>';
+                        }
+                        var actionBtn = '';
+                        if (st === 'Awaiting Payment') {
+                            var mk = escapeHtml(res.methodKey || 'mae');
+                            var oidSafe = escapeHtml(res.orderId);
+                            var amtNum = (parseFloat(res.amount) || 0).toFixed(2);
+                            actionBtn = '<div style="margin-top:10px;"><button type="button" class="prb-upload-btn" onclick="trackOverlay.classList.remove(\'open\'); openQRModal(\'' + oidSafe + '\', \'' + mk + '\', ' + amtNum + ', true)"><i class="fas fa-upload"></i> Upload Receipt / Pay Now</button></div>';
+                        }
+                        trackResults.innerHTML =
+                            '<div class="order-item">' +
+                                '<div class="order-id">' + escapeHtml(res.orderId) + '</div>' +
+                                (res.items ? '<div><strong>Items:</strong> ' + escapeHtml(res.items) + '</div>' : '') +
+                                '<div><strong>Method:</strong> ' + escapeHtml(res.paymentMethod || '-') + ' | <strong>Total:</strong> ' + CURRENCY + ' ' + (parseFloat(res.amount) || 0).toFixed(2) + '</div>' +
+                                '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + escapeHtml(st) + '</span></div>' +
+                                stepsHtml + actionBtn +
+                            '</div>';
+                    })
+                    .withFailureHandler(function(err) {
+                        trackResults.innerHTML = '<p style="color:#ff6b6b;">Error: ' + escapeHtml(err.message) + '</p>';
+                    })
+                    .getOrderForReceiptUpload(queryVal, '');
+                return;
+            }
+
+            // 2. Email Order History Lookup
             google.script.run
                 .withSuccessHandler(function(orders) {
                     if (!orders || orders.length === 0) {
@@ -15384,20 +15858,30 @@ function loadOrders() {
                         var items = o['Items'] || 'N/A';
                         var total = parseFloat(o['Total (RM)'] || 0).toFixed(2);
                         var date = o['Date'] || 'N/A';
+                        var pmRaw = String(o['Payment Method'] || '').toLowerCase();
+                        var mk = pmRaw.indexOf('sociabuzz') !== -1 ? 'sociabuzz' : ((pmRaw.indexOf('tng') !== -1 || pmRaw.indexOf('touch') !== -1) ? 'tng' : (pmRaw.indexOf('shopee') !== -1 ? 'shopee' : 'mae'));
+                        var payBtn = (status === 'Awaiting Payment')
+                            ? '<div style="margin-top:8px;"><button type="button" class="prb-upload-btn" onclick="trackOverlay.classList.remove(\'open\'); openQRModal(\'' + escapeHtml(orderId) + '\', \'' + mk + '\', ' + total + ', true)"><i class="fas fa-upload"></i> Upload Receipt / Pay Now</button></div>'
+                            : '';
+                        var trackInfo = o['Tracking Number']
+                            ? '<div><strong>Tracking:</strong> <code>' + escapeHtml(o['Tracking Number']) + '</code>' + (o['Tracking URL'] ? ' <a href="' + escapeHtml(o['Tracking URL']) + '" target="_blank" style="color:#38bdf8;">Track &rarr;</a>' : '') + '</div>'
+                            : '';
                         html += '<div class="order-item">';
-                        html += '<div class="order-id">' + orderId + '</div>';
-                        html += '<div><strong>Items:</strong> ' + items + '</div>';
+                        html += '<div class="order-id">' + escapeHtml(orderId) + '</div>';
+                        html += '<div><strong>Items:</strong> ' + escapeHtml(items) + '</div>';
                         html += '<div><strong>Total:</strong> ' + CURRENCY + ' ' + total + '</div>';
-                        html += '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + status + '</span></div>';
-                        html += '<div><strong>Date:</strong> ' + date + '</div>';
+                        html += '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + escapeHtml(status) + '</span></div>';
+                        html += trackInfo;
+                        html += '<div><strong>Date:</strong> ' + escapeHtml(date) + '</div>';
+                        html += payBtn;
                         html += '</div>';
                     }
                     trackResults.innerHTML = html;
                 })
                 .withFailureHandler(function(err) {
-                    trackResults.innerHTML = '<p style="color:#ff6b6b;">Error: ' + err.message + '</p>';
+                    trackResults.innerHTML = '<p style="color:#ff6b6b;">Error: ' + escapeHtml(err.message) + '</p>';
                 })
-                .getCustomerOrders(email);
+                .getCustomerOrders(queryVal);
         });
 
         // ================================================================
@@ -15465,6 +15949,8 @@ function loadOrders() {
                     productModalStock.textContent = 'Out of Stock';
                     productModalStock.className = 'product-stock out-of-stock';
                     modalAddBtn.textContent = 'Out of Stock';
+                } else {
+                    productModalStock.innerHTML = 'Select options below' + ((game.sold || 0) > 0 ? '<span class="verified-activity-pill"><i class="fas fa-fire"></i> ' + (game.sold || 0) + ' sold &bull; Verified Fast Delivery</span>' : '');
                 }
 
                 renderVariantPicker(game);
@@ -15482,7 +15968,8 @@ function loadOrders() {
                     modalAddBtn.style.opacity = '0.5';
                 } else {
             var preOrderNote = (game.productType === 'physical') ? ' · Pre-Order (Ships 13th of month)' : '';
-                    productModalStock.textContent = 'Stock: ' + stock + ' | Sold: ' + (game.sold || 0) + preOrderNote;
+                    productModalStock.innerHTML = 'Stock: ' + stock + ' | Sold: ' + (game.sold || 0) + escapeHtml(preOrderNote) +
+                        '<span class="verified-activity-pill"><i class="fas fa-shield-check"></i> Verified Instant Processing</span>';
                     productModalStock.className = 'product-stock';
                     modalQtyInput.disabled = false;
                     modalQtyMinus.disabled = false;
@@ -15957,10 +16444,10 @@ function loadMyOrders() {
                         createdAt: Date.now()
                     });
                 } else {
-                    removePendingPaymentSession(moId);
+                    rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(moId);
                 }
             }
-            renderPendingReceiptHistoryBanner();
+            rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
             renderOrderTabCounts();
             renderOrderList(activeOrderTab);
         })
@@ -16123,9 +16610,23 @@ function renderOrderList(tab) {
                 '</div>';
         }
 
+        var trackingNum = String(order['Tracking Number'] || '').trim();
+        var trackingUrl = String(order['Tracking URL'] || '').trim();
+        if (trackingNum || trackingUrl) {
+            html += '<div class="parcel-tracking-box">' +
+                '<div><i class="fas fa-truck" style="color:#38bdf8;"></i> <strong>Parcel Tracking:</strong> ' +
+                (trackingNum ? '<code style="color:#f7d875;">' + escapeHtml(trackingNum) + '</code>' : 'Available') + '</div>' +
+                '<div style="display:flex;gap:8px;align-items:center;">' +
+                (trackingNum ? '<button type="button" class="sbz-copy-btn" onclick="copyToClipboard(\'' + escapeHtml(trackingNum) + '\')"><i class="fas fa-copy"></i> Copy</button>' : '') +
+                (trackingUrl ? '<a href="' + escapeHtml(trackingUrl) + '" target="_blank" rel="noopener noreferrer" class="wa-mini-btn" style="border-color:#38bdf8;color:#38bdf8;background:rgba(56,189,248,0.12);"><i class="fas fa-external-link-alt"></i> Track Parcel</a>' : '') +
+                '</div></div>';
+        }
+
         html += '<div class="order-actions">';
         html += '<button class="rate-btn" style="background:#1e2a3a;color:#e8edf5;border:1px solid #2a3a52;" onclick="openDigitalReceiptModal(\'' + escapeHtml(orderId) + '\')">';
         html += '<i class="fas fa-receipt"></i> Receipt</button>';
+        html += '<button class="rate-btn" style="background:#192638;color:#f7d875;border:1px solid #3d5a7a;" onclick="buyAgainFromOrder(\'' + escapeHtml(orderId) + '\')">';
+        html += '<i class="fas fa-redo-alt"></i> Buy Again</button>';
 
         if (tab === 'To Pay') {
             html += '<button class="rate-btn" style="background:linear-gradient(135deg,#2e7d32,#4caf50);color:#fff;" onclick="reopenOrderPaymentModal(\'' + escapeHtml(orderId) + '\')">';
@@ -16181,6 +16682,60 @@ function renderOrderList(tab) {
             mlBtn.addEventListener('click', function() { lookupOrderAndOpenReceiptModal(mlInp.value, mlBtn); });
             mlInp.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); lookupOrderAndOpenReceiptModal(mlInp.value, mlBtn); } });
         }
+    }
+}
+
+// ===== Buy Again from previous order =====
+function buyAgainFromOrder(orderId) {
+    var order = null;
+    for (var i = 0; i < myOrdersCache.length; i++) {
+        if (String(myOrdersCache[i]['Order ID'] || '') === String(orderId)) {
+            order = myOrdersCache[i];
+            break;
+        }
+    }
+    if (!order || !order['Items']) {
+        showToast('Could not read items from this order.');
+        return;
+    }
+    var rawItems = String(order['Items']).split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+    var addedCount = 0;
+    for (var j = 0; j < rawItems.length; j++) {
+        var m = rawItems[j].match(/^(.*?)\s*×\s*(\d+)$/);
+        var fullName = m ? m[1].trim() : rawItems[j];
+        var qty = m ? (parseInt(m[2], 10) || 1) : 1;
+        var baseName = fullName.replace(/\s*\([^)]*\)\s*$/, '').trim();
+        var vLabelMatch = fullName.match(/\(([^)]+)\)\s*$/);
+        var vLabel = vLabelMatch ? vLabelMatch[1].trim() : '';
+
+        var game = null;
+        for (var g = 0; g < allGames.length; g++) {
+            if (allGames[g].title === fullName || allGames[g].title === baseName) { game = allGames[g]; break; }
+        }
+        if (!game) continue;
+
+        var matchedVariant = null;
+        if (game.hasVariants && Array.isArray(game.variants) && game.variants.length > 0) {
+            for (var vi = 0; vi < game.variants.length; vi++) {
+                var v = game.variants[vi];
+                var opts = v.options || {};
+                var optVals = Object.keys(opts).map(function(k) { return opts[k]; }).join(' / ');
+                if (!vLabel || optVals === vLabel || JSON.stringify(opts).indexOf(vLabel) !== -1) {
+                    var vKey = Object.keys(opts).sort().map(function(k) { return k + '=' + opts[k]; }).join('|');
+                    matchedVariant = { key: vKey, label: vLabel || optVals, price: v.price, stock: v.stock, image: v.image, options: opts };
+                    break;
+                }
+            }
+        }
+        addToCart(game, qty, matchedVariant);
+        addedCount++;
+    }
+    if (addedCount > 0) {
+        showStoreView();
+        showToast('🔄 Added ' + addedCount + ' item(s) to cart!');
+        setTimeout(function() { if (checkoutBtn) checkoutBtn.click(); }, 180);
+    } else {
+        showToast('Those items are no longer listed in the store.');
     }
 }
 
@@ -16268,7 +16823,7 @@ function cancelMyOrder(orderId) {
         .withSuccessHandler(function(res) {
             showToast(res.message || 'Order cancelled.');
             if (res.success) {
-                removePendingPaymentSession(orderId);
+                rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(orderId);
                 loadMyOrders();
             }
         })
@@ -17313,7 +17868,7 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
             }
 
             loadGames();
-            renderPendingReceiptHistoryBanner();
+            rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63();
             setTimeout(setupCarouselArrows, 800);
         }
 
@@ -19629,12 +20184,52 @@ function showAgentDashboard(targetEmail) {
 
     document.getElementById('agentTotalSales').textContent = 'Loading...';
     document.getElementById('agentTotalCommission').textContent = 'Loading...';
+    if (document.getElementById('agentUnpaidCommission')) document.getElementById('agentUnpaidCommission').textContent = 'Loading...';
+    if (document.getElementById('agentPaidOutCommission')) document.getElementById('agentPaidOutCommission').textContent = 'Loading...';
     document.getElementById('agentOrderHistory').innerHTML = '<p style="text-align:center; color:#6a7f9e; padding:20px;">Loading...</p>';
 
     google.script.run
         .withSuccessHandler(function(data) {
-            document.getElementById('agentTotalSales').textContent = 'RM ' + data.totalSales.toFixed(2);
-            document.getElementById('agentTotalCommission').textContent = 'RM ' + data.totalCommission.toFixed(2);
+            data = data || {};
+            var salesVal = parseFloat(data.totalSales) || 0;
+            var unpaidVal = parseFloat(data.unpaidCommission) || 0;
+            var paidOutVal = parseFloat(data.paidOutCommission) || 0;
+            var pendingVal = parseFloat(data.pendingCommission) || 0;
+            var minPayout = parseFloat(data.minPayout) || 50;
+
+            document.getElementById('agentTotalSales').textContent = 'RM ' + salesVal.toFixed(2);
+            document.getElementById('agentTotalCommission').textContent = 'RM ' + (parseFloat(data.totalCommission) || 0).toFixed(2);
+            if (document.getElementById('agentUnpaidCommission')) document.getElementById('agentUnpaidCommission').textContent = 'RM ' + unpaidVal.toFixed(2);
+            if (document.getElementById('agentPaidOutCommission')) document.getElementById('agentPaidOutCommission').textContent = 'RM ' + paidOutVal.toFixed(2);
+
+            var progBox = document.getElementById('agentPayoutProgressBox');
+            if (progBox) {
+                var pct = minPayout > 0 ? Math.min(100, Math.round((unpaidVal / minPayout) * 100)) : 100;
+                var remaining = Math.max(0, minPayout - unpaidVal);
+                progBox.style.display = 'block';
+                progBox.innerHTML =
+                    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;">' +
+                        (unpaidVal >= minPayout
+                            ? '<strong style="color:#4caf50;"><i class="fas fa-check-circle"></i> Payout Target Reached! Eligible for RM ' + unpaidVal.toFixed(2) + ' payout</strong>'
+                            : '<span style="color:#b0c8e0;"><i class="fas fa-bullseye" style="color:#f7d875;"></i> Progress to RM ' + minPayout.toFixed(2) + ' Payout: <strong style="color:#f7d875;">Earn RM ' + remaining.toFixed(2) + ' more</strong></span>') +
+                        '<span style="color:#8aa1c0;font-size:12px;">Pending Verification: RM ' + pendingVal.toFixed(2) + '</span>' +
+                    '</div>' +
+                    '<div class="comm-progress-bar" style="height:10px;margin-top:8px;"><div class="comm-progress-fill" style="width:' + pct + '%;"></div></div>' +
+                    (data.payoutInfo ? '<div style="margin-top:8px;font-size:11.5px;color:#8aa1c0;"><i class="fas fa-university"></i> Payout Account: <strong style="color:#e8edf5;">' + escapeHtml(data.payoutInfo) + '</strong></div>' : '');
+            }
+
+            var copyLinkBtn = document.getElementById('copyAgentLinkBtn');
+            if (copyLinkBtn) {
+                if (data.agentCode) {
+                    copyLinkBtn.style.display = 'inline-flex';
+                    copyLinkBtn.onclick = function() {
+                        var link = 'https://nex4upstoremy.github.io/Nex4UpStore/?agent=' + encodeURIComponent(data.agentCode);
+                        _copyQuickText(link, '🔗 Agent link copied: ' + link);
+                    };
+                } else {
+                    copyLinkBtn.style.display = 'none';
+                }
+            }
 
             var html = '';
             if (!data.history || data.history.length === 0) {
@@ -19645,17 +20240,21 @@ function showAgentDashboard(targetEmail) {
                     '<th>Rate</th><th>Commission</th><th>Status</th>' +
                     '</tr></thead><tbody>';
                 data.history.forEach(function(o) {
-                    var statusColor = o.status === 'Approved' ? '#4caf50'
-                                    : o.status === 'Reversed' ? '#ff6b6b'
+                    var stStr = String(o.status || 'Pending');
+                    var isPaidOut = stStr.indexOf('Paid Out') === 0;
+                    var statusColor = isPaidOut ? '#38bdf8'
+                                    : stStr === 'Approved' ? '#4caf50'
+                                    : stStr === 'Reversed' ? '#ff6b6b'
                                     : '#f7d875';
+                    var displaySt = isPaidOut ? ('✅ ' + stStr) : (stStr === 'Approved' ? 'Approved (Unpaid)' : stStr);
                     html += '<tr>' +
-                        '<td>' + o.orderId + '</td>' +
+                        '<td>' + escapeHtml(o.orderId) + '</td>' +
                         '<td>' + (o.date ? String(o.date).split(' ')[0] : '') + '</td>' +
-                        '<td>RM ' + o.netRevenue.toFixed(2) + '</td>' +
-                        '<td>RM ' + o.netProfit.toFixed(2) + '</td>' +
+                        '<td>RM ' + (parseFloat(o.netRevenue) || 0).toFixed(2) + '</td>' +
+                        '<td>RM ' + (parseFloat(o.netProfit) || 0).toFixed(2) + '</td>' +
                         '<td>' + o.rate + '%</td>' +
-                        '<td style="color:#4caf50; font-weight:700;">RM ' + o.commission.toFixed(2) + '</td>' +
-                        '<td><span style="color:' + statusColor + '; font-weight:600;">' + (o.status || 'Pending') + '</span></td>' +
+                        '<td style="color:#4caf50; font-weight:700;">RM ' + (parseFloat(o.commission) || 0).toFixed(2) + '</td>' +
+                        '<td><span style="color:' + statusColor + '; font-weight:600;">' + escapeHtml(displaySt) + '</span></td>' +
                     '</tr>';
                 });
                 html += '</tbody></table>';
@@ -19733,15 +20332,129 @@ document.getElementById('backToStoreFromAgentBtn').addEventListener('click', fun
 });
 
 
-// 3. Admin Sales Team UI Logic
+// 3. Admin Sales Team & Commission Payout Leaderboard UI Logic
+window._salesCommFilter = 'all';
+window._salesSummaryCache = null;
+
+function renderAdminSalesTeamLeaderboard() {
+    var container = document.getElementById('salesTeamList');
+    if (!container) return;
+    var summary = window._salesSummaryCache;
+    if (!summary || !summary.agents || summary.agents.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:20px; color:#6a7f9e;">No salespeople added yet.</p>';
+        return;
+    }
+
+    var filterMode = window._salesCommFilter || 'all';
+    var minPayout = parseFloat(summary.minPayout) || 50;
+    var filtered = summary.agents.filter(function(a) {
+        if (filterMode === 'ready') return a.reachedThreshold;
+        if (filterMode === 'below') return !a.reachedThreshold;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:20px; color:#6a7f9e;">No agents match this filter.</p>';
+        return;
+    }
+
+    var html = '<table><thead><tr>' +
+        '<th>Agent &amp; Payout Info</th><th>Code / Rate</th><th>Orders</th><th>Pending</th>' +
+        '<th>Unpaid Balance</th><th>Target (RM ' + minPayout.toFixed(0) + ')</th><th>Paid Out</th><th>Actions</th>' +
+        '</tr></thead><tbody>';
+
+    filtered.forEach(function(a) {
+        var unpaid = parseFloat(a.unpaidCommission) || 0;
+        var paidOut = parseFloat(a.paidOutCommission) || 0;
+        var pending = parseFloat(a.pendingCommission) || 0;
+        var pct = parseInt(a.progressPct, 10) || 0;
+        var targetCol = a.reachedThreshold
+            ? '<span class="ready-pay-badge"><i class="fas fa-fire"></i> READY TO PAY</span><div class="comm-progress-bar"><div class="comm-progress-fill" style="width:100%;"></div></div>'
+            : '<div class="comm-progress-wrap"><div style="font-size:11px;color:#8aa1c0;">RM ' + unpaid.toFixed(2) + ' / ' + minPayout.toFixed(0) + ' (' + pct + '%)</div><div class="comm-progress-bar"><div class="comm-progress-fill" style="width:' + pct + '%;"></div></div></div>';
+        var waAgentHref = a.phone
+            ? buildAdminWhatsAppLink(a.phone, a.code, a.name, a.reachedThreshold ? ('RM ' + unpaid.toFixed(2) + ' commission ready for payout!') : 'Commission check-in')
+            : '';
+
+        html += '<tr>' +
+            '<td><strong>' + escapeHtmlForAdmin(a.name) + '</strong><br><small style="color:#6a7f9e;">' + escapeHtmlForAdmin(a.email) + '</small>' +
+            (a.payoutInfo ? '<br><small style="color:#38bdf8;"><i class="fas fa-university"></i> ' + escapeHtmlForAdmin(a.payoutInfo) + '</small>' : '<br><small style="color:#6a7f9e;">No bank/TNG saved</small>') + '</td>' +
+            '<td><span style="font-family:monospace; color:#f7d875; font-weight:700;">' + escapeHtmlForAdmin(a.code) + '</span><br><small style="color:#8aa1c0;">' + a.rate + '% rate</small></td>' +
+            '<td>' + (a.ordersCount || 0) + '<br><small style="color:#6a7f9e;">RM ' + (parseFloat(a.totalSales) || 0).toFixed(2) + '</small></td>' +
+            '<td style="color:#ffa726;">RM ' + pending.toFixed(2) + '</td>' +
+            '<td style="font-weight:800; color:' + (a.reachedThreshold ? '#4caf50' : '#f7d875') + '; font-size:14px;">RM ' + unpaid.toFixed(2) + '</td>' +
+            '<td>' + targetCol + '</td>' +
+            '<td style="color:#38bdf8; font-weight:700;">RM ' + paidOut.toFixed(2) + '</td>' +
+            '<td><div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">' +
+                '<button type="button" class="pay-agent-btn" data-email="' + escapeHtmlForAdmin(a.email) + '" data-name="' + escapeHtmlForAdmin(a.name) + '" data-unpaid="' + unpaid.toFixed(2) + '" data-payout="' + escapeHtmlForAdmin(a.payoutInfo || '') + '" ' + (unpaid <= 0 ? 'disabled' : '') + ' style="background:' + (unpaid > 0 ? 'linear-gradient(135deg,#2e7d32,#4caf50)' : '#1e2a3a') + '; color:#fff; border:none; padding:6px 12px; border-radius:18px; cursor:' + (unpaid > 0 ? 'pointer' : 'not-allowed') + '; font-weight:700; font-size:11.5px; opacity:' + (unpaid > 0 ? '1' : '0.45') + ';">' +
+                    '<i class="fas fa-money-bill-wave"></i> Pay Out' +
+                '</button>' +
+                '<button type="button" class="view-agent-dash-btn" data-email="' + escapeHtmlForAdmin(a.email) + '" style="background:#f7d875; color:#0b0e14; border:none; padding:6px 11px; border-radius:18px; cursor:pointer; font-weight:700; font-size:11.5px;">' +
+                    '<i class="fas fa-chart-line"></i> View' +
+                '</button>' +
+                (waAgentHref ? '<a href="' + waAgentHref + '" target="_blank" rel="noopener noreferrer" class="wa-mini-btn"><i class="fab fa-whatsapp"></i> WA</a>' : '') +
+            '</div></td>' +
+        '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+
+    container.querySelectorAll('.view-agent-dash-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            showAgentDashboard(this.dataset.email);
+        });
+    });
+
+    container.querySelectorAll('.pay-agent-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            markAgentPaidOutClient(this.dataset.email, this.dataset.name, this.dataset.unpaid, this.dataset.payout);
+        });
+    });
+}
+
+function markAgentPaidOutClient(email, name, unpaidStr, payoutInfo) {
+    var acctDisplay = payoutInfo ? ('\nPayout Account: ' + payoutInfo) : '\n(No bank/TNG saved yet)';
+    var ref = prompt(
+        'Mark RM ' + unpaidStr + ' commission as PAID OUT to ' + name + ' (' + email + ')?' +
+        acctDisplay +
+        '\n\nEnter Payment Reference / Note (optional, e.g. TNG DuitNow):',
+        ''
+    );
+    if (ref === null) return;
+    showToast('Processing payout...');
+    google.script.run
+        .withSuccessHandler(function(res) {
+            showToast((res && res.message) || 'Commission marked as Paid Out.');
+            if (res && res.success) loadAdminSalesTeam();
+        })
+        .withFailureHandler(function(err) {
+            showToast('Payout error: ' + err.message);
+        })
+        .markAgentCommissionPaid(email, ref, '');
+}
+
+(function setupCommFilterPills() {
+    var pills = document.querySelectorAll('#commFilterPills .comm-filter-pill');
+    for (var i = 0; i < pills.length; i++) {
+        pills[i].addEventListener('click', function() {
+            for (var j = 0; j < pills.length; j++) pills[j].classList.remove('active');
+            this.classList.add('active');
+            window._salesCommFilter = this.getAttribute('data-commfilter') || 'all';
+            renderAdminSalesTeamLeaderboard();
+        });
+    }
+})();
+
 function loadAdminSalesTeam() {
     if (!isAdmin) return;
-    
+
     // Load Settings
     google.script.run.withSuccessHandler(function(settings) {
         settings = settings || {};
         if (document.getElementById('cfgDefaultComm')) {
             document.getElementById('cfgDefaultComm').value = settings['Default Commission Rate'] !== undefined ? settings['Default Commission Rate'] : 20;
+            if (document.getElementById('cfgMinCommissionPayout')) {
+                document.getElementById('cfgMinCommissionPayout').value = settings['Minimum Commission Payout (RM)'] !== undefined ? settings['Minimum Commission Payout (RM)'] : 50;
+            }
             document.getElementById('cfgGwFee').value = settings['Payment Gateway Fee (%)'] !== undefined ? settings['Payment Gateway Fee (%)'] : 2;
             document.getElementById('cfgPlatformFee').value = settings['Platform Fee (RM)'] !== undefined ? settings['Platform Fee (RM)'] : 0.50;
             if (document.getElementById('cfgSociaBuzzFee')) {
@@ -19756,46 +20469,28 @@ function loadAdminSalesTeam() {
         }
     }).getCostSettings();
 
-    // Load Team
-    google.script.run.withSuccessHandler(function(team) {
-        var container = document.getElementById('salesTeamList');
-        if (!container) return;
-        
-        if (team.length === 0) {
-            container.innerHTML = '<p style="text-align:center; padding:20px; color:#6a7f9e;">No salespeople added yet.</p>';
-            return;
-        }
-var html = '<table><thead><tr>' +
-    '<th>Name</th><th>Email</th><th>Agent Code</th><th>Rate (%)</th>' +
-    '<th>Status</th><th>Date Added</th><th>Actions</th>' +
-    '</tr></thead><tbody>';
-team.forEach(function(a) {
-    html += '<tr>' +
-        '<td>' + a.name + '</td>' +
-        '<td>' + a.email + '</td>' +
-        '<td style="font-family:monospace; color:#f7d875;">' + a.code + '</td>' +
-        '<td>' + a.rate + '%</td>' +
-        '<td><span class="status-badge status-' + (a.status === 'Active' ? 'paid' : 'cancelled') + '">' + a.status + '</span></td>' +
-        '<td>' + (a.dateAdded ? a.dateAdded.split(' ')[0] : '-') + '</td>' +
-        '<td>' +
-            '<button class="view-agent-dash-btn" data-email="' + escapeHtmlForAdmin(a.email) + '" ...' +
-                    'style="background:#f7d875; color:#0b0e14; border:none; padding:6px 14px; border-radius:20px; cursor:pointer; font-weight:700; font-size:12px;">' +
-                '<i class="fas fa-chart-line"></i> View Dashboard' +
-            '</button>' +
-        '</td>' +
-    '</tr>';
-});
-html += '</tbody></table>';
-container.innerHTML = html;
-
-// Wire up the buttons
-container.querySelectorAll('.view-agent-dash-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var email = this.dataset.email;
-        showAgentDashboard(email);   // pass email explicitly — admin viewing
-    });
-});
-    }).getSalesTeam();
+    // Load Team Commission Summary Leaderboard
+    var listEl = document.getElementById('salesTeamList');
+    if (listEl) listEl.innerHTML = '<p style="text-align:center;padding:20px;color:#6a7f9e;"><i class="fas fa-spinner fa-spin"></i> Loading commission summary...</p>';
+    google.script.run
+        .withSuccessHandler(function(res) {
+            if (!res || !res.success) {
+                if (listEl) listEl.innerHTML = '<p style="color:#ff6b6b;padding:16px;">Could not load commission summary.</p>';
+                return;
+            }
+            window._salesSummaryCache = res;
+            var readyEl = document.getElementById('commReadyAgentsCount');
+            var unpaidEl = document.getElementById('commTotalUnpaid');
+            var paidEl = document.getElementById('commTotalPaidOut');
+            if (readyEl) readyEl.textContent = res.readyAgentsCount || 0;
+            if (unpaidEl) unpaidEl.textContent = 'RM ' + (parseFloat(res.totalUnpaidCommission) || 0).toFixed(2);
+            if (paidEl) paidEl.textContent = 'RM ' + (parseFloat(res.totalPaidOutCommission) || 0).toFixed(2);
+            renderAdminSalesTeamLeaderboard();
+        })
+        .withFailureHandler(function(err) {
+            if (listEl) listEl.innerHTML = '<p style="color:#ff6b6b;padding:16px;">Error: ' + err.message + '</p>';
+        })
+        .getSalesTeamSummary();
 }
 
 // Admin: Save Settings Button
@@ -19805,6 +20500,9 @@ document.getElementById('saveCostSettingsBtn')?.addEventListener('click', functi
         'Payment Gateway Fee (%)': document.getElementById('cfgGwFee').value,
         'Platform Fee (RM)': document.getElementById('cfgPlatformFee').value
     };
+    if (document.getElementById('cfgMinCommissionPayout')) {
+        settings['Minimum Commission Payout (RM)'] = document.getElementById('cfgMinCommissionPayout').value;
+    }
     if (document.getElementById('cfgSociaBuzzFee')) {
         settings['SociaBuzz Fee (%)'] = document.getElementById('cfgSociaBuzzFee').value;
     }
@@ -19816,6 +20514,7 @@ document.getElementById('saveCostSettingsBtn')?.addEventListener('click', functi
     }
     google.script.run.withSuccessHandler(function(res) {
         showToast(res.message);
+        loadAdminSalesTeam();
     }).updateCostSettings(settings);
 });
 
@@ -19825,16 +20524,99 @@ document.getElementById('addAgentBtn')?.addEventListener('click', function() {
     var name = document.getElementById('newAgentName').value;
     var code = document.getElementById('newAgentCode').value;
     var rate = document.getElementById('newAgentRate').value;
-    
-    if (!email || !name || !code) { showToast('Please fill all fields'); return; }
-    
+    var payoutInfo = document.getElementById('newAgentPayoutInfo') ? document.getElementById('newAgentPayoutInfo').value : '';
+
+    if (!email || !name || !code) { showToast('Please fill all required fields'); return; }
+
     google.script.run.withSuccessHandler(function(res) {
         showToast(res.message);
         loadAdminSalesTeam();
         document.getElementById('newAgentEmail').value = '';
         document.getElementById('newAgentName').value = '';
         document.getElementById('newAgentCode').value = '';
-    }).addSalesperson(email, name, code, rate);
+        if (document.getElementById('newAgentPayoutInfo')) document.getElementById('newAgentPayoutInfo').value = '';
+    }).addSalesperson(email, name, code, rate, payoutInfo);
+});
+
+// Admin: Promo Code & Voucher Manager
+function loadAdminPromoCodes() {
+    if (!isAdmin) return;
+    var container = document.getElementById('adminPromoList');
+    if (!container) return;
+    container.innerHTML = '<p style="text-align:center;color:#6a7f9e;padding:12px;">Loading promo codes...</p>';
+    google.script.run
+        .withSuccessHandler(function(promos) {
+            promos = promos || [];
+            if (promos.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#6a7f9e;padding:16px;">No promo codes yet.</p>';
+                return;
+            }
+            var html = '<table><thead><tr><th>Code</th><th>Discount</th><th>Min Order</th><th>Usage</th><th>Expiry</th><th>Actions</th></tr></thead><tbody>';
+            promos.forEach(function(p) {
+                var discText = p.discountType === 'percentage' ? (p.discountValue + '%') : ('RM ' + (parseFloat(p.discountValue) || 0).toFixed(2));
+                var isOff = p.usageLimit === 0;
+                html += '<tr>' +
+                    '<td style="font-family:monospace;color:#f7d875;font-weight:700;">' + escapeHtmlForAdmin(p.code) + (isOff ? ' <span style="color:#ff6b6b;font-size:10px;">(Disabled)</span>' : '') + '</td>' +
+                    '<td>' + discText + '</td>' +
+                    '<td>RM ' + (parseFloat(p.minOrder) || 0).toFixed(2) + '</td>' +
+                    '<td>' + (p.usedCount || 0) + ' / ' + p.usageLimit + '</td>' +
+                    '<td>' + escapeHtmlForAdmin(p.expiryDate || '-') + '</td>' +
+                    '<td><div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+                        '<button type="button" class="toggle-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" data-type="' + escapeHtmlForAdmin(p.discountType) + '" data-val="' + p.discountValue + '" data-min="' + p.minOrder + '" data-exp="' + escapeHtmlForAdmin(p.expiryDate || '') + '" data-next="' + (isOff ? 100 : 0) + '" style="background:#1e2a3a;color:' + (isOff ? '#4caf50' : '#ffa726') + ';border:1px solid #2a3a52;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:700;">' + (isOff ? 'Enable' : 'Disable') + '</button>' +
+                        '<button type="button" class="del-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:rgba(255,107,107,0.14);color:#ff6b6b;border:1px solid rgba(255,107,107,0.35);border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:700;">Delete</button>' +
+                    '</div></td>' +
+                '</tr>';
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+
+            container.querySelectorAll('.toggle-promo-btn').forEach(function(b) {
+                b.addEventListener('click', function() {
+                    google.script.run.withSuccessHandler(function(r) {
+                        showToast((r && r.message) || 'Updated promo');
+                        loadAdminPromoCodes();
+                    }).saveAdminPromoCode({
+                        code: b.dataset.code,
+                        discountType: b.dataset.type,
+                        discountValue: b.dataset.val,
+                        minOrder: b.dataset.min,
+                        expiryDate: b.dataset.exp,
+                        usageLimit: b.dataset.next
+                    });
+                });
+            });
+
+            container.querySelectorAll('.del-promo-btn').forEach(function(b) {
+                b.addEventListener('click', function() {
+                    if (!confirm('Delete promo code "' + b.dataset.code + '"?')) return;
+                    google.script.run.withSuccessHandler(function(r) {
+                        showToast((r && r.message) || 'Deleted');
+                        loadAdminPromoCodes();
+                    }).deleteAdminPromoCode(b.dataset.code);
+                });
+            });
+        })
+        .getAdminPromoCodes();
+}
+
+document.getElementById('adminPromoForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var payload = {
+        code: document.getElementById('promoMgrCode').value,
+        discountType: document.getElementById('promoMgrType').value,
+        discountValue: document.getElementById('promoMgrValue').value,
+        minOrder: document.getElementById('promoMgrMinOrder').value,
+        usageLimit: document.getElementById('promoMgrLimit').value,
+        expiryDate: document.getElementById('promoMgrExpiry').value
+    };
+    google.script.run.withSuccessHandler(function(res) {
+        showToast((res && res.message) || 'Saved promo code.');
+        if (res && res.success) {
+            document.getElementById('adminPromoForm').reset();
+            document.getElementById('promoMgrLimit').value = 100;
+            loadAdminPromoCodes();
+        }
+    }).saveAdminPromoCode(payload);
 });
 
 // 4. Connect Sidebar Click to load Sales Team Admin view
@@ -19843,6 +20625,8 @@ showAdminSection = function(sectionId) {
     originalShowAdminSection(sectionId);
     if (sectionId === 'sales-team') {
         loadAdminSalesTeam();
+    } else if (sectionId === 'referral-settings') {
+        loadAdminPromoCodes();
     }
 };
 
@@ -19961,8 +20745,8 @@ function renderRobuxDashboard(res, range) {
 
     // Render the tables safely
     try { renderRobuxPricingTable(res.packages || []); } catch(e) { console.log('Pricing table err', e); }
-    try { renderRobuxPurchaseHistory(res.purchases || []); } catch(e) { console.log('Purchase table err', e); }
-    try { renderRobuxTransactionHistory(res.transactions || []); } catch(e) { console.log('Tx table err', e); }
+    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.purchases || []); } catch(e) { console.log('Purchase table err', e); }
+    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.transactions || []); } catch(e) { console.log('Tx table err', e); }
     try { renderRobuxBackorders(res.backorders || []); } catch(e) { console.log('Backorder table err', e); }
 }
 
@@ -20012,7 +20796,7 @@ function renderRobuxPricingTable(packages) {
     document.getElementById('robuxPricingTable').innerHTML = html;
 }
 
-function renderRobuxPurchaseHistory(rows) {
+function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
     if (!rows.length) {
         document.getElementById('robuxPurchaseHistory').innerHTML = '<div class="empty-msg">No purchases recorded yet.</div>';
         return;
@@ -20033,7 +20817,7 @@ function renderRobuxPurchaseHistory(rows) {
     document.getElementById('robuxPurchaseHistory').innerHTML = html;
 }
 
-function renderRobuxTransactionHistory(rows) {
+function rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(rows) {
     if (!rows.length) {
         document.getElementById('robuxTransactionHistory').innerHTML = '<div class="empty-msg">No transactions yet.</div>';
         return;
@@ -21631,8 +22415,8 @@ renderRobuxDashboard = function (res, range) {
     if (elLowStock) elLowStock.value = st.lowStockThreshold || 2000;
 
     try { renderRobuxPricingTable(res.packages || []); } catch (e) {}
-    try { renderRobuxPurchaseHistory(res.purchases || []); } catch (e) {}
-    try { renderRobuxTransactionHistory(res.transactions || []); } catch (e) {}
+    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.purchases || []); } catch (e) {}
+    try { rpZEAWYtiB6bJ16NuLbGCc6CZ6jJdKfb63(res.transactions || []); } catch (e) {}
     try { renderRobuxBackorders(res.backorders || []); } catch (e) {}
 };
 
