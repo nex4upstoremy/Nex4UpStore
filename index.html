@@ -9527,6 +9527,395 @@
 }
 .nex2-send-otp-btn:hover:not(:disabled) { background: #38bdf8; color: #0b0e14; }
 .nex2-send-otp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ============================================================
+   ✨ GOLROX-INSPIRED CUSTOMER DASHBOARD, FAQ & MOBILE POLISH
+   ============================================================ */
+html, body { max-width: 100%; overflow-x: hidden; }
+#section-community-hub .field input,
+#section-community-hub .field select,
+#section-community-hub .field textarea,
+#section-creator-campaigns .field input,
+#section-creator-campaigns .field select,
+#section-creator-campaigns .field textarea,
+#myAccountSection input[type="text"],
+#myAccountSection input[type="url"],
+#myAccountSection input[type="email"],
+#myAccountSection input[type="number"],
+#myAccountSection input[type="date"] {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+    background: #0b0e14;
+    border: 1px solid #24344d;
+    border-radius: 11px;
+    padding: 10px 13px;
+    color: #e8edf5;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+#myAccountSection input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+}
+.nex2-account-layout {
+    display: grid;
+    grid-template-columns: 315px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+.nex2-account-sidebar {
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 20px;
+    padding: 18px;
+    position: sticky;
+    top: 84px;
+}
+.nex2-acc-user-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.nex2-acc-edit-pill {
+    margin-left: auto;
+    background: #1a2538;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+}
+.nex2-acc-edit-pill:hover { border-color: #38bdf8; color: #38bdf8; }
+.nex2-ga-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 12px 0;
+}
+.nex2-ga-tile {
+    background: #0b111d;
+    border: 1px solid #1e2a3a;
+    border-radius: 13px;
+    padding: 9px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    text-align: left;
+    transition: border-color 0.18s, transform 0.18s;
+}
+.nex2-ga-tile:hover { border-color: #38bdf8; transform: translateY(-1px); }
+.nex2-ga-tile-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: #162133;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-size: 13px;
+    color: #38bdf8;
+}
+.nex2-ga-tile-icon img { width: 100%; height: 100%; object-fit: cover; }
+.nex2-ga-tile-meta { min-width: 0; flex: 1; }
+.nex2-ga-tile-meta small {
+    display: block;
+    font-size: 10px;
+    color: #8aa1c0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.nex2-ga-tile-meta strong {
+    display: block;
+    font-size: 12px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.nex2-tier-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(56, 189, 248, 0.08));
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+.nex2-tier-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.nex2-tier-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #10b981, #0ea5e9);
+    color: #071019;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+.nex2-tier-link {
+    background: none;
+    border: none;
+    color: #38bdf8;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-xp-bar {
+    height: 6px;
+    background: #0b0e14;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+.nex2-xp-bar > span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #38bdf8);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+}
+.nex2-wallet-summary-card {
+    background: #0b111d;
+    border: 1px solid #1e2a3a;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 14px;
+}
+.nex2-wallet-duo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #1a2434;
+}
+.nex2-wallet-stat small { display: block; font-size: 11px; color: #8aa1c0; }
+.nex2-wallet-stat strong { display: flex; align-items: center; gap: 5px; font-size: 15px; color: #f7d875; margin-top: 2px; }
+.nex2-side-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.nex2-side-nav-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #9bb3d1;
+    border-radius: 11px;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.16s, color 0.16s, border-color 0.16s;
+}
+.nex2-side-nav-btn i { width: 16px; text-align: center; }
+.nex2-side-nav-btn:hover { background: rgba(255, 255, 255, 0.04); color: #fff; }
+.nex2-side-nav-btn.active {
+    background: rgba(56, 189, 248, 0.14);
+    border-color: rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    font-weight: 700;
+}
+.nex2-side-badge {
+    margin-left: auto;
+    background: #f7d875;
+    color: #0b0e14;
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 800;
+}
+.nex2-side-divider { height: 1px; background: #1e2a3a; margin: 8px 0; border-top: 1px dashed #25344b; }
+.nex2-account-main {
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 20px;
+    padding: 22px;
+    min-width: 0;
+}
+.nex2-acc-pane { display: none; }
+.nex2-acc-pane.active { display: block; }
+.nex2-acc-pane-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.nex2-acc-pane-head h2 { font-size: 20px; margin: 0; color: #fff; display: flex; align-items: center; gap: 9px; }
+.nex2-overview-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.nex2-ov-card {
+    background: #0b111d;
+    border: 1px solid #1e2a3a;
+    border-radius: 14px;
+    padding: 14px;
+}
+.nex2-ov-card small { display: block; font-size: 11.5px; color: #8aa1c0; margin-bottom: 4px; }
+.nex2-ov-card strong { font-size: 20px; font-weight: 800; color: #fff; }
+.nex2-orders-tip {
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.nex2-orders-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(155px, 0.85fr) minmax(145px, 0.8fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.nex2-order-empty-card {
+    background: #0b111d;
+    border: 1px dashed #283850;
+    border-radius: 16px;
+    padding: 36px 20px;
+    text-align: center;
+}
+.nex2-order-empty-card i { font-size: 34px; color: #38bdf8; margin-bottom: 10px; opacity: 0.85; }
+.nex2-recovered-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(56, 189, 248, 0.14);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-recovered-pill:hover { background: #38bdf8; color: #0b0e14; }
+.nex2-voucher-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.nex2-voucher-card {
+    background: linear-gradient(135deg, #0b1322, #111d30);
+    border: 1px dashed #f7d875;
+    border-radius: 14px;
+    padding: 13px 15px;
+}
+.nex2-ledger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #1a2434;
+    font-size: 12.5px;
+}
+.nex2-ledger-row:last-child { border-bottom: none; }
+
+/* Dedicated FAQ / Help Centre */
+.nex2-faq-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+.nex2-faq-accordion { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.nex2-faq-item {
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+.nex2-faq-item.open { border-color: rgba(56, 189, 248, 0.45); }
+.nex2-faq-q {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 15px 18px;
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-faq-q i.chev { color: #38bdf8; transition: transform 0.2s; flex-shrink: 0; }
+.nex2-faq-item.open .nex2-faq-q i.chev { transform: rotate(180deg); }
+.nex2-faq-a {
+    display: none;
+    padding: 0 18px 16px;
+    color: #9bb3d1;
+    font-size: 13.5px;
+    line-height: 1.6;
+    border-top: 1px solid rgba(30, 42, 58, 0.6);
+    padding-top: 12px;
+    white-space: pre-line;
+}
+.nex2-faq-item.open .nex2-faq-a { display: block; }
+
+@media (max-width: 960px) {
+    .nex2-account-layout { grid-template-columns: 1fr; }
+    .nex2-account-sidebar { position: static; }
+    .nex2-side-menu {
+        flex-direction: row;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+        gap: 6px;
+    }
+    .nex2-side-menu::-webkit-scrollbar { display: none; }
+    .nex2-side-nav-btn { width: auto; white-space: nowrap; flex-shrink: 0; padding: 8px 12px; }
+    .nex2-side-divider { display: none; }
+}
+@media (max-width: 768px) {
+    .nex2-account-main { padding: 14px; }
+    .nex2-account-sidebar { padding: 14px; }
+    .nex2-orders-toolbar { grid-template-columns: 1fr; }
+    .nex2-hero-banner { padding: 16px; border-radius: 16px; }
+    .nex2-hero-banner h2 { font-size: 19px; }
+    .nex2-home-rank-strip { padding: 14px; border-radius: 16px; }
+}
     </style>
 </head>
 <body>
@@ -9622,6 +10011,7 @@
             <button type="button" class="nex2-nav-btn" data-nex2-tab="creators"><i class="fas fa-video" style="color:#fb923c;"></i> <span data-i18n="nav_creators">Creator Hub</span></button>
             <button type="button" class="nex2-nav-btn" data-nex2-tab="community"><i class="fas fa-users" style="color:#38bdf8;"></i> <span data-i18n="nav_community">Community &amp; Find Players</span></button>
             <button type="button" class="nex2-nav-btn" data-nex2-tab="reviews"><i class="fas fa-star" style="color:#4ade80;"></i> <span data-i18n="nav_reviews">Reviews</span></button>
+            <button type="button" class="nex2-nav-btn" data-nex2-tab="faq"><i class="fas fa-question-circle" style="color:#38bdf8;"></i> <span data-i18n="nav_faq">FAQ</span></button>
             <button type="button" class="nex2-nav-btn" data-nex2-tab="developers"><i class="fas fa-code" style="color:#c084fc;"></i> <span data-i18n="nav_devs">Developers</span></button>
         </div>
         <div class="nex2-brand-tagline">
@@ -9775,22 +10165,22 @@
                             <div class="mp-trust-text"><strong>Live Support</strong><span>In-app chat &amp; WhatsApp help</span></div>
                         </div>
                     </div>
-                </div>
 
-                <!-- ===== NEX4UP 2.0 HOMEPAGE TOP-5 LEADERBOARD STRIP ===== -->
-                <div class="nex2-home-rank-strip" id="nex2HomeRankStrip">
-                    <div class="nex2-rank-strip-head">
-                        <div>
-                            <div style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-crown" style="color:#facc15;"></i>
-                                <span>Climb the Ranks — Top Malaysian Gamers</span>
+                    <!-- ===== NEX4UP 2.0 HOMEPAGE TOP-5 LEADERBOARD STRIP (Homepage Only) ===== -->
+                    <div class="nex2-home-rank-strip" id="nex2HomeRankStrip">
+                        <div class="nex2-rank-strip-head">
+                            <div>
+                                <div style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;">
+                                    <i class="fas fa-crown" style="color:#facc15;"></i>
+                                    <span>Climb the Ranks — Top Malaysian Gamers</span>
+                                </div>
+                                <div style="font-size:12.5px;color:#8aa1c0;">Verified buyers &amp; supporters ranked with their equipped Profile Frames</div>
                             </div>
-                            <div style="font-size:12.5px;color:#8aa1c0;">Verified buyers &amp; supporters ranked with their equipped Profile Frames</div>
+                            <button type="button" class="nex2-top-promo-btn" id="nex2HomeViewRankBtn">See Full Leaderboard &rarr;</button>
                         </div>
-                        <button type="button" class="nex2-top-promo-btn" id="nex2HomeViewRankBtn">See Full Leaderboard &rarr;</button>
-                    </div>
-                    <div class="nex2-rank-strip-grid" id="nex2HomeRankGrid">
-                        <div style="color:#6a7f9e;font-size:12.5px;padding:8px 0;">Loading verified leaderboard...</div>
+                        <div class="nex2-rank-strip-grid" id="nex2HomeRankGrid">
+                            <div style="color:#6a7f9e;font-size:12.5px;padding:8px 0;">Loading verified leaderboard...</div>
+                        </div>
                     </div>
                 </div>
 
@@ -10882,213 +11272,461 @@
                     <div id="nex2AdminPostsList" class="orders-container" style="margin-bottom:20px;"></div>
 
                     <h3 style="margin-bottom:10px;"><i class="fas fa-clipboard-list" style="color:#f7d875;"></i> Admin Audit Log</h3>
-                    <div id="nex2AdminAuditList" class="orders-container"></div>
+                    <div id="nex2AdminAuditList" class="orders-container" style="margin-bottom:22px;"></div>
+
+                    <!-- 5. Existing Customer Roblox Account Recovery -->
+                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:20px; padding:20px; margin-bottom:20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+                            <h3 style="margin:0; font-size:16px;"><i class="fas fa-user-check" style="color:#38bdf8;"></i> Existing Customer Roblox Data Recovery</h3>
+                            <button type="button" class="submit-btn" id="nex2AdminRecoverRbxBtn" style="padding:8px 16px; font-size:12.5px;">
+                                <i class="fas fa-sync-alt"></i> Recover Existing Roblox Accounts from Orders
+                            </button>
+                        </div>
+                        <p style="font-size:12.5px; color:#8aa1c0; margin:0 0 8px;">Scans verified historical Orders, restores missing Roblox usernames &amp; official Roblox avatars into customer profiles without overwriting existing linked accounts, and cleans any base64 avatar bloat.</p>
+                        <div id="nex2AdminRecoverRbxStatus" style="font-size:12.5px; color:#4ade80; font-weight:700;"></div>
+                    </div>
+
+                    <!-- 6. Dedicated FAQ / Help Centre Manager -->
+                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:20px; padding:20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                            <h3 style="margin:0; font-size:16px;"><i class="fas fa-question-circle" style="color:#4ade80;"></i> FAQ &amp; Help Centre Manager</h3>
+                            <button type="button" class="cancel-btn" id="nex2ResetFaqBtn" style="padding:7px 14px; border-radius:10px; font-size:12px;">+ New FAQ Item</button>
+                        </div>
+                        <input type="hidden" id="nex2FaqId" />
+                        <div class="form-row">
+                            <div class="field">
+                                <label>Category</label>
+                                <select id="nex2FaqCategory">
+                                    <option value="General">General</option>
+                                    <option value="Orders & Payments">Orders &amp; Payments</option>
+                                    <option value="Roblox & Gaming Accounts">Roblox &amp; Gaming Accounts</option>
+                                    <option value="Wallet Points & Cashback">Wallet Points &amp; Cashback</option>
+                                    <option value="Creator Programme">Creator Programme</option>
+                                    <option value="Community">Community</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>Display Order</label><input type="number" id="nex2FaqOrder" value="1" min="1" /></div>
+                            <div class="field">
+                                <label>Published</label>
+                                <select id="nex2FaqPublished">
+                                    <option value="Yes">Yes (Visible on FAQ Page)</option>
+                                    <option value="No">No (Draft / Hidden)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Highlighted</label>
+                                <select id="nex2FaqHighlighted">
+                                    <option value="No">Standard</option>
+                                    <option value="Yes">Popular / Featured</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field"><label>Question *</label><input type="text" id="nex2FaqQuestion" placeholder="e.g. How long does Robux or diamond top-up delivery take?" /></div>
+                        <div class="field"><label>Answer *</label><textarea id="nex2FaqAnswer" rows="3" placeholder="Provide clear, verified details..."></textarea></div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+                            <button type="button" class="submit-btn" id="nex2SaveFaqBtn"><i class="fas fa-save"></i> Save FAQ Item</button>
+                        </div>
+                        <div id="nex2AdminFaqsList" class="orders-container"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- ===== MY ACCOUNT (Customer Dashboard) ===== -->
+            <!-- ===== MY ACCOUNT (Golrox-Inspired Customer Gaming & Orders Dashboard) ===== -->
             <div id="myAccountSection">
-                <div class="account-container">
-                    <div class="account-header">
-                        <h2><i class="fas fa-user-circle"></i> My Account</h2>
-                        <button class="back-btn" id="backToStoreBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
-                    </div>
-                    <div class="profile-header">
-                        <div id="profileAvatarContainer" class="nex2-profile-avatar-framed">
-                            <img id="profileAvatar" class="profile-avatar" src="" alt="Profile" style="display:none;" />
-                            <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder"><i class="fas fa-user"></i></div>
-                            <img id="myAccountFrameOverlay" class="nex2-frame-overlay" src="assets/frames/frame_default.svg" alt="Profile Frame" onerror="if(window._nexFrameSvgFallback)window._nexFrameSvgFallback(this,'frame_default')" />
+                <div class="nex2-account-layout">
+                    <!-- LEFT SIDEBAR: Gamer Identity, Direct Gaming Accounts, Tier & Wallet, Navigation -->
+                    <aside class="nex2-account-sidebar">
+                        <div class="nex2-acc-user-top">
+                            <div id="profileAvatarContainer" class="nex2-profile-avatar-framed" style="width:58px;height:58px;">
+                                <img id="profileAvatar" class="profile-avatar" src="" alt="Profile" style="display:none;" />
+                                <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder"><i class="fas fa-user"></i></div>
+                                <img id="myAccountFrameOverlay" class="nex2-frame-overlay" src="assets/frames/frame_default.svg" alt="Profile Frame" onerror="if(window._nexFrameSvgFallback)window._nexFrameSvgFallback(this,'frame_default')" />
+                            </div>
+                            <div class="profile-info" style="min-width:0;">
+                                <div class="profile-name" id="profileName" style="font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">-</div>
+                                <div class="profile-email" id="profileEmail" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">-</div>
+                            </div>
+                            <button type="button" class="nex2-acc-edit-pill" id="nex2SidebarEditBtn"><i class="fas fa-pen"></i> Edit</button>
                         </div>
-                        <div class="profile-info">
-                            <div class="profile-name" id="profileName">-</div>
-                            <div class="profile-email" id="profileEmail">-</div>
-                            <div id="nex2ProfileBadgesRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
-                            <div id="nex2ProfileSocialsRow" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12px;"></div>
-                        </div>
-                    </div>
-<div class="profile-details">
-    <div class="detail-row"><span class="label">Phone</span><span class="value" id="profilePhone">-</span></div>
-    <div class="detail-row"><span class="label">Roblox Username</span><span class="value" id="nex2ProfileRobloxVal" style="color:#38bdf8;font-weight:700;">Not linked</span></div>
-    <div class="detail-row"><span class="label">Member Since</span><span class="value" id="profileDate">-</span></div>
-    <div class="detail-row"><span class="label"><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Wallet Points</span><span class="value" id="profilePoints" style="color:#f7d875; font-weight:700;">-</span></div>
-</div>
 
-                    <!-- NEX Coin System Visual Tiers -->
-                    <div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:16px;padding:14px 16px;margin-bottom:16px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                            <div style="font-size:13px;font-weight:800;color:#fff;"><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Point Coin Visuals (1 Unified Wallet Balance)</div>
-                            <span style="font-size:11.5px;color:#8aa1c0;">100 NEX Points = RM 1.00 Store Discount or Frame Unlock</span>
+                        <!-- Direct Gaming Accounts Tiles (Visible immediately without clicking Edit) -->
+                        <div class="nex2-ga-tiles">
+                            <button type="button" class="nex2-ga-tile" id="nex2SidebarRobloxTile" data-acc-pane="gaming" title="Manage Roblox Account">
+                                <div class="nex2-ga-tile-icon" id="nex2SidebarRobloxIconWrap">
+                                    <i class="fas fa-cubes"></i>
+                                </div>
+                                <div class="nex2-ga-tile-meta">
+                                    <small>Roblox</small>
+                                    <strong id="nex2SidebarRobloxName" style="color:#38bdf8;">Connect</strong>
+                                </div>
+                            </button>
+                            <button type="button" class="nex2-ga-tile" id="nex2SidebarGameTile" data-acc-pane="gaming" title="Manage MLBB &amp; PUBG IDs">
+                                <div class="nex2-ga-tile-icon" style="color:#facc15;">
+                                    <i class="fas fa-gamepad"></i>
+                                </div>
+                                <div class="nex2-ga-tile-meta">
+                                    <small>Game IDs</small>
+                                    <strong id="nex2SidebarGameIdText">Connect ID</strong>
+                                </div>
+                            </button>
                         </div>
-                        <div class="nex2-coins-row" id="nex2MyAccountCoinsRow"></div>
-                    </div>
 
-                    <div class="account-actions">
-                        <button class="action-btn primary" id="editProfileBtn"><i class="fas fa-edit"></i> Edit Gamer Profile &amp; Socials</button>
-                        <button class="action-btn" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
-                    </div>
-                    <div class="edit-profile-form" id="editProfileForm">
-                        <div class="field">
-                            <label for="editName">Display Name</label>
-                            <input type="text" id="editName" placeholder="Your full name" />
+                        <!-- Membership Tier & XP Card -->
+                        <div class="nex2-tier-card">
+                            <div class="nex2-tier-head">
+                                <span class="nex2-tier-pill" id="nex2SidebarTierPill"><i class="fas fa-crown"></i> Starter</span>
+                                <button type="button" class="nex2-tier-link" data-acc-pane="frames">See Frames &rarr;</button>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#cbd5e1;">
+                                <span id="nex2SidebarXpText">0 XP / 500 XP</span>
+                                <span id="nex2SidebarTierGoal" style="color:#8aa1c0;">Next Tier</span>
+                            </div>
+                            <div class="nex2-xp-bar"><span id="nex2SidebarXpBar" style="width:10%;"></span></div>
                         </div>
-                        <div class="field">
-                            <label for="editPhone">Phone</label>
-                            <input type="text" id="editPhone" placeholder="Phone number" />
-                        </div>
-                        <div class="field">
-                            <label for="editRobloxUsername">Roblox Username (Auto-syncs official Roblox Avatar)</label>
-                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                <input type="text" id="editRobloxUsername" placeholder="Enter exact Roblox username" style="flex:1;min-width:180px;" />
-                                <button type="button" class="action-btn primary" id="verifyRobloxProfileBtn" style="padding:8px 14px;white-space:nowrap;">
-                                    <i class="fas fa-sync-alt"></i> Verify Roblox Avatar
+
+                        <!-- Wallet & Vouchers Card -->
+                        <div class="nex2-wallet-summary-card">
+                            <div class="nex2-wallet-duo">
+                                <div class="nex2-wallet-stat">
+                                    <small>Wallet Points</small>
+                                    <strong><i class="fas fa-coins" style="color:#f7d875;"></i> <span id="nex2SidebarPts">0</span></strong>
+                                </div>
+                                <div class="nex2-wallet-stat">
+                                    <small>Vouchers</small>
+                                    <strong style="color:#4ade80;"><i class="fas fa-ticket-alt"></i> <span id="nex2SidebarVouchers">0</span></strong>
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                                <div>
+                                    <div style="font-size:11px;color:#8aa1c0;">Store Value</div>
+                                    <div style="font-size:15px;font-weight:800;color:#fff;" id="nex2SidebarRm">RM 0.00</div>
+                                </div>
+                                <button type="button" class="submit-btn" data-acc-pane="wallet" style="padding:7px 12px;font-size:12px;">
+                                    <i class="fas fa-wallet"></i> Wallet
                                 </button>
                             </div>
-                            <div id="editRobloxVerifyMsg" style="font-size:12px;margin-top:6px;color:#8aa1c0;"></div>
-                            <input type="hidden" id="editRobloxUserId" />
-                            <input type="hidden" id="editRobloxAvatarUrl" />
                         </div>
-                        <div class="field">
-                            <label for="editAvatarMode">Profile Avatar Source</label>
-                            <select id="editAvatarMode" style="width:100%;padding:10px;border-radius:10px;background:#0b0e14;border:1px solid #1e2a3a;color:#e8edf5;">
-                                <option value="custom">Use Uploaded Profile Photo</option>
-                                <option value="roblox">Use Official Roblox Avatar Headshot</option>
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="field">
-                                <label for="editIgHandle">Instagram Handle</label>
-                                <input type="text" id="editIgHandle" placeholder="@yourhandle" />
-                            </div>
-                            <div class="field">
-                                <label for="editTtHandle">TikTok Handle</label>
-                                <input type="text" id="editTtHandle" placeholder="@yourtiktok" />
-                            </div>
-                            <div class="field">
-                                <label for="editYtHandle">YouTube Channel / @Handle</label>
-                                <input type="text" id="editYtHandle" placeholder="@yourchannel" />
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label for="editPlaystyle">Gaming Style (for Find Players)</label>
-                            <select id="editPlaystyle" style="width:100%;padding:10px;border-radius:10px;background:#0b0e14;border:1px solid #1e2a3a;color:#e8edf5;">
-                                <option value="Casual">Casual / Chill</option>
-                                <option value="Ranked / Competitive">Ranked / Competitive</option>
-                                <option value="Grinder / Trading">Grinder / Trading</option>
-                                <option value="Content Creator">Content Creator</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="editGamerBio">Gamer Bio</label>
-                            <textarea id="editGamerBio" rows="2" maxlength="220" placeholder="Tell Malaysian gamers what you play &amp; when you're online..." style="width:100%;padding:10px;border-radius:10px;background:#0b0e14;border:1px solid #1e2a3a;color:#e8edf5;"></textarea>
-                        </div>
-                        <div class="field">
-                            <label>Favorite Games (Shown on Find Players)</label>
-                            <div id="editFavGamesWrap" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
-                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Roblox" /> Roblox / Robux</label>
-                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Blox Fruits" /> Blox Fruits</label>
-                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Mobile Legends" /> Mobile Legends</label>
-                                <label class="nex2-fav-game-chip"><input type="checkbox" value="PUBG Mobile" /> PUBG Mobile</label>
-                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Valorant" /> Valorant</label>
-                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Genshin Impact" /> Genshin Impact</label>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label class="nex2-fav-game-chip" style="border-color:rgba(56,189,248,0.4);">
-                                <input type="checkbox" id="editPublicProfile" checked />
-                                Show my Gamer Profile publicly on Leaderboards &amp; Find Players
-                            </label>
-                        </div>
-                        <div class="field">
-                            <label for="editProfileImageUrl">Profile Image URL (or upload below)</label>
-                            <input type="text" id="editProfileImageUrl" placeholder="https://example.com/avatar.jpg" />
-                            <div class="profile-image-upload">
-                                <label class="upload-btn" for="profileImageFileInput"><i class="fas fa-cloud-upload-alt"></i> Upload from device</label>
-                                <input type="file" id="profileImageFileInput" accept="image/*" />
-                                <img id="editProfilePreview" class="preview-img" style="display:none;" alt="Preview" />
-                                <span class="hint">Choose an image from your device (will be converted to data URL).</span>
-                            </div>
-                        </div>
-                        <div class="actions">
-                            <button class="save-btn" id="saveProfileBtn"><i class="fas fa-save"></i> Save Changes</button>
-                            <button class="cancel-btn" id="cancelEditProfileBtn">Cancel</button>
-                        </div>
-                        <div id="profileUpdateMessage" class="profile-message"></div>
-                    </div>
-                </div>
 
-                <!-- ===== NEX4UP COLLECTIBLE PROFILE FRAME STUDIO ===== -->
-                <div class="nex2-frame-studio" id="nex2FrameStudioCard">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-                        <div>
-                            <h3 style="margin:0;font-size:18px;"><i class="fas fa-ring" style="color:#38bdf8;"></i> Collectible Profile Frames (10 Exclusive Frames)</h3>
-                            <div style="font-size:12.5px;color:#8aa1c0;">Preview any frame on your avatar, unlock via milestones/campaigns or redeem with NEX Points, and display it everywhere on NEX4UP!</div>
+                        <!-- Sidebar Navigation -->
+                        <div class="nex2-side-menu" id="nex2AccountSideMenu">
+                            <button type="button" class="nex2-side-nav-btn" data-acc-pane="overview"><i class="fas fa-th-large"></i> Overview</button>
+                            <button type="button" class="nex2-side-nav-btn active" data-acc-pane="orders"><i class="fas fa-receipt"></i> My Orders <span class="nex2-side-badge" id="nex2SidebarOrderBadge" style="display:none;">0</span></button>
+                            <button type="button" class="nex2-side-nav-btn" data-acc-pane="gaming"><i class="fas fa-gamepad"></i> Gaming Accounts</button>
+                            <button type="button" class="nex2-side-nav-btn" data-acc-pane="wallet"><i class="fas fa-coins"></i> Wallet &amp; Vouchers</button>
+                            <button type="button" class="nex2-side-nav-btn" data-acc-pane="referrals"><i class="fas fa-share-alt"></i> Referrals</button>
+                            <button type="button" class="nex2-side-nav-btn" data-acc-pane="frames"><i class="fas fa-ring"></i> Profile Frames</button>
+                            <button type="button" class="nex2-side-nav-btn" data-acc-pane="community"><i class="fas fa-users"></i> Community Profile</button>
+                            <button type="button" class="nex2-side-nav-btn" id="nex2AccOpenFaqBtn"><i class="fas fa-question-circle"></i> Help &amp; FAQ</button>
+                            <button type="button" class="nex2-side-nav-btn" data-acc-pane="settings"><i class="fas fa-cog"></i> Profile &amp; Settings</button>
+                            <div class="nex2-side-divider"></div>
+                            <button type="button" class="nex2-side-nav-btn" id="nex2SidebarLogoutBtn" style="color:#ff8080;"><i class="fas fa-sign-out-alt"></i> Log Out</button>
                         </div>
-                        <span id="nex2OwnedFramesCount" class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">1 / 10 Unlocked</span>
-                    </div>
-                    <div class="nex2-frame-preview-stage">
-                        <div id="nex2FramePreviewBox"></div>
-                        <div style="flex:1;min-width:200px;">
-                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-                                <strong id="nex2FramePreviewTitle" style="font-size:17px;color:#fff;">Default Frame</strong>
-                                <span id="nex2FramePreviewRarity" class="nex2-rarity-pill">Common</span>
+                    </aside>
+
+                    <!-- RIGHT WORKSPACE: Active Dashboard Pane -->
+                    <main class="nex2-account-main">
+                        <div class="account-header" style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #1e2a3a;">
+                            <h2 style="font-size:19px;"><i class="fas fa-user-circle" style="color:#38bdf8;"></i> Customer Dashboard</h2>
+                            <button class="back-btn" id="backToStoreBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
+                        </div>
+
+                        <!-- PANE 1: OVERVIEW -->
+                        <div class="nex2-acc-pane" id="nex2AccPaneOverview">
+                            <div class="nex2-acc-pane-head">
+                                <h2><i class="fas fa-sparkles" style="color:#f7d875;"></i> Account Overview</h2>
+                                <button type="button" class="nex2-top-promo-btn" data-acc-pane="gaming">Manage Gaming IDs &rarr;</button>
                             </div>
-                            <p id="nex2FramePreviewReq" style="font-size:13px;color:#9bb3d1;margin-bottom:12px;">Unlocked free for every registered NEX4UP gamer.</p>
-                            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                                <button type="button" class="submit-btn" id="nex2FrameActionBtn" style="padding:9px 18px;font-size:13px;">Equipped</button>
-                                <button type="button" class="cancel-btn" id="nex2FrameUnequipBtn" style="padding:9px 14px;border-radius:10px;font-size:12.5px;">Reset to Default</button>
+                            <div class="nex2-overview-stats">
+                                <div class="nex2-ov-card"><small>Total Orders</small><strong id="nex2OvTotalOrders">0</strong></div>
+                                <div class="nex2-ov-card"><small>Wallet Points</small><strong id="nex2OvPts" style="color:#f7d875;">0</strong></div>
+                                <div class="nex2-ov-card"><small>Unlocked Frames</small><strong id="nex2OvFrames" style="color:#38bdf8;">1 / 10</strong></div>
+                                <div class="nex2-ov-card"><small>Completed Referrals</small><strong id="nex2OvRefs" style="color:#4ade80;">0</strong></div>
+                            </div>
+                            <div class="profile-details" style="margin-top:0;border-top:none;padding-top:0;">
+                                <div class="detail-row"><span class="label">Phone</span><span class="value" id="profilePhone">-</span></div>
+                                <div class="detail-row"><span class="label">Linked Roblox Account</span><span class="value" id="nex2ProfileRobloxVal" style="color:#38bdf8;font-weight:700;">Not linked</span></div>
+                                <div class="detail-row"><span class="label">Member Since</span><span class="value" id="profileDate">-</span></div>
+                                <div class="detail-row"><span class="label"><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Wallet Points</span><span class="value" id="profilePoints" style="color:#f7d875; font-weight:700;">-</span></div>
+                            </div>
+                            <div id="nex2ProfileBadgesRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;"></div>
+                            <div id="nex2ProfileSocialsRow" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;"></div>
+                        </div>
+
+                        <!-- PANE 2: MY ORDERS (Default Visible Right Pane — Golrox Clean Filter Layout) -->
+                        <div class="nex2-acc-pane active" id="nex2AccPaneOrders">
+                            <div class="nex2-acc-pane-head">
+                                <h2><i class="fas fa-box-open" style="color:#f7d875;"></i> Orders</h2>
+                                <span style="font-size:12px;color:#8aa1c0;">Search &amp; track your NEX4UP purchases</span>
+                            </div>
+
+                            <div class="nex2-orders-tip">
+                                <span><i class="fas fa-info-circle" style="color:#38bdf8;"></i> Can't find your order or checked out as guest? Track &amp; upload receipt using Order ID.</span>
+                                <button type="button" class="nex2-top-promo-btn" id="nex2OrdersTrackShortcutBtn">Track Order</button>
+                            </div>
+
+                            <div class="nex2-orders-toolbar">
+                                <input type="text" id="nex2OrderSearchInput" placeholder="Search Order ID, game item, or Roblox username..." autocomplete="off" />
+                                <select id="nex2OrderCategoryFilter">
+                                    <option value="all">All Categories</option>
+                                    <option value="roblox">Roblox / Robux</option>
+                                    <option value="mlbb">Mobile Legends (MLBB)</option>
+                                    <option value="pubg">PUBG Mobile</option>
+                                    <option value="gift">Gift Codes / Vouchers</option>
+                                    <option value="other">Merch &amp; Other</option>
+                                </select>
+                                <select id="nex2OrderDateFilter">
+                                    <option value="all">Select Date: All</option>
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30">Last 30 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                </select>
+                            </div>
+
+                            <!-- Tabs (static — stay mounted, only counts update) -->
+                            <div class="order-tabs" id="orderTabs">
+                                <button class="order-tab active" data-tab="All">All <span class="tab-count" id="countAll">0</span></button>
+                                <button class="order-tab" data-tab="To Pay">To Pay <span class="tab-count" id="countToPay">0</span></button>
+                                <button class="order-tab" data-tab="To Ship">To Ship <span class="tab-count" id="countToShip">0</span></button>
+                                <button class="order-tab" data-tab="To Receive">To Receive <span class="tab-count" id="countToReceive">0</span></button>
+                                <button class="order-tab" data-tab="To Review">To Review <span class="tab-count" id="countToReview">0</span></button>
+                            </div>
+
+                            <div id="myOrdersList">
+                                <p style="color:#6a7f9e; text-align:center; padding:40px;">Loading your orders...</p>
                             </div>
                         </div>
-                    </div>
-                    <div class="nex2-frames-grid" id="nex2FramesGrid"></div>
-                </div>
 
-<h3 style="margin-bottom:16px;"><i class="fas fa-box-open" style="color:#f7d875;"></i> My Orders</h3>
-
-<!-- Tabs (static — stay mounted, only counts update) -->
-<div class="order-tabs" id="orderTabs">
-    <button class="order-tab active" data-tab="All">All <span class="tab-count" id="countAll">0</span></button>
-    <button class="order-tab" data-tab="To Pay">To Pay <span class="tab-count" id="countToPay">0</span></button>
-    <button class="order-tab" data-tab="To Ship">To Ship <span class="tab-count" id="countToShip">0</span></button>
-    <button class="order-tab" data-tab="To Receive">To Receive <span class="tab-count" id="countToReceive">0</span></button>
-    <button class="order-tab" data-tab="To Review">To Review <span class="tab-count" id="countToReview">0</span></button>
-</div>
-
-<!-- Content: still uses #myOrdersList so the existing `myOrdersList` variable keeps working -->
-<div id="myOrdersList">
-    <p style="color:#6a7f9e; text-align:center; padding:40px;">Loading your orders...</p>
-</div>
-
-                <!-- ===== REFERRAL SECTION (Customer) ===== -->
-                <div class="account-container" style="margin-top:20px;">
-                    <h3 style="margin-bottom:12px;"><i class="fas fa-share-alt"></i> Refer & Earn</h3>
-                    <p style="color:#8aa1c0; font-size:14px; margin-bottom:12px;">
-                        Share your referral link with friends. When they register and place their first order, you both get a coupon!
-                    </p>
-                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                        <input type="text" id="referralLink" readonly style="flex:1; background:#0b0e14; border:1px solid #2a3a52; border-radius:40px; padding:10px 20px; color:#e8edf5; font-size:14px;" />
-                        <button class="submit-btn" id="copyReferralBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-copy"></i> Copy</button>
-                    </div>
-                    <div id="referralStatus" style="margin-top:8px; font-size:14px; color:#4caf50;"></div>
-
-                    <div style="margin-top:16px; border-top:1px solid #1a2538; padding-top:16px;">
-                        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-                            <div>
-                                <span style="color:#6a7f9e; font-size:13px;">Completed Referrals</span>
-                                <span id="referralCompletedCount" style="font-size:20px; font-weight:700; color:#f7d875; display:block;">0</span>
+                        <!-- PANE 3: GAMING ACCOUNTS (Roblox Recovery + MLBB / PUBG Direct Management) -->
+                        <div class="nex2-acc-pane" id="nex2AccPaneGaming">
+                            <div class="nex2-acc-pane-head">
+                                <h2><i class="fas fa-gamepad" style="color:#38bdf8;"></i> Linked Gaming Accounts</h2>
                             </div>
-                            <div>
-                                <span style="color:#6a7f9e; font-size:13px;">Next Reward</span>
-                                <span id="referralNextReward" style="font-size:16px; font-weight:600; color:#4caf50; display:block;">-</span>
+                            <div id="nex2GamingRecoveredBanner" style="display:none;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.3);border-radius:14px;padding:12px 14px;margin-bottom:14px;">
+                                <div style="font-size:12.5px;font-weight:700;color:#38bdf8;margin-bottom:8px;"><i class="fas fa-history"></i> Found from Your Past Orders — Click to Verify &amp; Link:</div>
+                                <div id="nex2GamingRecoveredPills" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+                            </div>
+
+                            <div style="background:#0b111d;border:1px solid #1e2a3a;border-radius:16px;padding:16px;margin-bottom:14px;">
+                                <h4 style="margin:0 0 10px;color:#fff;font-size:14.5px;"><i class="fas fa-cubes" style="color:#38bdf8;"></i> Roblox Account</h4>
+                                <div id="nex2GaRobloxPreview" style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"></div>
+                                <div class="field">
+                                    <label for="nex2GaRobloxUsername">Roblox Username</label>
+                                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                        <input type="text" id="nex2GaRobloxUsername" placeholder="Enter your exact Roblox username" style="flex:1;min-width:170px;" />
+                                        <button type="button" class="submit-btn" id="nex2GaVerifyRbxBtn"><i class="fas fa-search"></i> Verify Roblox</button>
+                                    </div>
+                                    <div id="nex2GaRobloxMsg" style="font-size:12px;color:#8aa1c0;margin-top:4px;"></div>
+                                </div>
+                            </div>
+
+                            <div style="background:#0b111d;border:1px solid #1e2a3a;border-radius:16px;padding:16px;margin-bottom:14px;">
+                                <h4 style="margin:0 0 10px;color:#fff;font-size:14.5px;"><i class="fas fa-shield-alt" style="color:#facc15;"></i> Mobile Legends &amp; PUBG Mobile</h4>
+                                <div class="form-row">
+                                    <div class="field"><label for="nex2GaMlUser">MLBB User ID</label><input type="text" id="nex2GaMlUser" placeholder="e.g. 123456789" /></div>
+                                    <div class="field"><label for="nex2GaMlZone">MLBB Zone ID</label><input type="text" id="nex2GaMlZone" placeholder="e.g. 2345" /></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="field"><label for="nex2GaPubgId">PUBG Mobile Player ID</label><input type="text" id="nex2GaPubgId" placeholder="e.g. 5123456789" /></div>
+                                    <div class="field"><label for="nex2GaPubgNick">PUBG In-Game Nickname</label><input type="text" id="nex2GaPubgNick" placeholder="Optional nickname" /></div>
+                                </div>
+                                <button type="button" class="submit-btn" id="nex2SaveGamingAccBtn"><i class="fas fa-save"></i> Save All Gaming Accounts</button>
                             </div>
                         </div>
-                    </div>
 
-                    <div style="margin-top:16px;">
-                        <h4 style="color:#8aa1c0; font-size:14px; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Referral History</h4>
-                        <div id="referralHistory" style="background:#0b0e14; border-radius:12px; border:1px solid #1e2a3a; padding:8px 0;">
-                            <p style="color:#6a7f9e; text-align:center; padding:12px;">Loading referrals...</p>
+                        <!-- PANE 4: WALLET POINTS, COINS & VOUCHERS -->
+                        <div class="nex2-acc-pane" id="nex2AccPaneWallet">
+                            <div class="nex2-acc-pane-head">
+                                <h2><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Wallet &amp; Vouchers</h2>
+                                <span style="font-size:12px;color:#8aa1c0;">100 Points = RM 1.00 Discount</span>
+                            </div>
+
+                            <div style="background:#0b111d;border:1px solid #1e2a3a;border-radius:16px;padding:14px 16px;margin-bottom:16px;">
+                                <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px;"><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Point Coin Visuals (Unified Wallet Balance)</div>
+                                <div style="font-size:12px;color:#8aa1c0;">Earn Points on every order (+1 Pt/RM1) &amp; verified review (+5 Pts), usable across store checkout &amp; Profile Frames.</div>
+                                <div class="nex2-coins-row" id="nex2MyAccountCoinsRow"></div>
+                            </div>
+
+                            <h3 style="font-size:15px;margin-bottom:10px;"><i class="fas fa-ticket-alt" style="color:#4ade80;"></i> Available Store Vouchers &amp; Promos</h3>
+                            <div id="nex2WalletVouchersList" class="nex2-voucher-grid">
+                                <p style="color:#6a7f9e;font-size:13px;">Loading available vouchers...</p>
+                            </div>
+
+                            <h3 style="font-size:15px;margin-bottom:10px;"><i class="fas fa-history" style="color:#38bdf8;"></i> Recent Points Activity</h3>
+                            <div id="nex2WalletLedgerList" style="background:#0b111d;border:1px solid #1e2a3a;border-radius:14px;padding:4px 8px;">
+                                <p style="color:#6a7f9e;font-size:13px;padding:12px;">Loading points history...</p>
+                            </div>
                         </div>
-                    </div>
+
+                        <!-- PANE 5: REFERRALS -->
+                        <div class="nex2-acc-pane" id="nex2AccPaneReferrals">
+                            <div class="nex2-acc-pane-head">
+                                <h2><i class="fas fa-share-alt" style="color:#38bdf8;"></i> Refer &amp; Earn</h2>
+                            </div>
+                            <p style="color:#8aa1c0; font-size:13.5px; margin-bottom:12px;">
+                                Share your referral link with friends. When they register and place their first order, you both get a coupon!
+                            </p>
+                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                <input type="text" id="referralLink" readonly style="flex:1;min-width:180px; border-radius:40px;" />
+                                <button class="submit-btn" id="copyReferralBtn" style="padding:9px 20px; font-size:13.5px;"><i class="fas fa-copy"></i> Copy</button>
+                            </div>
+                            <div id="referralStatus" style="margin-top:8px; font-size:13.5px; color:#4caf50;"></div>
+
+                            <div style="margin-top:16px; border-top:1px solid #1a2538; padding-top:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                                <div>
+                                    <span style="color:#6a7f9e; font-size:12.5px;">Completed Referrals</span>
+                                    <span id="referralCompletedCount" style="font-size:20px; font-weight:700; color:#f7d875; display:block;">0</span>
+                                </div>
+                                <div>
+                                    <span style="color:#6a7f9e; font-size:12.5px;">Next Reward</span>
+                                    <span id="referralNextReward" style="font-size:15px; font-weight:600; color:#4caf50; display:block;">-</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-top:16px;">
+                                <h4 style="color:#8aa1c0; font-size:13px; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:8px;">Referral History</h4>
+                                <div id="referralHistory" style="background:#0b0e14; border-radius:12px; border:1px solid #1e2a3a; padding:8px 0;">
+                                    <p style="color:#6a7f9e; text-align:center; padding:12px;">Loading referrals...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PANE 6: PROFILE FRAMES -->
+                        <div class="nex2-acc-pane" id="nex2AccPaneFrames">
+                            <div class="nex2-frame-studio" id="nex2FrameStudioCard" style="border:none;padding:0;margin:0;background:transparent;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+                                    <div>
+                                        <h3 style="margin:0;font-size:18px;"><i class="fas fa-ring" style="color:#38bdf8;"></i> Collectible Profile Frames (10 Exclusive Frames)</h3>
+                                        <div style="font-size:12.5px;color:#8aa1c0;">Preview any frame on your avatar, unlock via milestones/campaigns or redeem with NEX Points!</div>
+                                    </div>
+                                    <span id="nex2OwnedFramesCount" class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">1 / 10 Unlocked</span>
+                                </div>
+                                <div class="nex2-frame-preview-stage">
+                                    <div id="nex2FramePreviewBox"></div>
+                                    <div style="flex:1;min-width:190px;">
+                                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+                                            <strong id="nex2FramePreviewTitle" style="font-size:17px;color:#fff;">Default Frame</strong>
+                                            <span id="nex2FramePreviewRarity" class="nex2-rarity-pill">Common</span>
+                                        </div>
+                                        <p id="nex2FramePreviewReq" style="font-size:13px;color:#9bb3d1;margin-bottom:12px;">Unlocked free for every registered NEX4UP gamer.</p>
+                                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                                            <button type="button" class="submit-btn" id="nex2FrameActionBtn" style="padding:9px 18px;font-size:13px;">Equipped</button>
+                                            <button type="button" class="cancel-btn" id="nex2FrameUnequipBtn" style="padding:9px 14px;border-radius:10px;font-size:12.5px;">Reset to Default</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="nex2-frames-grid" id="nex2FramesGrid"></div>
+                            </div>
+                        </div>
+
+                        <!-- PANE 7: COMMUNITY PROFILE SUMMARY -->
+                        <div class="nex2-acc-pane" id="nex2AccPaneCommunity">
+                            <div class="nex2-acc-pane-head">
+                                <h2><i class="fas fa-users" style="color:#38bdf8;"></i> Community &amp; Social Identity</h2>
+                                <button type="button" class="submit-btn" id="nex2CommOpenFullBtn" style="padding:8px 14px;font-size:12.5px;">Open Community Hub &rarr;</button>
+                            </div>
+                            <div id="nex2CommProfileSummary" style="background:#0b111d;border:1px solid #1e2a3a;border-radius:16px;padding:16px;margin-bottom:14px;"></div>
+                            <button type="button" class="submit-btn" id="nex2CommEditTriggerBtn"><i class="fas fa-edit"></i> Edit Gamer Bio, Socials &amp; Favorite Games</button>
+                        </div>
+
+                        <!-- PANE 8: SETTINGS & EDIT PROFILE FORM -->
+                        <div class="nex2-acc-pane" id="nex2AccPaneSettings">
+                            <div class="nex2-acc-pane-head">
+                                <h2><i class="fas fa-cog" style="color:#f7d875;"></i> Profile &amp; Account Settings</h2>
+                            </div>
+                            <div class="account-actions" style="margin-top:0;margin-bottom:14px;">
+                                <button class="action-btn primary" id="editProfileBtn"><i class="fas fa-edit"></i> Edit Gamer Profile &amp; Socials</button>
+                                <button class="action-btn" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
+                            </div>
+                            <div class="edit-profile-form" id="editProfileForm">
+                                <div class="field">
+                                    <label for="editName">Display Name</label>
+                                    <input type="text" id="editName" placeholder="Your full name" />
+                                </div>
+                                <div class="field">
+                                    <label for="editPhone">Phone</label>
+                                    <input type="text" id="editPhone" placeholder="Phone number" />
+                                </div>
+                                <div class="field">
+                                    <label for="editRobloxUsername">Roblox Username (Auto-syncs official Roblox Avatar)</label>
+                                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                        <input type="text" id="editRobloxUsername" placeholder="Enter exact Roblox username" style="flex:1;min-width:170px;" />
+                                        <button type="button" class="action-btn primary" id="verifyRobloxProfileBtn" style="padding:8px 14px;white-space:nowrap;">
+                                            <i class="fas fa-sync-alt"></i> Verify Roblox Avatar
+                                        </button>
+                                    </div>
+                                    <div id="editRobloxVerifyMsg" style="font-size:12px;margin-top:6px;color:#8aa1c0;"></div>
+                                    <input type="hidden" id="editRobloxUserId" />
+                                    <input type="hidden" id="editRobloxAvatarUrl" />
+                                </div>
+                                <div class="field">
+                                    <label for="editAvatarMode">Profile Avatar Source</label>
+                                    <select id="editAvatarMode">
+                                        <option value="custom">Use Uploaded Profile Photo</option>
+                                        <option value="roblox">Use Official Roblox Avatar Headshot</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <div class="field">
+                                        <label for="editIgHandle">Instagram Handle</label>
+                                        <input type="text" id="editIgHandle" placeholder="@yourhandle" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="editTtHandle">TikTok Handle</label>
+                                        <input type="text" id="editTtHandle" placeholder="@yourtiktok" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="editYtHandle">YouTube Channel / @Handle</label>
+                                        <input type="text" id="editYtHandle" placeholder="@yourchannel" />
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label for="editPlaystyle">Gaming Style (for Find Players)</label>
+                                    <select id="editPlaystyle">
+                                        <option value="Casual">Casual / Chill</option>
+                                        <option value="Ranked / Competitive">Ranked / Competitive</option>
+                                        <option value="Grinder / Trading">Grinder / Trading</option>
+                                        <option value="Content Creator">Content Creator</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label for="editGamerBio">Gamer Bio</label>
+                                    <textarea id="editGamerBio" rows="2" maxlength="220" placeholder="Tell Malaysian gamers what you play &amp; when you're online..."></textarea>
+                                </div>
+                                <div class="field">
+                                    <label>Favorite Games (Shown on Find Players)</label>
+                                    <div id="editFavGamesWrap" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+                                        <label class="nex2-fav-game-chip"><input type="checkbox" value="Roblox" /> Roblox / Robux</label>
+                                        <label class="nex2-fav-game-chip"><input type="checkbox" value="Blox Fruits" /> Blox Fruits</label>
+                                        <label class="nex2-fav-game-chip"><input type="checkbox" value="Mobile Legends" /> Mobile Legends</label>
+                                        <label class="nex2-fav-game-chip"><input type="checkbox" value="PUBG Mobile" /> PUBG Mobile</label>
+                                        <label class="nex2-fav-game-chip"><input type="checkbox" value="Valorant" /> Valorant</label>
+                                        <label class="nex2-fav-game-chip"><input type="checkbox" value="Genshin Impact" /> Genshin Impact</label>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="nex2-fav-game-chip" style="border-color:rgba(56,189,248,0.4);">
+                                        <input type="checkbox" id="editPublicProfile" checked />
+                                        Show my Gamer Profile publicly on Leaderboards &amp; Find Players
+                                    </label>
+                                </div>
+                                <div class="field">
+                                    <label for="editProfileImageUrl">Profile Image URL (or upload below)</label>
+                                    <input type="text" id="editProfileImageUrl" placeholder="https://example.com/avatar.jpg" />
+                                    <div class="profile-image-upload">
+                                        <label class="upload-btn" for="profileImageFileInput"><i class="fas fa-cloud-upload-alt"></i> Upload from device</label>
+                                        <input type="file" id="profileImageFileInput" accept="image/*" />
+                                        <img id="editProfilePreview" class="preview-img" style="display:none;" alt="Preview" />
+                                        <span class="hint">Auto-compressed to fast web avatar &amp; uploaded safely.</span>
+                                    </div>
+                                </div>
+                                <div class="actions">
+                                    <button class="save-btn" id="saveProfileBtn"><i class="fas fa-save"></i> Save Changes</button>
+                                    <button class="cancel-btn" id="cancelEditProfileBtn">Cancel</button>
+                                </div>
+                                <div id="profileUpdateMessage" class="profile-message"></div>
+                            </div>
+                        </div>
+                    </main>
                 </div>
             </div>
 
@@ -11381,6 +12019,46 @@
                     <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:#cbd5e1;">
                         <div><span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.2);color:#38bdf8;">v2.0</span> <strong>NEX4UP 2.0 Launch:</strong> Added 10 Collectible Profile Frames, 5 NEX Coin tiers, Verified Rankings (Overall / Robux / MLBB / PUBG), Creator Campaign Hub, Community Feed, Find Players &amp; Verified Reviews Wall.</div>
                         <div><span class="nex2-rarity-pill" style="background:rgba(74,222,128,0.2);color:#4ade80;">v1.8</span> <strong>Instant Store &amp; Automation:</strong> Added SociaBuzz webhook auto-verification, Telegram 1-tap order actions, Refresh-Proof Receipt History, Promo Manager &amp; Central Robux Backorder Ledger.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== NEX4UP 2.0: DEDICATED HELP CENTRE & FAQ ===== -->
+            <div id="nex2FaqSection" class="nex2-view-section">
+                <div class="nex2-hero-banner">
+                    <div>
+                        <h2><i class="fas fa-question-circle" style="color:#38bdf8;"></i> NEX4UP Help Centre &amp; FAQ</h2>
+                        <p>Clear answers on payment methods (MAE, Touch 'n Go, ShopeePay, SociaBuzz), delivery timing, Wallet Points, Roblox account linking &amp; Creator campaigns.</p>
+                    </div>
+                    <button type="button" class="submit-btn" id="nex2FaqOpenChatBtn"><i class="fas fa-headset"></i> Live Support Chat</button>
+                </div>
+
+                <div class="nex2-faq-controls">
+                    <input type="text" id="nex2FaqSearchInput" placeholder="Search FAQ questions (e.g. Robux, receipt, MAE, Wallet Points, frame)..." style="flex:1;min-width:240px;" />
+                </div>
+
+                <div class="nex2-pills-bar" id="nex2FaqCategoryPills">
+                    <button type="button" class="nex2-pill-btn active" data-faq-cat="All">All Topics</button>
+                    <button type="button" class="nex2-pill-btn" data-faq-cat="General">General</button>
+                    <button type="button" class="nex2-pill-btn" data-faq-cat="Orders & Payments">Orders &amp; Payments</button>
+                    <button type="button" class="nex2-pill-btn" data-faq-cat="Roblox & Gaming Accounts">Roblox &amp; Gaming IDs</button>
+                    <button type="button" class="nex2-pill-btn" data-faq-cat="Wallet Points & Cashback">Wallet Points</button>
+                    <button type="button" class="nex2-pill-btn" data-faq-cat="Creator Programme">Creator Programme</button>
+                    <button type="button" class="nex2-pill-btn" data-faq-cat="Community">Community</button>
+                </div>
+
+                <div class="nex2-faq-accordion" id="nex2FaqList">
+                    <div class="nex2-panel-card" style="text-align:center;color:#8aa1c0;">Loading FAQs...</div>
+                </div>
+
+                <div class="nex2-panel-card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+                    <div>
+                        <strong style="font-size:15.5px;color:#fff;">Still need help with an order?</strong>
+                        <div style="font-size:13px;color:#8aa1c0;margin-top:3px;">Daily Operations: 9:00 AM – 12:00 PM MYT • Fast human support on Live Chat &amp; WhatsApp.</div>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <button type="button" class="submit-btn" id="nex2FaqOpenChatBtn2"><i class="fas fa-comments"></i> Open Support Chat</button>
+                        <a href="https://wa.me/60165336856" target="_blank" rel="noopener noreferrer" class="nex2-top-promo-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;"><i class="fab fa-whatsapp"></i> WhatsApp Support</a>
                     </div>
                 </div>
             </div>
@@ -12219,11 +12897,11 @@
 
     <!-- ===== NEX4UP 2.0: MOBILE FIXED BOTTOM NAVIGATION ===== -->
     <nav class="nex2-mobile-bottom-nav" id="nex2MobileBottomNav" aria-label="Mobile Navigation">
-        <button type="button" class="nex2-mobile-nav-item active" data-nex2-tab="store"><i class="fas fa-store"></i><span>Store</span></button>
+        <button type="button" class="nex2-mobile-nav-item active" data-nex2-tab="store"><i class="fas fa-store"></i><span>Home</span></button>
         <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="rankings"><i class="fas fa-trophy"></i><span>Rankings</span></button>
         <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="creators"><i class="fas fa-video"></i><span>Creators</span></button>
         <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="community"><i class="fas fa-users"></i><span>Players</span></button>
-        <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="reviews"><i class="fas fa-star"></i><span>Reviews</span></button>
+        <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="profile"><i class="fas fa-user"></i><span>Account</span></button>
     </nav>
 
     <!-- ===== CUSTOMER CHAT WIDGET (MASCOT UI) ===== -->
@@ -12674,8 +13352,14 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
             if (!url || typeof url !== 'string') return url || PLACEHOLDER_IMG;
             var u = url.trim();
             if (!u) return PLACEHOLDER_IMG;
+            var w = width || 400;
+            var m = u.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (!m) m = u.match(/drive\.google\.com\/(?:open|uc|thumbnail)\?(?:[^#]*&)?id=([a-zA-Z0-9_-]+)/);
+            if (m && m[1]) {
+                return 'https://lh3.googleusercontent.com/d/' + m[1] + '=w' + w;
+            }
             if (u.indexOf('lh3.googleusercontent.com/') !== -1 && u.indexOf('?') === -1 && !/=w\d+|=s\d+|=h\d+/i.test(u)) {
-                return u + '=w' + (width || 400);
+                return u + '=w' + w;
             }
             return u;
         }
@@ -13014,15 +13698,18 @@ function showStoreView() {
     }
 }
 
-        function showMyAccount() {
+        function showMyAccount(initialPane) {
             _hideAllNex2Views();
-            if (typeof _setNex2ActiveNav === 'function') _setNex2ActiveNav('');
+            if (typeof _setNex2ActiveNav === 'function') _setNex2ActiveNav('profile');
             publicView.style.display = 'none';
             adminSections.style.display = 'none';
             myAccountSection.style.display = 'block';
             myAccountSection.classList.add('visible');
             wishlistSection.classList.remove('visible');
             wishlistSection.style.display = 'none';
+            if (initialPane && typeof window.switch_account_pane === 'function') {
+                window.switch_account_pane(initialPane);
+            }
             loadMyAccount();
             loadMyOrders();
             loadReferralData();
@@ -18113,6 +18800,13 @@ function renderOrderTabCounts() {
     document.getElementById('countToReceive').textContent = counts['To Receive'];
     document.getElementById('countToReview').textContent = counts['To Review'];
     updateProfileBadge(counts['To Receive'] + counts['To Review']);
+    var sbOrderBadge = document.getElementById('nex2SidebarOrderBadge');
+    if (sbOrderBadge) {
+        sbOrderBadge.textContent = counts['All'];
+        sbOrderBadge.style.display = counts['All'] > 0 ? 'inline-block' : 'none';
+    }
+    var ovOrders = document.getElementById('nex2OvTotalOrders');
+    if (ovOrders) ovOrders.textContent = counts['All'];
 }
 
 function renderOrderList(tab) {
@@ -18123,8 +18817,47 @@ function renderOrderList(tab) {
         allTabs[t].classList.toggle('active', allTabs[t].dataset.tab === tab);
     }
 
-    var filtered = myOrdersCache.filter(function(o) { return (o._tab || 'All') === tab; });
+    var searchEl = document.getElementById('nex2OrderSearchInput');
+    var catEl = document.getElementById('nex2OrderCategoryFilter');
+    var dateEl = document.getElementById('nex2OrderDateFilter');
+    var qText = (searchEl && searchEl.value || '').trim().toLowerCase();
+    var catVal = (catEl && catEl.value) || 'all';
+    var dateDays = parseInt((dateEl && dateEl.value) || 'all', 10);
+    var nowMs = Date.now();
 
+    var filtered = myOrdersCache.filter(function(o) {
+        if (tab !== 'All' && (o._tab || 'All') !== tab) return false;
+        if (qText) {
+            var gids = (o['Game IDs'] && typeof o['Game IDs'] === 'object') ? JSON.stringify(o['Game IDs']) : String(o['Game IDs'] || '');
+            var hay = [
+                o['Order ID'],
+                o['Items'],
+                o['Customer Name'],
+                o['Payment Method'],
+                gids
+            ].join(' ').toLowerCase();
+            if (hay.indexOf(qText) === -1) return false;
+        }
+        if (catVal && catVal !== 'all') {
+            var itemsLow = String(o['Items'] || '').toLowerCase();
+            if (catVal === 'roblox' && itemsLow.indexOf('robux') === -1 && itemsLow.indexOf('roblox') === -1 && itemsLow.indexOf('blox') === -1) return false;
+            if (catVal === 'mlbb' && itemsLow.indexOf('mobile legends') === -1 && itemsLow.indexOf('mlbb') === -1 && itemsLow.indexOf('diamond') === -1) return false;
+            if (catVal === 'pubg' && itemsLow.indexOf('pubg') === -1 && itemsLow.indexOf(' uc') === -1) return false;
+            if (catVal === 'gift' && itemsLow.indexOf('gift') === -1 && itemsLow.indexOf('code') === -1 && itemsLow.indexOf('voucher') === -1 && itemsLow.indexOf('card') === -1) return false;
+            if (catVal === 'other' && /(robux|roblox|blox|mobile legends|mlbb|diamond|pubg|gift|voucher)/.test(itemsLow)) return false;
+        }
+        if (!isNaN(dateDays) && dateDays > 0) {
+            var dRaw = String(o['Date'] || '').trim();
+            var parsedDate = new Date(dRaw);
+            if (!isNaN(parsedDate.getTime())) {
+                var diffDays = (nowMs - parsedDate.getTime()) / (1000 * 60 * 60 * 24);
+                if (diffDays > dateDays) return false;
+            }
+        }
+        return true;
+    });
+
+    var hasExtraFilters = Boolean(qText || (catVal && catVal !== 'all') || (!isNaN(dateDays) && dateDays > 0));
     var topLookupHtml = '';
     if (tab === 'To Pay') {
         topLookupHtml = '<div class="pending-receipt-banner" style="margin-bottom:14px;padding:12px 14px;">' +
@@ -18144,7 +18877,26 @@ function renderOrderList(tab) {
             'To Receive': 'No orders currently in transit.',
             'To Review': 'You have no pending reviews. Thank you for shopping with Nex4UpStore!'
         }[tab] || 'No orders found.';
-        myOrdersList.innerHTML = topLookupHtml + '<div class="order-empty-state"><i class="fas fa-box-open"></i><p>' + emptyMsg + '</p></div>';
+        if (hasExtraFilters) {
+            myOrdersList.innerHTML = topLookupHtml +
+                '<div class="nex2-order-empty-card">' +
+                '<i class="fas fa-search"></i>' +
+                '<h4 style="color:#fff;font-size:16px;margin:0 0 6px;">No Orders Found</h4>' +
+                '<p style="color:#8aa1c0;font-size:13px;margin:0 0 14px;">No orders match your search keywords or filters. Try resetting or changing your filters.</p>' +
+                '<button type="button" class="submit-btn" id="nex2ResetOrderFiltersBtn" style="padding:8px 18px;font-size:12.5px;"><i class="fas fa-undo"></i> Reset Filters</button>' +
+                '</div>';
+            var rstBtn = document.getElementById('nex2ResetOrderFiltersBtn');
+            if (rstBtn) {
+                rstBtn.addEventListener('click', function() {
+                    if (searchEl) searchEl.value = '';
+                    if (catEl) catEl.value = 'all';
+                    if (dateEl) dateEl.value = 'all';
+                    renderOrderList('All');
+                });
+            }
+        } else {
+            myOrdersList.innerHTML = topLookupHtml + '<div class="order-empty-state"><i class="fas fa-box-open"></i><p>' + emptyMsg + '</p></div>';
+        }
         if (tab === 'To Pay') {
             var mlBtnEmpty = document.getElementById('myOrdersLookupBtn');
             var mlInpEmpty = document.getElementById('myOrdersLookupInput');
@@ -18271,19 +19023,20 @@ function renderOrderList(tab) {
         html += '<button class="rate-btn" style="background:#192638;color:#f7d875;border:1px solid #3d5a7a;" onclick="buyAgainFromOrder(\'' + escapeHtml(orderId) + '\')">';
         html += '<i class="fas fa-redo-alt"></i> Buy Again</button>';
 
-        if (tab === 'To Pay') {
+        var effTab = order._tab || tab;
+        if (effTab === 'To Pay') {
             html += '<button class="rate-btn" style="background:linear-gradient(135deg,#2e7d32,#4caf50);color:#fff;" onclick="reopenOrderPaymentModal(\'' + escapeHtml(orderId) + '\')">';
             html += '<i class="fas fa-wallet"></i> Pay Now / Switch Method</button>';
             html += '<button class="rate-btn" style="background:#ff6b6b;color:#fff;" onclick="cancelMyOrder(\'' + orderId + '\')">';
             html += '<i class="fas fa-times"></i> Cancel Order</button>';
         }
 
-        if (tab === 'To Receive') {
+        if (effTab === 'To Receive') {
             html += '<button class="rate-btn" onclick="confirmOrderReceived(\'' + orderId + '\')">';
             html += '<i class="fas fa-check-circle"></i> Order Received</button>';
         }
 
-        if (tab === 'To Review') {
+        if (effTab === 'To Review') {
             for (var k = 0; k < items.length; k++) {
                 var m2 = items[k].match(/^(.*?)\s*×\s*(\d+)$/);
                 var name2 = m2 ? m2[1].trim() : items[k];
@@ -18844,10 +19597,18 @@ function submitInlineReview() {
     // ✅ Show points balance
     google.script.run
         .withSuccessHandler(function(points) {
+            var numPts = parseInt(points, 10) || 0;
+            var rmVal = 'RM ' + (numPts * 0.01).toFixed(2);
             var pointsDisplay = document.getElementById('profilePoints');
             if (pointsDisplay) {
-            pointsDisplay.textContent = points + ' Points (= RM' + (points * 0.01).toFixed(2) + ')';
+                pointsDisplay.textContent = numPts + ' Points (= ' + rmVal + ')';
             }
+            var sbPts = document.getElementById('nex2SidebarPts');
+            var sbRm = document.getElementById('nex2SidebarRm');
+            var ovPts = document.getElementById('nex2OvPts');
+            if (sbPts) sbPts.textContent = numPts.toLocaleString();
+            if (sbRm) sbRm.textContent = rmVal;
+            if (ovPts) ovPts.textContent = numPts.toLocaleString();
         })
         .getCustomerPoints(customer.email);
         }
@@ -18883,10 +19644,38 @@ function submitInlineReview() {
             if (!file) return;
             var reader = new FileReader();
             reader.onload = function(ev) {
-                var dataUrl = ev.target.result;
-                editProfileImageUrl.value = dataUrl;
-                editProfilePreview.src = dataUrl;
-                editProfilePreview.style.display = 'block';
+                var img = new Image();
+                img.onload = function() {
+                    try {
+                        var maxDim = 360;
+                        var w = img.naturalWidth || img.width || 360;
+                        var h = img.naturalHeight || img.height || 360;
+                        if (w > maxDim || h > maxDim) {
+                            var sc = Math.min(maxDim / w, maxDim / h);
+                            w = Math.max(1, Math.round(w * sc));
+                            h = Math.max(1, Math.round(h * sc));
+                        }
+                        var canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        var compressedUrl = canvas.toDataURL('image/jpeg', 0.82);
+                        editProfileImageUrl.value = compressedUrl;
+                        editProfilePreview.src = compressedUrl;
+                        editProfilePreview.style.display = 'block';
+                    } catch (err) {
+                        editProfileImageUrl.value = ev.target.result;
+                        editProfilePreview.src = ev.target.result;
+                        editProfilePreview.style.display = 'block';
+                    }
+                };
+                img.onerror = function() {
+                    editProfileImageUrl.value = ev.target.result;
+                    editProfilePreview.src = ev.target.result;
+                    editProfilePreview.style.display = 'block';
+                };
+                img.src = ev.target.result;
             };
             reader.readAsDataURL(file);
         });
@@ -18908,9 +19697,11 @@ function submitInlineReview() {
             google.script.run
                 .withSuccessHandler(function(result) {
                     if (result.success) {
+                        var finalImgUrl = result.profileImage || profileImage;
                         customer.name = name;
                         customer.phone = phone;
-                        customer.profileImage = profileImage;
+                        customer.profileImage = finalImgUrl;
+                        editProfileImageUrl.value = finalImgUrl;
                         try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
                         if (typeof window.nex2_save_gamer_profile === 'function') {
                             window.nex2_save_gamer_profile(function() {
@@ -19746,8 +20537,13 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
                 var img = document.getElementById('cropImage');
                 var overlay = document.getElementById('cropOverlay');
 
-                // ✅ Define the init function FIRST (before setting src)
+                var cropInitialized = false;
                 var initCropper = function() {
+                    if (cropInitialized) return;
+                    cropInitialized = true;
+                    clearTimeout(loadTimeout);
+                    img.onload = null;
+                    img.onerror = null;
                     try {
                         if (_cropper) { _cropper.destroy(); _cropper = null; }
                         _cropper = new Cropper(img, {
@@ -19773,47 +20569,40 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
                     }
                 };
 
-                // ✅ Safety timeout — if image doesn't load in 8 seconds, fail gracefully
-                // ✅ Detach any previous handlers first
+                // Open modal before initCropper so Cropper measures real visible bounds
+                overlay.classList.add('open');
+
+                // Reset ratio selection to default 16:9
+                var tabs = document.querySelectorAll('#cropRatioTabs .ratio-btn');
+                for (var i = 0; i < tabs.length; i++) {
+                    tabs[i].classList.toggle('active', tabs[i].dataset.ratio === '1.7777');
+                }
+
+                // Safety timeout — if image doesn't load in 8 seconds, fail gracefully
                 img.onload = null;
                 img.onerror = null;
 
                 var loadTimeout = setTimeout(function() {
+                    if (cropInitialized) return;
                     img.onload = null;
                     img.onerror = null;
                     showToast('❌ Image took too long to load. Please try a smaller image.');
                     _closeCropModal(true);
                 }, 8000);
 
-                img.onload = function() {
-                    clearTimeout(loadTimeout);
-                    img.onload = null;
-                    img.onerror = null;
-                    initCropper();
-                };
+                img.onload = initCropper;
                 img.onerror = function() {
                     clearTimeout(loadTimeout);
                     img.onload = null;
                     img.onerror = null;
-                    // ✅ Only show toast if this was a REAL image load (not a cleanup)
                     if (!img.src || img.src === '' || img.src === window.location.href) return;
                     showToast('❌ Image format not supported. Please use JPG, PNG, or WebP.');
                     _closeCropModal(true);
                 };
                 img.src = ev.target.result;
 
-                // ✅ Handle very fast-loading images (fallback)
                 if (img.complete && img.naturalWidth > 0) {
                     initCropper();
-                }
-
-                // ✅ Show the modal
-                overlay.classList.add('open');
-
-                // ✅ Reset ratio selection to default 16:9
-                var tabs = document.querySelectorAll('#cropRatioTabs .ratio-btn');
-                for (var i = 0; i < tabs.length; i++) {
-                    tabs[i].classList.toggle('active', tabs[i].dataset.ratio === '1.7777');
                 }
             };
             reader.readAsDataURL(file);
@@ -23178,17 +23967,20 @@ function renderMarketplaceBreadcrumbs() {
     var bar = document.getElementById('mpBreadcrumbBar');
     var crumbs = document.getElementById('mpBreadcrumbs');
     var heroWrap = document.getElementById('mpHomeHeroWrapper');
+    var rankStrip = document.getElementById('nex2HomeRankStrip');
     if (!bar || !crumbs) return;
 
     var isFiltering = selectedCategory || selectedGenre || currentFilter === 'hotselling' || (searchQuery && searchQuery.trim() !== '');
     if (!isFiltering) {
         bar.style.display = 'none';
         if (heroWrap) heroWrap.style.display = 'block';
+        if (rankStrip) rankStrip.style.display = 'block';
         return;
     }
 
     bar.style.display = 'flex';
     if (heroWrap) heroWrap.style.display = 'none';
+    if (rankStrip) rankStrip.style.display = 'none';
 
     var html = '<span class="mp-crumb" data-step="home"><i class="fas fa-home"></i> Home</span>';
 
@@ -24125,11 +24917,11 @@ updateProfileDropdown();
         });
     }
 
-    // Header Points Pill -> Open My Account
+    // Header Points Pill -> Open My Account Wallet Pane
     var ptsPill = document.getElementById('headerPointsPill');
     if (ptsPill) {
         ptsPill.addEventListener('click', function () {
-            if (customer) showMyAccount();
+            if (customer) showMyAccount('wallet');
         });
     }
 
@@ -24453,10 +25245,13 @@ loadMyAccount = function () {
     var _nex2State = {
         lang: localStorage.getItem('nex4up_lang') || 'EN',
         activeTab: 'store',
+        activeAccountPane: 'orders',
         rankCat: 'overall',
         rankTime: 'allTime',
         commMode: 'feed',
         feedFilter: 'All',
+        faqCat: 'All',
+        faqSearch: '',
         previewFrameId: 'frame_default',
         data: null,
         pendingPostImgDataUrl: ''
@@ -24469,6 +25264,7 @@ loadMyAccount = function () {
             nav_creators: 'Creator Hub',
             nav_community: 'Community & Find Players',
             nav_reviews: 'Reviews',
+            nav_faq: 'FAQ',
             nav_devs: 'Developers',
             promo: '🎬 NEX Creator Challenge: Post your TikTok / Reels / Shorts & win NEX Points, Vouchers & Event Frame!',
             promoBtn: 'Join Creator Hub →'
@@ -24479,6 +25275,7 @@ loadMyAccount = function () {
             nav_creators: 'Hab Pencipta',
             nav_community: 'Komuniti & Cari Pemain',
             nav_reviews: 'Ulasan',
+            nav_faq: 'Soalan Lazim',
             nav_devs: 'Pembangun',
             promo: '🎬 Cabaran Pencipta NEX: Kongsi video TikTok / Reels / Shorts & menangi Mata NEX, Baucar & Bingkai Acara!',
             promoBtn: 'Sertai Hab Pencipta →'
@@ -24503,10 +25300,13 @@ loadMyAccount = function () {
 
     function get_frame_def(frameId) {
         var list = (_nex2State.data && _nex2State.data.frameCatalog) || NEX2_FRAMES_DEFAULT;
+        var found = list[0];
         for (var i = 0; i < list.length; i++) {
-            if (list[i].id === frameId) return list[i];
+            if (list[i].id === frameId) { found = list[i]; break; }
         }
-        return list[0];
+        var copy = Object.assign({}, found);
+        if (NEX2_INLINE_FRAME_MAP[copy.id]) copy.assetUrl = NEX2_INLINE_FRAME_MAP[copy.id];
+        return copy;
     }
 
     function render_framed_avatar_html(opts) {
@@ -24517,6 +25317,9 @@ loadMyAccount = function () {
         var name = String(opts.name || 'G').trim();
         var initial = escapeHtml(name.charAt(0).toUpperCase() || 'G');
         var avatarUrl = String(opts.avatarUrl || '').trim();
+        if (avatarUrl && avatarUrl.indexOf('http') === 0 && typeof optimizeDriveImg === 'function') {
+            avatarUrl = optimizeDriveImg(avatarUrl, Math.max(120, size * 2));
+        }
         var coreHtml = (avatarUrl && (avatarUrl.indexOf('http') === 0 || avatarUrl.indexOf('data:image') === 0))
             ? '<img src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(name) + '" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + initial + '\';" />'
             : initial;
@@ -24554,6 +25357,14 @@ loadMyAccount = function () {
             showStoreView();
             return;
         }
+        if (tabName === 'profile') {
+            if (customer && customer.email) {
+                showMyAccount();
+            } else if (typeof loginOverlay !== 'undefined' && loginOverlay) {
+                loginOverlay.classList.add('open');
+            }
+            return;
+        }
         _hideAllNex2Views();
         if (typeof publicView !== 'undefined' && publicView) publicView.style.display = 'none';
         if (typeof adminSections !== 'undefined' && adminSections) adminSections.style.display = 'none';
@@ -24573,6 +25384,7 @@ loadMyAccount = function () {
             creators: 'nex2CreatorsSection',
             community: 'nex2CommunitySection',
             reviews: 'nex2ReviewsSection',
+            faq: 'nex2FaqSection',
             developers: 'nex2DevSection'
         };
         var sec = document.getElementById(mapId[tabName]);
@@ -24580,6 +25392,7 @@ loadMyAccount = function () {
             sec.style.display = 'block';
             sec.classList.add('active');
             window._setNex2ActiveNav(tabName);
+            if (tabName === 'faq') render_nex2_faqs();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
@@ -24589,8 +25402,9 @@ loadMyAccount = function () {
         if (!el) return;
         var coins = (_nex2State.data && _nex2State.data.coinVariants) || NEX2_COINS_DEFAULT;
         el.innerHTML = coins.map(function(c) {
+            var coinSrc = NEX2_INLINE_COIN_MAP[c.id] || c.assetUrl;
             return '<div class="nex2-coin-card">' +
-                '<img src="' + escapeHtml(c.assetUrl) + '" alt="' + escapeHtml(c.name) + '" onerror="window._nexCoinSvgFallback(this,\'' + escapeHtml(c.id) + '\')" />' +
+                '<img src="' + escapeHtml(coinSrc) + '" alt="' + escapeHtml(c.name) + '" onerror="window._nexCoinSvgFallback(this,\'' + escapeHtml(c.id) + '\')" />' +
                 '<strong style="font-size:12px;color:#fff;">' + escapeHtml(c.name) + '</strong>' +
                 '<span style="font-size:10.5px;color:#8aa1c0;">' + escapeHtml(c.usage) + '</span>' +
                 '</div>';
@@ -24680,7 +25494,8 @@ loadMyAccount = function () {
                 campsGrid.innerHTML = '<div class="nex2-panel-card">No active campaigns right now. Check back soon!</div>';
             } else {
                 campsGrid.innerHTML = campaigns.map(function(c) {
-                    var coinAsset = 'assets/coins/coin_' + (c.rewardCoinVariant || 'event') + '.svg';
+                    var cVar = c.rewardCoinVariant || 'event';
+                    var coinAsset = NEX2_INLINE_COIN_MAP[cVar] || NEX2_INLINE_COIN_MAP.event || ('assets/coins/coin_' + cVar + '.svg');
                     var rewardLabel = c.rewardType === 'Points' ? (c.rewardValue + ' NEX Points') : (c.rewardType === 'Voucher' ? ('RM ' + c.rewardValue + ' Voucher') : (c.rewardType + ' ' + c.rewardValue));
                     return '<div class="nex2-panel-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">' +
                         '<div>' +
@@ -24924,6 +25739,8 @@ loadMyAccount = function () {
 
         var countEl = document.getElementById('nex2OwnedFramesCount');
         if (countEl) countEl.textContent = owned.length + ' / 10 Unlocked';
+        var ovFrames = document.getElementById('nex2OvFrames');
+        if (ovFrames) ovFrames.textContent = owned.length + ' / 10';
 
         var badgesRow = document.getElementById('nex2ProfileBadgesRow');
         if (badgesRow) {
@@ -25077,6 +25894,228 @@ loadMyAccount = function () {
             .updateGamerProfile(customer.email, payload, customer.sessionToken);
     };
 
+    var NEX2_FALLBACK_FAQS = [
+        { faqId: 'faq-pay', category: 'Orders & Payments', question: 'What payment methods are accepted on NEX4UP?', answer: 'We accept MAE (Maybank QR), Touch \'n Go eWallet (TNG), ShopeePay, and SociaBuzz. Orders paid via MAE/TNG/ShopeePay can upload their receipt inside Checkout or My Orders.', highlighted: true },
+        { faqId: 'faq-deliv', category: 'General', question: 'How fast are Robux and game top-ups delivered?', answer: 'Digital orders and Robux are processed daily within 1–2 hours during operating hours (9:00 AM – 12:00 PM MYT). Track live status anytime in My Orders or Track Order.', highlighted: true },
+        { faqId: 'faq-rbx', category: 'Roblox & Gaming Accounts', question: 'How do I link or recover my Roblox username?', answer: 'Open My Account -> Gaming Accounts. Enter your Roblox username and click Verify Roblox, or click any past Roblox username automatically recovered from your order history.', highlighted: false },
+        { faqId: 'faq-pts', category: 'Wallet Points & Cashback', question: 'How do NEX Wallet Points work?', answer: 'Earn +1 Wallet Point per RM 1 spent on verified orders plus +5 bonus Points per verified product review. Every 100 NEX Points equals RM 1.00 discount or unlocks exclusive Profile Frames.', highlighted: true },
+        { faqId: 'faq-camp', category: 'Creator Programme', question: 'How do I join NEX4UP Creator Campaigns?', answer: 'Open Creator Hub in the top navigation, pick an active TikTok / Instagram Reels / YouTube Shorts campaign, and submit your clip link for review and rewards.', highlighted: false },
+        { faqId: 'faq-comm', category: 'Community', question: 'How can I find other Malaysian gamers to play with?', answer: 'Visit Community & Find Players and filter players by game (Roblox, Blox Fruits, MLBB, PUBG Mobile, Valorant) or playstyle, then follow players with matching schedules.', highlighted: false }
+    ];
+
+    window.switch_account_pane = function(paneName) {
+        var valid = { overview: 'nex2AccPaneOverview', orders: 'nex2AccPaneOrders', gaming: 'nex2AccPaneGaming', wallet: 'nex2AccPaneWallet', referrals: 'nex2AccPaneReferrals', frames: 'nex2AccPaneFrames', community: 'nex2AccPaneCommunity', settings: 'nex2AccPaneSettings' };
+        var targetPane = valid[paneName] ? paneName : 'orders';
+        _nex2State.activeAccountPane = targetPane;
+        document.querySelectorAll('#myAccountSection .nex2-acc-pane').forEach(function(el) {
+            el.classList.toggle('active', el.id === valid[targetPane]);
+        });
+        document.querySelectorAll('#nex2AccountSideMenu [data-acc-pane]').forEach(function(btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-acc-pane') === targetPane);
+        });
+        if (targetPane === 'wallet') load_wallet_and_vouchers();
+        if (targetPane === 'referrals' && typeof loadReferralData === 'function') loadReferralData();
+        if (targetPane === 'frames') render_nex2_frame_studio();
+        if (targetPane === 'gaming' || targetPane === 'community' || targetPane === 'overview') sync_account_sidebar_and_gaming_panel();
+    };
+
+    function sync_account_sidebar_and_gaming_panel() {
+        if (!customer) return;
+        var sbRbxName = document.getElementById('nex2SidebarRobloxName');
+        var sbRbxWrap = document.getElementById('nex2SidebarRobloxIconWrap');
+        var sbGameTxt = document.getElementById('nex2SidebarGameIdText');
+        var rbxUname = String(customer.robloxUsername || '').trim();
+        var rbxAv = String(customer.robloxAvatarUrl || '').trim();
+        var ga = (customer.savedGamingAccounts && typeof customer.savedGamingAccounts === 'object') ? customer.savedGamingAccounts : {};
+
+        if (sbRbxName) {
+            sbRbxName.textContent = rbxUname ? ('@' + rbxUname) : 'Connect';
+            sbRbxName.style.color = rbxUname ? '#fff' : '#38bdf8';
+        }
+        if (sbRbxWrap) {
+            sbRbxWrap.innerHTML = (rbxAv && rbxAv.indexOf('http') === 0)
+                ? '<img src="' + escapeHtml(rbxAv) + '" alt="Roblox" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<i class=\\\'fas fa-cubes\\\'></i>\';" />'
+                : '<i class="fas fa-cubes"></i>';
+        }
+        if (sbGameTxt) {
+            var mlStr = (ga.mlbb && ga.mlbb.userId) ? ('MLBB ' + ga.mlbb.userId) : '';
+            var pbStr = (ga.pubg && ga.pubg.userId) ? ('PUBG ' + ga.pubg.userId) : '';
+            sbGameTxt.textContent = mlStr || pbStr || 'Connect ID';
+            sbGameTxt.style.color = (mlStr || pbStr) ? '#fff' : '#facc15';
+        }
+
+        // Tier & XP card computed from verified frames + points
+        var ptsNum = parseInt(customer.points, 10) || 0;
+        var spentApprox = parseFloat(customer.totalSpent || 0) || 0;
+        var xpVal = Math.max(ptsNum, Math.round(spentApprox * 2));
+        var tierName = 'Starter';
+        var tierNext = 500;
+        if (xpVal >= 2000 || spentApprox >= 500) { tierName = 'VIP Mythic'; tierNext = Math.max(xpVal, 2500); }
+        else if (xpVal >= 500 || spentApprox >= 100) { tierName = 'Pro Gamer'; tierNext = 2000; }
+        var tierPill = document.getElementById('nex2SidebarTierPill');
+        var xpText = document.getElementById('nex2SidebarXpText');
+        var xpBar = document.getElementById('nex2SidebarXpBar');
+        var tierGoal = document.getElementById('nex2SidebarTierGoal');
+        if (tierPill) tierPill.innerHTML = '<i class="fas fa-crown"></i> ' + escapeHtml(tierName);
+        if (xpText) xpText.textContent = xpVal + ' XP / ' + tierNext + ' XP';
+        if (xpBar) xpBar.style.width = Math.min(100, Math.max(8, Math.round((xpVal / tierNext) * 100))) + '%';
+        if (tierGoal) tierGoal.textContent = tierName === 'VIP Mythic' ? 'Top Tier Unlocked' : 'Next Tier';
+
+        // Overview stats
+        var sbPts = document.getElementById('nex2SidebarPts');
+        var sbRm = document.getElementById('nex2SidebarRm');
+        var ovPts = document.getElementById('nex2OvPts');
+        if (sbPts) sbPts.textContent = ptsNum.toLocaleString();
+        if (sbRm) sbRm.textContent = 'RM ' + (ptsNum * 0.01).toFixed(2);
+        if (ovPts) ovPts.textContent = ptsNum.toLocaleString();
+
+        // Community Summary Card
+        var cSum = document.getElementById('nex2CommProfileSummary');
+        if (cSum) {
+            var favs = Array.isArray(customer.favoriteGames) ? customer.favoriteGames : [];
+            cSum.innerHTML =
+                '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px;">' +
+                render_framed_avatar_html({ size: 64, frameId: customer.equippedFrameId || 'frame_default', avatarUrl: (customer.avatarMode === 'roblox' && rbxAv) ? rbxAv : (customer.profileImage || rbxAv), name: customer.name }) +
+                '<div><div style="font-size:16px;font-weight:800;color:#fff;">' + escapeHtml(customer.name || '-') + '</div>' +
+                '<div style="font-size:12.5px;color:#38bdf8;">' + (rbxUname ? ('Roblox: @' + escapeHtml(rbxUname)) : 'Roblox not linked yet') + ' • ' + escapeHtml(customer.playstyle || 'Casual') + '</div></div></div>' +
+                (customer.bio ? '<p style="font-size:13px;color:#cbd5e1;margin-bottom:10px;">' + escapeHtml(customer.bio) + '</p>' : '<p style="font-size:12.5px;color:#6a7f9e;margin-bottom:10px;">Add a Gamer Bio &amp; social handles so teammates can recognize you on Find Players.</p>') +
+                '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+                (favs.length ? favs.map(function(g) { return '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.14);color:#38bdf8;">' + escapeHtml(g) + '</span>'; }).join('') : '<span style="font-size:12px;color:#8aa1c0;">No favorite games selected yet</span>') +
+                '</div>';
+        }
+
+        // Gaming Accounts pane population
+        var gaPrev = document.getElementById('nex2GaRobloxPreview');
+        if (gaPrev) {
+            if (rbxUname) {
+                gaPrev.innerHTML = render_framed_avatar_html({ size: 54, frameId: customer.equippedFrameId || 'frame_default', avatarUrl: rbxAv, name: rbxUname }) +
+                    '<div><div style="font-weight:800;color:#fff;font-size:14px;">@' + escapeHtml(rbxUname) + '</div>' +
+                    '<div style="font-size:12px;color:#4ade80;">' + (customer.robloxUserId ? '✓ Official Roblox Verified (ID: ' + escapeHtml(String(customer.robloxUserId)) + ')' : 'Linked username (Click Verify Roblox to sync headshot)') + '</div></div>';
+            } else {
+                gaPrev.innerHTML = '<div style="font-size:12.5px;color:#8aa1c0;">No Roblox account linked yet. Enter your username below and click <strong>Verify Roblox</strong>.</div>';
+            }
+        }
+        var gaIn = document.getElementById('nex2GaRobloxUsername');
+        if (gaIn && !gaIn.dataset.dirty) gaIn.value = rbxUname;
+        var mlU = document.getElementById('nex2GaMlUser');
+        var mlZ = document.getElementById('nex2GaMlZone');
+        var pgI = document.getElementById('nex2GaPubgId');
+        var pgN = document.getElementById('nex2GaPubgNick');
+        if (mlU && ga.mlbb) mlU.value = ga.mlbb.userId || '';
+        if (mlZ && ga.mlbb) mlZ.value = ga.mlbb.zoneId || '';
+        if (pgI && ga.pubg) pgI.value = ga.pubg.userId || '';
+        if (pgN && ga.pubg) pgN.value = ga.pubg.nickname || '';
+
+        // Recovered historical Roblox usernames from profile + past orders
+        var recBan = document.getElementById('nex2GamingRecoveredBanner');
+        var recPills = document.getElementById('nex2GamingRecoveredPills');
+        var recMap = {};
+        var recList = [];
+        var pushRec = function(u) {
+            var clean = String(u || '').replace(/^@+/, '').trim();
+            if (!clean || /^(-|n\/a|none|nil|null|test|testing)$/i.test(clean)) return;
+            var low = clean.toLowerCase();
+            if (!recMap[low]) { recMap[low] = true; recList.push(clean); }
+        };
+        (Array.isArray(customer.recoveredRobloxUsernames) ? customer.recoveredRobloxUsernames : []).forEach(pushRec);
+        if (typeof myOrdersCache !== 'undefined' && Array.isArray(myOrdersCache)) {
+            myOrdersCache.forEach(function(mo) {
+                if (mo['Roblox Username']) pushRec(mo['Roblox Username']);
+                if (mo['Game IDs'] && typeof mo['Game IDs'] === 'object') {
+                    Object.keys(mo['Game IDs']).forEach(function(k) {
+                        var gObj = mo['Game IDs'][k];
+                        if (gObj && typeof gObj === 'object' && gObj.robloxUsername) pushRec(gObj.robloxUsername);
+                    });
+                }
+            });
+        }
+        if (recBan && recPills) {
+            if (recList.length > 0) {
+                recBan.style.display = 'block';
+                recPills.innerHTML = recList.map(function(u) {
+                    return '<button type="button" class="nex2-recovered-pill" data-recover-rbx="' + escapeHtml(u) + '"><i class="fas fa-user-check"></i> @' + escapeHtml(u) + '</button>';
+                }).join('');
+            } else {
+                recBan.style.display = 'none';
+            }
+        }
+    }
+
+    function load_wallet_and_vouchers() {
+        if (!customer || !customer.email) return;
+        var vEl = document.getElementById('nex2WalletVouchersList');
+        var lEl = document.getElementById('nex2WalletLedgerList');
+        var sbV = document.getElementById('nex2SidebarVouchers');
+        if (!customer.sessionToken) {
+            if (vEl) vEl.innerHTML = '<div style="grid-column:1/-1;color:#8aa1c0;font-size:13px;">Sign in with email/Google to load active vouchers &amp; activity.</div>';
+            return;
+        }
+        google.script.run.withSuccessHandler(function(res) {
+            if (!res || !res.success) return;
+            var pts = parseInt(res.pointsBalance, 10) || 0;
+            customer.points = pts;
+            var rmVal = 'RM ' + (pts * 0.01).toFixed(2);
+            ['nex2SidebarPts', 'nex2OvPts'].forEach(function(id) { var el = document.getElementById(id); if (el) el.textContent = pts.toLocaleString(); });
+            var sbRm = document.getElementById('nex2SidebarRm');
+            if (sbRm) sbRm.textContent = rmVal;
+            var vouchers = res.vouchers || [];
+            if (sbV) sbV.textContent = vouchers.length;
+            if (vEl) {
+                vEl.innerHTML = vouchers.length ? vouchers.map(function(v) {
+                    var valTxt = v.discountType === 'percent' ? (v.discountValue + '% OFF') : ('RM ' + parseFloat(v.discountValue || 0).toFixed(2) + ' OFF');
+                    return '<div class="nex2-voucher-card">' +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">' +
+                        '<span class="nex2-rarity-pill" style="background:rgba(247,216,117,0.16);color:#f7d875;">' + escapeHtml(v.tag || 'PROMO') + '</span>' +
+                        '<span style="font-size:11px;color:#8aa1c0;">' + (v.expiryDate ? 'Exp: ' + escapeHtml(v.expiryDate) : 'Active') + '</span></div>' +
+                        '<div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;">' + escapeHtml(valTxt) + '</div>' +
+                        (v.minOrder > 0 ? '<div style="font-size:11.5px;color:#8aa1c0;margin-bottom:8px;">Min. spend RM ' + parseFloat(v.minOrder).toFixed(2) + '</div>' : '<div style="font-size:11.5px;color:#8aa1c0;margin-bottom:8px;">No minimum spend</div>') +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;background:#0b0e14;padding:6px 10px;border-radius:8px;border:1px solid #1e2a3a;">' +
+                        '<code style="color:#4ade80;font-weight:800;">' + escapeHtml(v.code) + '</code>' +
+                        '<button type="button" class="nex2-top-promo-btn" onclick="copyToClipboard(\'' + escapeHtml(v.code) + '\')">Copy</button></div></div>';
+                }).join('') : '<div style="grid-column:1/-1;color:#6a7f9e;font-size:13px;padding:12px;">No active store vouchers available right now. Refer friends or submit creator videos to unlock vouchers!</div>';
+            }
+            if (lEl) {
+                var ledger = res.ledger || [];
+                lEl.innerHTML = ledger.length ? ledger.map(function(item) {
+                    var chg = parseInt(item.pointsChange, 10) || 0;
+                    return '<div class="nex2-ledger-row">' +
+                        '<div><div style="font-weight:700;color:#fff;">' + escapeHtml(item.reason || 'Points Update') + '</div>' +
+                        '<div style="font-size:11px;color:#6a7f9e;">' + escapeHtml(item.date || '') + (item.orderId ? ' • ' + escapeHtml(item.orderId) : '') + '</div></div>' +
+                        '<strong style="color:' + (chg >= 0 ? '#4ade80' : '#ff6b6b') + ';">' + (chg >= 0 ? '+' : '') + chg + ' Pts</strong></div>';
+                }).join('') : '<p style="color:#6a7f9e;font-size:13px;padding:12px;">No Wallet Points transactions yet — complete orders or leave product reviews to earn points!</p>';
+            }
+        }).getCustomerWalletAndVouchers(customer.email, customer.sessionToken);
+    }
+
+    function render_nex2_faqs() {
+        var listEl = document.getElementById('nex2FaqList');
+        if (!listEl) return;
+        var allFaqs = (_nex2State.data && Array.isArray(_nex2State.data.faqs) && _nex2State.data.faqs.length > 0)
+            ? _nex2State.data.faqs
+            : NEX2_FALLBACK_FAQS;
+        var cat = _nex2State.faqCat || 'All';
+        var q = (_nex2State.faqSearch || '').trim().toLowerCase();
+        var filtered = allFaqs.filter(function(f) {
+            if (cat !== 'All' && f.category !== cat) return false;
+            if (q) {
+                var hay = ((f.question || '') + ' ' + (f.answer || '') + ' ' + (f.category || '')).toLowerCase();
+                if (hay.indexOf(q) === -1) return false;
+            }
+            return true;
+        });
+        if (filtered.length === 0) {
+            listEl.innerHTML = '<div class="nex2-panel-card" style="text-align:center;color:#8aa1c0;">No matching FAQ answers found. Try clearing your filter or ask NexBot Live Support!</div>';
+            return;
+        }
+        listEl.innerHTML = filtered.map(function(f, idx) {
+            return '<div class="nex2-faq-item' + (idx === 0 ? ' open' : '') + '">' +
+                '<button type="button" class="nex2-faq-q">' +
+                '<span>' + (f.highlighted ? '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;margin-right:8px;">Popular</span>' : '') + escapeHtml(f.question) + '</span>' +
+                '<i class="fas fa-chevron-down chev"></i></button>' +
+                '<div class="nex2-faq-a">' + escapeHtml(f.answer) + '</div></div>';
+        }).join('');
+    }
+
     function render_nex2_all_sections() {
         render_home_rank_strip();
         render_nex2_rankings();
@@ -25084,8 +26123,10 @@ loadMyAccount = function () {
         render_nex2_community_hub();
         render_nex2_reviews_wall();
         render_nex2_dev_team();
+        render_nex2_faqs();
         render_nex2_notifications();
         render_nex2_frame_studio();
+        sync_account_sidebar_and_gaming_panel();
         sync_profile_form_fields();
     }
 
@@ -25128,12 +26169,15 @@ loadMyAccount = function () {
             .getNex4Up2Bootstrap(em, tok);
     };
 
-    // Hook My Account loading so framed avatar & studio update seamlessly
+    // Hook My Account loading so framed avatar, sidebar & studio update seamlessly
     var _preNex2LoadMyAccount = loadMyAccount;
     loadMyAccount = function() {
         _preNex2LoadMyAccount();
         if (customer) {
-            var effImg = (customer.avatarMode === 'roblox' && customer.robloxAvatarUrl) ? customer.robloxAvatarUrl : customer.profileImage;
+            var effImg = (customer.avatarMode === 'roblox' && customer.robloxAvatarUrl) ? customer.robloxAvatarUrl : (customer.profileImage || customer.robloxAvatarUrl || '');
+            if (effImg && effImg.indexOf('http') === 0 && typeof optimizeDriveImg === 'function') {
+                effImg = optimizeDriveImg(effImg, 240);
+            }
             if (effImg && (effImg.indexOf('http') === 0 || effImg.indexOf('data:image') === 0)) {
                 profileAvatar.src = effImg;
                 profileAvatar.style.display = 'block';
@@ -25142,6 +26186,8 @@ loadMyAccount = function () {
             _nex2State.previewFrameId = customer.equippedFrameId || 'frame_default';
         }
         render_nex2_frame_studio();
+        sync_account_sidebar_and_gaming_panel();
+        load_wallet_and_vouchers();
         sync_profile_form_fields();
     };
 
@@ -25277,6 +26323,22 @@ loadMyAccount = function () {
                             '<span style="color:#6a7f9e;">[' + escapeHtml(String(l[1])) + ']</span> <strong style="color:#f7d875;">' + escapeHtml(String(l[3])) + '</strong> → ' + escapeHtml(String(l[4])) + ' <span style="color:#8aa1c0;">' + escapeHtml(String(l[5])) + '</span></div>';
                     }).join('') || '<p style="color:#6a7f9e;padding:12px;">No audit events recorded yet.</p>';
                 }
+
+                // 8. Admin FAQs List
+                var fList = document.getElementById('nex2AdminFaqsList');
+                if (fList) {
+                    window._nex2AdminFaqsCache = res.faqs || [];
+                    fList.innerHTML = window._nex2AdminFaqsCache.map(function(f) {
+                        var pubSt = String(f[5] || 'Yes');
+                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                            '<div style="flex:1;min-width:220px;"><strong style="color:#fff;">' + escapeHtml(String(f[2])) + '</strong> ' +
+                            '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">' + escapeHtml(String(f[1])) + '</span> ' +
+                            '<span class="nex2-rarity-pill" style="background:rgba(255,255,255,0.06);color:' + (pubSt === 'Yes' ? '#4ade80' : '#f7d875') + ';">' + escapeHtml(pubSt === 'Yes' ? 'Published' : 'Draft') + '</span>' +
+                            '<div style="font-size:12px;color:#8aa1c0;margin-top:4px;">' + escapeHtml(String(f[3]).slice(0, 120)) + (String(f[3]).length > 120 ? '...' : '') + '</div></div>' +
+                            '<div style="display:flex;gap:6px;"><button type="button" class="nex2-comm-action-btn" data-edit-faq="' + escapeHtml(String(f[0])) + '">✏️ Edit</button>' +
+                            '<button type="button" class="nex2-comm-action-btn" style="color:#ff6b6b;" data-del-faq="' + escapeHtml(String(f[0])) + '">🗑️ Delete</button></div></div>';
+                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No FAQ entries found.</p>';
+                }
             })
             .adminGetCommunityDashboard(pwd);
     };
@@ -25290,6 +26352,97 @@ loadMyAccount = function () {
         }
         if (e.target.closest('#nex2TopPromoBtn')) { switch_nex2_tab('creators'); return; }
         if (e.target.closest('#nex2HomeViewRankBtn')) { switch_nex2_tab('rankings'); return; }
+        var accPaneBtn = e.target.closest('[data-acc-pane]');
+        if (accPaneBtn) {
+            window.switch_account_pane(accPaneBtn.getAttribute('data-acc-pane'));
+            return;
+        }
+        if (e.target.closest('#nex2SidebarEditBtn') || e.target.closest('#nex2CommEditTriggerBtn')) {
+            window.switch_account_pane('settings');
+            if (typeof editProfileForm !== 'undefined' && editProfileForm && editProfileForm.style.display !== 'block') {
+                editProfileForm.style.display = 'block';
+                sync_profile_form_fields();
+            }
+            return;
+        }
+        if (e.target.closest('#nex2AccOpenFaqBtn')) { switch_nex2_tab('faq'); return; }
+        if (e.target.closest('#nex2SidebarLogoutBtn')) { if (typeof logoutCustomer === 'function') logoutCustomer(); return; }
+        if (e.target.closest('#nex2OrdersTrackShortcutBtn')) {
+            var trBtn = document.getElementById('trackBtn');
+            if (trBtn) trBtn.click();
+            return;
+        }
+        if (e.target.closest('#nex2CommOpenFullBtn')) { switch_nex2_tab('community'); return; }
+        var recPill = e.target.closest('[data-recover-rbx]');
+        if (recPill) {
+            var rbxBox = document.getElementById('nex2GaRobloxUsername');
+            if (rbxBox) { rbxBox.value = recPill.getAttribute('data-recover-rbx'); rbxBox.dataset.dirty = '1'; }
+            var vBtn = document.getElementById('nex2GaVerifyRbxBtn');
+            if (vBtn) vBtn.click();
+            return;
+        }
+        if (e.target.closest('#nex2GaVerifyRbxBtn')) {
+            var gaIn = document.getElementById('nex2GaRobloxUsername');
+            var gaMsg = document.getElementById('nex2GaRobloxMsg');
+            var gaPrev = document.getElementById('nex2GaRobloxPreview');
+            var uname = gaIn ? gaIn.value.replace(/^@+/, '').trim() : '';
+            if (!uname) { if (gaMsg) gaMsg.textContent = 'Enter a Roblox username first.'; return; }
+            if (gaMsg) gaMsg.textContent = 'Verifying official Roblox account...';
+            google.script.run.withSuccessHandler(function(r) {
+                if (r && r.found) {
+                    if (document.getElementById('editRobloxUsername')) document.getElementById('editRobloxUsername').value = r.username || uname;
+                    if (document.getElementById('editRobloxUserId')) document.getElementById('editRobloxUserId').value = r.userId || '';
+                    if (document.getElementById('editRobloxAvatarUrl')) document.getElementById('editRobloxAvatarUrl').value = r.avatarUrl || '';
+                    if (gaMsg) gaMsg.innerHTML = '✅ Verified <strong>' + escapeHtml(r.displayName || r.username) + '</strong>! Click Save All Gaming Accounts below.';
+                    if (gaPrev) gaPrev.innerHTML = render_framed_avatar_html({ size: 54, frameId: (customer && customer.equippedFrameId) || 'frame_default', avatarUrl: r.avatarUrl, name: r.displayName || uname }) + '<div><div style="font-weight:800;color:#fff;">@' + escapeHtml(r.username || uname) + '</div><div style="font-size:12px;color:#4ade80;">Ready to save</div></div>';
+                    window._nex2PendingGaRbx = r;
+                } else {
+                    if (gaMsg) gaMsg.textContent = '❌ Roblox username not found.';
+                }
+            }).lookupRobloxUser(uname);
+            return;
+        }
+        if (e.target.closest('#nex2SaveGamingAccBtn')) {
+            if (!customer || !customer.email || !customer.sessionToken) { showToast('Sign in to save Gaming Accounts.'); return; }
+            var gaPayload = {
+                robloxUsername: (document.getElementById('nex2GaRobloxUsername') && document.getElementById('nex2GaRobloxUsername').value.trim()) || '',
+                mlUserId: (document.getElementById('nex2GaMlUser') && document.getElementById('nex2GaMlUser').value.trim()) || '',
+                mlZoneId: (document.getElementById('nex2GaMlZone') && document.getElementById('nex2GaMlZone').value.trim()) || '',
+                pubgUserId: (document.getElementById('nex2GaPubgId') && document.getElementById('nex2GaPubgId').value.trim()) || '',
+                pubgNickname: (document.getElementById('nex2GaPubgNick') && document.getElementById('nex2GaPubgNick').value.trim()) || ''
+            };
+            google.script.run.withSuccessHandler(function(r) {
+                if (r && r.success && r.customer) {
+                    r.customer.sessionToken = customer.sessionToken;
+                    customer = Object.assign({}, customer, r.customer);
+                    try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
+                    sync_account_sidebar_and_gaming_panel();
+                    sync_profile_form_fields();
+                    showToast(r.message || 'Gaming accounts saved!');
+                } else {
+                    showToast((r && r.message) || 'Could not save gaming accounts.');
+                }
+            }).saveGamingAccountsProfile(customer.email, gaPayload, customer.sessionToken);
+            return;
+        }
+        var faqCatBtn = e.target.closest('[data-faq-cat]');
+        if (faqCatBtn) {
+            _nex2State.faqCat = faqCatBtn.getAttribute('data-faq-cat') || 'All';
+            document.querySelectorAll('[data-faq-cat]').forEach(function(b) { b.classList.toggle('active', b === faqCatBtn); });
+            render_nex2_faqs();
+            return;
+        }
+        var faqQBtn = e.target.closest('.nex2-faq-q');
+        if (faqQBtn) {
+            var item = faqQBtn.closest('.nex2-faq-item');
+            if (item) item.classList.toggle('open');
+            return;
+        }
+        if (e.target.closest('#nex2FaqOpenChatBtn') || e.target.closest('#nex2FaqOpenChatBtn2')) {
+            var cf = document.getElementById('chatFab');
+            if (cf) cf.click();
+            return;
+        }
         if (e.target.closest('#nex2ScrollSubmitCampBtn')) {
             var card = document.getElementById('nex2SubmitCampCard');
             if (card) card.scrollIntoView({ behavior: 'smooth' });
@@ -25703,6 +26856,69 @@ loadMyAccount = function () {
             }).adminSyncSupabaseNow(window._nexAdminPwdSession || '');
             return;
         }
+        if (e.target.closest('#nex2AdminRecoverRbxBtn')) {
+            var stElR = document.getElementById('nex2AdminRecoverRbxStatus');
+            if (stElR) stElR.textContent = 'Scanning orders & verifying Roblox avatars...';
+            google.script.run.withSuccessHandler(function(r) {
+                if (stElR) stElR.textContent = (r && r.message) || 'Done.';
+                showToast((r && r.message) || 'Recovery complete!');
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminRecoverRobloxAccounts(window._nexAdminPwdSession || '');
+            return;
+        }
+        if (e.target.closest('#nex2ResetFaqBtn')) {
+            ['nex2FaqId', 'nex2FaqQuestion', 'nex2FaqAnswer'].forEach(function(id) { var x = document.getElementById(id); if (x) x.value = ''; });
+            document.getElementById('nex2FaqCategory').value = 'General';
+            document.getElementById('nex2FaqOrder').value = '1';
+            document.getElementById('nex2FaqPublished').value = 'Yes';
+            document.getElementById('nex2FaqHighlighted').value = 'No';
+            return;
+        }
+        if (e.target.closest('#nex2SaveFaqBtn')) {
+            var fp = {
+                faqId: document.getElementById('nex2FaqId').value,
+                category: document.getElementById('nex2FaqCategory').value,
+                question: document.getElementById('nex2FaqQuestion').value,
+                answer: document.getElementById('nex2FaqAnswer').value,
+                order: document.getElementById('nex2FaqOrder').value,
+                published: document.getElementById('nex2FaqPublished').value,
+                highlighted: document.getElementById('nex2FaqHighlighted').value
+            };
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'FAQ saved!');
+                if (r && r.success) {
+                    ['nex2FaqId', 'nex2FaqQuestion', 'nex2FaqAnswer'].forEach(function(id) { var x = document.getElementById(id); if (x) x.value = ''; });
+                }
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminSaveFaq(fp, window._nexAdminPwdSession || '');
+            return;
+        }
+        var editFaqBtn = e.target.closest('[data-edit-faq]');
+        if (editFaqBtn && window._nex2AdminFaqsCache) {
+            var fv = window._nex2AdminFaqsCache.find(function(x) { return String(x[0]) === editFaqBtn.getAttribute('data-edit-faq'); });
+            if (fv) {
+                document.getElementById('nex2FaqId').value = fv[0] || '';
+                document.getElementById('nex2FaqCategory').value = fv[1] || 'General';
+                document.getElementById('nex2FaqQuestion').value = fv[2] || '';
+                document.getElementById('nex2FaqAnswer').value = fv[3] || '';
+                document.getElementById('nex2FaqOrder').value = fv[4] || 1;
+                document.getElementById('nex2FaqPublished').value = fv[5] || 'Yes';
+                document.getElementById('nex2FaqHighlighted').value = fv[6] || 'No';
+            }
+            return;
+        }
+        var delFaqBtn = e.target.closest('[data-del-faq]');
+        if (delFaqBtn) {
+            if (!confirm('Delete this FAQ entry?')) return;
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Deleted.');
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminDeleteFaq(delFaqBtn.getAttribute('data-del-faq'), window._nexAdminPwdSession || '');
+            return;
+        }
 
         // ---------- Verified Google / Email OTP & Password Reset Auth Controls ----------
         function show_otp_login_panel(mode) {
@@ -25921,6 +27137,26 @@ loadMyAccount = function () {
         var el = document.getElementById(id);
         if (el) el.addEventListener(id === 'nex2FindSearchInput' ? 'input' : 'change', render_nex2_community_hub);
     });
+
+    ['nex2OrderSearchInput', 'nex2OrderCategoryFilter', 'nex2OrderDateFilter'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener(id === 'nex2OrderSearchInput' ? 'input' : 'change', function() {
+                if (typeof renderOrderList === 'function') renderOrderList(activeOrderTab || 'All');
+            });
+        }
+    });
+
+    var faqSearchEl = document.getElementById('nex2FaqSearchInput');
+    if (faqSearchEl) {
+        faqSearchEl.addEventListener('input', function() {
+            _nex2State.faqSearch = this.value || '';
+            render_nex2_faqs();
+        });
+    }
+
+    var gaRbxEl = document.getElementById('nex2GaRobloxUsername');
+    if (gaRbxEl) gaRbxEl.addEventListener('input', function() { this.dataset.dirty = '1'; });
 
     apply_nex2_language(_nex2State.lang);
     setTimeout(loadNex4Up2Bootstrap, 700);
