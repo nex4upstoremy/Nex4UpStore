@@ -9323,6 +9323,210 @@
     body { padding-bottom: 66px; }
     .mascot-fab { bottom: 76px !important; }
 }
+
+/* ============================================================
+   🎨 NEX4UP 2.0 FORM INPUTS, BUTTONS, GUIDED ADMIN & OTP AUTH UI
+   ============================================================ */
+.nex2-view-section .form-row,
+#section-creator-campaigns .form-row,
+#section-community-hub .form-row,
+#myAccountSection .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+.nex2-view-section .field,
+#section-creator-campaigns .field,
+#section-community-hub .field,
+#nex2PlayerModalOverlay .field,
+#myAccountSection .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.nex2-view-section .field label,
+#section-creator-campaigns .field label,
+#section-community-hub .field label,
+#myAccountSection .field label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #9bb3d1;
+    display: block;
+}
+.nex2-view-section input[type="text"],
+.nex2-view-section input[type="url"],
+.nex2-view-section input[type="email"],
+.nex2-view-section input[type="number"],
+.nex2-view-section input[type="password"],
+.nex2-view-section input[type="date"],
+.nex2-view-section input[type="file"],
+.nex2-view-section select,
+.nex2-view-section textarea,
+#section-creator-campaigns input[type="text"],
+#section-creator-campaigns input[type="url"],
+#section-creator-campaigns input[type="email"],
+#section-creator-campaigns input[type="number"],
+#section-creator-campaigns input[type="password"],
+#section-creator-campaigns input[type="date"],
+#section-creator-campaigns select,
+#section-creator-campaigns textarea,
+#section-community-hub input[type="text"],
+#section-community-hub input[type="url"],
+#section-community-hub input[type="email"],
+#section-community-hub input[type="number"],
+#section-community-hub input[type="password"],
+#section-community-hub input[type="date"],
+#section-community-hub select,
+#section-community-hub textarea,
+#myAccountSection select,
+#myAccountSection textarea {
+    width: 100%;
+    background: #0b0e14;
+    border: 1px solid #24344d;
+    border-radius: 11px;
+    padding: 10px 13px;
+    color: #e8edf5;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.nex2-view-section input:focus,
+.nex2-view-section select:focus,
+.nex2-view-section textarea:focus,
+#section-creator-campaigns input:focus,
+#section-creator-campaigns select:focus,
+#section-creator-campaigns textarea:focus,
+#section-community-hub input:focus,
+#section-community-hub select:focus,
+#section-community-hub textarea:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+}
+.nex2-view-section .submit-btn,
+#section-creator-campaigns .submit-btn,
+#section-community-hub .submit-btn,
+#nex2FrameStudioCard .submit-btn {
+    background: linear-gradient(135deg, #f7d875, #f59e0b);
+    color: #0b0e14;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    transition: transform 0.16s, filter 0.16s;
+}
+.nex2-view-section .submit-btn:hover:not(:disabled),
+#section-creator-campaigns .submit-btn:hover:not(:disabled),
+#section-community-hub .submit-btn:hover:not(:disabled),
+#nex2FrameStudioCard .submit-btn:hover:not(:disabled) {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+}
+.nex2-view-section .submit-btn:disabled,
+#nex2FrameStudioCard .submit-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.nex2-view-section .cancel-btn,
+#section-creator-campaigns .cancel-btn,
+#section-community-hub .cancel-btn {
+    background: #1a2436;
+    border: 1px solid #2a3a52;
+    color: #cbd5e1;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-guide-box {
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px dashed rgba(56, 189, 248, 0.4);
+    border-radius: 14px;
+    padding: 12px 15px;
+    font-size: 12.5px;
+    color: #cbd5e1;
+    margin-bottom: 14px;
+    line-height: 1.55;
+}
+.nex2-badge-picker {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+.nex2-badge-pick-chip {
+    background: #141c2b;
+    border: 1px solid #2a3a52;
+    color: #f7d875;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-badge-pick-chip:hover { border-color: #f7d875; background: rgba(247, 216, 117, 0.14); }
+.nex2-google-auth-btn {
+    width: 100%;
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 10px;
+    transition: transform 0.15s, background 0.15s;
+}
+.nex2-google-auth-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+.nex2-auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #6a7f9e;
+    font-size: 11.5px;
+    margin: 10px 0 14px;
+}
+.nex2-auth-divider::before,
+.nex2-auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #1e2a3a;
+}
+.nex2-otp-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+.nex2-otp-row input { flex: 1; }
+.nex2-send-otp-btn {
+    background: rgba(56, 189, 248, 0.16);
+    border: 1px solid #38bdf8;
+    color: #38bdf8;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-send-otp-btn:hover:not(:disabled) { background: #38bdf8; color: #0b0e14; }
+.nex2-send-otp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -10565,11 +10769,12 @@
 
                     <!-- 1. Grant Profile Frame -->
                     <div style="background:#121821; border:1px solid #1e2a3a; border-radius:20px; padding:20px; margin-bottom:20px;">
-                        <h3 style="margin-bottom:12px; font-size:16px;"><i class="fas fa-award" style="color:#f7d875;"></i> Grant Profile Frame to Customer</h3>
+                        <h3 style="margin-bottom:8px; font-size:16px;"><i class="fas fa-award" style="color:#f7d875;"></i> Grant Profile Frame to Customer</h3>
+                        <p style="font-size:12.5px; color:#8aa1c0; margin-bottom:12px;">Enter the customer's registered <strong>Email</strong>, <strong>Username</strong>, or linked <strong>Roblox Username</strong> (e.g. <code>lilnugget02</code>).</p>
                         <div class="form-row">
                             <div class="field">
-                                <label>Customer Email *</label>
-                                <input type="email" id="nex2GrantFrameEmail" placeholder="customer@email.com" />
+                                <label>Customer Email or Username *</label>
+                                <input type="text" id="nex2GrantFrameEmail" placeholder="e.g. lilnugget02 or customer@gmail.com" />
                             </div>
                             <div class="field">
                                 <label>Select Profile Frame</label>
@@ -10610,26 +10815,63 @@
                         </div>
                     </div>
 
-                    <!-- 3. Developer Page Manager -->
+                    <!-- 3. Developer Page Manager (Guided Toggle UI) -->
                     <div style="background:#121821; border:1px solid #1e2a3a; border-radius:20px; padding:20px; margin-bottom:20px;">
-                        <h3 style="margin-bottom:12px; font-size:16px;"><i class="fas fa-code" style="color:#c084fc;"></i> NEX4UP Development Page Showcase</h3>
-                        <input type="hidden" id="nex2DevId" />
-                        <div class="form-row">
-                            <div class="field"><label>Display Name *</label><input type="text" id="nex2DevName" placeholder="e.g. Adam (Founder)" /></div>
-                            <div class="field"><label>Roblox Username *</label><input type="text" id="nex2DevRbx" placeholder="Exact Roblox username for live headshot" /></div>
-                            <div class="field"><label>Role *</label><input type="text" id="nex2DevRole" placeholder="e.g. Founder &amp; Lead Developer" /></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                            <h3 style="margin:0; font-size:16px;"><i class="fas fa-code" style="color:#c084fc;"></i> NEX4UP Development Page Showcase</h3>
+                            <button type="button" class="submit-btn" id="nex2ToggleAddDevBtn" style="padding:8px 16px; font-size:12.5px;">
+                                <i class="fas fa-user-plus"></i> Add New Developer
+                            </button>
                         </div>
-                        <div class="form-row">
-                            <div class="field"><label>Badge</label><input type="text" id="nex2DevBadge" value="CORE DEV" /></div>
-                            <div class="field"><label>Display Order</label><input type="number" id="nex2DevOrder" value="1" min="1" /></div>
+                        <div class="nex2-guide-box">
+                            <strong style="color:#38bdf8;"><i class="fas fa-compass"></i> Quick Guide:</strong>
+                            1. Click <strong>+ Add New Developer</strong> (to add a new teammate) or click <strong>✏️ Edit</strong> on any card below to update an existing card.<br/>
+                            2. Enter their exact <strong>Roblox Username</strong> and click <strong>🔍 Verify Roblox Avatar</strong> to preview their profile picture live.<br/>
+                            3. Pick a role badge (e.g. <code>FOUNDER</code>, <code>TOP PARTNER</code>, <code>CORE DEV</code>) and click <strong>Save Developer Card</strong> — it updates the live <strong>Developers</strong> tab immediately!
                         </div>
-                        <div class="field" style="margin-bottom:10px;"><label>Bio</label><input type="text" id="nex2DevBio" placeholder="Short developer intro..." /></div>
-                        <div class="field" style="margin-bottom:12px;"><label>Contributions</label><input type="text" id="nex2DevContrib" placeholder="Store architecture, UI design, creator hub..." /></div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
-                            <button type="button" class="submit-btn" id="nex2SaveDevBtn"><i class="fas fa-save"></i> Save Developer Card</button>
-                            <button type="button" class="cancel-btn" id="nex2ResetDevBtn" style="padding:10px 18px; border-radius:12px;">Clear</button>
+
+                        <div id="nex2AdminDevList" class="orders-container" style="margin-bottom:14px;"></div>
+
+                        <div id="nex2DevFormWrap" style="display:none; background:#0b111e; border:1px solid #2a3a52; border-radius:16px; padding:18px; margin-top:12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <strong id="nex2DevFormModeTitle" style="color:#f7d875; font-size:14.5px;">➕ Add New Developer Card</strong>
+                                <button type="button" class="cancel-btn" id="nex2CloseDevFormBtn" style="padding:5px 12px; border-radius:8px; font-size:12px;">Close Form</button>
+                            </div>
+                            <input type="hidden" id="nex2DevId" />
+                            <div class="form-row">
+                                <div class="field"><label>Display Name *</label><input type="text" id="nex2DevName" placeholder="e.g. Adam (Founder)" /></div>
+                                <div class="field">
+                                    <label>Roblox Username *</label>
+                                    <div class="nex2-otp-row">
+                                        <input type="text" id="nex2DevRbx" placeholder="Exact Roblox username" />
+                                        <button type="button" class="nex2-send-otp-btn" id="nex2PreviewDevRbxBtn"><i class="fas fa-search"></i> Verify Avatar</button>
+                                    </div>
+                                </div>
+                                <div class="field"><label>Role *</label><input type="text" id="nex2DevRole" placeholder="e.g. Founder &amp; Lead Developer" /></div>
+                            </div>
+                            <div id="nex2DevAvatarPreviewBox" style="display:none; align-items:center; gap:12px; background:#121821; border:1px solid #1e2a3a; border-radius:12px; padding:10px 14px; margin-bottom:12px;"></div>
+                            <div class="form-row">
+                                <div class="field">
+                                    <label>Role Badge (Click a preset or type your own)</label>
+                                    <input type="text" id="nex2DevBadge" value="CORE DEV" />
+                                    <div class="nex2-badge-picker">
+                                        <button type="button" class="nex2-badge-pick-chip" data-pick-dev-badge="FOUNDER">FOUNDER</button>
+                                        <button type="button" class="nex2-badge-pick-chip" data-pick-dev-badge="LEAD DEV">LEAD DEV</button>
+                                        <button type="button" class="nex2-badge-pick-chip" data-pick-dev-badge="CORE DEV">CORE DEV</button>
+                                        <button type="button" class="nex2-badge-pick-chip" data-pick-dev-badge="TOP PARTNER">TOP PARTNER</button>
+                                        <button type="button" class="nex2-badge-pick-chip" data-pick-dev-badge="SALES EXEC">SALES EXEC</button>
+                                        <button type="button" class="nex2-badge-pick-chip" data-pick-dev-badge="MODERATOR">MODERATOR</button>
+                                    </div>
+                                </div>
+                                <div class="field"><label>Display Order (1 = shows first)</label><input type="number" id="nex2DevOrder" value="1" min="1" /></div>
+                            </div>
+                            <div class="field"><label>Short Bio / Intro</label><input type="text" id="nex2DevBio" placeholder="What does this contributor build or manage?" /></div>
+                            <div class="field"><label>Key Contributions (Shown inside card)</label><input type="text" id="nex2DevContrib" placeholder="Store architecture, creator partnerships, UI design..." /></div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <button type="button" class="submit-btn" id="nex2SaveDevBtn"><i class="fas fa-save"></i> Save Developer Card</button>
+                                <button type="button" class="cancel-btn" id="nex2ResetDevBtn" style="padding:10px 18px; border-radius:12px;">Reset Fields</button>
+                            </div>
                         </div>
-                        <div id="nex2AdminDevList" class="orders-container"></div>
                     </div>
 
                     <!-- 4. Reported Content & Posts Moderation -->
@@ -11224,7 +11466,43 @@
                 <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
                 <button class="close-auth" id="loginClose"><i class="fas fa-times"></i></button>
             </div>
-            <p class="sub">Welcome back! Log in to your account.</p>
+            <p class="sub">Welcome back! Log in or verify via Google Email Code (1 account per customer).</p>
+
+            <button type="button" class="nex2-google-auth-btn" id="nex2OpenGoogleLoginBtn">
+                <i class="fab fa-google" style="color:#4285F4;font-size:16px;"></i>
+                <span>Continue with Google / Gmail Verification</span>
+            </button>
+            <div class="nex2-auth-divider">OR SIGN IN WITH PASSWORD / CODE</div>
+
+            <!-- Inline Verified Email OTP & Reset Password Panel -->
+            <div id="nex2EmailOtpPanel" style="display:none;background:#0b111e;border:1px solid #24344d;border-radius:14px;padding:14px;margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <strong id="nex2OtpPanelTitle" style="color:#38bdf8;font-size:13.5px;">📧 Google / Verified Email Sign-In</strong>
+                    <button type="button" id="nex2BackToPwdLoginBtn" style="background:none;border:none;color:#8aa1c0;font-size:12px;cursor:pointer;text-decoration:underline;">Use Password</button>
+                </div>
+                <div class="field" style="margin-bottom:10px;">
+                    <label id="nex2OtpEmailLabel" for="nex2OtpEmailInput">Google / Gmail or Registered Email *</label>
+                    <div class="nex2-otp-row">
+                        <input type="text" id="nex2OtpEmailInput" placeholder="yourname@gmail.com" />
+                        <button type="button" class="nex2-send-otp-btn" id="nex2SendLoginOtpBtn">Send Code</button>
+                    </div>
+                </div>
+                <div class="field" id="nex2OtpNameRow" style="margin-bottom:10px;">
+                    <label for="nex2OtpDisplayName">Display Name (Only if new to NEX4UP)</label>
+                    <input type="text" id="nex2OtpDisplayName" placeholder="Optional gaming name" />
+                </div>
+                <div class="field" style="margin-bottom:10px;">
+                    <label for="nex2OtpCodeInput">6-Digit Code from Email *</label>
+                    <input type="text" id="nex2OtpCodeInput" maxlength="6" placeholder="123456" />
+                </div>
+                <div class="field" id="nex2ResetNewPwdRow" style="display:none;margin-bottom:10px;">
+                    <label for="nex2ResetNewPwdInput">New Password * (Min 6 characters)</label>
+                    <input type="password" id="nex2ResetNewPwdInput" placeholder="Enter new password" />
+                </div>
+                <div id="nex2OtpStatusMsg" class="auth-error" style="color:#38bdf8;"></div>
+                <button type="button" class="auth-submit" id="nex2ConfirmOtpAuthBtn" style="width:100%;"><i class="fas fa-check-circle"></i> Verify Code &amp; Continue</button>
+            </div>
+
             <form class="auth-form" id="loginForm">
                 <div class="field">
                     <label for="loginEmail">Email / Username *</label>
@@ -11233,6 +11511,9 @@
                 <div class="field">
                     <label for="loginPassword">Password *</label>
                     <input type="password" id="loginPassword" required placeholder="Enter your password" />
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;">
+                    <a href="#" id="nex2ForgotPwdLink" style="color:#38bdf8;font-weight:700;">🔑 Forgot Password? Reset via Email Code</a>
                 </div>
                 <div id="loginError" class="auth-error"></div>
                 <div class="auth-actions">
@@ -11251,19 +11532,34 @@
                 <h2><i class="fas fa-user-plus"></i> Register</h2>
                 <button class="close-auth" id="registerClose"><i class="fas fa-times"></i></button>
             </div>
-            <p class="sub">Create your account for faster checkout and order tracking.</p>
+            <p class="sub">1 verified account per email &amp; phone for faster checkout, Wallet Points, and Profile Frames.</p>
+
+            <button type="button" class="nex2-google-auth-btn" id="nex2OpenGoogleRegBtn">
+                <i class="fab fa-google" style="color:#4285F4;font-size:16px;"></i>
+                <span>Continue with Google / Gmail (No Duplicate Account)</span>
+            </button>
+            <div class="nex2-auth-divider">OR REGISTER WITH EMAIL VERIFICATION</div>
+
             <form class="auth-form" id="registerForm">
                 <div class="field">
-                    <label for="registerName">Username*</label>
-                    <input type="text" id="registerName" required placeholder="Username" />
+                    <label for="registerName">Username *</label>
+                    <input type="text" id="registerName" required placeholder="Unique username" />
                 </div>
                 <div class="field">
                     <label for="registerPhone">Phone Number *</label>
                     <input type="tel" id="registerPhone" required placeholder="012-3456789" />
                 </div>
                 <div class="field">
-                    <label for="registerEmail">Email *</label>
-                    <input type="email" id="registerEmail" required placeholder="you@example.com" />
+                    <label for="registerEmail">Email * (Click Send Code to verify)</label>
+                    <div class="nex2-otp-row">
+                        <input type="email" id="registerEmail" required placeholder="you@gmail.com" />
+                        <button type="button" class="nex2-send-otp-btn" id="sendRegisterOtpBtn">Send Code</button>
+                    </div>
+                    <div id="registerOtpStatus" style="font-size:11.5px;color:#38bdf8;margin-top:4px;"></div>
+                </div>
+                <div class="field">
+                    <label for="registerOtpCode">6-Digit Email Verification Code *</label>
+                    <input type="text" id="registerOtpCode" required maxlength="6" placeholder="Enter 6-digit code from your email" />
                 </div>
                 <div class="field">
                     <label for="registerPassword">Password *</label>
@@ -11276,7 +11572,7 @@
                 <div id="registerError" class="auth-error"></div>
                 <div class="auth-actions">
                     <button type="button" class="auth-cancel" id="registerCancel">Cancel</button>
-                    <button type="submit" class="auth-submit"><i class="fas fa-user-plus"></i> Register</button>
+                    <button type="submit" class="auth-submit"><i class="fas fa-user-plus"></i> Verify &amp; Register</button>
                 </div>
                 <div class="auth-switch">Already have an account? <a id="switchToLogin">Log in here</a></div>
             </form>
@@ -11677,11 +11973,22 @@
                 <h2><i class="fas fa-key"></i> Change Password</h2>
                 <button class="close-pwd" id="passwordClose"><i class="fas fa-times"></i></button>
             </div>
-            <p class="sub">Enter your current password and set a new one.</p>
+            <p class="sub">Verify by sending a 6-digit code to your registered email, or enter your current password.</p>
+            <div style="background:#0b111e;border:1px solid #24344d;border-radius:12px;padding:12px;margin-bottom:14px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+                    <strong style="color:#38bdf8;font-size:12.5px;"><i class="fas fa-envelope-open-text"></i> Recommended: Email Verification Code</strong>
+                    <button type="button" class="nex2-send-otp-btn" id="sendChangePwdOtpBtn" style="padding:6px 12px;">Send Code to My Email</button>
+                </div>
+                <div id="changePwdOtpStatus" style="font-size:11.5px;color:#8aa1c0;">Use a 6-digit email code so we verify ownership before changing password.</div>
+            </div>
             <form class="password-form" id="passwordForm">
                 <div class="field">
-                    <label for="currentPwd">Current Password *</label>
-                    <input type="password" id="currentPwd" required placeholder="Enter current password" />
+                    <label for="changePwdOtpInput">6-Digit Email Code (Required if using email verification)</label>
+                    <input type="text" id="changePwdOtpInput" maxlength="6" placeholder="Leave blank only if using current password below" />
+                </div>
+                <div class="field">
+                    <label for="currentPwd">OR Current Password</label>
+                    <input type="password" id="currentPwd" placeholder="Enter current password (or leave blank if using Email Code)" />
                 </div>
                 <div class="field">
                     <label for="newPwd">New Password *</label>
@@ -17666,10 +17973,15 @@ function renderReviews(reviews) {
             var name = registerName.value.trim();
             var phone = registerPhone.value.trim();
             var email = registerEmail.value.trim();
+            var otpCode = (document.getElementById('registerOtpCode') && document.getElementById('registerOtpCode').value.trim()) || '';
             var password = registerPassword.value;
             var confirm = registerConfirmPassword.value;
             if (!name || !phone || !email || !password || !confirm) {
                 registerError.textContent = 'Please fill in all fields.';
+                return;
+            }
+            if (!otpCode || otpCode.length < 4) {
+                registerError.textContent = 'Click "Send Code" next to Email and enter your 6-digit verification code.';
                 return;
             }
             if (password.length < 6) {
@@ -17680,35 +17992,40 @@ function renderReviews(reviews) {
                 registerError.textContent = 'Passwords do not match.';
                 return;
             }
-            registerError.textContent = 'Creating account...';
+            registerError.textContent = 'Verifying code & creating account...';
 
             google.script.run
                 .withSuccessHandler(function(result) {
-if (result.success) {
-    referralCodeFromUrl = null;
-    
-    // ✅ Hide the banner
-    var banner = document.getElementById('referralBanner');
-    if (banner) banner.style.display = 'none';
-registerOverlay.classList.remove('open');
-registerForm.reset();
-registerError.textContent = '';
-showToast('Account created! Please log in.');
-loginEmail.value = email;
-loginPassword.value = password;
-// ✅ Reset sub-text to default
-var sub = loginOverlay.querySelector('.sub');
-if (sub) sub.textContent = 'Welcome back! Log in to your account.';
-loginOverlay.classList.add('open');
-registerOverlay.classList.remove('open');
+                    if (result && result.success) {
+                        referralCodeFromUrl = null;
+                        var banner = document.getElementById('referralBanner');
+                        if (banner) banner.style.display = 'none';
+                        registerOverlay.classList.remove('open');
+                        registerForm.reset();
+                        registerError.textContent = '';
+                        var otpSt = document.getElementById('registerOtpStatus');
+                        if (otpSt) otpSt.textContent = '';
+
+                        if (result.customer) {
+                            customer = result.customer;
+                            try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
+                            updateProfileDropdown();
+                            if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap();
+                            showToast('🎉 Verified & logged in as ' + (customer.name || customer.email) + '!');
+                        } else {
+                            showToast('Account verified & created! Please log in.');
+                            loginEmail.value = email;
+                            loginPassword.value = password;
+                            loginOverlay.classList.add('open');
+                        }
                     } else {
-                        registerError.textContent = result.message || 'Registration failed.';
+                        registerError.textContent = (result && result.message) || 'Registration failed.';
                     }
                 })
                 .withFailureHandler(function(err) {
                     registerError.textContent = 'Error: ' + err.message;
                 })
-                .createAccount(email, password, name, phone, referralCodeFromUrl || '');
+                .createAccountWithOtp(email, password, name, phone, referralCodeFromUrl || '', otpCode);
         });
 
         switchToRegister.addEventListener('click', function(e) {
@@ -18640,12 +18957,17 @@ function submitInlineReview() {
 
         passwordForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            var otpCode = (document.getElementById('changePwdOtpInput') && document.getElementById('changePwdOtpInput').value.trim()) || '';
             var current = currentPwd.value;
             var newP = newPwd.value;
             var confirm = confirmPwd.value;
 
-            if (!current || !newP || !confirm) {
-                pwdError.textContent = 'All fields are required.';
+            if (!newP || !confirm) {
+                pwdError.textContent = 'New password and confirmation are required.';
+                return;
+            }
+            if (!otpCode && !current) {
+                pwdError.textContent = 'Click "Send Code to My Email" above OR enter your current password.';
                 return;
             }
             if (newP.length < 6) {
@@ -18660,23 +18982,39 @@ function submitInlineReview() {
             pwdError.textContent = 'Updating...';
             pwdError.style.color = '#f7d875';
 
-            google.script.run
-                .withSuccessHandler(function(result) {
-                    if (result.success) {
-                        pwdError.textContent = '✅ Password updated successfully!';
-                        pwdError.style.color = '#4caf50';
-                        showToast('Password changed!');
-                        setTimeout(closePasswordModal, 1500);
-                    } else {
-                        pwdError.textContent = result.message || 'Error updating password.';
-                        pwdError.style.color = '#ff6b6b';
+            var onPwdDone = function(result) {
+                if (result && result.success) {
+                    if (result.sessionToken && customer) {
+                        customer.sessionToken = result.sessionToken;
+                        try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
                     }
-                })
-                .withFailureHandler(function(err) {
-                    pwdError.textContent = 'Error: ' + err.message;
+                    pwdError.textContent = '✅ Password updated successfully!';
+                    pwdError.style.color = '#4caf50';
+                    showToast('Password changed!');
+                    setTimeout(closePasswordModal, 1400);
+                } else {
+                    pwdError.textContent = (result && result.message) || 'Error updating password.';
                     pwdError.style.color = '#ff6b6b';
-                })
-                .updateCustomerPassword(customer.email, current, newP);
+                }
+            };
+
+            if (otpCode) {
+                google.script.run
+                    .withSuccessHandler(onPwdDone)
+                    .withFailureHandler(function(err) {
+                        pwdError.textContent = 'Error: ' + err.message;
+                        pwdError.style.color = '#ff6b6b';
+                    })
+                    .resetOrChangePasswordWithOtp(customer.email, otpCode, newP);
+            } else {
+                google.script.run
+                    .withSuccessHandler(onPwdDone)
+                    .withFailureHandler(function(err) {
+                        pwdError.textContent = 'Error: ' + err.message;
+                        pwdError.style.color = '#ff6b6b';
+                    })
+                    .updateCustomerPassword(customer.email, current, newP);
+            }
         });
 
         // ================================================================
@@ -24739,28 +25077,48 @@ loadMyAccount = function () {
             .updateGamerProfile(customer.email, payload, customer.sessionToken);
     };
 
+    function render_nex2_all_sections() {
+        render_home_rank_strip();
+        render_nex2_rankings();
+        render_nex2_creators_hub();
+        render_nex2_community_hub();
+        render_nex2_reviews_wall();
+        render_nex2_dev_team();
+        render_nex2_notifications();
+        render_nex2_frame_studio();
+        sync_profile_form_fields();
+    }
+
     window.loadNex4Up2Bootstrap = function() {
         var em = (customer && customer.email) || '';
         var tok = (customer && customer.sessionToken) || '';
+        try {
+            var cachedRaw = localStorage.getItem('nex4up2_public_cache_v2');
+            if (cachedRaw && !_nex2State.data) {
+                var parsedCache = JSON.parse(cachedRaw);
+                if (parsedCache && parsedCache.frameCatalog) {
+                    _nex2State.data = parsedCache;
+                    render_nex2_all_sections();
+                }
+            }
+        } catch (err) {}
+
         google.script.run
             .withSuccessHandler(function(res) {
                 if (!res || res.success === false) return;
                 _nex2State.data = res;
+                try {
+                    var publicCopy = Object.assign({}, res);
+                    delete publicCopy.myData;
+                    localStorage.setItem('nex4up2_public_cache_v2', JSON.stringify(publicCopy));
+                } catch (err) {}
                 if (res.myData && res.myData.profile && customer) {
                     var tokKeep = customer.sessionToken;
                     customer = Object.assign({}, customer, res.myData.profile);
                     if (tokKeep) customer.sessionToken = tokKeep;
                     try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
                 }
-                render_home_rank_strip();
-                render_nex2_rankings();
-                render_nex2_creators_hub();
-                render_nex2_community_hub();
-                render_nex2_reviews_wall();
-                render_nex2_dev_team();
-                render_nex2_notifications();
-                render_nex2_frame_studio();
-                sync_profile_form_fields();
+                render_nex2_all_sections();
             })
             .withFailureHandler(function(err) {
                 console.warn('NEX4UP 2.0 bootstrap pending deploy or offline:', err && err.message);
@@ -24892,10 +25250,15 @@ loadMyAccount = function () {
                 var dList = document.getElementById('nex2AdminDevList');
                 if (dList) {
                     dList.innerHTML = (res.devTeam || []).map(function(d) {
-                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
-                            '<div><strong style="color:#fff;">' + escapeHtml(String(d[1])) + '</strong> (@' + escapeHtml(String(d[2])) + ') — <span style="color:#38bdf8;">' + escapeHtml(String(d[3])) + '</span></div>' +
-                            '<div style="display:flex;gap:6px;"><button type="button" class="nex2-comm-action-btn" data-edit-dev="' + escapeHtml(String(d[0])) + '">Edit</button><button type="button" class="nex2-comm-action-btn" style="color:#ff6b6b;" data-del-dev="' + escapeHtml(String(d[0])) + '">Remove</button></div></div>';
-                    }).join('');
+                        var avImg = String(d[7] || '').trim();
+                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                            '<div style="display:flex;align-items:center;gap:12px;">' +
+                            render_framed_avatar_html({ size: 46, frameId: 'frame_esports', avatarUrl: avImg, name: String(d[1] || 'D') }) +
+                            '<div><strong style="color:#fff;font-size:14px;">' + escapeHtml(String(d[1])) + '</strong> <span class="nex2-rarity-pill" style="background:rgba(192,132,252,0.16);color:#c084fc;">' + escapeHtml(String(d[6] || 'DEV')) + '</span>' +
+                            '<div style="font-size:12px;color:#38bdf8;">Roblox: @' + escapeHtml(String(d[2])) + ' • ' + escapeHtml(String(d[3])) + ' <span style="color:#6a7f9e;">(Order #' + escapeHtml(String(d[8] || 1)) + ')</span></div>' +
+                            '</div></div>' +
+                            '<div style="display:flex;gap:6px;"><button type="button" class="nex2-comm-action-btn" data-edit-dev="' + escapeHtml(String(d[0])) + '">✏️ Edit</button><button type="button" class="nex2-comm-action-btn" style="color:#ff6b6b;" data-del-dev="' + escapeHtml(String(d[0])) + '">🗑️ Remove</button></div></div>';
+                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No developer cards yet. Click "+ Add New Developer" above to add your first teammate!</p>';
                     window._nex2AdminDevsCache = res.devTeam || [];
                 }
 
@@ -25222,8 +25585,56 @@ loadMyAccount = function () {
             }).adminGrantFrame(gfEmail, gfId, window._nexAdminPwdSession || '');
             return;
         }
+        if (e.target.closest('#nex2ToggleAddDevBtn')) {
+            var wrap = document.getElementById('nex2DevFormWrap');
+            var titleEl = document.getElementById('nex2DevFormModeTitle');
+            var pvBox = document.getElementById('nex2DevAvatarPreviewBox');
+            if (wrap) {
+                var openNow = wrap.style.display === 'none';
+                wrap.style.display = openNow ? 'block' : 'none';
+                if (openNow) {
+                    ['nex2DevId', 'nex2DevName', 'nex2DevRbx', 'nex2DevRole', 'nex2DevBio', 'nex2DevContrib'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+                    document.getElementById('nex2DevBadge').value = 'CORE DEV';
+                    document.getElementById('nex2DevOrder').value = '1';
+                    if (titleEl) titleEl.textContent = '➕ Add New Developer Card';
+                    if (pvBox) pvBox.style.display = 'none';
+                    wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+            return;
+        }
+        if (e.target.closest('#nex2CloseDevFormBtn')) {
+            var wrap2 = document.getElementById('nex2DevFormWrap');
+            if (wrap2) wrap2.style.display = 'none';
+            return;
+        }
+        var pickBadgeBtn = e.target.closest('[data-pick-dev-badge]');
+        if (pickBadgeBtn) {
+            var bInput = document.getElementById('nex2DevBadge');
+            if (bInput) bInput.value = pickBadgeBtn.getAttribute('data-pick-dev-badge');
+            return;
+        }
+        if (e.target.closest('#nex2PreviewDevRbxBtn')) {
+            var rbxName = (document.getElementById('nex2DevRbx') && document.getElementById('nex2DevRbx').value.replace(/^@+/, '').trim()) || '';
+            var pvBox2 = document.getElementById('nex2DevAvatarPreviewBox');
+            if (!rbxName) { showToast('Enter a Roblox username first!'); return; }
+            if (pvBox2) { pvBox2.style.display = 'flex'; pvBox2.innerHTML = '<span style="color:#38bdf8;font-size:12.5px;">Checking Roblox avatar...</span>'; }
+            google.script.run.withSuccessHandler(function(r) {
+                if (!pvBox2) return;
+                if (r && r.found) {
+                    pvBox2.innerHTML = render_framed_avatar_html({ size: 54, frameId: 'frame_esports', avatarUrl: r.avatarUrl, name: r.displayName || rbxName }) +
+                        '<div><div style="color:#4ade80;font-weight:800;font-size:13px;">✅ Roblox User Verified: ' + escapeHtml(r.displayName || r.username) + '</div>' +
+                        '<div style="color:#8aa1c0;font-size:11.5px;">User ID: ' + escapeHtml(String(r.userId)) + ' — Avatar will display automatically!</div></div>';
+                } else {
+                    pvBox2.innerHTML = '<span style="color:#ff6b6b;font-size:12.5px;">❌ Roblox username not found. Check exact spelling.</span>';
+                }
+            }).lookupRobloxUser(rbxName);
+            return;
+        }
         if (e.target.closest('#nex2ResetDevBtn')) {
             ['nex2DevId', 'nex2DevName', 'nex2DevRbx', 'nex2DevRole', 'nex2DevBio', 'nex2DevContrib'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+            var pvBox3 = document.getElementById('nex2DevAvatarPreviewBox');
+            if (pvBox3) pvBox3.style.display = 'none';
             return;
         }
         if (e.target.closest('#nex2SaveDevBtn')) {
@@ -25239,6 +25650,10 @@ loadMyAccount = function () {
             };
             google.script.run.withSuccessHandler(function(r) {
                 showToast((r && r.message) || 'Saved developer card!');
+                if (r && r.success) {
+                    var wrap3 = document.getElementById('nex2DevFormWrap');
+                    if (wrap3) wrap3.style.display = 'none';
+                }
                 loadNex4Up2AdminDashboard();
                 loadNex4Up2Bootstrap();
             }).adminSaveDevProfile(dp, window._nexAdminPwdSession || '');
@@ -25248,6 +25663,10 @@ loadMyAccount = function () {
         if (editDevBtn && window._nex2AdminDevsCache) {
             var dv = window._nex2AdminDevsCache.find(function(x) { return String(x[0]) === editDevBtn.getAttribute('data-edit-dev'); });
             if (dv) {
+                var wrap4 = document.getElementById('nex2DevFormWrap');
+                var titleEl4 = document.getElementById('nex2DevFormModeTitle');
+                if (wrap4) wrap4.style.display = 'block';
+                if (titleEl4) titleEl4.textContent = '✏️ Editing: ' + String(dv[1] || dv[0]);
                 document.getElementById('nex2DevId').value = dv[0] || '';
                 document.getElementById('nex2DevName').value = dv[1] || '';
                 document.getElementById('nex2DevRbx').value = dv[2] || '';
@@ -25256,6 +25675,7 @@ loadMyAccount = function () {
                 document.getElementById('nex2DevContrib').value = dv[5] || '';
                 document.getElementById('nex2DevBadge').value = dv[6] || 'DEV';
                 document.getElementById('nex2DevOrder').value = dv[8] || 1;
+                if (wrap4) wrap4.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
             return;
         }
@@ -25281,6 +25701,140 @@ loadMyAccount = function () {
             google.script.run.withSuccessHandler(function(r) {
                 showToast((r && r.message) || 'Sync finished.');
             }).adminSyncSupabaseNow(window._nexAdminPwdSession || '');
+            return;
+        }
+
+        // ---------- Verified Google / Email OTP & Password Reset Auth Controls ----------
+        function show_otp_login_panel(mode) {
+            window._nex2OtpAuthMode = mode; // 'google' | 'reset_password'
+            var p = document.getElementById('nex2EmailOtpPanel');
+            var lf = document.getElementById('loginForm');
+            var tEl = document.getElementById('nex2OtpPanelTitle');
+            var lblEl = document.getElementById('nex2OtpEmailLabel');
+            var nameRow = document.getElementById('nex2OtpNameRow');
+            var newPwdRow = document.getElementById('nex2ResetNewPwdRow');
+            var statusEl = document.getElementById('nex2OtpStatusMsg');
+            if (p) p.style.display = 'block';
+            if (lf) lf.style.display = 'none';
+            if (statusEl) statusEl.textContent = '';
+            if (mode === 'reset_password') {
+                if (tEl) tEl.textContent = '🔑 Reset Password via Verified Email Code';
+                if (lblEl) lblEl.textContent = 'Registered Email or Username *';
+                if (nameRow) nameRow.style.display = 'none';
+                if (newPwdRow) newPwdRow.style.display = 'block';
+            } else {
+                if (tEl) tEl.textContent = '🔵 Google / Gmail Verified Sign-In';
+                if (lblEl) lblEl.textContent = 'Google / Gmail Email *';
+                if (nameRow) nameRow.style.display = 'block';
+                if (newPwdRow) newPwdRow.style.display = 'none';
+            }
+        }
+
+        if (e.target.closest('#nex2OpenGoogleLoginBtn')) {
+            show_otp_login_panel('google');
+            return;
+        }
+        if (e.target.closest('#nex2OpenGoogleRegBtn')) {
+            registerOverlay.classList.remove('open');
+            loginOverlay.classList.add('open');
+            show_otp_login_panel('google');
+            return;
+        }
+        if (e.target.closest('#nex2ForgotPwdLink')) {
+            e.preventDefault();
+            show_otp_login_panel('reset_password');
+            return;
+        }
+        if (e.target.closest('#nex2BackToPwdLoginBtn')) {
+            var p2 = document.getElementById('nex2EmailOtpPanel');
+            var lf2 = document.getElementById('loginForm');
+            if (p2) p2.style.display = 'none';
+            if (lf2) lf2.style.display = 'block';
+            return;
+        }
+        if (e.target.closest('#nex2SendLoginOtpBtn')) {
+            var emIn = document.getElementById('nex2OtpEmailInput').value.trim();
+            var nmIn = (document.getElementById('nex2OtpDisplayName') && document.getElementById('nex2OtpDisplayName').value.trim()) || '';
+            var stEl = document.getElementById('nex2OtpStatusMsg');
+            var modeNow = window._nex2OtpAuthMode || 'google';
+            if (!emIn) { if (stEl) { stEl.style.color = '#ff6b6b'; stEl.textContent = 'Enter your email first.'; } return; }
+            if (stEl) { stEl.style.color = '#f7d875'; stEl.textContent = 'Sending 6-digit verification code...'; }
+            google.script.run.withSuccessHandler(function(r) {
+                if (!stEl) return;
+                stEl.style.color = (r && r.success) ? '#4ade80' : '#ff6b6b';
+                stEl.textContent = (r && r.message) || 'Check your email.';
+            }).sendAuthEmailOtp(emIn, modeNow, nmIn);
+            return;
+        }
+        if (e.target.closest('#nex2ConfirmOtpAuthBtn')) {
+            var emIn2 = document.getElementById('nex2OtpEmailInput').value.trim();
+            var code2 = document.getElementById('nex2OtpCodeInput').value.trim();
+            var nmIn2 = (document.getElementById('nex2OtpDisplayName') && document.getElementById('nex2OtpDisplayName').value.trim()) || '';
+            var npw2 = (document.getElementById('nex2ResetNewPwdInput') && document.getElementById('nex2ResetNewPwdInput').value) || '';
+            var stEl2 = document.getElementById('nex2OtpStatusMsg');
+            var modeNow2 = window._nex2OtpAuthMode || 'google';
+            if (!emIn2 || !code2) { if (stEl2) { stEl2.style.color = '#ff6b6b'; stEl2.textContent = 'Enter email and 6-digit code.'; } return; }
+            if (stEl2) { stEl2.style.color = '#f7d875'; stEl2.textContent = 'Verifying code...'; }
+            if (modeNow2 === 'reset_password') {
+                google.script.run.withSuccessHandler(function(r) {
+                    if (!stEl2) return;
+                    if (r && r.success) {
+                        stEl2.style.color = '#4ade80';
+                        stEl2.textContent = r.message;
+                        showToast('✅ Password reset! Please log in.');
+                        setTimeout(function() {
+                            var p3 = document.getElementById('nex2EmailOtpPanel');
+                            var lf3 = document.getElementById('loginForm');
+                            if (p3) p3.style.display = 'none';
+                            if (lf3) lf3.style.display = 'block';
+                            if (r.email) loginEmail.value = r.email;
+                        }, 1100);
+                    } else {
+                        stEl2.style.color = '#ff6b6b';
+                        stEl2.textContent = (r && r.message) || 'Verification failed.';
+                    }
+                }).resetOrChangePasswordWithOtp(emIn2, code2, npw2);
+            } else {
+                google.script.run.withSuccessHandler(function(r) {
+                    if (r && r.success && r.customer) {
+                        customer = r.customer;
+                        try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
+                        loginOverlay.classList.remove('open');
+                        updateProfileDropdown();
+                        loadWishlistIds();
+                        renderPaginatedGrid();
+                        loadNex4Up2Bootstrap();
+                        showToast('✅ Signed in as ' + (customer.name || customer.email) + '!');
+                    } else if (stEl2) {
+                        stEl2.style.color = '#ff6b6b';
+                        stEl2.textContent = (r && r.message) || 'Verification failed.';
+                    }
+                }).verifyEmailOtpLogin(emIn2, code2, nmIn2);
+            }
+            return;
+        }
+        if (e.target.closest('#sendRegisterOtpBtn')) {
+            var rem = document.getElementById('registerEmail').value.trim();
+            var rnm = document.getElementById('registerName').value.trim();
+            var rst = document.getElementById('registerOtpStatus');
+            if (!rem) { if (rst) { rst.style.color = '#ff6b6b'; rst.textContent = 'Enter email first.'; } return; }
+            if (rst) { rst.style.color = '#f7d875'; rst.textContent = 'Sending 6-digit code...'; }
+            google.script.run.withSuccessHandler(function(r) {
+                if (!rst) return;
+                rst.style.color = (r && r.success) ? '#4ade80' : '#ff6b6b';
+                rst.textContent = (r && r.message) || 'Done.';
+            }).sendAuthEmailOtp(rem, 'register', rnm);
+            return;
+        }
+        if (e.target.closest('#sendChangePwdOtpBtn')) {
+            if (!customer || !customer.email) { showToast('Log in first.'); return; }
+            var cpst = document.getElementById('changePwdOtpStatus');
+            if (cpst) { cpst.style.color = '#f7d875'; cpst.textContent = 'Sending 6-digit code to ' + customer.email + '...'; }
+            google.script.run.withSuccessHandler(function(r) {
+                if (!cpst) return;
+                cpst.style.color = (r && r.success) ? '#4ade80' : '#ff6b6b';
+                cpst.textContent = (r && r.message) || 'Code sent!';
+            }).sendAuthEmailOtp(customer.email, 'change_password', customer.name || '');
             return;
         }
     });
