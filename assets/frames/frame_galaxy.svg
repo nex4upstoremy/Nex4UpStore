@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="galNebula" x1="15" y1="15" x2="225" y2="225" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#6366f1"/>
+      <stop offset="75%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#f7d875"/>
+    </linearGradient>
+    <filter id="galGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <path d="M120 14 A106 106 0 1 0 120 226 A106 106 0 1 0 120 14 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="#080b1c" fill-rule="evenodd"/>
+  <circle cx="120" cy="120" r="103" stroke="url(#galNebula)" stroke-width="6" filter="url(#galGlow)"/>
+  <!-- Tilted orbital energy ring (behind avatar cutout) -->
+  <ellipse cx="120" cy="120" rx="112" ry="38" transform="rotate(-24 120 120)" stroke="#38bdf8" stroke-width="2" stroke-dasharray="16 12" opacity="0.75"/>
+  <circle cx="120" cy="120" r="83.5" stroke="#c084fc" stroke-width="3.5" filter="url(#galGlow)"/>
+  <!-- Cosmic stars on ring -->
+  <circle cx="48" cy="48" r="3" fill="#fff" filter="url(#galGlow)"/>
+  <circle cx="195" cy="52" r="2.5" fill="#38bdf8" filter="url(#galGlow)"/>
+  <circle cx="190" cy="190" r="3.5" fill="#f7d875" filter="url(#galGlow)"/>
+  <circle cx="52" cy="192" r="2.5" fill="#c084fc"/>
+  <path d="M120 6 L123 15 L132 18 L123 21 L120 30 L117 21 L108 18 L117 15 Z" fill="#fef08a" filter="url(#galGlow)"/>
+</svg>

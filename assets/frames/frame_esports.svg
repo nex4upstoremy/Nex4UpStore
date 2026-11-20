@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="espArmor" x1="0" y1="0" x2="240" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <filter id="espGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Mecha dark chassis -->
+  <path d="M120 12 A108 108 0 1 0 120 228 A108 108 0 1 0 120 12 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="#09111f" fill-rule="evenodd"/>
+  <circle cx="120" cy="120" r="105" stroke="url(#espArmor)" stroke-width="6"/>
+  <circle cx="120" cy="120" r="83.5" stroke="#38bdf8" stroke-width="3.5" filter="url(#espGlow)"/>
+  <!-- Angular mecha side shields & tactical chevrons -->
+  <path d="M22 86 L8 104 L8 136 L22 154 L34 140 L22 120 L34 100 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <path d="M218 86 L232 104 L232 136 L218 154 L206 140 L218 120 L206 100 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <!-- Top & bottom target reticles -->
+  <path d="M98 18 L120 6 L142 18 L134 29 L120 21 L106 29 Z" fill="#f97316" stroke="#fff" stroke-width="1.2" filter="url(#espGlow)"/>
+  <path d="M98 222 L120 234 L142 222 L134 211 L120 219 L106 211 Z" fill="#38bdf8" stroke="#fff" stroke-width="1.2"/>
+</svg>

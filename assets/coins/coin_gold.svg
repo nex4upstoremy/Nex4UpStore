@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <linearGradient id="goldRim" x1="12" y1="12" x2="116" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="45%" stop-color="#f7d875"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <radialGradient id="goldCore" cx="45%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#78350f"/>
+      <stop offset="100%" stop-color="#1c1104"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="56" fill="url(#goldCore)" stroke="url(#goldRim)" stroke-width="8"/>
+  <circle cx="64" cy="64" r="44" stroke="#fde047" stroke-width="2.2" stroke-dasharray="14 6"/>
+  <polygon points="64,25 97,44 97,84 64,103 31,84 31,44" fill="#271706" stroke="url(#goldRim)" stroke-width="2.5"/>
+  <path d="M52 38 L56 30 L64 36 L72 30 L76 38 Z" fill="#fde047"/>
+  <text x="64" y="69" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="22" letter-spacing="1" fill="#fef08a">NEX</text>
+  <text x="64" y="83" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800" font-size="9" letter-spacing="1.6" fill="#f59e0b">GOLD</text>
+</svg>

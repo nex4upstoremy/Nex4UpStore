@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="crysIce" x1="20" y1="10" x2="220" y2="230" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="35%" stop-color="#38bdf8"/>
+      <stop offset="70%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a5f3fc"/>
+    </linearGradient>
+    <linearGradient id="crysFacet" x1="120" y1="0" x2="120" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#bae6fd"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="crysGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Dark crystalline base -->
+  <path d="M120 14 A106 106 0 1 0 120 226 A106 106 0 1 0 120 14 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="#091529" fill-rule="evenodd"/>
+  <circle cx="120" cy="120" r="103" stroke="url(#crysIce)" stroke-width="5"/>
+  <circle cx="120" cy="120" r="83.5" stroke="#a5f3fc" stroke-width="3.5" filter="url(#crysGlow)"/>
+  <!-- Crystal shard facets around perimeter -->
+  <g filter="url(#crysGlow)">
+    <polygon points="120,2 132,22 120,34 108,22" fill="url(#crysFacet)" stroke="#e0f2fe" stroke-width="1.5"/>
+    <polygon points="120,238 132,218 120,206 108,218" fill="url(#crysFacet)" stroke="#e0f2fe" stroke-width="1.5"/>
+    <polygon points="2,120 22,108 34,120 22,132" fill="url(#crysFacet)" stroke="#e0f2fe" stroke-width="1.5"/>
+    <polygon points="238,120 218,108 206,120 218,132" fill="url(#crysFacet)" stroke="#e0f2fe" stroke-width="1.5"/>
+    <polygon points="40,40 56,42 54,58 38,54" fill="#67e8f9" stroke="#fff" stroke-width="1"/>
+    <polygon points="200,40 184,42 186,58 202,54" fill="#67e8f9" stroke="#fff" stroke-width="1"/>
+    <polygon points="40,200 56,198 54,182 38,186" fill="#818cf8" stroke="#e0f2fe" stroke-width="1"/>
+    <polygon points="200,200 184,198 186,182 202,186" fill="#818cf8" stroke="#e0f2fe" stroke-width="1"/>
+  </g>
+</svg>

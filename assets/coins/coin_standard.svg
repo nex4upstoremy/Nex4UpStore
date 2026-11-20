@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <linearGradient id="stdRim" x1="16" y1="16" x2="112" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="45%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <radialGradient id="stdCore" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#09111e"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="56" fill="url(#stdCore)" stroke="url(#stdRim)" stroke-width="8"/>
+  <circle cx="64" cy="64" r="44" stroke="#38bdf8" stroke-width="2" stroke-dasharray="10 6" opacity="0.8"/>
+  <polygon points="64,26 95,45 95,83 64,102 33,83 33,45" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+  <text x="64" y="69" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="22" letter-spacing="1" fill="#e0f2fe">NEX</text>
+  <text x="64" y="83" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="8.5" letter-spacing="1.5" fill="#38bdf8">STANDARD</text>
+</svg>

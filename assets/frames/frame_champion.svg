@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="champGold" x1="20" y1="15" x2="220" y2="225" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="35%" stop-color="#f7d875"/>
+      <stop offset="70%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="champOrange" x1="0" y1="120" x2="240" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="50%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <filter id="champGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Dark obsidian ring -->
+  <path d="M120 16 A104 104 0 1 0 120 224 A104 104 0 1 0 120 16 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="#130f0a" fill-rule="evenodd"/>
+  <!-- Outer gold laurel arc + frame -->
+  <circle cx="120" cy="120" r="102" stroke="url(#champGold)" stroke-width="6" filter="url(#champGlow)"/>
+  <circle cx="120" cy="120" r="91" stroke="url(#champOrange)" stroke-width="2" stroke-dasharray="10 6"/>
+  <circle cx="120" cy="120" r="83.5" stroke="#fef08a" stroke-width="3.5"/>
+  <!-- Left & Right Victory Wing Accents -->
+  <path d="M24 148 C10 130 12 96 26 78 L34 90 C25 106 25 124 33 138 Z" fill="url(#champGold)" stroke="#78350f" stroke-width="1.5"/>
+  <path d="M216 148 C230 130 228 96 214 78 L206 90 C215 106 215 124 207 138 Z" fill="url(#champGold)" stroke="#78350f" stroke-width="1.5"/>
+  <!-- Top Crown Crest -->
+  <g filter="url(#champGlow)">
+    <path d="M90 30 L96 10 L110 22 L120 4 L130 22 L144 10 L150 30 Z" fill="url(#champGold)" stroke="#78350f" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="120" cy="20" r="4" fill="#38bdf8" stroke="#fff" stroke-width="1"/>
+  </g>
+  <!-- Bottom #1 Crest -->
+  <polygon points="120,235 135,219 120,208 105,219" fill="url(#champOrange)" stroke="#fef08a" stroke-width="1.5"/>
+</svg>

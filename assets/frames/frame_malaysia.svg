@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="myStripe" x1="20" y1="20" x2="220" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#010066"/>
+      <stop offset="35%" stop-color="#cc0001"/>
+      <stop offset="65%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ffcc00"/>
+    </linearGradient>
+    <linearGradient id="myGold" x1="80" y1="0" x2="160" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <filter id="myGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Royal Malaysian dark blue base ring -->
+  <path d="M120 14 A106 106 0 1 0 120 226 A106 106 0 1 0 120 14 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="#071240" fill-rule="evenodd"/>
+  <!-- Red & white futuristic speed arcs -->
+  <path d="M26 120 A94 94 0 0 0 120 214" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+  <path d="M214 120 A94 94 0 0 1 120 214" stroke="#f8fafc" stroke-width="5" stroke-linecap="round"/>
+  <!-- Outer gold & royal blue rim -->
+  <circle cx="120" cy="120" r="103" stroke="url(#myGold)" stroke-width="5" filter="url(#myGlow)"/>
+  <circle cx="120" cy="120" r="83.5" stroke="#ffcc00" stroke-width="3.5"/>
+  <!-- Top Crescent & Bintang Crest -->
+  <g filter="url(#myGlow)">
+    <path d="M115 8 A14 14 0 1 0 115 32 A11 11 0 1 1 115 8 Z" fill="#ffcc00"/>
+    <polygon points="128,11 131,17 138,16 133,21 136,27 129,24 124,28 125,22 120,18 126,17" fill="#ffcc00"/>
+  </g>
+  <!-- Side cyber accents -->
+  <circle cx="24" cy="120" r="4" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+  <circle cx="216" cy="120" r="4" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+  <rect x="92" y="212" width="56" height="16" rx="8" fill="#010066" stroke="#ffcc00" stroke-width="2"/>
+  <text x="120" y="223.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800" font-size="9.5" fill="#ffcc00">MY GAMER</text>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="neonGrad1" x1="15" y1="15" x2="225" y2="225" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00f5ff"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#ff6b2b"/>
+    </linearGradient>
+    <linearGradient id="neonGrad2" x1="225" y1="15" x2="15" y2="225" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#fb923c"/>
+    </linearGradient>
+    <filter id="neonBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Translucent dark ring -->
+  <path d="M120 15 A105 105 0 1 0 120 225 A105 105 0 1 0 120 15 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="#070d19" fill-rule="evenodd"/>
+  <!-- Outer cyber neon arc -->
+  <circle cx="120" cy="120" r="103" stroke="url(#neonGrad1)" stroke-width="5" filter="url(#neonBlur)"/>
+  <!-- Segmented cyber rings -->
+  <path d="M40 70 A94 94 0 0 1 170 40" stroke="#00f5ff" stroke-width="3.5" stroke-linecap="round" filter="url(#neonBlur)"/>
+  <path d="M200 170 A94 94 0 0 1 70 200" stroke="#ff6b2b" stroke-width="3.5" stroke-linecap="round" filter="url(#neonBlur)"/>
+  <circle cx="120" cy="120" r="83.5" stroke="url(#neonGrad2)" stroke-width="3.5" filter="url(#neonBlur)"/>
+  <!-- Neon bolts at 4 corners -->
+  <circle cx="48" cy="48" r="4" fill="#00f5ff" filter="url(#neonBlur)"/>
+  <circle cx="192" cy="48" r="4" fill="#38bdf8" filter="url(#neonBlur)"/>
+  <circle cx="48" cy="192" r="4" fill="#ff6b2b" filter="url(#neonBlur)"/>
+  <circle cx="192" cy="192" r="4" fill="#fb923c" filter="url(#neonBlur)"/>
+</svg>

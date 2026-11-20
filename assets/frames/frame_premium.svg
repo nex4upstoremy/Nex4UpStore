@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="premSilver" x1="20" y1="20" x2="220" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="40%" stop-color="#38bdf8"/>
+      <stop offset="70%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="premNavy" x1="120" y1="14" x2="120" y2="226" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#172554"/>
+      <stop offset="100%" stop-color="#09111e"/>
+    </linearGradient>
+    <filter id="premGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Hollow navy chassis -->
+  <path d="M120 14 A106 106 0 1 0 120 226 A106 106 0 1 0 120 14 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="url(#premNavy)" fill-rule="evenodd"/>
+  <!-- Outer silver-blue rim -->
+  <circle cx="120" cy="120" r="104" stroke="url(#premSilver)" stroke-width="5.5"/>
+  <!-- Circuit dash ring -->
+  <circle cx="120" cy="120" r="94" stroke="#38bdf8" stroke-width="2" stroke-dasharray="18 10 6 10" opacity="0.85"/>
+  <!-- Inner bright cyan ring -->
+  <circle cx="120" cy="120" r="83.5" stroke="#38bdf8" stroke-width="3.5" filter="url(#premGlow)"/>
+  <!-- Hex circuit energy nodes -->
+  <g filter="url(#premGlow)">
+    <polygon points="120,6 129,14 125,25 115,25 111,14" fill="#38bdf8" stroke="#e2e8f0" stroke-width="1.5"/>
+    <polygon points="120,234 129,226 125,215 115,215 111,226" fill="#38bdf8" stroke="#e2e8f0" stroke-width="1.5"/>
+    <polygon points="6,120 14,111 25,115 25,125 14,129" fill="#0ea5e9" stroke="#e2e8f0" stroke-width="1.5"/>
+    <polygon points="234,120 226,111 215,115 215,125 226,129" fill="#0ea5e9" stroke="#e2e8f0" stroke-width="1.5"/>
+  </g>
+  <!-- Diagonal metallic brackets -->
+  <path d="M48 48 L57 57 M192 48 L183 57 M48 192 L57 183 M192 192 L183 183" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="vipGold" x1="20" y1="10" x2="220" y2="230" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="30%" stop-color="#f7d875"/>
+      <stop offset="65%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fde047"/>
+    </linearGradient>
+    <filter id="vipGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Deep navy-obsidian frame -->
+  <path d="M120 12 A108 108 0 1 0 120 228 A108 108 0 1 0 120 12 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="#090b16" fill-rule="evenodd"/>
+  <!-- Outer gold + electric cyan VIP aura -->
+  <circle cx="120" cy="120" r="105" stroke="url(#vipGold)" stroke-width="6" filter="url(#vipGlow)"/>
+  <circle cx="120" cy="120" r="95" stroke="#38bdf8" stroke-width="2" stroke-dasharray="24 8"/>
+  <circle cx="120" cy="120" r="83.5" stroke="url(#vipGold)" stroke-width="4" filter="url(#vipGlow)"/>
+  <!-- Cyber Wings Left & Right -->
+  <path d="M22 146 L4 114 L18 76 L32 94 L20 116 L32 134 Z" fill="url(#vipGold)" stroke="#78350f" stroke-width="1.5"/>
+  <path d="M218 146 L236 114 L222 76 L208 94 L220 116 L208 134 Z" fill="url(#vipGold)" stroke="#78350f" stroke-width="1.5"/>
+  <!-- Top Diamond Gemstone -->
+  <polygon points="120,4 134,18 120,34 106,18" fill="#38bdf8" stroke="#fef08a" stroke-width="2" filter="url(#vipGlow)"/>
+  <!-- Bottom VIP Crest -->
+  <rect x="96" y="210" width="48" height="18" rx="9" fill="#090b16" stroke="url(#vipGold)" stroke-width="2.5"/>
+  <text x="120" y="222.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="11" letter-spacing="1.2" fill="#fde047">VIP</text>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" fill="none">
+  <defs>
+    <linearGradient id="evtGrad" x1="15" y1="20" x2="225" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="45%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="evtGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <path d="M120 15 A105 105 0 1 0 120 225 A105 105 0 1 0 120 15 Z M120 38 A82 82 0 1 1 120 202 A82 82 0 1 1 120 38 Z" fill="#13101d" fill-rule="evenodd"/>
+  <circle cx="120" cy="120" r="103" stroke="url(#evtGrad)" stroke-width="5.5" filter="url(#evtGlow)"/>
+  <circle cx="120" cy="120" r="93" stroke="#fb923c" stroke-width="2" stroke-dasharray="14 8"/>
+  <circle cx="120" cy="120" r="83.5" stroke="#38bdf8" stroke-width="3.5"/>
+  <!-- Festive starburst emblems at cardinal & diagonal points -->
+  <g filter="url(#evtGlow)">
+    <path d="M120 5 L124 17 L136 21 L124 25 L120 37 L116 25 L104 21 L116 17 Z" fill="#facc15" stroke="#fff" stroke-width="1"/>
+    <path d="M120 203 L124 215 L136 219 L124 223 L120 235 L116 223 L104 219 L116 215 Z" fill="#fb923c" stroke="#fff" stroke-width="1"/>
+    <path d="M21 104 L25 116 L37 120 L25 124 L21 136 L17 124 L5 120 L17 116 Z" fill="#38bdf8"/>
+    <path d="M219 104 L223 116 L235 120 L223 124 L219 136 L215 124 L203 120 L215 116 Z" fill="#38bdf8"/>
+  </g>
+</svg>
