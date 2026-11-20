@@ -8798,9 +8798,541 @@
     font-family: 'Inter', sans-serif;
 }
 .inbox-qr-chip:hover { border-color: #f7d875; color: #f7d875; }
+
+/* ============================================================
+   🌐 NEX4UP 2.0 — MALAYSIA'S GAMING COMMUNITY PLATFORM UI
+   ============================================================ */
+.nex2-top-promo-bar {
+    background: linear-gradient(90deg, #0b1730 0%, #102a4c 45%, #163042 100%);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.35);
+    color: #e8edf5;
+    padding: 8px 16px;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    z-index: 120;
+}
+.nex2-top-promo-pill {
+    background: linear-gradient(135deg, #f97316, #f7d875);
+    color: #0b0e14;
+    font-weight: 800;
+    font-size: 10.5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.nex2-top-promo-btn {
+    background: rgba(56, 189, 248, 0.16);
+    border: 1px solid #38bdf8;
+    color: #38bdf8;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+}
+.nex2-top-promo-btn:hover { background: #38bdf8; color: #0b0e14; }
+
+.nex2-primary-nav {
+    background: #0f1522;
+    border-bottom: 1px solid #1e2a3a;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.nex2-primary-nav::-webkit-scrollbar { display: none; }
+.nex2-nav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+}
+.nex2-nav-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #9bb3d1;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+}
+.nex2-nav-btn:hover { color: #f7d875; background: rgba(247, 216, 117, 0.08); }
+.nex2-nav-btn.active {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(247, 216, 117, 0.12));
+    border-color: rgba(56, 189, 248, 0.5);
+    color: #ffffff;
+}
+.nex2-brand-tagline {
+    font-size: 11.5px;
+    color: #8aa1c0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.nex2-my-badge {
+    background: rgba(255, 204, 0, 0.14);
+    border: 1px solid rgba(255, 204, 0, 0.45);
+    color: #ffcc00;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+.nex2-lang-pill {
+    background: #141c2b;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    padding: 7px 11px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-lang-pill:hover { border-color: #38bdf8; color: #38bdf8; }
+
+.nex2-notif-wrap { position: relative; }
+.nex2-notif-btn {
+    background: #141c2b;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 15px;
+}
+.nex2-notif-btn:hover { border-color: #f7d875; color: #f7d875; }
+.nex2-notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff6b6b;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    min-width: 17px;
+    height: 17px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+.nex2-notif-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 46px;
+    width: 320px;
+    max-width: 90vw;
+    background: #121821;
+    border: 1px solid #2a3a52;
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    z-index: 300;
+    overflow: hidden;
+}
+.nex2-notif-dropdown.open { display: block; }
+.nex2-notif-head {
+    padding: 12px 14px;
+    border-bottom: 1px solid #1e2a3a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 13px;
+}
+.nex2-notif-list { max-height: 320px; overflow-y: auto; }
+.nex2-notif-item {
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(30, 42, 58, 0.7);
+    font-size: 12.5px;
+    cursor: pointer;
+}
+.nex2-notif-item:hover { background: rgba(56, 189, 248, 0.08); }
+.nex2-notif-item.unread { border-left: 3px solid #38bdf8; background: rgba(56, 189, 248, 0.06); }
+
+/* Universal Circular Framed Avatar Component */
+.nex2-framed-avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+.nex2-avatar-core {
+    width: 68.5%;
+    height: 68.5%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #141c2b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #94a3b8;
+    font-weight: 800;
+}
+.nex2-avatar-core img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+}
+.nex2-frame-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+#profileAvatarContainer.nex2-profile-avatar-framed {
+    position: relative;
+    width: 116px;
+    height: 116px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+#profileAvatarContainer.nex2-profile-avatar-framed .profile-avatar,
+#profileAvatarContainer.nex2-profile-avatar-framed .profile-avatar-placeholder {
+    width: 79px;
+    height: 79px;
+    border: none;
+}
+
+/* Homepage Top-5 Leaderboard Preview Strip */
+.nex2-home-rank-strip {
+    background: linear-gradient(135deg, #101829 0%, #121c2e 100%);
+    border: 1px solid #22324d;
+    border-radius: 20px;
+    padding: 18px 20px;
+    margin: 18px 0 24px;
+}
+.nex2-rank-strip-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.nex2-rank-strip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    gap: 12px;
+}
+.nex2-rank-mini-card {
+    background: #0b111d;
+    border: 1px solid #1e2a3a;
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.nex2-rank-mini-card:hover { border-color: #38bdf8; transform: translateY(-2px); }
+.nex2-rank-num {
+    font-size: 13px;
+    font-weight: 900;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #1a2538;
+    color: #94a3b8;
+}
+.nex2-rank-num.top1 { background: rgba(250, 204, 21, 0.2); color: #facc15; border: 1px solid #facc15; }
+.nex2-rank-num.top2 { background: rgba(226, 232, 240, 0.16); color: #e2e8f0; border: 1px solid #94a3b8; }
+.nex2-rank-num.top3 { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid #fb923c; }
+
+/* Shared NEX4UP 2.0 Page Container & Cards */
+.nex2-view-section { display: none; padding: 14px 0 36px; }
+.nex2-view-section.active { display: block; }
+.nex2-hero-banner {
+    background: linear-gradient(135deg, #0e192d 0%, #13223b 60%, #1a1f36 100%);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 22px;
+    padding: 24px 26px;
+    margin-bottom: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.nex2-hero-banner h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+}
+.nex2-hero-banner p { color: #9bb3d1; font-size: 13.5px; max-width: 640px; line-height: 1.5; }
+.nex2-pills-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+.nex2-pill-btn {
+    background: #121821;
+    border: 1px solid #243247;
+    color: #9bb3d1;
+    padding: 8px 15px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+}
+.nex2-pill-btn.active {
+    background: linear-gradient(135deg, #38bdf8, #0284c7);
+    color: #0b0e14;
+    border-color: #38bdf8;
+}
+
+.nex2-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 16px;
+}
+.nex2-panel-card {
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 18px;
+    padding: 18px;
+    transition: 0.2s;
+}
+.nex2-panel-card:hover { border-color: rgba(56, 189, 248, 0.45); }
+
+/* Podium Cards for Rankings */
+.nex2-podium-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+.nex2-podium-card {
+    background: linear-gradient(160deg, #141d2e, #0d131f);
+    border: 1px solid #24344d;
+    border-radius: 18px;
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+}
+.nex2-podium-card.pos1 { border-color: #facc15; box-shadow: 0 0 24px rgba(250, 204, 21, 0.14); }
+.nex2-podium-card.pos2 { border-color: #94a3b8; }
+.nex2-podium-card.pos3 { border-color: #fb923c; }
+
+/* Frame Studio & 5 Coin Visuals in My Account */
+.nex2-coins-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+.nex2-coin-card {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 14px;
+    padding: 12px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.nex2-coin-card img { width: 48px; height: 48px; }
+.nex2-frame-studio {
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 22px;
+    padding: 22px;
+    margin-top: 20px;
+    margin-bottom: 24px;
+}
+.nex2-frame-preview-stage {
+    background: linear-gradient(135deg, #0b111e, #111c30);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+.nex2-frames-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 12px;
+}
+.nex2-frame-item {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 16px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+    position: relative;
+}
+.nex2-frame-item:hover { border-color: #38bdf8; transform: translateY(-2px); }
+.nex2-frame-item.selected { border-color: #f7d875; box-shadow: 0 0 16px rgba(247, 216, 117, 0.18); }
+.nex2-frame-item.locked { opacity: 0.78; }
+.nex2-rarity-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* Community Feed & Find Players */
+.nex2-comm-post-card {
+    background: #121821;
+    border: 1px solid #1e2a3a;
+    border-radius: 18px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+}
+.nex2-comm-post-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.nex2-comm-post-img {
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 1px solid #1e2a3a;
+}
+.nex2-comm-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #1e2a3a;
+    flex-wrap: wrap;
+}
+.nex2-comm-action-btn {
+    background: #141c2b;
+    border: 1px solid #243247;
+    color: #9bb3d1;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-comm-action-btn.liked { color: #ff6b6b; border-color: #ff6b6b; background: rgba(255, 107, 107, 0.12); }
+
+/* Mobile Fixed Bottom Nav */
+.nex2-mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #0d131f;
+    border-top: 1px solid #1e2a3a;
+    z-index: 150;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    justify-content: space-around;
+}
+.nex2-mobile-nav-item {
+    background: transparent;
+    border: none;
+    color: #8aa1c0;
+    font-size: 10.5px;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 4px 6px;
+    font-family: 'Inter', sans-serif;
+}
+.nex2-mobile-nav-item i { font-size: 16px; }
+.nex2-mobile-nav-item.active { color: #38bdf8; }
+
+.nex2-fav-game-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #0b0e14;
+    border: 1px solid #2a3a52;
+    color: #cbd5e1;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.nex2-fav-game-chip input { accent-color: #38bdf8; }
+
+@media (max-width: 768px) {
+    .nex2-brand-tagline { display: none; }
+    .nex2-mobile-bottom-nav { display: flex; }
+    body { padding-bottom: 66px; }
+    .mascot-fab { bottom: 76px !important; }
+}
     </style>
 </head>
 <body>
+
+<!-- ===== NEX4UP 2.0 STICKY CAMPAIGN ANNOUNCEMENT BAR ===== -->
+<div class="nex2-top-promo-bar" id="nex2TopPromoBar">
+    <span class="nex2-top-promo-pill">🇲🇾 Malaysia Plays Here</span>
+    <span id="nex2TopPromoText">🎬 NEX Creator Challenge: Post your TikTok / Reels / Shorts &amp; win NEX Points, Vouchers &amp; Event Frame!</span>
+    <button type="button" class="nex2-top-promo-btn" id="nex2TopPromoBtn">Join Creator Hub &rarr;</button>
+</div>
 
 <!-- ===== HEADER ===== -->
     <header>
@@ -8835,6 +9367,27 @@
 
             <button class="track-btn" id="trackBtn"><i class="fas fa-search"></i> Track Order</button>
 
+            <button type="button" class="nex2-lang-pill" id="nex2LangToggle" title="Switch Language (English / Bahasa Malaysia)">
+                <i class="fas fa-globe" style="color:#38bdf8;"></i>
+                <span id="nex2LangLabel">EN</span>
+            </button>
+
+            <div class="nex2-notif-wrap" id="nex2NotifWrap">
+                <button type="button" class="nex2-notif-btn" id="nex2NotifBtn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="nex2-notif-badge" id="nex2NotifBadge" style="display:none;">0</span>
+                </button>
+                <div class="nex2-notif-dropdown" id="nex2NotifDropdown">
+                    <div class="nex2-notif-head">
+                        <span><i class="fas fa-bell" style="color:#f7d875;"></i> Notifications</span>
+                        <button type="button" id="nex2MarkAllReadBtn" style="background:none;border:none;color:#38bdf8;font-size:11.5px;cursor:pointer;font-weight:700;">Mark Read</button>
+                    </div>
+                    <div class="nex2-notif-list" id="nex2NotifList">
+                        <div style="padding:18px;text-align:center;color:#6a7f9e;font-size:12.5px;">No new notifications yet.</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Live Wallet Points Pill (Visible when customer is logged in) -->
             <button type="button" class="header-points-pill" id="headerPointsPill" title="View My Wallet Points">
                 <i class="fas fa-coins"></i>
@@ -8856,6 +9409,22 @@
             </div>
         </div>
     </header>
+
+    <!-- ===== NEX4UP 2.0 PRIMARY NAVIGATION STRIP ===== -->
+    <nav class="nex2-primary-nav" id="nex2PrimaryNav" aria-label="NEX4UP Platform Navigation">
+        <div class="nex2-nav-tabs">
+            <button type="button" class="nex2-nav-btn active" data-nex2-tab="store"><i class="fas fa-store" style="color:#f7d875;"></i> <span data-i18n="nav_store">Store</span></button>
+            <button type="button" class="nex2-nav-btn" data-nex2-tab="rankings"><i class="fas fa-trophy" style="color:#facc15;"></i> <span data-i18n="nav_rankings">Rankings</span></button>
+            <button type="button" class="nex2-nav-btn" data-nex2-tab="creators"><i class="fas fa-video" style="color:#fb923c;"></i> <span data-i18n="nav_creators">Creator Hub</span></button>
+            <button type="button" class="nex2-nav-btn" data-nex2-tab="community"><i class="fas fa-users" style="color:#38bdf8;"></i> <span data-i18n="nav_community">Community &amp; Find Players</span></button>
+            <button type="button" class="nex2-nav-btn" data-nex2-tab="reviews"><i class="fas fa-star" style="color:#4ade80;"></i> <span data-i18n="nav_reviews">Reviews</span></button>
+            <button type="button" class="nex2-nav-btn" data-nex2-tab="developers"><i class="fas fa-code" style="color:#c084fc;"></i> <span data-i18n="nav_devs">Developers</span></button>
+        </div>
+        <div class="nex2-brand-tagline">
+            <span class="nex2-my-badge">🇲🇾 Malaysia's Gaming Community</span>
+            <span>Shop. Connect. Compete. Create.</span>
+        </div>
+    </nav>
 
     <!-- ===== APP CONTAINER ===== -->
     <div class="app-container">
@@ -8894,6 +9463,12 @@
         <div class="sidebar-item" data-section="sales-team">
     <i class="fas fa-users-cog"></i> Sales Team & Commissions
 </div>
+            <div class="sidebar-item" data-section="creator-campaigns">
+                <i class="fas fa-video"></i> Creator Campaigns
+            </div>
+            <div class="sidebar-item" data-section="community-hub">
+                <i class="fas fa-shield-alt"></i> Community, Frames &amp; Dev
+            </div>
             <!-- ✅ NEW: Backup Sidebar Item -->
             <div class="sidebar-item" data-section="backup">
                 <i class="fas fa-database"></i> Backup & Restore
@@ -8995,6 +9570,23 @@
                             <div class="mp-trust-icon"><i class="fas fa-headset"></i></div>
                             <div class="mp-trust-text"><strong>Live Support</strong><span>In-app chat &amp; WhatsApp help</span></div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- ===== NEX4UP 2.0 HOMEPAGE TOP-5 LEADERBOARD STRIP ===== -->
+                <div class="nex2-home-rank-strip" id="nex2HomeRankStrip">
+                    <div class="nex2-rank-strip-head">
+                        <div>
+                            <div style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-crown" style="color:#facc15;"></i>
+                                <span>Climb the Ranks — Top Malaysian Gamers</span>
+                            </div>
+                            <div style="font-size:12.5px;color:#8aa1c0;">Verified buyers &amp; supporters ranked with their equipped Profile Frames</div>
+                        </div>
+                        <button type="button" class="nex2-top-promo-btn" id="nex2HomeViewRankBtn">See Full Leaderboard &rarr;</button>
+                    </div>
+                    <div class="nex2-rank-strip-grid" id="nex2HomeRankGrid">
+                        <div style="color:#6a7f9e;font-size:12.5px;padding:8px 0;">Loading verified leaderboard...</div>
                     </div>
                 </div>
 
@@ -9866,6 +10458,190 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- ===== NEX4UP 2.0: ADMIN CREATOR CAMPAIGNS & SUBMISSIONS ===== -->
+                <div class="admin-section" id="section-creator-campaigns">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+                        <h2><i class="fas fa-video" style="color:#fb923c;"></i> Creator Campaigns &amp; Rewards</h2>
+                        <button type="button" class="submit-btn" id="nex2AdminRefreshCampBtn" style="padding:8px 18px; font-size:13.5px;">
+                            <i class="fas fa-sync-alt"></i> Refresh Data
+                        </button>
+                    </div>
+
+                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:20px; padding:22px; margin-bottom:22px;">
+                        <h3 style="margin-bottom:14px; font-size:16px;"><i class="fas fa-plus-circle" style="color:#f7d875;"></i> Create / Edit Creator Campaign</h3>
+                        <input type="hidden" id="nex2CampId" />
+                        <div class="form-row">
+                            <div class="field">
+                                <label>Campaign Title *</label>
+                                <input type="text" id="nex2CampTitle" placeholder="e.g. Merdeka Robux TikTok Challenge" />
+                            </div>
+                            <div class="field">
+                                <label>Platform</label>
+                                <select id="nex2CampPlatform">
+                                    <option value="TikTok">TikTok</option>
+                                    <option value="Instagram">Instagram Reels</option>
+                                    <option value="YouTube">YouTube Shorts</option>
+                                    <option value="All">All Platforms</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field">
+                                <label>Reward Type</label>
+                                <select id="nex2CampRewardType">
+                                    <option value="Points">NEX Wallet Points (Auto-Credit)</option>
+                                    <option value="Voucher">RM Discount Voucher (Auto-Issue)</option>
+                                    <option value="Robux">Robux Prize (Manual Payout)</option>
+                                    <option value="Product">Gaming Product Prize</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Reward Value (Points or RM)</label>
+                                <input type="text" id="nex2CampRewardValue" value="500" placeholder="e.g. 500 or 10" />
+                            </div>
+                            <div class="field">
+                                <label>NEX Coin Visual Variant</label>
+                                <select id="nex2CampCoinVariant">
+                                    <option value="event">Event Coin</option>
+                                    <option value="gold">Gold Coin</option>
+                                    <option value="premium">Premium Coin</option>
+                                    <option value="crystal">Crystal Coin</option>
+                                    <option value="standard">Standard Coin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field">
+                                <label>End Date</label>
+                                <input type="date" id="nex2CampEndDate" />
+                            </div>
+                            <div class="field">
+                                <label>Status</label>
+                                <select id="nex2CampStatus">
+                                    <option value="Active">Active</option>
+                                    <option value="Ended">Ended</option>
+                                    <option value="Draft">Draft (Hidden)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Banner Tag</label>
+                                <input type="text" id="nex2CampBannerTag" value="HOT CAMPAIGN" placeholder="MOST POPULAR / EVENT" />
+                            </div>
+                        </div>
+                        <div class="field" style="margin-bottom:12px;">
+                            <label>Description</label>
+                            <textarea id="nex2CampDesc" rows="2" placeholder="Explain what creators should showcase..."></textarea>
+                        </div>
+                        <div class="field" style="margin-bottom:14px;">
+                            <label>Rules &amp; Hashtags</label>
+                            <textarea id="nex2CampRules" rows="2" placeholder="e.g. Tag @nex4upstore and include #MalaysiaPlaysHere"></textarea>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" class="submit-btn" id="nex2SaveCampBtn"><i class="fas fa-save"></i> Save Campaign</button>
+                            <button type="button" class="cancel-btn" id="nex2ResetCampBtn" style="padding:10px 18px; border-radius:12px;">Clear Form</button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom:12px;"><i class="fas fa-bullhorn" style="color:#38bdf8;"></i> Existing Campaigns</h3>
+                    <div id="nex2AdminCampaignsList" class="orders-container" style="margin-bottom:22px;">
+                        <p style="color:#6a7f9e; text-align:center; padding:18px;">Loading campaigns...</p>
+                    </div>
+
+                    <h3 style="margin-bottom:12px;"><i class="fas fa-inbox" style="color:#4ade80;"></i> Creator Submissions Queue</h3>
+                    <div id="nex2AdminSubmissionsList" class="orders-container">
+                        <p style="color:#6a7f9e; text-align:center; padding:18px;">Loading submissions...</p>
+                    </div>
+                </div>
+
+                <!-- ===== NEX4UP 2.0: COMMUNITY MODERATION, FRAMES, DEV TEAM & SUPABASE ===== -->
+                <div class="admin-section" id="section-community-hub">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+                        <h2><i class="fas fa-shield-alt" style="color:#38bdf8;"></i> Community, Frames, Dev Team &amp; Supabase</h2>
+                        <button type="button" class="submit-btn" id="nex2AdminRefreshCommBtn" style="padding:8px 18px; font-size:13.5px;">
+                            <i class="fas fa-sync-alt"></i> Refresh Panel
+                        </button>
+                    </div>
+
+                    <!-- 1. Grant Profile Frame -->
+                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:20px; padding:20px; margin-bottom:20px;">
+                        <h3 style="margin-bottom:12px; font-size:16px;"><i class="fas fa-award" style="color:#f7d875;"></i> Grant Profile Frame to Customer</h3>
+                        <div class="form-row">
+                            <div class="field">
+                                <label>Customer Email *</label>
+                                <input type="email" id="nex2GrantFrameEmail" placeholder="customer@email.com" />
+                            </div>
+                            <div class="field">
+                                <label>Select Profile Frame</label>
+                                <select id="nex2GrantFrameSelect">
+                                    <option value="frame_vip">VIP Frame (Mythic)</option>
+                                    <option value="frame_champion">Champion Frame (Legendary)</option>
+                                    <option value="frame_galaxy">Galaxy Frame (Legendary)</option>
+                                    <option value="frame_malaysia">Malaysia Frame (Epic)</option>
+                                    <option value="frame_esports">Esports Frame (Epic)</option>
+                                    <option value="frame_event">Event Frame (Epic)</option>
+                                    <option value="frame_crystal">Crystal Frame (Epic)</option>
+                                    <option value="frame_neon">Neon Frame (Rare)</option>
+                                    <option value="frame_premium">Premium Frame (Rare)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="button" class="submit-btn" id="nex2GrantFrameBtn"><i class="fas fa-gift"></i> Unlock &amp; Grant Frame</button>
+                    </div>
+
+                    <!-- 2. Supabase Hybrid Integration -->
+                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:20px; padding:20px; margin-bottom:20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+                            <h3 style="font-size:16px; margin:0;"><i class="fas fa-database" style="color:#4ade80;"></i> Supabase Hybrid Integration</h3>
+                            <span id="nex2SupabaseStatusBadge" class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16); color:#38bdf8;">Checking...</span>
+                        </div>
+                        <p style="color:#8aa1c0; font-size:12.5px; margin-bottom:12px;">
+                            Project URL: <code style="color:#f7d875;">https://sgmyphflffpeqjmivfwq.supabase.co</code> — Secret Key is saved exclusively in Google Apps Script ScriptProperties (never stored in frontend HTML). Run <code style="color:#38bdf8;">supabase_schema.sql</code> in Supabase SQL Editor, then paste your Secret Key below to sync profiles.
+                        </p>
+                        <div class="form-row">
+                            <div class="field">
+                                <label>SUPABASE_SECRET_KEY (sb_secret_...)</label>
+                                <input type="password" id="nex2SupabaseSecretInput" placeholder="sb_secret_..." autocomplete="off" />
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" class="submit-btn" id="nex2SaveSupabaseBtn"><i class="fas fa-key"></i> Save Secret to GAS</button>
+                            <button type="button" class="submit-btn" id="nex2SyncSupabaseBtn" style="background:#1e2a3a; color:#38bdf8; border:1px solid #38bdf8;"><i class="fas fa-cloud-upload-alt"></i> Sync Gamer Profiles to Supabase</button>
+                        </div>
+                    </div>
+
+                    <!-- 3. Developer Page Manager -->
+                    <div style="background:#121821; border:1px solid #1e2a3a; border-radius:20px; padding:20px; margin-bottom:20px;">
+                        <h3 style="margin-bottom:12px; font-size:16px;"><i class="fas fa-code" style="color:#c084fc;"></i> NEX4UP Development Page Showcase</h3>
+                        <input type="hidden" id="nex2DevId" />
+                        <div class="form-row">
+                            <div class="field"><label>Display Name *</label><input type="text" id="nex2DevName" placeholder="e.g. Adam (Founder)" /></div>
+                            <div class="field"><label>Roblox Username *</label><input type="text" id="nex2DevRbx" placeholder="Exact Roblox username for live headshot" /></div>
+                            <div class="field"><label>Role *</label><input type="text" id="nex2DevRole" placeholder="e.g. Founder &amp; Lead Developer" /></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field"><label>Badge</label><input type="text" id="nex2DevBadge" value="CORE DEV" /></div>
+                            <div class="field"><label>Display Order</label><input type="number" id="nex2DevOrder" value="1" min="1" /></div>
+                        </div>
+                        <div class="field" style="margin-bottom:10px;"><label>Bio</label><input type="text" id="nex2DevBio" placeholder="Short developer intro..." /></div>
+                        <div class="field" style="margin-bottom:12px;"><label>Contributions</label><input type="text" id="nex2DevContrib" placeholder="Store architecture, UI design, creator hub..." /></div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+                            <button type="button" class="submit-btn" id="nex2SaveDevBtn"><i class="fas fa-save"></i> Save Developer Card</button>
+                            <button type="button" class="cancel-btn" id="nex2ResetDevBtn" style="padding:10px 18px; border-radius:12px;">Clear</button>
+                        </div>
+                        <div id="nex2AdminDevList" class="orders-container"></div>
+                    </div>
+
+                    <!-- 4. Reported Content & Posts Moderation -->
+                    <h3 style="margin-bottom:10px;"><i class="fas fa-flag" style="color:#ff6b6b;"></i> Reported Content Queue</h3>
+                    <div id="nex2AdminReportsList" class="orders-container" style="margin-bottom:20px;"></div>
+
+                    <h3 style="margin-bottom:10px;"><i class="fas fa-comments" style="color:#38bdf8;"></i> Community Posts Moderation</h3>
+                    <div id="nex2AdminPostsList" class="orders-container" style="margin-bottom:20px;"></div>
+
+                    <h3 style="margin-bottom:10px;"><i class="fas fa-clipboard-list" style="color:#f7d875;"></i> Admin Audit Log</h3>
+                    <div id="nex2AdminAuditList" class="orders-container"></div>
+                </div>
             </div>
 
             <!-- ===== MY ACCOUNT (Customer Dashboard) ===== -->
@@ -9876,32 +10652,109 @@
                         <button class="back-btn" id="backToStoreBtn"><i class="fas fa-arrow-left"></i> Back to Store</button>
                     </div>
                     <div class="profile-header">
-                        <div id="profileAvatarContainer">
+                        <div id="profileAvatarContainer" class="nex2-profile-avatar-framed">
                             <img id="profileAvatar" class="profile-avatar" src="" alt="Profile" style="display:none;" />
                             <div id="profileAvatarPlaceholder" class="profile-avatar-placeholder"><i class="fas fa-user"></i></div>
+                            <img id="myAccountFrameOverlay" class="nex2-frame-overlay" src="assets/frames/frame_default.svg" alt="Profile Frame" onerror="if(window._nexFrameSvgFallback)window._nexFrameSvgFallback(this,'frame_default')" />
                         </div>
                         <div class="profile-info">
                             <div class="profile-name" id="profileName">-</div>
                             <div class="profile-email" id="profileEmail">-</div>
+                            <div id="nex2ProfileBadgesRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
+                            <div id="nex2ProfileSocialsRow" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12px;"></div>
                         </div>
                     </div>
 <div class="profile-details">
     <div class="detail-row"><span class="label">Phone</span><span class="value" id="profilePhone">-</span></div>
+    <div class="detail-row"><span class="label">Roblox Username</span><span class="value" id="nex2ProfileRobloxVal" style="color:#38bdf8;font-weight:700;">Not linked</span></div>
     <div class="detail-row"><span class="label">Member Since</span><span class="value" id="profileDate">-</span></div>
-    <div class="detail-row"><span class="label"><i class="fas fa-coins" style="color:#f7d875;"></i> Points Balance</span><span class="value" id="profilePoints" style="color:#f7d875; font-weight:700;">-</span></div>
+    <div class="detail-row"><span class="label"><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Wallet Points</span><span class="value" id="profilePoints" style="color:#f7d875; font-weight:700;">-</span></div>
 </div>
+
+                    <!-- NEX Coin System Visual Tiers -->
+                    <div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:16px;padding:14px 16px;margin-bottom:16px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div style="font-size:13px;font-weight:800;color:#fff;"><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Point Coin Visuals (1 Unified Wallet Balance)</div>
+                            <span style="font-size:11.5px;color:#8aa1c0;">100 NEX Points = RM 1.00 Store Discount or Frame Unlock</span>
+                        </div>
+                        <div class="nex2-coins-row" id="nex2MyAccountCoinsRow"></div>
+                    </div>
+
                     <div class="account-actions">
-                        <button class="action-btn primary" id="editProfileBtn"><i class="fas fa-edit"></i> Edit Profile</button>
+                        <button class="action-btn primary" id="editProfileBtn"><i class="fas fa-edit"></i> Edit Gamer Profile &amp; Socials</button>
                         <button class="action-btn" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
                     </div>
                     <div class="edit-profile-form" id="editProfileForm">
                         <div class="field">
-                            <label for="editName">Name</label>
+                            <label for="editName">Display Name</label>
                             <input type="text" id="editName" placeholder="Your full name" />
                         </div>
                         <div class="field">
                             <label for="editPhone">Phone</label>
                             <input type="text" id="editPhone" placeholder="Phone number" />
+                        </div>
+                        <div class="field">
+                            <label for="editRobloxUsername">Roblox Username (Auto-syncs official Roblox Avatar)</label>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <input type="text" id="editRobloxUsername" placeholder="Enter exact Roblox username" style="flex:1;min-width:180px;" />
+                                <button type="button" class="action-btn primary" id="verifyRobloxProfileBtn" style="padding:8px 14px;white-space:nowrap;">
+                                    <i class="fas fa-sync-alt"></i> Verify Roblox Avatar
+                                </button>
+                            </div>
+                            <div id="editRobloxVerifyMsg" style="font-size:12px;margin-top:6px;color:#8aa1c0;"></div>
+                            <input type="hidden" id="editRobloxUserId" />
+                            <input type="hidden" id="editRobloxAvatarUrl" />
+                        </div>
+                        <div class="field">
+                            <label for="editAvatarMode">Profile Avatar Source</label>
+                            <select id="editAvatarMode" style="width:100%;padding:10px;border-radius:10px;background:#0b0e14;border:1px solid #1e2a3a;color:#e8edf5;">
+                                <option value="custom">Use Uploaded Profile Photo</option>
+                                <option value="roblox">Use Official Roblox Avatar Headshot</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="field">
+                                <label for="editIgHandle">Instagram Handle</label>
+                                <input type="text" id="editIgHandle" placeholder="@yourhandle" />
+                            </div>
+                            <div class="field">
+                                <label for="editTtHandle">TikTok Handle</label>
+                                <input type="text" id="editTtHandle" placeholder="@yourtiktok" />
+                            </div>
+                            <div class="field">
+                                <label for="editYtHandle">YouTube Channel / @Handle</label>
+                                <input type="text" id="editYtHandle" placeholder="@yourchannel" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="editPlaystyle">Gaming Style (for Find Players)</label>
+                            <select id="editPlaystyle" style="width:100%;padding:10px;border-radius:10px;background:#0b0e14;border:1px solid #1e2a3a;color:#e8edf5;">
+                                <option value="Casual">Casual / Chill</option>
+                                <option value="Ranked / Competitive">Ranked / Competitive</option>
+                                <option value="Grinder / Trading">Grinder / Trading</option>
+                                <option value="Content Creator">Content Creator</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="editGamerBio">Gamer Bio</label>
+                            <textarea id="editGamerBio" rows="2" maxlength="220" placeholder="Tell Malaysian gamers what you play &amp; when you're online..." style="width:100%;padding:10px;border-radius:10px;background:#0b0e14;border:1px solid #1e2a3a;color:#e8edf5;"></textarea>
+                        </div>
+                        <div class="field">
+                            <label>Favorite Games (Shown on Find Players)</label>
+                            <div id="editFavGamesWrap" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Roblox" /> Roblox / Robux</label>
+                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Blox Fruits" /> Blox Fruits</label>
+                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Mobile Legends" /> Mobile Legends</label>
+                                <label class="nex2-fav-game-chip"><input type="checkbox" value="PUBG Mobile" /> PUBG Mobile</label>
+                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Valorant" /> Valorant</label>
+                                <label class="nex2-fav-game-chip"><input type="checkbox" value="Genshin Impact" /> Genshin Impact</label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="nex2-fav-game-chip" style="border-color:rgba(56,189,248,0.4);">
+                                <input type="checkbox" id="editPublicProfile" checked />
+                                Show my Gamer Profile publicly on Leaderboards &amp; Find Players
+                            </label>
                         </div>
                         <div class="field">
                             <label for="editProfileImageUrl">Profile Image URL (or upload below)</label>
@@ -9919,6 +10772,32 @@
                         </div>
                         <div id="profileUpdateMessage" class="profile-message"></div>
                     </div>
+                </div>
+
+                <!-- ===== NEX4UP COLLECTIBLE PROFILE FRAME STUDIO ===== -->
+                <div class="nex2-frame-studio" id="nex2FrameStudioCard">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+                        <div>
+                            <h3 style="margin:0;font-size:18px;"><i class="fas fa-ring" style="color:#38bdf8;"></i> Collectible Profile Frames (10 Exclusive Frames)</h3>
+                            <div style="font-size:12.5px;color:#8aa1c0;">Preview any frame on your avatar, unlock via milestones/campaigns or redeem with NEX Points, and display it everywhere on NEX4UP!</div>
+                        </div>
+                        <span id="nex2OwnedFramesCount" class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">1 / 10 Unlocked</span>
+                    </div>
+                    <div class="nex2-frame-preview-stage">
+                        <div id="nex2FramePreviewBox"></div>
+                        <div style="flex:1;min-width:200px;">
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+                                <strong id="nex2FramePreviewTitle" style="font-size:17px;color:#fff;">Default Frame</strong>
+                                <span id="nex2FramePreviewRarity" class="nex2-rarity-pill">Common</span>
+                            </div>
+                            <p id="nex2FramePreviewReq" style="font-size:13px;color:#9bb3d1;margin-bottom:12px;">Unlocked free for every registered NEX4UP gamer.</p>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                                <button type="button" class="submit-btn" id="nex2FrameActionBtn" style="padding:9px 18px;font-size:13px;">Equipped</button>
+                                <button type="button" class="cancel-btn" id="nex2FrameUnequipBtn" style="padding:9px 14px;border-radius:10px;font-size:12.5px;">Reset to Default</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nex2-frames-grid" id="nex2FramesGrid"></div>
                 </div>
 
 <h3 style="margin-bottom:16px;"><i class="fas fa-box-open" style="color:#f7d875;"></i> My Orders</h3>
@@ -10018,6 +10897,248 @@
                     </div>
                     <div id="wishlistGrid" class="games-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
                         <p style="color:#6a7f9e; grid-column:1/-1; text-align:center; padding:40px 0;">Loading your wishlist...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== NEX4UP 2.0: VERIFIED RANKINGS & LEADERBOARDS ===== -->
+            <div id="nex2RankingsSection" class="nex2-view-section">
+                <div class="nex2-hero-banner">
+                    <div>
+                        <h2><i class="fas fa-trophy" style="color:#facc15;"></i> Malaysia's Verified Gaming Rankings</h2>
+                        <p>Live leaderboards powered exclusively by verified Paid &amp; Completed NEX4UP orders. Reach Top 3 in any category to automatically unlock the Legendary <strong>Champion Frame</strong>!</p>
+                    </div>
+                    <div class="nex2-pills-bar" style="margin-bottom:0;" id="nex2RankTimePills">
+                        <button type="button" class="nex2-pill-btn active" data-rank-time="allTime">All Time</button>
+                        <button type="button" class="nex2-pill-btn" data-rank-time="monthly">This Month</button>
+                    </div>
+                </div>
+
+                <div class="nex2-pills-bar" id="nex2RankCatPills">
+                    <button type="button" class="nex2-pill-btn active" data-rank-cat="overall">🏆 Overall Top Supporters</button>
+                    <button type="button" class="nex2-pill-btn" data-rank-cat="robux">💎 Roblox / Robux</button>
+                    <button type="button" class="nex2-pill-btn" data-rank-cat="mlbb">⚔️ Mobile Legends</button>
+                    <button type="button" class="nex2-pill-btn" data-rank-cat="pubg">🎯 PUBG Mobile</button>
+                    <button type="button" class="nex2-pill-btn" data-rank-cat="creators">🎬 Top Creators</button>
+                </div>
+
+                <div class="nex2-podium-grid" id="nex2RankPodium"></div>
+                <div class="nex2-panel-card" style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+                        <thead>
+                            <tr style="border-bottom:1px solid #1e2a3a;color:#8aa1c0;text-align:left;">
+                                <th style="padding:10px;">Rank</th>
+                                <th style="padding:10px;">Player</th>
+                                <th style="padding:10px;">Roblox / Tag</th>
+                                <th style="padding:10px;">Orders</th>
+                                <th style="padding:10px;text-align:right;">Total / Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nex2RankTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== NEX4UP 2.0: NEX CREATOR HUB & CAMPAIGNS ===== -->
+            <div id="nex2CreatorsSection" class="nex2-view-section">
+                <div class="nex2-hero-banner">
+                    <div>
+                        <h2><i class="fas fa-video" style="color:#fb923c;"></i> NEX Creator Programme</h2>
+                        <p>Turn your TikTok, Instagram Reels &amp; YouTube Shorts gaming clips into Robux, NEX Wallet Points, Discount Vouchers, and the exclusive <strong>Event Profile Frame</strong>!</p>
+                    </div>
+                    <button type="button" class="submit-btn" id="nex2ScrollSubmitCampBtn"><i class="fas fa-paper-plane"></i> Submit Video Entry</button>
+                </div>
+
+                <!-- 5 NEX Point Coin Variants Showcase -->
+                <div class="nex2-panel-card" style="margin-bottom:20px;">
+                    <div style="font-weight:800;font-size:15px;color:#fff;margin-bottom:4px;"><i class="fas fa-coins" style="color:#f7d875;"></i> Earn Across All 5 NEX Point Coin Tiers</div>
+                    <div style="font-size:12.5px;color:#8aa1c0;">Every reward credits into your single NEX Wallet Points balance (redeemable on orders &amp; Profile Frames).</div>
+                    <div class="nex2-coins-row" id="nex2CreatorsCoinsRow"></div>
+                </div>
+
+                <h3 style="margin-bottom:12px;"><i class="fas fa-fire" style="color:#ff6b6b;"></i> Active Creator Campaigns</h3>
+                <div class="nex2-card-grid" id="nex2CampaignsGrid" style="margin-bottom:24px;"></div>
+
+                <!-- Submit Campaign Entry -->
+                <div class="nex2-panel-card" id="nex2SubmitCampCard" style="margin-bottom:24px;">
+                    <h3 style="margin-bottom:12px;"><i class="fas fa-upload" style="color:#38bdf8;"></i> Submit Your Promotional Video</h3>
+                    <form id="nex2SubmitCampaignForm">
+                        <div class="form-row">
+                            <div class="field">
+                                <label>Select Active Campaign *</label>
+                                <select id="nex2SubCampaignId" required></select>
+                            </div>
+                            <div class="field">
+                                <label>Platform *</label>
+                                <select id="nex2SubPlatform">
+                                    <option value="TikTok">TikTok</option>
+                                    <option value="Instagram">Instagram Reels</option>
+                                    <option value="YouTube">YouTube Shorts</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field">
+                                <label>Video URL *</label>
+                                <input type="url" id="nex2SubVideoUrl" placeholder="https://www.tiktok.com/@you/video/..." required />
+                            </div>
+                            <div class="field">
+                                <label>Related Order ID (Optional)</label>
+                                <input type="text" id="nex2SubOrderId" placeholder="ORD-2026..." />
+                            </div>
+                        </div>
+                        <div class="field" style="margin-bottom:12px;">
+                            <label>Notes / Social Handle</label>
+                            <input type="text" id="nex2SubNotes" placeholder="Your TikTok/IG/YT @handle or clip title" />
+                        </div>
+                        <button type="submit" class="submit-btn" id="nex2SubmitCampEntryBtn"><i class="fas fa-paper-plane"></i> Submit Campaign Entry</button>
+                    </form>
+                </div>
+
+                <div class="nex2-panel-card" style="margin-bottom:24px;" id="nex2MySubmissionsBox">
+                    <h3 style="margin-bottom:10px;"><i class="fas fa-history" style="color:#f7d875;"></i> My Campaign Submissions</h3>
+                    <div id="nex2MySubmissionsList"><p style="color:#6a7f9e;font-size:13px;">Log in to track your campaign submissions &amp; rewards.</p></div>
+                </div>
+
+                <h3 style="margin-bottom:12px;"><i class="fas fa-star" style="color:#facc15;"></i> Featured Approved Creators</h3>
+                <div class="nex2-card-grid" id="nex2CreatorShowcaseGrid"></div>
+            </div>
+
+            <!-- ===== NEX4UP 2.0: COMMUNITY FEED & FIND PLAYERS ===== -->
+            <div id="nex2CommunitySection" class="nex2-view-section">
+                <div class="nex2-hero-banner">
+                    <div>
+                        <h2><i class="fas fa-users" style="color:#38bdf8;"></i> Malaysia Gaming Community &amp; Find Players</h2>
+                        <p>Share top-up screenshots, follow Malaysian gamers, showcase your Profile Frame, and find squadmates by game &amp; playstyle.</p>
+                    </div>
+                    <div class="nex2-pills-bar" style="margin-bottom:0;" id="nex2CommModePills">
+                        <button type="button" class="nex2-pill-btn active" data-comm-mode="feed">💬 Community Feed</button>
+                        <button type="button" class="nex2-pill-btn" data-comm-mode="players">🎮 Find Players</button>
+                    </div>
+                </div>
+
+                <!-- Sub-View A: Community Feed -->
+                <div id="nex2CommFeedView">
+                    <div class="nex2-panel-card" style="margin-bottom:18px;">
+                        <h3 style="font-size:15.5px;margin-bottom:10px;"><i class="fas fa-pen" style="color:#38bdf8;"></i> Share with Malaysian Gamers</h3>
+                        <form id="nex2PostForm">
+                            <div class="form-row">
+                                <div class="field">
+                                    <label>Game Tag</label>
+                                    <select id="nex2PostGameTag">
+                                        <option value="General">General Gaming MY</option>
+                                        <option value="Roblox">Roblox / Robux</option>
+                                        <option value="MLBB">Mobile Legends (MLBB)</option>
+                                        <option value="PUBG">PUBG Mobile</option>
+                                        <option value="Valorant">Valorant</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Attach Screenshot (Optional)</label>
+                                    <input type="file" id="nex2PostImgInput" accept="image/*" style="padding:7px;" />
+                                </div>
+                            </div>
+                            <div class="field" style="margin-bottom:10px;">
+                                <textarea id="nex2PostContent" rows="2" maxlength="800" placeholder="Drop your Roblox clip update, look-for-group (LFG) invite, or recent NEX4UP loot..."></textarea>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                                <span id="nex2PostImgStatus" style="font-size:12px;color:#8aa1c0;"></span>
+                                <button type="submit" class="submit-btn" id="nex2CreatePostBtn"><i class="fas fa-paper-plane"></i> Post Update</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="nex2-pills-bar" id="nex2FeedFilterPills">
+                        <button type="button" class="nex2-pill-btn active" data-feed-filter="All">All Posts</button>
+                        <button type="button" class="nex2-pill-btn" data-feed-filter="Roblox">Roblox</button>
+                        <button type="button" class="nex2-pill-btn" data-feed-filter="MLBB">MLBB</button>
+                        <button type="button" class="nex2-pill-btn" data-feed-filter="PUBG">PUBG</button>
+                        <button type="button" class="nex2-pill-btn" data-feed-filter="Following">Following</button>
+                    </div>
+                    <div id="nex2PostsFeedList"></div>
+                </div>
+
+                <!-- Sub-View B: Find Players Directory -->
+                <div id="nex2CommPlayersView" style="display:none;">
+                    <div class="nex2-panel-card" style="margin-bottom:18px;">
+                        <div class="form-row">
+                            <div class="field">
+                                <label>Filter by Game</label>
+                                <select id="nex2FindGameSelect">
+                                    <option value="All">All Games</option>
+                                    <option value="Roblox">Roblox / Robux</option>
+                                    <option value="Blox Fruits">Blox Fruits</option>
+                                    <option value="Mobile Legends">Mobile Legends</option>
+                                    <option value="PUBG Mobile">PUBG Mobile</option>
+                                    <option value="Valorant">Valorant</option>
+                                    <option value="Genshin Impact">Genshin Impact</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Filter by Playstyle</label>
+                                <select id="nex2FindStyleSelect">
+                                    <option value="All">All Playstyles</option>
+                                    <option value="Casual">Casual / Chill</option>
+                                    <option value="Ranked / Competitive">Ranked / Competitive</option>
+                                    <option value="Grinder / Trading">Grinder / Trading</option>
+                                    <option value="Content Creator">Content Creator</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Search Player / Roblox Username</label>
+                                <input type="text" id="nex2FindSearchInput" placeholder="Search name, Roblox or @handle..." />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nex2-card-grid" id="nex2FindPlayersGrid"></div>
+                </div>
+            </div>
+
+            <!-- ===== NEX4UP 2.0: PUBLIC VERIFIED REVIEWS WALL ===== -->
+            <div id="nex2ReviewsSection" class="nex2-view-section">
+                <div class="nex2-hero-banner">
+                    <div>
+                        <h2><i class="fas fa-star" style="color:#4ade80;"></i> Verified Buyer Reviews Wall</h2>
+                        <p>100% authentic ratings submitted by real NEX4UP customers after receiving their orders. Leave a review in <strong>My Orders</strong> to earn bonus NEX Points!</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:34px;font-weight:900;color:#f7d875;" id="nex2RevAvgScore">5.0 ★</div>
+                        <div style="font-size:12.5px;color:#8aa1c0;" id="nex2RevTotalCount">Verified Reviews</div>
+                    </div>
+                </div>
+
+                <div class="nex2-card-grid" style="margin-bottom:20px;" id="nex2RevTrustCards">
+                    <div class="nex2-panel-card">
+                        <div style="font-weight:800;color:#4ade80;font-size:15px;">⚡ Lightning Fast Delivery</div>
+                        <div style="font-size:12.5px;color:#8aa1c0;margin-top:4px;">Digital orders &amp; Robux queued and processed daily 9AM–12PM MYT.</div>
+                    </div>
+                    <div class="nex2-panel-card">
+                        <div style="font-weight:800;color:#38bdf8;font-size:15px;">🛡️ 100% Account Safe</div>
+                        <div style="font-size:12.5px;color:#8aa1c0;margin-top:4px;">Official top-up workflows + Malaysian QR &amp; SociaBuzz verification.</div>
+                    </div>
+                    <div class="nex2-panel-card" id="nex2RevDistBars"></div>
+                </div>
+
+                <div class="nex2-card-grid" id="nex2ReviewsWallGrid"></div>
+            </div>
+
+            <!-- ===== NEX4UP 2.0: DEVELOPERS & CHANGELOG PAGE ===== -->
+            <div id="nex2DevSection" class="nex2-view-section">
+                <div class="nex2-hero-banner">
+                    <div>
+                        <h2><i class="fas fa-code" style="color:#c084fc;"></i> NEX4UP 2.0 Development Team</h2>
+                        <p>Meet the builders, operators, and Roblox contributors shaping <strong>Malaysia's Gaming Community</strong>. Live Roblox profile avatars sync automatically from official Roblox APIs.</p>
+                    </div>
+                    <span class="nex2-my-badge">Build v2.0 — Shop. Connect. Compete. Create.</span>
+                </div>
+
+                <div class="nex2-card-grid" id="nex2DevTeamGrid" style="margin-bottom:24px;"></div>
+
+                <div class="nex2-panel-card">
+                    <h3 style="margin-bottom:12px;"><i class="fas fa-rocket" style="color:#38bdf8;"></i> Platform Development Updates</h3>
+                    <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:#cbd5e1;">
+                        <div><span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.2);color:#38bdf8;">v2.0</span> <strong>NEX4UP 2.0 Launch:</strong> Added 10 Collectible Profile Frames, 5 NEX Coin tiers, Verified Rankings (Overall / Robux / MLBB / PUBG), Creator Campaign Hub, Community Feed, Find Players &amp; Verified Reviews Wall.</div>
+                        <div><span class="nex2-rarity-pill" style="background:rgba(74,222,128,0.2);color:#4ade80;">v1.8</span> <strong>Instant Store &amp; Automation:</strong> Added SociaBuzz webhook auto-verification, Telegram 1-tap order actions, Refresh-Proof Receipt History, Promo Manager &amp; Central Robux Backorder Ledger.</div>
                     </div>
                 </div>
             </div>
@@ -10781,6 +11902,23 @@
         </div>
     </div>
 
+    <!-- ===== NEX4UP 2.0: PLAYER PROFILE POPUP MODAL ===== -->
+    <div class="auth-overlay" id="nex2PlayerModalOverlay">
+        <div class="auth-modal" style="max-width:460px;">
+            <button type="button" class="auth-close" id="nex2PlayerModalClose"><i class="fas fa-times"></i></button>
+            <div id="nex2PlayerModalBody" style="text-align:center;padding-top:10px;"></div>
+        </div>
+    </div>
+
+    <!-- ===== NEX4UP 2.0: MOBILE FIXED BOTTOM NAVIGATION ===== -->
+    <nav class="nex2-mobile-bottom-nav" id="nex2MobileBottomNav" aria-label="Mobile Navigation">
+        <button type="button" class="nex2-mobile-nav-item active" data-nex2-tab="store"><i class="fas fa-store"></i><span>Store</span></button>
+        <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="rankings"><i class="fas fa-trophy"></i><span>Rankings</span></button>
+        <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="creators"><i class="fas fa-video"></i><span>Creators</span></button>
+        <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="community"><i class="fas fa-users"></i><span>Players</span></button>
+        <button type="button" class="nex2-mobile-nav-item" data-nex2-tab="reviews"><i class="fas fa-star"></i><span>Reviews</span></button>
+    </nav>
+
     <!-- ===== CUSTOMER CHAT WIDGET (MASCOT UI) ===== -->
     <button class="mascot-fab" id="chatFab" title="Chat with Customer Support">
         <!-- 👇 Speech Bubble -->
@@ -11330,6 +12468,8 @@ var agentCodeFromUrl = null;
             'genres': document.getElementById('section-genres'),
             'referral-settings': document.getElementById('section-referral-settings'),
             'sales-team': document.getElementById('section-sales-team'), // ✅ ADD THIS LINE
+            'creator-campaigns': document.getElementById('section-creator-campaigns'),
+            'community-hub': document.getElementById('section-community-hub'),
             'backup': document.getElementById('section-backup'),
             'change-password': document.getElementById('section-change-password')
         };
@@ -11534,7 +12674,18 @@ var agentCodeFromUrl = null;
         // ================================================================
         // 4. VIEW CONTROLLERS
         // ================================================================
+function _hideAllNex2Views() {
+    document.querySelectorAll('.nex2-view-section').forEach(function(el) {
+        el.classList.remove('active');
+        el.style.display = 'none';
+    });
+}
+
 function showStoreView() {
+    _hideAllNex2Views();
+    if (typeof _setNex2ActiveNav === 'function') _setNex2ActiveNav('store');
+    var pNav = document.getElementById('nex2PrimaryNav');
+    if (pNav) pNav.style.display = 'flex';
     publicView.style.display = 'block';
     adminSections.style.display = 'none';
     myAccountSection.classList.remove('visible');
@@ -11557,6 +12708,8 @@ function showStoreView() {
 }
 
         function showMyAccount() {
+            _hideAllNex2Views();
+            if (typeof _setNex2ActiveNav === 'function') _setNex2ActiveNav('');
             publicView.style.display = 'none';
             adminSections.style.display = 'none';
             myAccountSection.style.display = 'block';
@@ -11569,6 +12722,8 @@ function showStoreView() {
         }
 
         function showWishlist() {
+            _hideAllNex2Views();
+            if (typeof _setNex2ActiveNav === 'function') _setNex2ActiveNav('');
             publicView.style.display = 'none';
             adminSections.style.display = 'none';
             wishlistSection.style.display = 'block';
@@ -11579,6 +12734,10 @@ function showStoreView() {
         }
 
         function showAdminView() {
+            _hideAllNex2Views();
+            if (typeof _setNex2ActiveNav === 'function') _setNex2ActiveNav('');
+            var pNav = document.getElementById('nex2PrimaryNav');
+            if (pNav) pNav.style.display = 'none';
             publicView.style.display = 'none';
             adminSections.style.display = 'block';
             myAccountSection.classList.remove('visible');
@@ -14199,6 +15358,7 @@ loginError.textContent = '';
 var sub = loginOverlay.querySelector('.sub');
 if (sub) sub.textContent = 'Welcome back! Log in to your account.';
     updateProfileDropdown();
+    if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap();
     setTimeout(refreshPendingBadge, 400);
     showToast('Welcome back, ' + (customer.name || customer.email) + '!');
     loadWishlistIds();
@@ -14237,6 +15397,7 @@ if (cart.length > 0) {
                 .withSuccessHandler(function(result) {
                     if (result === true) {
                         isAdmin = true;
+                        window._nexAdminPwdSession = password;
                         profileToggle.classList.add('active');
                         sidebar.classList.add('visible');
                         showAdminView();
@@ -14289,6 +15450,7 @@ if (cart.length > 0) {
             if (inboxPollTimer) { clearInterval(inboxPollTimer); inboxPollTimer = null; }
             inboxCurrentEmail = null;
             isAdmin = false;
+            window._nexAdminPwdSession = '';
             profileToggle.classList.remove('active');
             sidebar.classList.remove('visible');
             adminSections.style.display = 'none';
@@ -14350,6 +15512,8 @@ if (cart.length > 0) {
                         refreshAdminUnreadBadge();
                     } else if (section === 'robux-inventory') {
                         loadRobuxInventory();
+                    } else if (section === 'creator-campaigns' || section === 'community-hub') {
+                        if (typeof loadNex4Up2AdminDashboard === 'function') loadNex4Up2AdminDashboard();
                     }
                 }
             });
@@ -16466,6 +17630,7 @@ function renderReviews(reviews) {
             google.script.run
                 .withSuccessHandler(function(result) {
                     if (result.success) {
+                        window._nexAdminPwdSession = newPwd;
                         changePasswordError.textContent = '';
                         showToast(result.message);
                         currentPassword.value = '';
@@ -16490,6 +17655,7 @@ function renderReviews(reviews) {
             try { localStorage.removeItem('nex4up_customer'); } catch (e) {}
             updateProfileBadge(0);
             updateProfileDropdown();
+            if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap();
             showToast('Logged out successfully.');
             showStoreView();
             renderPaginatedGrid();
@@ -17429,8 +18595,15 @@ function submitInlineReview() {
                         customer.phone = phone;
                         customer.profileImage = profileImage;
                         try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
-                        loadMyAccount();
-                        updateProfileDropdown();
+                        if (typeof window.nex2_save_gamer_profile === 'function') {
+                            window.nex2_save_gamer_profile(function() {
+                                loadMyAccount();
+                                updateProfileDropdown();
+                            });
+                        } else {
+                            loadMyAccount();
+                            updateProfileDropdown();
+                        }
                         profileUpdateMessage.textContent = '✅ Profile updated successfully!';
                         profileUpdateMessage.style.color = '#4caf50';
                         showToast('Profile updated!');
@@ -20513,6 +21686,7 @@ function showAgentDashboard(targetEmail) {
     window._agentDashboardEmail = email;
     window._agentDashboardOpenedByAdmin = !!(isAdmin && targetEmail);
 
+    if (typeof _hideAllNex2Views === 'function') _hideAllNex2Views();
     publicView.style.display = 'none';
     adminSections.style.display = 'none';
     myAccountSection.style.display = 'none';
@@ -22912,6 +24086,1303 @@ loadMyAccount = function () {
         })
         .getCustomerPoints(customer.email);
 };
+
+// ================================================================
+// 🌐 NEX4UP 2.0 — COMMUNITY, FRAMES, RANKINGS, CREATORS & DEV HUB
+// ================================================================
+(function initNex4Up2Platform() {
+    var NEX2_FRAMES_DEFAULT = [
+        { id: 'frame_default', name: 'Default Frame', rarity: 'Common', rarityColor: '#94a3b8', costPoints: 0, unlockType: 'free', requirement: 'Unlocked free for every registered NEX4UP gamer.', assetUrl: 'assets/frames/frame_default.svg' },
+        { id: 'frame_malaysia', name: 'Malaysia Frame', rarity: 'Epic', rarityColor: '#ffcc00', costPoints: 300, unlockType: 'points_or_event', requirement: 'Redeem with 300 NEX Points or Malaysian Event unlock.', assetUrl: 'assets/frames/frame_malaysia.svg' },
+        { id: 'frame_neon', name: 'Neon Frame', rarity: 'Rare', rarityColor: '#38bdf8', costPoints: 500, unlockType: 'points', requirement: 'Redeem in Frame Shop with 500 NEX Points.', assetUrl: 'assets/frames/frame_neon.svg' },
+        { id: 'frame_crystal', name: 'Crystal Frame', rarity: 'Epic', rarityColor: '#a855f7', costPoints: 1200, unlockType: 'points', requirement: 'Limited edition prismatic frame — Redeem with 1,200 NEX Points.', assetUrl: 'assets/frames/frame_crystal.svg' },
+        { id: 'frame_esports', name: 'Esports Frame', rarity: 'Epic', rarityColor: '#38bdf8', costPoints: 1500, unlockType: 'points_or_event', requirement: 'Competitive achievement or redeem with 1,500 NEX Points.', assetUrl: 'assets/frames/frame_esports.svg' },
+        { id: 'frame_galaxy', name: 'Galaxy Frame', rarity: 'Legendary', rarityColor: '#f59e0b', costPoints: 2500, unlockType: 'points', requirement: 'Cosmic tier frame — Redeem with 2,500 NEX Points.', assetUrl: 'assets/frames/frame_galaxy.svg' },
+        { id: 'frame_premium', name: 'Premium Frame', rarity: 'Rare', rarityColor: '#60a5fa', costPoints: 0, unlockType: 'milestone', requirement: 'Auto-unlocks at 5+ verified orders OR RM 100+ verified spend.', assetUrl: 'assets/frames/frame_premium.svg' },
+        { id: 'frame_event', name: 'Event Frame', rarity: 'Epic', rarityColor: '#fb923c', costPoints: 0, unlockType: 'campaign', requirement: 'Auto-unlocks when your Creator Campaign video is approved!', assetUrl: 'assets/frames/frame_event.svg' },
+        { id: 'frame_champion', name: 'Champion Frame', rarity: 'Legendary', rarityColor: '#facc15', costPoints: 0, unlockType: 'leaderboard', requirement: 'Auto-unlocks when you reach Top 3 on any Verified Leaderboard.', assetUrl: 'assets/frames/frame_champion.svg' },
+        { id: 'frame_vip', name: 'VIP Frame', rarity: 'Mythic', rarityColor: '#f43f5e', costPoints: 0, unlockType: 'milestone', requirement: 'Auto-unlocks at RM 500+ verified spend or Admin VIP grant.', assetUrl: 'assets/frames/frame_vip.svg' }
+    ];
+
+    var NEX2_COINS_DEFAULT = [
+        { id: 'standard', name: 'Standard Coin', usage: 'Purchases & Reviews Cashback', assetUrl: 'assets/coins/coin_standard.svg' },
+        { id: 'gold', name: 'Gold Coin', usage: 'VIP & Big Order Bonuses', assetUrl: 'assets/coins/coin_gold.svg' },
+        { id: 'premium', name: 'Premium Coin', usage: 'Loyalty Milestones', assetUrl: 'assets/coins/coin_premium.svg' },
+        { id: 'crystal', name: 'Crystal Coin', usage: 'Seasonal Drops & Giveaways', assetUrl: 'assets/coins/coin_crystal.svg' },
+        { id: 'event', name: 'Event Coin', usage: 'Creator Campaigns & Events', assetUrl: 'assets/coins/coin_event.svg' }
+    ];
+
+    var _nex2State = {
+        lang: localStorage.getItem('nex4up_lang') || 'EN',
+        activeTab: 'store',
+        rankCat: 'overall',
+        rankTime: 'allTime',
+        commMode: 'feed',
+        feedFilter: 'All',
+        previewFrameId: 'frame_default',
+        data: null,
+        pendingPostImgDataUrl: ''
+    };
+
+    var NEX2_I18N = {
+        EN: {
+            nav_store: 'Store',
+            nav_rankings: 'Rankings',
+            nav_creators: 'Creator Hub',
+            nav_community: 'Community & Find Players',
+            nav_reviews: 'Reviews',
+            nav_devs: 'Developers',
+            promo: '🎬 NEX Creator Challenge: Post your TikTok / Reels / Shorts & win NEX Points, Vouchers & Event Frame!',
+            promoBtn: 'Join Creator Hub →'
+        },
+        BM: {
+            nav_store: 'Kedai',
+            nav_rankings: 'Ranking',
+            nav_creators: 'Hab Pencipta',
+            nav_community: 'Komuniti & Cari Pemain',
+            nav_reviews: 'Ulasan',
+            nav_devs: 'Pembangun',
+            promo: '🎬 Cabaran Pencipta NEX: Kongsi video TikTok / Reels / Shorts & menangi Mata NEX, Baucar & Bingkai Acara!',
+            promoBtn: 'Sertai Hab Pencipta →'
+        }
+    };
+
+    window._nexFrameSvgFallback = function(imgEl, fid) {
+        if (!imgEl || imgEl.dataset.fallbackDone === '1') return;
+        imgEl.dataset.fallbackDone = '1';
+        var colMap = {
+            frame_default: '#38bdf8', frame_premium: '#60a5fa', frame_champion: '#facc15',
+            frame_neon: '#00f5ff', frame_crystal: '#a855f7', frame_event: '#fb923c',
+            frame_esports: '#0ea5e9', frame_galaxy: '#c084fc', frame_malaysia: '#ffcc00', frame_vip: '#f7d875'
+        };
+        var col = colMap[fid] || '#38bdf8';
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">' +
+            '<circle cx="120" cy="120" r="102" stroke="' + col + '" stroke-width="8"/>' +
+            '<circle cx="120" cy="120" r="84" stroke="' + col + '" stroke-width="3"/>' +
+            '</svg>';
+        imgEl.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    };
+
+    window._nexCoinSvgFallback = function(imgEl, cid) {
+        if (!imgEl || imgEl.dataset.fallbackDone === '1') return;
+        imgEl.dataset.fallbackDone = '1';
+        var colMap = { standard: '#38bdf8', gold: '#facc15', premium: '#60a5fa', crystal: '#a855f7', event: '#fb923c' };
+        var col = colMap[cid] || '#f7d875';
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">' +
+            '<circle cx="64" cy="64" r="54" fill="#0b1220" stroke="' + col + '" stroke-width="8"/>' +
+            '<text x="64" y="72" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="24" fill="' + col + '">NEX</text>' +
+            '</svg>';
+        imgEl.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    };
+
+    function get_frame_def(frameId) {
+        var list = (_nex2State.data && _nex2State.data.frameCatalog) || NEX2_FRAMES_DEFAULT;
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].id === frameId) return list[i];
+        }
+        return list[0];
+    }
+
+    function render_framed_avatar_html(opts) {
+        opts = opts || {};
+        var size = parseInt(opts.size, 10) || 56;
+        var frameId = opts.frameId || 'frame_default';
+        var frameDef = get_frame_def(frameId);
+        var name = String(opts.name || 'G').trim();
+        var initial = escapeHtml(name.charAt(0).toUpperCase() || 'G');
+        var avatarUrl = String(opts.avatarUrl || '').trim();
+        var coreHtml = (avatarUrl && (avatarUrl.indexOf('http') === 0 || avatarUrl.indexOf('data:image') === 0))
+            ? '<img src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(name) + '" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + initial + '\';" />'
+            : initial;
+        return '<div class="nex2-framed-avatar" style="width:' + size + 'px;height:' + size + 'px;">' +
+            '<div class="nex2-avatar-core" style="font-size:' + Math.max(12, Math.round(size * 0.28)) + 'px;">' + coreHtml + '</div>' +
+            '<img class="nex2-frame-overlay" src="' + escapeHtml(frameDef.assetUrl) + '" alt="' + escapeHtml(frameDef.name) + '" onerror="window._nexFrameSvgFallback(this,\'' + escapeHtml(frameDef.id) + '\')" />' +
+            '</div>';
+    }
+
+    function apply_nex2_language(lang) {
+        _nex2State.lang = (lang === 'BM') ? 'BM' : 'EN';
+        try { localStorage.setItem('nex4up_lang', _nex2State.lang); } catch (e) {}
+        var lbl = document.getElementById('nex2LangLabel');
+        if (lbl) lbl.textContent = _nex2State.lang;
+        var dict = NEX2_I18N[_nex2State.lang];
+        document.querySelectorAll('[data-i18n]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n');
+            if (dict[key]) el.textContent = dict[key];
+        });
+        var pt = document.getElementById('nex2TopPromoText');
+        var pb = document.getElementById('nex2TopPromoBtn');
+        if (pt) pt.textContent = dict.promo;
+        if (pb) pb.textContent = dict.promoBtn;
+    }
+
+    window._setNex2ActiveNav = function(tabName) {
+        _nex2State.activeTab = tabName || '';
+        document.querySelectorAll('.nex2-nav-btn, .nex2-mobile-nav-item').forEach(function(btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-nex2-tab') === tabName);
+        });
+    };
+
+    function switch_nex2_tab(tabName) {
+        if (tabName === 'store' || !tabName) {
+            showStoreView();
+            return;
+        }
+        _hideAllNex2Views();
+        if (typeof publicView !== 'undefined' && publicView) publicView.style.display = 'none';
+        if (typeof adminSections !== 'undefined' && adminSections) adminSections.style.display = 'none';
+        if (typeof myAccountSection !== 'undefined' && myAccountSection) {
+            myAccountSection.classList.remove('visible');
+            myAccountSection.style.display = 'none';
+        }
+        if (typeof wishlistSection !== 'undefined' && wishlistSection) {
+            wishlistSection.classList.remove('visible');
+            wishlistSection.style.display = 'none';
+        }
+        var agentSec = document.getElementById('agentDashboardSection');
+        if (agentSec) agentSec.style.display = 'none';
+
+        var mapId = {
+            rankings: 'nex2RankingsSection',
+            creators: 'nex2CreatorsSection',
+            community: 'nex2CommunitySection',
+            reviews: 'nex2ReviewsSection',
+            developers: 'nex2DevSection'
+        };
+        var sec = document.getElementById(mapId[tabName]);
+        if (sec) {
+            sec.style.display = 'block';
+            sec.classList.add('active');
+            window._setNex2ActiveNav(tabName);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function render_coins_grid_into(containerId) {
+        var el = document.getElementById(containerId);
+        if (!el) return;
+        var coins = (_nex2State.data && _nex2State.data.coinVariants) || NEX2_COINS_DEFAULT;
+        el.innerHTML = coins.map(function(c) {
+            return '<div class="nex2-coin-card">' +
+                '<img src="' + escapeHtml(c.assetUrl) + '" alt="' + escapeHtml(c.name) + '" onerror="window._nexCoinSvgFallback(this,\'' + escapeHtml(c.id) + '\')" />' +
+                '<strong style="font-size:12px;color:#fff;">' + escapeHtml(c.name) + '</strong>' +
+                '<span style="font-size:10.5px;color:#8aa1c0;">' + escapeHtml(c.usage) + '</span>' +
+                '</div>';
+        }).join('');
+    }
+
+    function render_home_rank_strip() {
+        var grid = document.getElementById('nex2HomeRankGrid');
+        if (!grid) return;
+        var lb = _nex2State.data && _nex2State.data.leaderboards && _nex2State.data.leaderboards.allTime && _nex2State.data.leaderboards.allTime.overall;
+        if (!lb || lb.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;color:#8aa1c0;font-size:12.5px;">Be the first verified Top Supporter this week on NEX4UP! 🏆</div>';
+            return;
+        }
+        grid.innerHTML = lb.slice(0, 5).map(function(entry, idx) {
+            var posCls = idx === 0 ? 'top1' : (idx === 1 ? 'top2' : (idx === 2 ? 'top3' : ''));
+            return '<div class="nex2-rank-mini-card" data-player-email="' + escapeHtml(entry.email || '') + '">' +
+                '<span class="nex2-rank-num ' + posCls + '">#' + (idx + 1) + '</span>' +
+                render_framed_avatar_html({ size: 46, frameId: entry.equippedFrameId, avatarUrl: entry.avatarUrl, name: entry.name }) +
+                '<div style="min-width:0;flex:1;">' +
+                '<div style="font-weight:700;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(entry.name) + '</div>' +
+                '<div style="font-size:11.5px;color:#f7d875;font-weight:700;">RM ' + (parseFloat(entry.totalSpent) || 0).toFixed(2) + '</div>' +
+                '<div style="font-size:10.5px;color:#8aa1c0;">' + (entry.ordersCount || 0) + ' verified order(s)</div>' +
+                '</div></div>';
+        }).join('');
+    }
+
+    function render_nex2_rankings() {
+        var podium = document.getElementById('nex2RankPodium');
+        var tbody = document.getElementById('nex2RankTableBody');
+        if (!podium || !tbody || !_nex2State.data || !_nex2State.data.leaderboards) return;
+
+        var scope = _nex2State.data.leaderboards[_nex2State.rankTime] || _nex2State.data.leaderboards.allTime;
+        var list = (scope && scope[_nex2State.rankCat]) || [];
+        var isCreators = _nex2State.rankCat === 'creators';
+        var isRobux = _nex2State.rankCat === 'robux';
+
+        if (list.length === 0) {
+            podium.innerHTML = '<div class="nex2-panel-card" style="grid-column:1/-1;text-align:center;color:#8aa1c0;">No verified orders or entries recorded in this category yet.</div>';
+            tbody.innerHTML = '';
+            return;
+        }
+
+        podium.innerHTML = list.slice(0, 3).map(function(entry, idx) {
+            var pos = idx + 1;
+            var medal = pos === 1 ? '🥇 #1 Champion' : (pos === 2 ? '🥈 #2 Runner-Up' : '🥉 #3 Podium');
+            var metricText = isCreators
+                ? ((entry.ordersCount || 0) + ' Approved Clips')
+                : (isRobux && entry.robuxTotal > 0 ? (entry.robuxTotal.toLocaleString() + ' Robux • RM ' + (entry.totalSpent || 0).toFixed(2)) : ('RM ' + (entry.totalSpent || 0).toFixed(2)));
+            return '<div class="nex2-podium-card pos' + pos + '" data-player-email="' + escapeHtml(entry.email || '') + '">' +
+                '<div style="font-weight:800;font-size:13px;color:#f7d875;margin-bottom:10px;">' + medal + '</div>' +
+                render_framed_avatar_html({ size: 86, frameId: entry.equippedFrameId, avatarUrl: entry.avatarUrl, name: entry.name }) +
+                '<div style="font-weight:800;font-size:16px;color:#fff;margin-top:10px;">' + escapeHtml(entry.name) + '</div>' +
+                (entry.robloxUsername ? '<div style="font-size:12px;color:#38bdf8;">@' + escapeHtml(entry.robloxUsername) + '</div>' : '') +
+                '<div style="margin-top:8px;font-weight:800;color:#4ade80;font-size:14px;">' + metricText + '</div>' +
+                '<div style="font-size:11.5px;color:#8aa1c0;margin-top:2px;">' + (entry.ordersCount || 0) + ' verified entries</div>' +
+                '</div>';
+        }).join('');
+
+        tbody.innerHTML = list.map(function(entry, idx) {
+            var metric = isCreators
+                ? ((entry.ordersCount || 0) + ' Approved Entries')
+                : (isRobux && entry.robuxTotal > 0 ? (entry.robuxTotal.toLocaleString() + ' R$ (RM ' + (entry.totalSpent || 0).toFixed(2) + ')') : ('RM ' + (entry.totalSpent || 0).toFixed(2)));
+            return '<tr style="border-bottom:1px solid #1a2433;cursor:pointer;" data-player-email="' + escapeHtml(entry.email || '') + '">' +
+                '<td style="padding:10px;font-weight:800;color:#f7d875;">#' + (idx + 1) + '</td>' +
+                '<td style="padding:10px;"><div style="display:flex;align-items:center;gap:10px;">' +
+                render_framed_avatar_html({ size: 42, frameId: entry.equippedFrameId, avatarUrl: entry.avatarUrl, name: entry.name }) +
+                '<span style="font-weight:700;color:#fff;">' + escapeHtml(entry.name) + '</span></div></td>' +
+                '<td style="padding:10px;color:#38bdf8;">' + (entry.robloxUsername ? '@' + escapeHtml(entry.robloxUsername) : '-') + '</td>' +
+                '<td style="padding:10px;color:#cbd5e1;">' + (entry.ordersCount || 0) + '</td>' +
+                '<td style="padding:10px;text-align:right;font-weight:800;color:#4ade80;">' + metric + '</td>' +
+                '</tr>';
+        }).join('');
+    }
+
+    function render_nex2_creators_hub() {
+        render_coins_grid_into('nex2CreatorsCoinsRow');
+        var campsGrid = document.getElementById('nex2CampaignsGrid');
+        var sel = document.getElementById('nex2SubCampaignId');
+        var mySubList = document.getElementById('nex2MySubmissionsList');
+        var showcaseGrid = document.getElementById('nex2CreatorShowcaseGrid');
+        if (!_nex2State.data) return;
+
+        var campaigns = _nex2State.data.campaigns || [];
+        if (campsGrid) {
+            if (campaigns.length === 0) {
+                campsGrid.innerHTML = '<div class="nex2-panel-card">No active campaigns right now. Check back soon!</div>';
+            } else {
+                campsGrid.innerHTML = campaigns.map(function(c) {
+                    var coinAsset = 'assets/coins/coin_' + (c.rewardCoinVariant || 'event') + '.svg';
+                    var rewardLabel = c.rewardType === 'Points' ? (c.rewardValue + ' NEX Points') : (c.rewardType === 'Voucher' ? ('RM ' + c.rewardValue + ' Voucher') : (c.rewardType + ' ' + c.rewardValue));
+                    return '<div class="nex2-panel-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">' +
+                        '<div>' +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">' +
+                        '<span class="nex2-rarity-pill" style="background:rgba(249,115,22,0.18);color:#fb923c;">' + escapeHtml(c.bannerTag || c.platform) + '</span>' +
+                        '<span style="font-size:11px;color:#8aa1c0;">' + escapeHtml(c.platform) + (c.endDate ? ' • Ends ' + escapeHtml(c.endDate) : '') + '</span>' +
+                        '</div>' +
+                        '<h4 style="font-size:16px;color:#fff;margin-bottom:6px;">' + escapeHtml(c.title) + '</h4>' +
+                        '<p style="font-size:12.5px;color:#9bb3d1;line-height:1.5;margin-bottom:8px;">' + escapeHtml(c.description) + '</p>' +
+                        '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:10px;padding:8px 10px;font-size:11.5px;color:#cbd5e1;white-space:pre-line;">' + escapeHtml(c.rules) + '</div>' +
+                        '</div>' +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #1e2a3a;">' +
+                        '<div style="display:flex;align-items:center;gap:8px;">' +
+                        '<img src="' + escapeHtml(coinAsset) + '" alt="Reward Coin" style="width:28px;height:28px;" onerror="window._nexCoinSvgFallback(this,\'' + escapeHtml(c.rewardCoinVariant || 'event') + '\')" />' +
+                        '<span style="font-weight:800;font-size:13px;color:#f7d875;">' + escapeHtml(rewardLabel) + ' + Event Frame</span>' +
+                        '</div>' +
+                        '<button type="button" class="nex2-top-promo-btn" data-pick-camp="' + escapeHtml(c.campaignId) + '">Select</button>' +
+                        '</div></div>';
+                }).join('');
+            }
+        }
+
+        if (sel) {
+            var activeList = campaigns.filter(function(c) { return c.status === 'Active'; });
+            sel.innerHTML = activeList.length
+                ? activeList.map(function(c) { return '<option value="' + escapeHtml(c.campaignId) + '">' + escapeHtml(c.title) + ' (' + escapeHtml(c.platform) + ')</option>'; }).join('')
+                : '<option value="">No active campaigns</option>';
+        }
+
+        if (mySubList) {
+            var subs = (_nex2State.data.myData && _nex2State.data.myData.submissions) || [];
+            if (!customer || !customer.email) {
+                mySubList.innerHTML = '<p style="color:#8aa1c0;font-size:13px;">Please log in to view your submissions &amp; track rewards.</p>';
+            } else if (!customer.sessionToken) {
+                mySubList.innerHTML = '<p style="color:#f7d875;font-size:13px;">Log out and sign back in once with your password to view &amp; submit campaign entries.</p>';
+            } else if (subs.length === 0) {
+                mySubList.innerHTML = '<p style="color:#6a7f9e;font-size:13px;">You have not submitted any creator entries yet.</p>';
+            } else {
+                mySubList.innerHTML = subs.map(function(s) {
+                    var stColor = s.status === 'Approved' ? '#4ade80' : (s.status === 'Rejected' ? '#ff6b6b' : '#f7d875');
+                    return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                        '<div>' +
+                        '<div style="font-weight:700;color:#fff;font-size:13px;">' + escapeHtml(s.submissionId) + ' • ' + escapeHtml(s.platform) + '</div>' +
+                        '<a href="' + escapeHtml(s.videoUrl) + '" target="_blank" rel="noopener noreferrer" style="color:#38bdf8;font-size:12px;word-break:break-all;">' + escapeHtml(s.videoUrl) + '</a>' +
+                        (s.adminFeedback ? '<div style="font-size:11.5px;color:#9bb3d1;margin-top:3px;">Note: ' + escapeHtml(s.adminFeedback) + '</div>' : '') +
+                        '</div>' +
+                        '<span class="nex2-rarity-pill" style="background:rgba(255,255,255,0.08);color:' + stColor + ';">' + escapeHtml(s.status) + ' (' + escapeHtml(s.rewardType + ' ' + s.rewardValue) + ')</span>' +
+                        '</div>';
+                }).join('');
+            }
+        }
+
+        if (showcaseGrid) {
+            var sc = _nex2State.data.creatorShowcase || [];
+            showcaseGrid.innerHTML = sc.length ? sc.map(function(item) {
+                return '<div class="nex2-panel-card" style="display:flex;align-items:center;gap:12px;">' +
+                    render_framed_avatar_html({ size: 58, frameId: item.equippedFrameId, avatarUrl: item.avatarUrl, name: item.creatorName }) +
+                    '<div style="min-width:0;flex:1;">' +
+                    '<div style="font-weight:800;color:#fff;font-size:14px;">' + escapeHtml(item.creatorName) + '</div>' +
+                    '<div style="font-size:12px;color:#fb923c;">' + escapeHtml(item.platform) + ' • ' + escapeHtml(item.rewardType + ' ' + item.rewardValue) + '</div>' +
+                    '<a href="' + escapeHtml(item.videoUrl) + '" target="_blank" rel="noopener noreferrer" style="font-size:12px;color:#38bdf8;display:inline-block;margin-top:4px;">Watch Clip &rarr;</a>' +
+                    '</div></div>';
+            }).join('') : '<div class="nex2-panel-card" style="color:#6a7f9e;">Approved creator highlights will appear here!</div>';
+        }
+    }
+
+    function render_nex2_community_hub() {
+        var feedList = document.getElementById('nex2PostsFeedList');
+        var playersGrid = document.getElementById('nex2FindPlayersGrid');
+        if (!_nex2State.data) return;
+
+        var myData = _nex2State.data.myData || {};
+        var likedIds = myData.likedPostIds || [];
+        var following = myData.followingEmails || [];
+        var blocked = myData.blockedEmails || [];
+
+        if (feedList) {
+            var posts = (_nex2State.data.posts || []).filter(function(p) {
+                if (blocked.indexOf(p.authorEmail) !== -1) return false;
+                if (_nex2State.feedFilter === 'Following') return following.indexOf(p.authorEmail) !== -1;
+                if (_nex2State.feedFilter !== 'All') return (p.gameTag || '').toLowerCase() === _nex2State.feedFilter.toLowerCase();
+                return true;
+            });
+
+            if (posts.length === 0) {
+                feedList.innerHTML = '<div class="nex2-panel-card" style="text-align:center;color:#8aa1c0;">No community posts in this filter yet. Be the first to post!</div>';
+            } else {
+                feedList.innerHTML = posts.map(function(p) {
+                    var isLiked = likedIds.indexOf(p.postId) !== -1;
+                    var isFollowing = following.indexOf(p.authorEmail) !== -1;
+                    var isSelf = customer && customer.email && customer.email.toLowerCase() === p.authorEmail;
+                    var commentsHtml = (p.comments || []).map(function(cm) {
+                        return '<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(30,42,58,0.6);">' +
+                            render_framed_avatar_html({ size: 32, frameId: cm.equippedFrameId, avatarUrl: cm.avatarUrl, name: cm.authorName }) +
+                            '<div style="font-size:12.5px;"><strong style="color:#fff;">' + escapeHtml(cm.authorName) + '</strong> <span style="color:#6a7f9e;font-size:11px;">' + escapeHtml(cm.createdAt) + '</span><div style="color:#cbd5e1;">' + escapeHtml(cm.content) + '</div></div></div>';
+                    }).join('');
+
+                    return '<div class="nex2-comm-post-card">' +
+                        '<div class="nex2-comm-post-head">' +
+                        '<div style="display:flex;align-items:center;gap:11px;cursor:pointer;" data-player-email="' + escapeHtml(p.authorEmail) + '">' +
+                        render_framed_avatar_html({ size: 48, frameId: p.equippedFrameId, avatarUrl: p.avatarUrl, name: p.authorName }) +
+                        '<div>' +
+                        '<div style="font-weight:800;color:#fff;font-size:14px;">' + escapeHtml(p.authorName) + (p.pinned ? ' <span class="nex2-rarity-pill" style="background:rgba(247,216,117,0.2);color:#f7d875;">PINNED</span>' : '') + '</div>' +
+                        '<div style="font-size:11.5px;color:#8aa1c0;">' + (p.robloxUsername ? '@' + escapeHtml(p.robloxUsername) + ' • ' : '') + escapeHtml(p.gameTag) + ' • ' + escapeHtml(p.createdAt) + '</div>' +
+                        '</div></div>' +
+                        (!isSelf ? '<button type="button" class="nex2-comm-action-btn" data-follow-email="' + escapeHtml(p.authorEmail) + '">' + (isFollowing ? '✓ Following' : '+ Follow') + '</button>' : '') +
+                        '</div>' +
+                        '<div style="font-size:13.5px;color:#e2e8f0;line-height:1.55;white-space:pre-line;">' + escapeHtml(p.content) + '</div>' +
+                        (p.imageUrl ? '<img class="nex2-comm-post-img" src="' + escapeHtml(p.imageUrl) + '" alt="Post screenshot" loading="lazy" />' : '') +
+                        '<div class="nex2-comm-actions">' +
+                        '<button type="button" class="nex2-comm-action-btn ' + (isLiked ? 'liked' : '') + '" data-like-post="' + escapeHtml(p.postId) + '">❤️ ' + (p.likesCount || 0) + '</button>' +
+                        '<button type="button" class="nex2-comm-action-btn" data-toggle-comments="' + escapeHtml(p.postId) + '">💬 ' + (p.commentsCount || 0) + ' Comments</button>' +
+                        (!isSelf ? '<button type="button" class="nex2-comm-action-btn" data-report-post="' + escapeHtml(p.postId) + '" title="Report abusive post">🚩 Report</button>' : '') +
+                        '</div>' +
+                        '<div id="nex2CommentsWrap_' + escapeHtml(p.postId) + '" style="display:none;margin-top:10px;background:#0b0e14;border-radius:12px;padding:10px 12px;">' +
+                        commentsHtml +
+                        '<div style="display:flex;gap:8px;margin-top:8px;">' +
+                        '<input type="text" id="nex2CmtInput_' + escapeHtml(p.postId) + '" placeholder="Write a friendly comment..." style="flex:1;padding:8px 10px;border-radius:10px;background:#121821;border:1px solid #1e2a3a;color:#fff;font-size:12.5px;" />' +
+                        '<button type="button" class="nex2-top-promo-btn" data-send-comment="' + escapeHtml(p.postId) + '">Send</button>' +
+                        '</div></div>' +
+                        '</div>';
+                }).join('');
+            }
+        }
+
+        if (playersGrid) {
+            var gameFilter = (document.getElementById('nex2FindGameSelect') && document.getElementById('nex2FindGameSelect').value) || 'All';
+            var styleFilter = (document.getElementById('nex2FindStyleSelect') && document.getElementById('nex2FindStyleSelect').value) || 'All';
+            var q = ((document.getElementById('nex2FindSearchInput') && document.getElementById('nex2FindSearchInput').value) || '').trim().toLowerCase();
+
+            var players = (_nex2State.data.players || []).filter(function(pl) {
+                if (blocked.indexOf(pl.email) !== -1) return false;
+                if (gameFilter !== 'All' && (pl.favoriteGames || []).indexOf(gameFilter) === -1) return false;
+                if (styleFilter !== 'All' && pl.playstyle !== styleFilter) return false;
+                if (q) {
+                    var hay = (pl.displayName + ' ' + pl.robloxUsername + ' ' + pl.instagramHandle + ' ' + pl.tiktokHandle).toLowerCase();
+                    if (hay.indexOf(q) === -1) return false;
+                }
+                return true;
+            });
+
+            playersGrid.innerHTML = players.length ? players.map(function(pl) {
+                var isFlw = following.indexOf(pl.email) !== -1;
+                var isMe = customer && customer.email && customer.email.toLowerCase() === pl.email;
+                var gamesHtml = (pl.favoriteGames || []).slice(0, 4).map(function(g) {
+                    return '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.14);color:#38bdf8;">' + escapeHtml(g) + '</span>';
+                }).join(' ');
+                return '<div class="nex2-panel-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:10px;">' +
+                    '<div style="display:flex;align-items:center;gap:12px;">' +
+                    render_framed_avatar_html({ size: 62, frameId: pl.equippedFrameId, avatarUrl: pl.avatarUrl, name: pl.displayName }) +
+                    '<div style="min-width:0;flex:1;">' +
+                    '<div style="font-weight:800;color:#fff;font-size:15px;">' + escapeHtml(pl.displayName) + '</div>' +
+                    (pl.robloxUsername ? '<div style="font-size:12px;color:#38bdf8;">Roblox: @' + escapeHtml(pl.robloxUsername) + '</div>' : '') +
+                    '<div style="font-size:11px;color:#f7d875;">' + escapeHtml(pl.playstyle || 'Casual') + '</div>' +
+                    '</div></div>' +
+                    (pl.bio ? '<p style="font-size:12.5px;color:#9bb3d1;">' + escapeHtml(pl.bio) + '</p>' : '') +
+                    '<div style="display:flex;gap:5px;flex-wrap:wrap;">' + (gamesHtml || '<span style="font-size:11px;color:#6a7f9e;">Malaysian Gamer</span>') + '</div>' +
+                    '<div style="display:flex;gap:8px;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid #1e2a3a;">' +
+                    '<button type="button" class="nex2-comm-action-btn" data-player-email="' + escapeHtml(pl.email) + '">View Profile</button>' +
+                    (!isMe ? '<button type="button" class="nex2-top-promo-btn" data-follow-email="' + escapeHtml(pl.email) + '">' + (isFlw ? '✓ Following' : '+ Follow') + '</button>' : '<span style="font-size:11px;color:#4ade80;">You</span>') +
+                    '</div></div>';
+            }).join('') : '<div class="nex2-panel-card" style="grid-column:1/-1;text-align:center;color:#8aa1c0;">No matching public players found yet. Edit your Gamer Profile in My Account to appear here!</div>';
+        }
+    }
+
+    function render_nex2_reviews_wall() {
+        var wall = _nex2State.data && _nex2State.data.reviewsWall;
+        if (!wall) return;
+        var sum = wall.summary || { avgRating: 5.0, totalReviews: 0, distribution: {} };
+        var avgEl = document.getElementById('nex2RevAvgScore');
+        var cntEl = document.getElementById('nex2RevTotalCount');
+        var barsEl = document.getElementById('nex2RevDistBars');
+        var gridEl = document.getElementById('nex2ReviewsWallGrid');
+
+        if (avgEl) avgEl.textContent = (sum.avgRating || 5.0).toFixed(1) + ' ★';
+        if (cntEl) cntEl.textContent = (sum.totalReviews || 0) + ' Verified Customer Reviews';
+        if (barsEl) {
+            var total = Math.max(1, sum.totalReviews || 0);
+            barsEl.innerHTML = [5, 4, 3, 2, 1].map(function(star) {
+                var c = (sum.distribution && sum.distribution[star]) || 0;
+                var pct = Math.round((c / total) * 100);
+                return '<div style="display:flex;align-items:center;gap:8px;font-size:11.5px;margin-bottom:4px;">' +
+                    '<span style="width:28px;color:#f7d875;">' + star + '★</span>' +
+                    '<div style="flex:1;height:6px;background:#0b0e14;border-radius:99px;overflow:hidden;"><div style="width:' + pct + '%;height:100%;background:#4ade80;"></div></div>' +
+                    '<span style="width:26px;text-align:right;color:#8aa1c0;">' + c + '</span>' +
+                    '</div>';
+            }).join('');
+        }
+        if (gridEl) {
+            var list = wall.reviews || [];
+            gridEl.innerHTML = list.length ? list.map(function(r) {
+                var stars = '★★★★★'.slice(0, r.rating || 5);
+                return '<div class="nex2-panel-card">' +
+                    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+                    render_framed_avatar_html({ size: 46, frameId: r.equippedFrameId, avatarUrl: r.avatarUrl, name: r.customerName }) +
+                    '<div>' +
+                    '<div style="font-weight:700;color:#fff;font-size:13.5px;">' + escapeHtml(r.customerName) + ' <span style="color:#4ade80;font-size:11px;">✓ Verified</span></div>' +
+                    '<div style="font-size:11.5px;color:#f7d875;">' + stars + ' <span style="color:#8aa1c0;">• ' + escapeHtml(r.gameTitle) + '</span></div>' +
+                    '</div></div>' +
+                    '<p style="font-size:13px;color:#cbd5e1;line-height:1.5;">' + escapeHtml(r.reviewText) + '</p>' +
+                    '<div style="font-size:11px;color:#6a7f9e;margin-top:8px;">' + escapeHtml(r.date) + '</div>' +
+                    '</div>';
+            }).join('') : '<div class="nex2-panel-card" style="grid-column:1/-1;text-align:center;color:#8aa1c0;">No customer reviews yet — leave your review after receiving an order to earn bonus NEX Points!</div>';
+        }
+    }
+
+    function render_nex2_dev_team() {
+        var grid = document.getElementById('nex2DevTeamGrid');
+        if (!grid || !_nex2State.data) return;
+        var devs = _nex2State.data.devTeam || [];
+        grid.innerHTML = devs.map(function(d, i) {
+            var fid = i === 0 ? 'frame_vip' : 'frame_esports';
+            return '<div class="nex2-panel-card" style="text-align:center;">' +
+                render_framed_avatar_html({ size: 96, frameId: fid, avatarUrl: d.avatarUrl, name: d.displayName }) +
+                '<div style="margin-top:10px;"><span class="nex2-rarity-pill" style="background:rgba(192,132,252,0.2);color:#c084fc;">' + escapeHtml(d.badge || 'DEV') + '</span></div>' +
+                '<h3 style="margin-top:8px;font-size:17px;color:#fff;">' + escapeHtml(d.displayName) + '</h3>' +
+                '<div style="font-size:12.5px;color:#38bdf8;font-weight:700;">' + escapeHtml(d.role) + '</div>' +
+                (d.robloxUsername ? '<div style="font-size:12px;color:#f7d875;margin-top:3px;">Roblox: @' + escapeHtml(d.robloxUsername) + '</div>' : '') +
+                (d.bio ? '<p style="font-size:12.5px;color:#9bb3d1;margin-top:8px;line-height:1.5;">' + escapeHtml(d.bio) + '</p>' : '') +
+                (d.contributions ? '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:10px;padding:8px 10px;margin-top:10px;font-size:11.5px;color:#cbd5e1;"><strong style="color:#f7d875;">Contributions:</strong> ' + escapeHtml(d.contributions) + '</div>' : '') +
+                '</div>';
+        }).join('');
+    }
+
+    function render_nex2_frame_studio() {
+        render_coins_grid_into('nex2MyAccountCoinsRow');
+        if (!customer) return;
+
+        var owned = Array.isArray(customer.unlockedFrames) ? customer.unlockedFrames : ['frame_default'];
+        if (owned.indexOf('frame_default') === -1) owned.unshift('frame_default');
+        var equipped = customer.equippedFrameId || 'frame_default';
+        if (!_nex2State.previewFrameId) _nex2State.previewFrameId = equipped;
+
+        var overlayEl = document.getElementById('myAccountFrameOverlay');
+        var equippedDef = get_frame_def(equipped);
+        if (overlayEl) {
+            overlayEl.dataset.fallbackDone = '';
+            overlayEl.src = equippedDef.assetUrl;
+            overlayEl.onerror = function() { window._nexFrameSvgFallback(overlayEl, equippedDef.id); };
+        }
+
+        var countEl = document.getElementById('nex2OwnedFramesCount');
+        if (countEl) countEl.textContent = owned.length + ' / 10 Unlocked';
+
+        var badgesRow = document.getElementById('nex2ProfileBadgesRow');
+        if (badgesRow) {
+            var bdg = Array.isArray(customer.badges) ? customer.badges : [];
+            badgesRow.innerHTML = bdg.map(function(b) {
+                return '<span class="nex2-rarity-pill" style="background:rgba(247,216,117,0.16);color:#f7d875;">🏅 ' + escapeHtml(b) + '</span>';
+            }).join('');
+        }
+        var socialsRow = document.getElementById('nex2ProfileSocialsRow');
+        if (socialsRow) {
+            var links = [];
+            if (customer.instagramHandle) links.push('<span style="color:#f472b6;">📸 IG: @' + escapeHtml(customer.instagramHandle) + '</span>');
+            if (customer.tiktokHandle) links.push('<span style="color:#38bdf8;">🎵 TikTok: @' + escapeHtml(customer.tiktokHandle) + '</span>');
+            if (customer.youtubeHandle) links.push('<span style="color:#ff6b6b;">▶ YT: ' + escapeHtml(customer.youtubeHandle) + '</span>');
+            socialsRow.innerHTML = links.join(' ');
+        }
+        var rbxRowVal = document.getElementById('nex2ProfileRobloxVal');
+        if (rbxRowVal) {
+            rbxRowVal.textContent = customer.robloxUsername ? ('@' + customer.robloxUsername) : 'Not linked yet (Click Edit Gamer Profile)';
+        }
+
+        // Populate preview stage
+        var selDef = get_frame_def(_nex2State.previewFrameId);
+        var isUnlocked = owned.indexOf(selDef.id) !== -1;
+        var isEquipped = equipped === selDef.id;
+        var effAvatar = (customer.avatarMode === 'roblox' && customer.robloxAvatarUrl) ? customer.robloxAvatarUrl : (customer.profileImage || customer.robloxAvatarUrl || '');
+
+        var pBox = document.getElementById('nex2FramePreviewBox');
+        if (pBox) pBox.innerHTML = render_framed_avatar_html({ size: 112, frameId: selDef.id, avatarUrl: effAvatar, name: customer.name });
+        var pTitle = document.getElementById('nex2FramePreviewTitle');
+        if (pTitle) pTitle.textContent = selDef.name;
+        var pRarity = document.getElementById('nex2FramePreviewRarity');
+        if (pRarity) {
+            pRarity.textContent = selDef.rarity;
+            pRarity.style.background = 'rgba(255,255,255,0.08)';
+            pRarity.style.color = selDef.rarityColor || '#38bdf8';
+        }
+        var pReq = document.getElementById('nex2FramePreviewReq');
+        if (pReq) pReq.textContent = selDef.requirement;
+
+        var actBtn = document.getElementById('nex2FrameActionBtn');
+        if (actBtn) {
+            if (isEquipped) {
+                actBtn.textContent = '✓ Currently Equipped';
+                actBtn.disabled = true;
+            } else if (isUnlocked) {
+                actBtn.textContent = 'Equip This Frame';
+                actBtn.disabled = false;
+            } else if (selDef.costPoints > 0) {
+                actBtn.textContent = '🪙 Redeem with ' + selDef.costPoints + ' NEX Points';
+                actBtn.disabled = false;
+            } else {
+                actBtn.textContent = '🔒 Locked (' + selDef.rarity + ' Requirement)';
+                actBtn.disabled = true;
+            }
+        }
+
+        // Render all 10 frames
+        var grid = document.getElementById('nex2FramesGrid');
+        if (!grid) return;
+        var allFrames = (_nex2State.data && _nex2State.data.frameCatalog) || NEX2_FRAMES_DEFAULT;
+        grid.innerHTML = allFrames.map(function(fr) {
+            var unl = owned.indexOf(fr.id) !== -1;
+            var eq = equipped === fr.id;
+            var sel = _nex2State.previewFrameId === fr.id;
+            return '<div class="nex2-frame-item ' + (sel ? 'selected' : '') + ' ' + (!unl ? 'locked' : '') + '" data-select-frame="' + escapeHtml(fr.id) + '">' +
+                render_framed_avatar_html({ size: 78, frameId: fr.id, avatarUrl: effAvatar, name: customer.name }) +
+                '<div style="font-weight:700;font-size:13px;color:#fff;margin-top:8px;">' + escapeHtml(fr.name) + '</div>' +
+                '<span class="nex2-rarity-pill" style="background:rgba(255,255,255,0.07);color:' + (fr.rarityColor || '#38bdf8') + ';margin:4px 0;">' + escapeHtml(fr.rarity) + '</span>' +
+                '<div style="font-size:11px;color:' + (eq ? '#4ade80' : (unl ? '#38bdf8' : '#8aa1c0')) + ';font-weight:700;">' +
+                (eq ? '✓ Equipped' : (unl ? 'Unlocked' : (fr.costPoints > 0 ? ('🪙 ' + fr.costPoints + ' Pts') : '🔒 Milestone'))) +
+                '</div></div>';
+        }).join('');
+    }
+
+    function render_nex2_notifications() {
+        var listEl = document.getElementById('nex2NotifList');
+        var badge = document.getElementById('nex2NotifBadge');
+        var notifs = (_nex2State.data && _nex2State.data.myData && _nex2State.data.myData.notifications) || [];
+        var unread = notifs.filter(function(n) { return !n.read; }).length;
+        if (badge) {
+            badge.textContent = unread;
+            badge.style.display = unread > 0 ? 'inline-flex' : 'none';
+        }
+        if (listEl) {
+            listEl.innerHTML = notifs.length ? notifs.map(function(n) {
+                return '<div class="nex2-notif-item ' + (!n.read ? 'unread' : '') + '" data-notif-tab="' + escapeHtml(n.targetTab || 'account') + '">' +
+                    '<div style="font-weight:700;color:#fff;">' + escapeHtml(n.title) + '</div>' +
+                    '<div style="color:#9bb3d1;font-size:11.5px;margin-top:2px;">' + escapeHtml(n.message) + '</div>' +
+                    '<div style="color:#6a7f9e;font-size:10px;margin-top:4px;">' + escapeHtml(n.createdAt) + '</div>' +
+                    '</div>';
+            }).join('') : '<div style="padding:18px;text-align:center;color:#6a7f9e;font-size:12.5px;">No notifications yet.</div>';
+        }
+    }
+
+    function sync_profile_form_fields() {
+        if (!customer) return;
+        var setVal = function(id, v) { var e = document.getElementById(id); if (e) e.value = v || ''; };
+        setVal('editRobloxUsername', customer.robloxUsername || '');
+        setVal('editRobloxUserId', customer.robloxUserId || '');
+        setVal('editRobloxAvatarUrl', customer.robloxAvatarUrl || '');
+        setVal('editAvatarMode', customer.avatarMode || 'custom');
+        setVal('editIgHandle', customer.instagramHandle || '');
+        setVal('editTtHandle', customer.tiktokHandle || '');
+        setVal('editYtHandle', customer.youtubeHandle || '');
+        setVal('editPlaystyle', customer.playstyle || 'Casual');
+        setVal('editGamerBio', customer.bio || '');
+        var pubChk = document.getElementById('editPublicProfile');
+        if (pubChk) pubChk.checked = customer.publicProfile !== false;
+        var favs = Array.isArray(customer.favoriteGames) ? customer.favoriteGames : [];
+        document.querySelectorAll('#editFavGamesWrap input[type="checkbox"]').forEach(function(cb) {
+            cb.checked = favs.indexOf(cb.value) !== -1;
+        });
+    }
+
+    window.nex2_save_gamer_profile = function(doneCb) {
+        if (!customer || !customer.email) { if (doneCb) doneCb(); return; }
+        if (!customer.sessionToken) {
+            showToast('Basic info updated! Log out & sign in once to unlock Gamer Profile saving.');
+            if (doneCb) doneCb();
+            return;
+        }
+        var favGames = [];
+        document.querySelectorAll('#editFavGamesWrap input[type="checkbox"]:checked').forEach(function(cb) {
+            favGames.push(cb.value);
+        });
+        var payload = {
+            robloxUsername: (document.getElementById('editRobloxUsername') && document.getElementById('editRobloxUsername').value) || '',
+            robloxUserId: (document.getElementById('editRobloxUserId') && document.getElementById('editRobloxUserId').value) || '',
+            robloxAvatarUrl: (document.getElementById('editRobloxAvatarUrl') && document.getElementById('editRobloxAvatarUrl').value) || '',
+            avatarMode: (document.getElementById('editAvatarMode') && document.getElementById('editAvatarMode').value) || 'custom',
+            instagramHandle: (document.getElementById('editIgHandle') && document.getElementById('editIgHandle').value) || '',
+            tiktokHandle: (document.getElementById('editTtHandle') && document.getElementById('editTtHandle').value) || '',
+            youtubeHandle: (document.getElementById('editYtHandle') && document.getElementById('editYtHandle').value) || '',
+            playstyle: (document.getElementById('editPlaystyle') && document.getElementById('editPlaystyle').value) || 'Casual',
+            bio: (document.getElementById('editGamerBio') && document.getElementById('editGamerBio').value) || '',
+            favoriteGames: favGames,
+            publicProfile: !(document.getElementById('editPublicProfile') && document.getElementById('editPublicProfile').checked === false)
+        };
+        google.script.run
+            .withSuccessHandler(function(res) {
+                if (res && res.success && res.customer) {
+                    res.customer.sessionToken = customer.sessionToken;
+                    customer = Object.assign({}, customer, res.customer);
+                    try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
+                    loadNex4Up2Bootstrap();
+                }
+                if (doneCb) doneCb();
+            })
+            .withFailureHandler(function() { if (doneCb) doneCb(); })
+            .updateGamerProfile(customer.email, payload, customer.sessionToken);
+    };
+
+    window.loadNex4Up2Bootstrap = function() {
+        var em = (customer && customer.email) || '';
+        var tok = (customer && customer.sessionToken) || '';
+        google.script.run
+            .withSuccessHandler(function(res) {
+                if (!res || res.success === false) return;
+                _nex2State.data = res;
+                if (res.myData && res.myData.profile && customer) {
+                    var tokKeep = customer.sessionToken;
+                    customer = Object.assign({}, customer, res.myData.profile);
+                    if (tokKeep) customer.sessionToken = tokKeep;
+                    try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
+                }
+                render_home_rank_strip();
+                render_nex2_rankings();
+                render_nex2_creators_hub();
+                render_nex2_community_hub();
+                render_nex2_reviews_wall();
+                render_nex2_dev_team();
+                render_nex2_notifications();
+                render_nex2_frame_studio();
+                sync_profile_form_fields();
+            })
+            .withFailureHandler(function(err) {
+                console.warn('NEX4UP 2.0 bootstrap pending deploy or offline:', err && err.message);
+                render_coins_grid_into('nex2MyAccountCoinsRow');
+                render_coins_grid_into('nex2CreatorsCoinsRow');
+            })
+            .getNex4Up2Bootstrap(em, tok);
+    };
+
+    // Hook My Account loading so framed avatar & studio update seamlessly
+    var _preNex2LoadMyAccount = loadMyAccount;
+    loadMyAccount = function() {
+        _preNex2LoadMyAccount();
+        if (customer) {
+            var effImg = (customer.avatarMode === 'roblox' && customer.robloxAvatarUrl) ? customer.robloxAvatarUrl : customer.profileImage;
+            if (effImg && (effImg.indexOf('http') === 0 || effImg.indexOf('data:image') === 0)) {
+                profileAvatar.src = effImg;
+                profileAvatar.style.display = 'block';
+                profileAvatarPlaceholder.style.display = 'none';
+            }
+            _nex2State.previewFrameId = customer.equippedFrameId || 'frame_default';
+        }
+        render_nex2_frame_studio();
+        sync_profile_form_fields();
+    };
+
+    function open_player_modal(email) {
+        if (!email || !_nex2State.data) return;
+        var pls = _nex2State.data.players || [];
+        var pl = pls.find(function(x) { return x.email === email; });
+        var modal = document.getElementById('nex2PlayerModalOverlay');
+        var body = document.getElementById('nex2PlayerModalBody');
+        if (!modal || !body) return;
+        if (!pl) {
+            showToast('This player has set their profile to leaderboard-only privacy mode.');
+            return;
+        }
+        var myData = _nex2State.data.myData || {};
+        var isFlw = (myData.followingEmails || []).indexOf(pl.email) !== -1;
+        var isMe = customer && customer.email && customer.email.toLowerCase() === pl.email;
+        body.innerHTML =
+            render_framed_avatar_html({ size: 108, frameId: pl.equippedFrameId, avatarUrl: pl.avatarUrl, name: pl.displayName }) +
+            '<h3 style="margin-top:10px;color:#fff;font-size:20px;">' + escapeHtml(pl.displayName) + '</h3>' +
+            (pl.robloxUsername ? '<div style="color:#38bdf8;font-size:13px;font-weight:700;margin-top:3px;">Roblox: @' + escapeHtml(pl.robloxUsername) + '</div>' : '') +
+            '<div style="font-size:12px;color:#f7d875;margin-top:4px;">' + escapeHtml(pl.playstyle || 'Casual Gamer') + '</div>' +
+            (pl.bio ? '<p style="font-size:13px;color:#cbd5e1;margin:12px 0;">' + escapeHtml(pl.bio) + '</p>' : '') +
+            '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:10px 0;font-size:12px;">' +
+            (pl.instagramHandle ? '<span style="color:#f472b6;">📸 @' + escapeHtml(pl.instagramHandle) + '</span>' : '') +
+            (pl.tiktokHandle ? '<span style="color:#38bdf8;">🎵 @' + escapeHtml(pl.tiktokHandle) + '</span>' : '') +
+            (pl.youtubeHandle ? '<span style="color:#ff6b6b;">▶ ' + escapeHtml(pl.youtubeHandle) + '</span>' : '') +
+            '</div>' +
+            '<div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:14px;">' +
+            (pl.favoriteGames || []).map(function(g) { return '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">' + escapeHtml(g) + '</span>'; }).join('') +
+            '</div>' +
+            (!isMe ? '<div style="display:flex;justify-content:center;gap:10px;">' +
+                '<button type="button" class="submit-btn" data-follow-email="' + escapeHtml(pl.email) + '">' + (isFlw ? '✓ Following' : '+ Follow Gamer') + '</button>' +
+                '<button type="button" class="cancel-btn" id="nex2BlockPlayerBtn" data-block-email="' + escapeHtml(pl.email) + '" style="padding:10px 14px;border-radius:10px;">Block User</button>' +
+            '</div>' : '');
+        modal.classList.add('open');
+    }
+
+    // ---------- Admin Panel Loader for NEX4UP 2.0 ----------
+    window.loadNex4Up2AdminDashboard = function() {
+        var pwd = window._nexAdminPwdSession || '';
+        if (!pwd) return;
+        google.script.run
+            .withSuccessHandler(function(res) {
+                if (!res || !res.success) return;
+                // 1. Campaigns List
+                var cList = document.getElementById('nex2AdminCampaignsList');
+                if (cList) {
+                    cList.innerHTML = (res.campaigns || []).map(function(c) {
+                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                            '<div><strong style="color:#fff;">' + escapeHtml(String(c[1])) + '</strong> <span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">' + escapeHtml(String(c[10])) + '</span>' +
+                            '<div style="font-size:12px;color:#8aa1c0;">' + escapeHtml(String(c[2])) + ' • Reward: ' + escapeHtml(String(c[5]) + ' ' + String(c[6])) + ' • Ends: ' + escapeHtml(String(c[9])) + '</div></div>' +
+                            '<button type="button" class="nex2-top-promo-btn" data-edit-camp="' + escapeHtml(String(c[0])) + '">Edit</button>' +
+                            '</div>';
+                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No campaigns.</p>';
+                    window._nex2AdminCampsCache = res.campaigns || [];
+                }
+
+                // 2. Submissions Queue
+                var sList = document.getElementById('nex2AdminSubmissionsList');
+                if (sList) {
+                    sList.innerHTML = (res.submissions || []).map(function(s) {
+                        var sid = String(s[0]);
+                        var st = String(s[8] || 'Pending');
+                        var stCol = st === 'Approved' ? '#4ade80' : (st === 'Rejected' ? '#ff6b6b' : '#f7d875');
+                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                            '<div><strong style="color:#fff;">' + escapeHtml(sid) + '</strong> — ' + escapeHtml(String(s[3] || s[2])) + ' (' + escapeHtml(String(s[4])) + ') ' +
+                            '<span class="nex2-rarity-pill" style="background:rgba(255,255,255,0.07);color:' + stCol + ';">' + escapeHtml(st) + '</span>' +
+                            '<div style="font-size:12px;margin-top:3px;"><a href="' + escapeHtml(String(s[5])) + '" target="_blank" style="color:#38bdf8;">🔗 Open Video</a> • Reward: ' + escapeHtml(String(s[9]) + ' ' + String(s[10])) + '</div></div>' +
+                            (st === 'Pending' ? '<div style="display:flex;gap:8px;"><button type="button" class="submit-btn" style="padding:7px 12px;font-size:12px;" data-review-sub="' + escapeHtml(sid) + '" data-decision="Approved">✅ Approve &amp; Reward</button><button type="button" class="cancel-btn" style="padding:7px 12px;font-size:12px;border-radius:10px;" data-review-sub="' + escapeHtml(sid) + '" data-decision="Rejected">❌ Reject</button></div>' : '<span style="font-size:11.5px;color:#8aa1c0;">Ref: ' + escapeHtml(String(s[11] || '-')) + '</span>') +
+                            '</div>';
+                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No creator submissions yet.</p>';
+                }
+
+                // 3. Reports Queue
+                var rList = document.getElementById('nex2AdminReportsList');
+                if (rList) {
+                    rList.innerHTML = (res.interactions || []).map(function(rep) {
+                        return '<div style="background:#0b0e14;border:1px solid #3f1d28;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+                            '<div><strong style="color:#ff6b6b;">Report ' + escapeHtml(String(rep[0])) + '</strong> on <code>' + escapeHtml(String(rep[2])) + '</code> by ' + escapeHtml(String(rep[3])) + '<div style="font-size:12px;color:#cbd5e1;">' + escapeHtml(String(rep[5])) + '</div></div>' +
+                            '<button type="button" class="nex2-comm-action-btn" data-mod-action="dismissReport" data-mod-target="' + escapeHtml(String(rep[0])) + '">Dismiss</button>' +
+                            '</div>';
+                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No open reports.</p>';
+                }
+
+                // 4. Community Posts
+                var pList = document.getElementById('nex2AdminPostsList');
+                if (pList) {
+                    pList.innerHTML = (res.posts || []).map(function(p) {
+                        var pid = String(p[0]);
+                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;">' +
+                            '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+                            '<strong style="color:#fff;">' + escapeHtml(String(p[2])) + ' (' + escapeHtml(String(p[3])) + ')</strong>' +
+                            '<span style="font-size:11.5px;color:#8aa1c0;">' + escapeHtml(String(p[8])) + ' • Pinned: ' + escapeHtml(String(p[9])) + '</span>' +
+                            '</div>' +
+                            '<p style="font-size:12.5px;color:#cbd5e1;margin:6px 0;">' + escapeHtml(String(p[4])) + '</p>' +
+                            '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+                            '<button type="button" class="nex2-comm-action-btn" data-mod-action="' + (String(p[9]) === 'Yes' ? 'unpin' : 'pin') + '" data-mod-target="' + escapeHtml(pid) + '">' + (String(p[9]) === 'Yes' ? 'Unpin' : '📌 Pin') + '</button>' +
+                            '<button type="button" class="nex2-comm-action-btn" data-mod-action="' + (String(p[8]) === 'Hidden' ? 'approve' : 'hide') + '" data-mod-target="' + escapeHtml(pid) + '">' + (String(p[8]) === 'Hidden' ? 'Show' : 'Hide') + '</button>' +
+                            '<button type="button" class="nex2-comm-action-btn" data-mod-action="delete" data-mod-target="' + escapeHtml(pid) + '" style="color:#ff6b6b;">Delete</button>' +
+                            '</div></div>';
+                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No posts.</p>';
+                }
+
+                // 5. Dev Team Admin List
+                var dList = document.getElementById('nex2AdminDevList');
+                if (dList) {
+                    dList.innerHTML = (res.devTeam || []).map(function(d) {
+                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+                            '<div><strong style="color:#fff;">' + escapeHtml(String(d[1])) + '</strong> (@' + escapeHtml(String(d[2])) + ') — <span style="color:#38bdf8;">' + escapeHtml(String(d[3])) + '</span></div>' +
+                            '<div style="display:flex;gap:6px;"><button type="button" class="nex2-comm-action-btn" data-edit-dev="' + escapeHtml(String(d[0])) + '">Edit</button><button type="button" class="nex2-comm-action-btn" style="color:#ff6b6b;" data-del-dev="' + escapeHtml(String(d[0])) + '">Remove</button></div></div>';
+                    }).join('');
+                    window._nex2AdminDevsCache = res.devTeam || [];
+                }
+
+                // 6. Supabase Status
+                var sbBadge = document.getElementById('nex2SupabaseStatusBadge');
+                if (sbBadge && res.supabase) {
+                    sbBadge.textContent = res.supabase.hasSecretKey ? '✅ Secret Key Configured in GAS' : '⚠️ Secret Key Not Set Yet';
+                    sbBadge.style.color = res.supabase.hasSecretKey ? '#4ade80' : '#f7d875';
+                }
+
+                // 7. Audit Log
+                var aList = document.getElementById('nex2AdminAuditList');
+                if (aList) {
+                    aList.innerHTML = (res.auditLogs || []).map(function(l) {
+                        return '<div style="padding:7px 10px;border-bottom:1px solid #1e2a3a;font-size:12px;color:#cbd5e1;">' +
+                            '<span style="color:#6a7f9e;">[' + escapeHtml(String(l[1])) + ']</span> <strong style="color:#f7d875;">' + escapeHtml(String(l[3])) + '</strong> → ' + escapeHtml(String(l[4])) + ' <span style="color:#8aa1c0;">' + escapeHtml(String(l[5])) + '</span></div>';
+                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No audit events recorded yet.</p>';
+                }
+            })
+            .adminGetCommunityDashboard(pwd);
+    };
+
+    // ---------- Event Wiring ----------
+    document.addEventListener('click', function(e) {
+        var navTarget = e.target.closest('[data-nex2-tab]');
+        if (navTarget) {
+            switch_nex2_tab(navTarget.getAttribute('data-nex2-tab'));
+            return;
+        }
+        if (e.target.closest('#nex2TopPromoBtn')) { switch_nex2_tab('creators'); return; }
+        if (e.target.closest('#nex2HomeViewRankBtn')) { switch_nex2_tab('rankings'); return; }
+        if (e.target.closest('#nex2ScrollSubmitCampBtn')) {
+            var card = document.getElementById('nex2SubmitCampCard');
+            if (card) card.scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+        if (e.target.closest('#nex2LangToggle')) {
+            apply_nex2_language(_nex2State.lang === 'EN' ? 'BM' : 'EN');
+            return;
+        }
+        if (e.target.closest('#nex2NotifBtn')) {
+            var dd = document.getElementById('nex2NotifDropdown');
+            if (dd) dd.classList.toggle('open');
+            return;
+        }
+        if (e.target.closest('#nex2MarkAllReadBtn')) {
+            if (!customer || !customer.email || !customer.sessionToken) return;
+            google.script.run.withSuccessHandler(function() { loadNex4Up2Bootstrap(); }).markNotificationsRead(customer.email, customer.sessionToken);
+            return;
+        }
+        var notifItem = e.target.closest('[data-notif-tab]');
+        if (notifItem) {
+            var dd2 = document.getElementById('nex2NotifDropdown');
+            if (dd2) dd2.classList.remove('open');
+            var tTab = notifItem.getAttribute('data-notif-tab');
+            if (tTab === 'account') showMyAccount();
+            else switch_nex2_tab(tTab);
+            return;
+        }
+
+        // Rankings filters
+        var rkCat = e.target.closest('[data-rank-cat]');
+        if (rkCat) {
+            _nex2State.rankCat = rkCat.getAttribute('data-rank-cat');
+            document.querySelectorAll('[data-rank-cat]').forEach(function(b) { b.classList.toggle('active', b === rkCat); });
+            render_nex2_rankings();
+            return;
+        }
+        var rkTime = e.target.closest('[data-rank-time]');
+        if (rkTime) {
+            _nex2State.rankTime = rkTime.getAttribute('data-rank-time');
+            document.querySelectorAll('[data-rank-time]').forEach(function(b) { b.classList.toggle('active', b === rkTime); });
+            render_nex2_rankings();
+            return;
+        }
+
+        // Creator pick button
+        var pickCamp = e.target.closest('[data-pick-camp]');
+        if (pickCamp) {
+            var cid = pickCamp.getAttribute('data-pick-camp');
+            var s = document.getElementById('nex2SubCampaignId');
+            if (s) s.value = cid;
+            var sc = document.getElementById('nex2SubmitCampCard');
+            if (sc) sc.scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+
+        // Community sub-tabs & filters
+        var cMode = e.target.closest('[data-comm-mode]');
+        if (cMode) {
+            _nex2State.commMode = cMode.getAttribute('data-comm-mode');
+            document.querySelectorAll('[data-comm-mode]').forEach(function(b) { b.classList.toggle('active', b === cMode); });
+            var fv = document.getElementById('nex2CommFeedView');
+            var pv = document.getElementById('nex2CommPlayersView');
+            if (fv) fv.style.display = _nex2State.commMode === 'feed' ? 'block' : 'none';
+            if (pv) pv.style.display = _nex2State.commMode === 'players' ? 'block' : 'none';
+            return;
+        }
+        var ffBtn = e.target.closest('[data-feed-filter]');
+        if (ffBtn) {
+            _nex2State.feedFilter = ffBtn.getAttribute('data-feed-filter');
+            document.querySelectorAll('[data-feed-filter]').forEach(function(b) { b.classList.toggle('active', b === ffBtn); });
+            render_nex2_community_hub();
+            return;
+        }
+
+        // Community Interactions (Like / Comment / Follow / Report / Block / Open Profile)
+        var likeBtn = e.target.closest('[data-like-post]');
+        if (likeBtn) {
+            if (!customer || !customer.email || !customer.sessionToken) { showToast('Please log in with your password to like posts.'); return; }
+            google.script.run.withSuccessHandler(function() { loadNex4Up2Bootstrap(); }).togglePostLike(customer.email, likeBtn.getAttribute('data-like-post'), customer.sessionToken);
+            return;
+        }
+        var tCmtBtn = e.target.closest('[data-toggle-comments]');
+        if (tCmtBtn) {
+            var wrap = document.getElementById('nex2CommentsWrap_' + tCmtBtn.getAttribute('data-toggle-comments'));
+            if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+            return;
+        }
+        var sCmtBtn = e.target.closest('[data-send-comment]');
+        if (sCmtBtn) {
+            if (!customer || !customer.email || !customer.sessionToken) { showToast('Please log in with your password to comment.'); return; }
+            var postId = sCmtBtn.getAttribute('data-send-comment');
+            var inp = document.getElementById('nex2CmtInput_' + postId);
+            var txt = inp ? inp.value.trim() : '';
+            if (!txt) return;
+            google.script.run.withSuccessHandler(function(r) {
+                if (r && r.success) { if (inp) inp.value = ''; loadNex4Up2Bootstrap(); }
+                else showToast((r && r.message) || 'Failed.');
+            }).addPostComment(customer.email, postId, txt, customer.sessionToken);
+            return;
+        }
+        var flwBtn = e.target.closest('[data-follow-email]');
+        if (flwBtn) {
+            if (!customer || !customer.email || !customer.sessionToken) { showToast('Please log in with your password to follow players.'); return; }
+            google.script.run.withSuccessHandler(function(r) {
+                if (r && r.success) { showToast(r.following ? 'Following gamer!' : 'Unfollowed.'); loadNex4Up2Bootstrap(); }
+                else showToast((r && r.message) || 'Failed.');
+            }).toggleFollowPlayer(customer.email, flwBtn.getAttribute('data-follow-email'), customer.sessionToken);
+            return;
+        }
+        var repBtn = e.target.closest('[data-report-post]');
+        if (repBtn) {
+            if (!customer || !customer.email || !customer.sessionToken) { showToast('Please log in with your password to report content.'); return; }
+            var reason = prompt('Reason for reporting this post to NEX4UP moderators:');
+            if (!reason) return;
+            google.script.run.withSuccessHandler(function(r) { showToast((r && r.message) || 'Report sent.'); }).reportCommunityContent(customer.email, 'REPORT', repBtn.getAttribute('data-report-post'), reason, customer.sessionToken);
+            return;
+        }
+        var blkBtn = e.target.closest('[data-block-email]');
+        if (blkBtn) {
+            if (!customer || !customer.email || !customer.sessionToken) return;
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'User blocked.');
+                var m = document.getElementById('nex2PlayerModalOverlay'); if (m) m.classList.remove('open');
+                loadNex4Up2Bootstrap();
+            }).reportCommunityContent(customer.email, 'BLOCK', blkBtn.getAttribute('data-block-email'), 'User blocked player', customer.sessionToken);
+            return;
+        }
+        var playerCard = e.target.closest('[data-player-email]');
+        if (playerCard && !e.target.closest('button')) {
+            var pe = playerCard.getAttribute('data-player-email');
+            if (pe) open_player_modal(pe);
+            return;
+        }
+        if (e.target.closest('#nex2PlayerModalClose') || e.target.id === 'nex2PlayerModalOverlay') {
+            var pm = document.getElementById('nex2PlayerModalOverlay');
+            if (pm) pm.classList.remove('open');
+            return;
+        }
+
+        // Profile Frame Studio Selection / Equip / Redeem
+        var fItem = e.target.closest('[data-select-frame]');
+        if (fItem) {
+            _nex2State.previewFrameId = fItem.getAttribute('data-select-frame');
+            render_nex2_frame_studio();
+            return;
+        }
+        if (e.target.closest('#nex2FrameUnequipBtn')) {
+            _nex2State.previewFrameId = 'frame_default';
+            if (customer && customer.sessionToken) {
+                google.script.run.withSuccessHandler(function(res) {
+                    if (res && res.success && res.customer) {
+                        res.customer.sessionToken = customer.sessionToken;
+                        customer = Object.assign({}, customer, res.customer);
+                        try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
+                        render_nex2_frame_studio();
+                        showToast('Reset to Default Frame.');
+                    }
+                }).equipProfileFrame(customer.email, 'frame_default', customer.sessionToken);
+            }
+            return;
+        }
+        if (e.target.closest('#nex2FrameActionBtn')) {
+            if (!customer || !customer.email) return;
+            if (!customer.sessionToken) { showToast('Please log out and sign in once with your password to equip or redeem frames.'); return; }
+            var fid = _nex2State.previewFrameId || 'frame_default';
+            var def = get_frame_def(fid);
+            var owned = Array.isArray(customer.unlockedFrames) ? customer.unlockedFrames : ['frame_default'];
+            if (owned.indexOf(fid) !== -1) {
+                google.script.run.withSuccessHandler(function(res) {
+                    if (res && res.success && res.customer) {
+                        res.customer.sessionToken = customer.sessionToken;
+                        customer = Object.assign({}, customer, res.customer);
+                        try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
+                        render_nex2_frame_studio();
+                        loadNex4Up2Bootstrap();
+                        showToast(res.message);
+                    } else showToast((res && res.message) || 'Could not equip frame.');
+                }).equipProfileFrame(customer.email, fid, customer.sessionToken);
+            } else if (def.costPoints > 0) {
+                if (!confirm('Redeem ' + def.name + ' for ' + def.costPoints + ' NEX Points?')) return;
+                google.script.run.withSuccessHandler(function(res) {
+                    if (res && res.success && res.customer) {
+                        res.customer.sessionToken = customer.sessionToken;
+                        customer = Object.assign({}, customer, res.customer);
+                        try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
+                        loadMyAccount();
+                        loadNex4Up2Bootstrap();
+                        showToast(res.message);
+                    } else showToast((res && res.message) || 'Redemption failed.');
+                }).redeemProfileFrame(customer.email, fid, customer.sessionToken);
+            }
+            return;
+        }
+
+        // Verify Roblox Username in Edit Gamer Profile
+        if (e.target.closest('#verifyRobloxProfileBtn')) {
+            var rbxInput = document.getElementById('editRobloxUsername');
+            var rbxMsg = document.getElementById('editRobloxVerifyMsg');
+            var uname = rbxInput ? rbxInput.value.replace(/^@+/, '').trim() : '';
+            if (!uname) { if (rbxMsg) rbxMsg.textContent = 'Enter a Roblox username first.'; return; }
+            if (rbxMsg) rbxMsg.textContent = 'Looking up Roblox user...';
+            google.script.run.withSuccessHandler(function(res) {
+                if (res && res.found) {
+                    if (document.getElementById('editRobloxUserId')) document.getElementById('editRobloxUserId').value = res.userId || '';
+                    if (document.getElementById('editRobloxAvatarUrl')) document.getElementById('editRobloxAvatarUrl').value = res.avatarUrl || '';
+                    if (document.getElementById('editAvatarMode')) document.getElementById('editAvatarMode').value = 'roblox';
+                    if (rbxMsg) rbxMsg.innerHTML = '✅ Found <strong>' + escapeHtml(res.displayName || res.username) + '</strong> — Roblox avatar synced! Click Save Changes below.';
+                } else {
+                    if (rbxMsg) rbxMsg.textContent = '❌ Roblox user not found.';
+                }
+            }).lookupRobloxUser(uname);
+            return;
+        }
+
+        // Admin Campaign & Community buttons
+        if (e.target.closest('#nex2AdminRefreshCampBtn') || e.target.closest('#nex2AdminRefreshCommBtn')) {
+            loadNex4Up2AdminDashboard();
+            return;
+        }
+        if (e.target.closest('#nex2ResetCampBtn')) {
+            ['nex2CampId', 'nex2CampTitle', 'nex2CampDesc', 'nex2CampRules', 'nex2CampEndDate'].forEach(function(id) { var x = document.getElementById(id); if (x) x.value = ''; });
+            return;
+        }
+        if (e.target.closest('#nex2SaveCampBtn')) {
+            var pwd = window._nexAdminPwdSession || '';
+            var p = {
+                campaignId: document.getElementById('nex2CampId').value,
+                title: document.getElementById('nex2CampTitle').value,
+                platform: document.getElementById('nex2CampPlatform').value,
+                rewardType: document.getElementById('nex2CampRewardType').value,
+                rewardValue: document.getElementById('nex2CampRewardValue').value,
+                rewardCoinVariant: document.getElementById('nex2CampCoinVariant').value,
+                endDate: document.getElementById('nex2CampEndDate').value,
+                status: document.getElementById('nex2CampStatus').value,
+                bannerTag: document.getElementById('nex2CampBannerTag').value,
+                description: document.getElementById('nex2CampDesc').value,
+                rules: document.getElementById('nex2CampRules').value
+            };
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Saved!');
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminSaveCampaign(p, pwd);
+            return;
+        }
+        var editCampBtn = e.target.closest('[data-edit-camp]');
+        if (editCampBtn && window._nex2AdminCampsCache) {
+            var ec = window._nex2AdminCampsCache.find(function(x) { return String(x[0]) === editCampBtn.getAttribute('data-edit-camp'); });
+            if (ec) {
+                document.getElementById('nex2CampId').value = ec[0] || '';
+                document.getElementById('nex2CampTitle').value = ec[1] || '';
+                document.getElementById('nex2CampPlatform').value = ec[2] || 'TikTok';
+                document.getElementById('nex2CampDesc').value = ec[3] || '';
+                document.getElementById('nex2CampRules').value = ec[4] || '';
+                document.getElementById('nex2CampRewardType').value = ec[5] || 'Points';
+                document.getElementById('nex2CampRewardValue').value = ec[6] || '500';
+                document.getElementById('nex2CampCoinVariant').value = ec[7] || 'event';
+                document.getElementById('nex2CampEndDate').value = String(ec[9] || '').slice(0, 10);
+                document.getElementById('nex2CampStatus').value = ec[10] || 'Active';
+                document.getElementById('nex2CampBannerTag').value = ec[11] || 'CAMPAIGN';
+            }
+            return;
+        }
+        var revSubBtn = e.target.closest('[data-review-sub]');
+        if (revSubBtn) {
+            var sid = revSubBtn.getAttribute('data-review-sub');
+            var dec = revSubBtn.getAttribute('data-decision');
+            var fb = prompt('Optional feedback note for creator (' + dec + '):', '') || '';
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Updated!');
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminReviewSubmission(sid, dec, fb, window._nexAdminPwdSession || '');
+            return;
+        }
+        var modBtn = e.target.closest('[data-mod-action]');
+        if (modBtn) {
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Moderated!');
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminModerateCommunity(modBtn.getAttribute('data-mod-action'), modBtn.getAttribute('data-mod-target'), '', window._nexAdminPwdSession || '');
+            return;
+        }
+        if (e.target.closest('#nex2GrantFrameBtn')) {
+            var gfEmail = document.getElementById('nex2GrantFrameEmail').value.trim();
+            var gfId = document.getElementById('nex2GrantFrameSelect').value;
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Done!');
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminGrantFrame(gfEmail, gfId, window._nexAdminPwdSession || '');
+            return;
+        }
+        if (e.target.closest('#nex2ResetDevBtn')) {
+            ['nex2DevId', 'nex2DevName', 'nex2DevRbx', 'nex2DevRole', 'nex2DevBio', 'nex2DevContrib'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+            return;
+        }
+        if (e.target.closest('#nex2SaveDevBtn')) {
+            var dp = {
+                devId: document.getElementById('nex2DevId').value,
+                displayName: document.getElementById('nex2DevName').value,
+                robloxUsername: document.getElementById('nex2DevRbx').value,
+                role: document.getElementById('nex2DevRole').value,
+                badge: document.getElementById('nex2DevBadge').value,
+                order: document.getElementById('nex2DevOrder').value,
+                bio: document.getElementById('nex2DevBio').value,
+                contributions: document.getElementById('nex2DevContrib').value
+            };
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Saved developer card!');
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminSaveDevProfile(dp, window._nexAdminPwdSession || '');
+            return;
+        }
+        var editDevBtn = e.target.closest('[data-edit-dev]');
+        if (editDevBtn && window._nex2AdminDevsCache) {
+            var dv = window._nex2AdminDevsCache.find(function(x) { return String(x[0]) === editDevBtn.getAttribute('data-edit-dev'); });
+            if (dv) {
+                document.getElementById('nex2DevId').value = dv[0] || '';
+                document.getElementById('nex2DevName').value = dv[1] || '';
+                document.getElementById('nex2DevRbx').value = dv[2] || '';
+                document.getElementById('nex2DevRole').value = dv[3] || '';
+                document.getElementById('nex2DevBio').value = dv[4] || '';
+                document.getElementById('nex2DevContrib').value = dv[5] || '';
+                document.getElementById('nex2DevBadge').value = dv[6] || 'DEV';
+                document.getElementById('nex2DevOrder').value = dv[8] || 1;
+            }
+            return;
+        }
+        var delDevBtn = e.target.closest('[data-del-dev]');
+        if (delDevBtn) {
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Removed.');
+                loadNex4Up2AdminDashboard();
+                loadNex4Up2Bootstrap();
+            }).adminSaveDevProfile({ devId: delDevBtn.getAttribute('data-del-dev'), delete: true }, window._nexAdminPwdSession || '');
+            return;
+        }
+        if (e.target.closest('#nex2SaveSupabaseBtn')) {
+            var sk = document.getElementById('nex2SupabaseSecretInput').value.trim();
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Saved.');
+                if (r && r.success) document.getElementById('nex2SupabaseSecretInput').value = '';
+                loadNex4Up2AdminDashboard();
+            }).adminSaveSupabaseConfig({ secretKey: sk }, window._nexAdminPwdSession || '');
+            return;
+        }
+        if (e.target.closest('#nex2SyncSupabaseBtn')) {
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Sync finished.');
+            }).adminSyncSupabaseNow(window._nexAdminPwdSession || '');
+            return;
+        }
+    });
+
+    // Creator Submission Form
+    var campForm = document.getElementById('nex2SubmitCampaignForm');
+    if (campForm) {
+        campForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!customer || !customer.email || !customer.sessionToken) {
+                showToast('Please log in with your password to submit a Creator Campaign video!');
+                return;
+            }
+            var payload = {
+                campaignId: document.getElementById('nex2SubCampaignId').value,
+                platform: document.getElementById('nex2SubPlatform').value,
+                videoUrl: document.getElementById('nex2SubVideoUrl').value.trim(),
+                orderId: document.getElementById('nex2SubOrderId').value.trim(),
+                notes: document.getElementById('nex2SubNotes').value.trim()
+            };
+            google.script.run.withSuccessHandler(function(r) {
+                if (r && r.success) {
+                    campForm.reset();
+                    showToast(r.message);
+                    loadNex4Up2Bootstrap();
+                } else showToast((r && r.message) || 'Submission error.');
+            }).submitCreatorCampaign(customer.email, payload, customer.sessionToken);
+        });
+    }
+
+    // Community Screenshot Compression & Post Submit
+    var postImgInput = document.getElementById('nex2PostImgInput');
+    if (postImgInput) {
+        postImgInput.addEventListener('change', function() {
+            var file = this.files[0];
+            var st = document.getElementById('nex2PostImgStatus');
+            if (!file) { _nex2State.pendingPostImgDataUrl = ''; if (st) st.textContent = ''; return; }
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                var img = new Image();
+                img.onload = function() {
+                    var maxW = 1080;
+                    var scale = img.width > maxW ? (maxW / img.width) : 1;
+                    var canvas = document.createElement('canvas');
+                    canvas.width = Math.round(img.width * scale);
+                    canvas.height = Math.round(img.height * scale);
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    _nex2State.pendingPostImgDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+                    if (st) st.textContent = '✅ Screenshot ready (' + canvas.width + '×' + canvas.height + ')';
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    var postForm = document.getElementById('nex2PostForm');
+    if (postForm) {
+        postForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!customer || !customer.email || !customer.sessionToken) {
+                showToast('Please log in with your password to post in Community!');
+                return;
+            }
+            var payload = {
+                gameTag: document.getElementById('nex2PostGameTag').value,
+                content: document.getElementById('nex2PostContent').value.trim(),
+                imageUrl: _nex2State.pendingPostImgDataUrl || ''
+            };
+            google.script.run.withSuccessHandler(function(r) {
+                if (r && r.success) {
+                    postForm.reset();
+                    _nex2State.pendingPostImgDataUrl = '';
+                    var st = document.getElementById('nex2PostImgStatus'); if (st) st.textContent = '';
+                    showToast(r.message);
+                    loadNex4Up2Bootstrap();
+                } else showToast((r && r.message) || 'Post failed.');
+            }).createCommunityPost(customer.email, payload, customer.sessionToken);
+        });
+    }
+
+    ['nex2FindGameSelect', 'nex2FindStyleSelect', 'nex2FindSearchInput'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener(id === 'nex2FindSearchInput' ? 'input' : 'change', render_nex2_community_hub);
+    });
+
+    apply_nex2_language(_nex2State.lang);
+    setTimeout(loadNex4Up2Bootstrap, 700);
+})();
 
     </script>
 </body>
