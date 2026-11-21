@@ -9916,6 +9916,453 @@ html, body { max-width: 100%; overflow-x: hidden; }
     .nex2-hero-banner h2 { font-size: 19px; }
     .nex2-home-rank-strip { padding: 14px; border-radius: 16px; }
 }
+
+/* ============================================================
+   DYNAMIC PRODUCT-BASED GAME ID REQUIREMENTS SYSTEM
+   ============================================================ */
+.dyn-req-admin-section {
+    margin-top: 16px;
+}
+.dyn-req-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    margin-bottom: 14px;
+}
+.dyn-req-switch-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #e8edf5;
+    font-size: 13.5px;
+    user-select: none;
+}
+.dyn-req-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+.dyn-req-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.dyn-req-slider {
+    position: absolute;
+    inset: 0;
+    background: #233044;
+    border: 1px solid #354764;
+    border-radius: 999px;
+    transition: 0.2s;
+}
+.dyn-req-slider:before {
+    content: "";
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    top: 3px;
+    background: #8aa1c0;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+.dyn-req-switch input:checked + .dyn-req-slider {
+    background: rgba(247, 216, 117, 0.25);
+    border-color: #f7d875;
+}
+.dyn-req-switch input:checked + .dyn-req-slider:before {
+    transform: translateX(20px);
+    background: #f7d875;
+}
+.dyn-req-mode-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.dyn-req-mode-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+.dyn-req-mode-opt:has(input:checked) {
+    border-color: #f7d875;
+    background: rgba(247, 216, 117, 0.06);
+}
+.dyn-req-mode-opt input {
+    margin-top: 3px;
+    accent-color: #f7d875;
+}
+.dyn-req-mode-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e8edf5;
+    display: block;
+}
+.dyn-req-mode-sub {
+    font-size: 11.5px;
+    color: #8aa1c0;
+    display: block;
+    margin-top: 2px;
+}
+.dyn-req-security-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(56, 189, 248, 0.07);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: 11.5px;
+    color: #a8c7e0;
+    margin-bottom: 14px;
+    line-height: 1.45;
+}
+.dyn-req-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.dyn-req-btn {
+    background: #1a2538;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    border-radius: 10px;
+    padding: 7px 13px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+}
+.dyn-req-btn:hover { border-color: #f7d875; color: #f7d875; }
+.dyn-req-btn.primary {
+    background: #f7d875;
+    border-color: #f7d875;
+    color: #0b0e14;
+}
+.dyn-req-btn.primary:hover { background: #ffe08a; color: #0b0e14; }
+.dyn-req-btn.danger:hover { border-color: #ff6b6b; color: #ff6b6b; }
+.dyn-req-btn.sm { padding: 5px 9px; font-size: 11px; border-radius: 8px; }
+.dyn-req-fields-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.dyn-req-field-card {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    transition: border-color 0.15s, opacity 0.15s, transform 0.15s;
+}
+.dyn-req-field-card.dragging {
+    opacity: 0.45;
+    border-style: dashed;
+    border-color: #f7d875;
+}
+.dyn-req-field-card.drag-over {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
+.dyn-req-drag-handle {
+    color: #6a7f9e;
+    cursor: grab;
+    padding: 4px 6px;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.dyn-req-field-main {
+    flex: 1;
+    min-width: 0;
+}
+.dyn-req-field-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #e8edf5;
+}
+.dyn-req-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    background: #1a2538;
+    color: #8aa1c0;
+    border: 1px solid #2a3a52;
+}
+.dyn-req-tag.req { background: rgba(255, 107, 107, 0.14); color: #ff8a8a; border-color: rgba(255, 107, 107, 0.35); }
+.dyn-req-tag.opt { background: rgba(56, 189, 248, 0.12); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.3); }
+.dyn-req-tag.type { background: rgba(247, 216, 117, 0.12); color: #f7d875; border-color: rgba(247, 216, 117, 0.3); }
+.dyn-req-field-meta {
+    font-size: 11.5px;
+    color: #7c93b5;
+    margin-top: 3px;
+    word-break: break-word;
+}
+.dyn-req-field-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+}
+.dyn-req-field-editor {
+    background: #0d131d;
+    border: 1px solid #354764;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+.dyn-req-field-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+}
+.dyn-req-field-editor-grid .full { grid-column: 1 / -1; }
+.dyn-req-field-editor label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #8aa1c0;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.dyn-req-field-editor input[type="text"],
+.dyn-req-field-editor input[type="number"],
+.dyn-req-field-editor select,
+.dyn-req-field-editor textarea {
+    width: 100%;
+    background: #121821;
+    border: 1px solid #2a3a52;
+    border-radius: 9px;
+    padding: 8px 10px;
+    color: #e8edf5;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+.dyn-req-field-editor input:focus,
+.dyn-req-field-editor select:focus,
+.dyn-req-field-editor textarea:focus {
+    outline: none;
+    border-color: #f7d875;
+}
+.dyn-req-preview-box {
+    background: #080c12;
+    border: 1px dashed #2a3a52;
+    border-radius: 14px;
+    padding: 14px;
+    margin-top: 10px;
+}
+.dyn-req-preview-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #f7d875;
+}
+.dyn-req-unit-group {
+    background: #101723;
+    border: 1px solid #1e2a3a;
+    border-radius: 11px;
+    padding: 11px 12px;
+    margin-top: 10px;
+}
+.dyn-req-unit-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #7dd3fc;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.dyn-req-instructions {
+    font-size: 11.5px;
+    color: #8aa1c0;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+.dyn-req-field-error {
+    color: #ff7b7b;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+    min-height: 0;
+}
+.dyn-req-input.dyn-req-invalid,
+.game-id-section input.dyn-req-invalid,
+.game-id-section select.dyn-req-invalid {
+    border-color: #ff6b6b !important;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.16) !important;
+}
+.game-id-section select {
+    width: 100%;
+    background: #121821;
+    border: 1px solid #2a3a52;
+    border-radius: 10px;
+    padding: 11px 13px;
+    color: #e8edf5;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.game-id-section select:focus {
+    outline: none;
+    border-color: #f7d875;
+}
+.dyn-req-loading, .dyn-req-error-box {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #8aa1c0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.dyn-req-error-box {
+    border-color: rgba(255, 107, 107, 0.4);
+    color: #ff9494;
+}
+.dyn-req-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    background: rgba(56, 189, 248, 0.12);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    margin-top: 4px;
+}
+.dyn-req-badge-pill.none {
+    background: rgba(138, 161, 192, 0.1);
+    color: #8aa1c0;
+    border-color: rgba(138, 161, 192, 0.25);
+}
+.dyn-req-order-detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 8, 15, 0.82);
+    backdrop-filter: blur(5px);
+    z-index: 3200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.dyn-req-order-detail-overlay.open { display: flex; }
+.dyn-req-order-detail-panel {
+    background: #121821;
+    border: 1px solid #2a3a52;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 22px;
+    color: #e8edf5;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+}
+.dyn-req-order-product-box {
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 10px;
+}
+.dyn-req-kv-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #172131;
+}
+.dyn-req-kv-row:last-child { border-bottom: none; }
+.dyn-req-kv-label {
+    font-size: 12px;
+    color: #8aa1c0;
+    font-weight: 600;
+}
+.dyn-req-kv-val {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #f7d875;
+    word-break: break-all;
+    text-align: right;
+}
+.dyn-req-copy-btn {
+    background: #1a2538;
+    border: 1px solid #2a3a52;
+    color: #e8edf5;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Inter', sans-serif;
+}
+.dyn-req-copy-btn:hover { border-color: #f7d875; color: #f7d875; }
+.dyn-req-copy-btn.copied { border-color: #4caf50; color: #66bb6a; background: rgba(76, 175, 80, 0.14); }
+.dyn-req-customer-box {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #0b0e14;
+    border: 1px solid #1e2a3a;
+    border-radius: 10px;
+    font-size: 12.5px;
+}
+@media (max-width: 640px) {
+    .dyn-req-field-card { flex-direction: column; align-items: stretch; }
+    .dyn-req-field-actions { justify-content: flex-end; }
+    .dyn-req-kv-row { flex-wrap: wrap; }
+    .dyn-req-order-detail-panel { padding: 16px; }
+}
     </style>
 </head>
 <body>
@@ -10358,15 +10805,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
         OFF = This product will be excluded.
     </small>
 </div>
-                                <div class="field field-full">
-                                    <label for="gameType">Game Type (for digital products) *</label>
-                                    <select id="gameType" required>
-                                        <option value="roblox">Roblox — Username + Nickname</option>
-                                        <option value="ml">Mobile Legends — User ID + Zone ID</option>
-                                        <option value="pubg">PUBG Mobile — User ID + Nickname</option>
-                                        <option value="other">Other / Generic — Account ID</option>
-                                    </select>
-                                </div>
+                                <input type="hidden" id="gameType" value="other" />
                             </div>
                         </div>
 
@@ -10506,6 +10945,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
         </div>
     </div>
 </div>
+
+                        <!-- ============ SECTION 5: CUSTOMER INFORMATION REQUIREMENTS ============ -->
+                        <div class="admin-form-section dyn-req-admin-section" id="addReqConfigSection"></div>
 
                         <!-- ============ SECTION 6: ACTIONS ============ -->
                         <div class="admin-form-actions">
@@ -12341,15 +12783,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
                         <label for="editCategory">Combined Category Path</label>
                         <input type="text" id="editCategory" placeholder="e.g. Roblox > Robux" />
                     </div>
-                    <div class="field field-full">
-                        <label for="editGameType">Game Type <span class="required">*</span></label>
-                        <select id="editGameType" required>
-                            <option value="roblox">Roblox — Username + Nickname</option>
-                            <option value="ml">Mobile Legends — User ID + Zone ID</option>
-                            <option value="pubg">PUBG Mobile — User ID + Nickname</option>
-                            <option value="other">Other / Generic — Account ID</option>
-                        </select>
-                    </div>
+                    <input type="hidden" id="editGameType" value="other" />
                     <div class="field">
                         <label for="editPrice">Price (RM) <span class="required">*</span></label>
                         <input type="number" id="editPrice" required step="0.01" min="0" placeholder="249.90" />
@@ -12486,6 +12920,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
     </div>
 </div>
 
+                <!-- ============ CUSTOMER INFORMATION REQUIREMENTS (EDIT) ============ -->
+                <div class="admin-form-section dyn-req-admin-section" id="editReqConfigSection" style="margin-top:16px;"></div>
+
                 <div class="edit-actions">
                     <button type="button" class="cancel-btn" id="editCancel">
                         <i class="fas fa-times"></i> Cancel
@@ -12509,6 +12946,20 @@ html, body { max-width: 100%; overflow-x: hidden; }
                 <button class="cancel-delete" id="deleteCancel">Cancel</button>
                 <button class="confirm-delete" id="deleteConfirm"><i class="fas fa-trash"></i> Delete</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== ADMIN ORDER DETAILS & REQUIREMENTS MODAL ===== -->
+    <div class="dyn-req-order-detail-overlay" id="adminOrderDetailOverlay">
+        <div class="dyn-req-order-detail-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #1e2a3a;">
+                <div>
+                    <h2 style="margin:0; font-size:19px; color:#f7d875;"><i class="fas fa-clipboard-list"></i> Order Details <span id="adminOrderDetailId"></span></h2>
+                    <div id="adminOrderDetailSub" style="font-size:12px; color:#8aa1c0; margin-top:2px;"></div>
+                </div>
+                <button type="button" class="close-edit" id="adminOrderDetailClose" style="background:transparent; border:none; color:#8aa1c0; font-size:24px; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="adminOrderDetailBody"></div>
         </div>
     </div>
 
@@ -13297,39 +13748,12 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
             '</svg>'
         );
 
-        var GAME_TYPES = {
-            roblox: {
-                label: 'Roblox',
-                icon: 'fa-gamepad',
-                fields: [
-                    { id: 'robloxUsername', label: 'Roblox Username', placeholder: 'e.g. @JohnDoe123', required: true },
-                    { id: 'robloxNickname', label: 'Roblox Nickname', placeholder: 'Your display nickname', required: true }
-                ]
-            },
-            ml: {
-                label: 'Mobile Legends',
-                icon: 'fa-mobile-alt',
-                fields: [
-                    { id: 'mlUserId',  label: 'ML User ID',  placeholder: 'e.g. 123456789', required: true },
-                    { id: 'mlZoneId',  label: 'ML Zone ID',  placeholder: 'e.g. 1234',      required: true }
-                ]
-            },
-            pubg: {
-                label: 'PUBG Mobile',
-                icon: 'fa-crosshairs',
-                fields: [
-                    { id: 'pubgUserId',  label: 'PUBG User ID',  placeholder: 'e.g. 5123456789', required: true },
-                    { id: 'pubgNickname',label: 'PUBG Nickname', placeholder: 'Your in-game nickname', required: true }
-                ]
-            },
-            other: {
-                label: 'Other / Generic',
-                icon: 'fa-user-tag',
-                fields: [
-                    { id: 'otherAccountId', label: 'Account ID', placeholder: 'Your player/account ID', required: true }
-                ]
-            }
-        };
+        // Dynamic product requirement state (fetched from GAS backend — no hardcoded game list)
+        window._checkoutReqsMap = {};
+        window._checkoutReqsLoaded = false;
+        window._checkoutReqsLoading = false;
+        window._checkoutReqsRequestSeq = 0;
+        window._checkoutSubmissionToken = '';
 
         var confirmCallback = null;
         var currentReviewGameId = null;
@@ -14999,7 +15423,8 @@ checkoutBtn.addEventListener('click', function() {
     applyBtn.innerHTML = '<i class="fas fa-tag"></i> Apply';
 
     resetPaymentMethodSelector();
-    buildGameIdFields();
+    window._checkoutSubmissionToken = 'SUB-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    loadAndBuildCheckoutRequirements();
     loadCustomerPoints();
 
     // ✅ Show/hide shipping form based on cart contents
@@ -15063,176 +15488,466 @@ checkoutBtn.addEventListener('click', function() {
     }
 });
 
-        var SAVED_GAME_IDS_KEY = 'nex4up_saved_game_ids_v1';
+        var SAVED_DYN_REQS_KEY = 'nex4up_saved_dyn_reqs_v2';
+        var _PR_CLIENT_PASSWORD_RE = /\b(password|passcode|passphrase|kata\s*laluan|pin\s*code|2fa|otp\s*code|secret\s*key|login\s*pass|account\s*pass)\b/i;
 
-        function getSavedGameIds() {
+        function getSavedDynReqValues() {
             try {
-                var raw = localStorage.getItem(SAVED_GAME_IDS_KEY);
+                var raw = localStorage.getItem(SAVED_DYN_REQS_KEY);
                 return raw ? (JSON.parse(raw) || {}) : {};
             } catch (e) {
                 return {};
             }
         }
 
-        function saveGameIdsToStorage(gameIdsObj) {
+        function saveDynReqValues(submittedList, reqsMap) {
             try {
-                if (!gameIdsObj || typeof gameIdsObj !== 'object') return;
-                var merged = getSavedGameIds();
-                var keys = Object.keys(gameIdsObj);
-                for (var i = 0; i < keys.length; i++) {
-                    var val = gameIdsObj[keys[i]];
-                    if (val && typeof val === 'object') {
-                        var subKeys = Object.keys(val);
-                        for (var j = 0; j < subKeys.length; j++) {
-                            var subVal = String(val[subKeys[j]] || '').trim();
-                            if (subVal) merged[subKeys[j]] = subVal;
-                        }
-                    } else if (typeof val === 'string') {
-                        var flatVal = val.trim();
-                        if (flatVal) merged[keys[i]] = flatVal;
+                if (!Array.isArray(submittedList)) return;
+                var merged = getSavedDynReqValues();
+                for (var i = 0; i < submittedList.length; i++) {
+                    var item = submittedList[i];
+                    if (!item || !Array.isArray(item.units) || item.units.length === 0) continue;
+                    var pid = String(item.productId || '');
+                    var cfg = (reqsMap && reqsMap[pid]) || null;
+                    var fieldsById = {};
+                    if (cfg && Array.isArray(cfg.fields)) {
+                        cfg.fields.forEach(function(f) { fieldsById[f.fieldId] = f; });
                     }
+                    // Save the first unit's values as auto-fill defaults
+                    var vals = item.units[0].values || {};
+                    Object.keys(vals).forEach(function(fid) {
+                        var v = String(vals[fid] || '').trim();
+                        if (!v) return;
+                        merged[pid + '::' + fid] = v;
+                        if (fieldsById[fid] && fieldsById[fid].validationRule === 'roblox_username') {
+                            merged['__rule__roblox_username'] = v;
+                        }
+                    });
                 }
-                localStorage.setItem(SAVED_GAME_IDS_KEY, JSON.stringify(merged));
+                localStorage.setItem(SAVED_DYN_REQS_KEY, JSON.stringify(merged));
             } catch (e) {}
         }
 
-        function clearSavedGameIds() {
-            try { localStorage.removeItem(SAVED_GAME_IDS_KEY); } catch (e) {}
+        function clearSavedDynReqValues() {
+            try { localStorage.removeItem(SAVED_DYN_REQS_KEY); } catch (e) {}
         }
 
-        function buildGameIdFields() {
-            var container = document.getElementById('gameIdFields');
-            if (!container) return;
+        function validateSingleDynamicFieldValue(field, rawValue) {
+            var val = rawValue !== undefined && rawValue !== null ? String(rawValue).trim() : '';
+            var label = (field && field.label) ? field.label : 'Field';
 
-            var typesPresent = new Set();
-            for (var i = 0; i < cart.length; i++) {
-                var g = null;
-                for (var j = 0; j < allGames.length; j++) {
-                    if (allGames[j].id === cart[i].id) { g = allGames[j]; break; }
+            if (field && field.required && !val) {
+                return { valid: false, value: '', message: label + ' is required.' };
+            }
+            if (!val) {
+                return { valid: true, value: '', message: '' };
+            }
+
+            if (field.inputType === 'number') {
+                if (!/^-?\d+(\.\d+)?$/.test(val)) {
+                    return { valid: false, value: val, message: label + ' must be a valid number.' };
                 }
-      // ✅ Only digital products need game ID fields
-                if (g && (g.productType === 'physical' || g.productType === 'gift_code')) continue;
-                var type = (g && g.gameType) ? g.gameType : 'roblox';
-                typesPresent.add(type);
+            } else if (field.inputType === 'dropdown') {
+                var opts = Array.isArray(field.options) ? field.options : [];
+                if (opts.indexOf(val) === -1) {
+                    return { valid: false, value: val, message: 'Please select a valid option for ' + label + '.' };
+                }
             }
 
-            // If cart has NO digital items, hide the game ID section entirely
-            if (typesPresent.size === 0) {
-                container.innerHTML = '';
-                return;
+            if (field.minLength !== null && field.minLength !== undefined && field.minLength !== '' && Number(field.minLength) > 0) {
+                if (val.length < Number(field.minLength)) {
+                    return { valid: false, value: val, message: label + ' must be at least ' + Number(field.minLength) + ' characters.' };
+                }
+            }
+            if (field.maxLength !== null && field.maxLength !== undefined && field.maxLength !== '' && Number(field.maxLength) > 0) {
+                if (val.length > Number(field.maxLength)) {
+                    return { valid: false, value: val, message: label + ' must be at most ' + Number(field.maxLength) + ' characters.' };
+                }
             }
 
-            var savedIds = getSavedGameIds();
+            var rule = String(field.validationRule || 'none').toLowerCase();
+            if (rule === 'digits_only' && !/^\d+$/.test(val)) {
+                return { valid: false, value: val, message: field.validationMessage || (label + ' must contain digits only.') };
+            }
+            if (rule === 'alphanumeric' && !/^[A-Za-z0-9]+$/.test(val)) {
+                return { valid: false, value: val, message: field.validationMessage || (label + ' must contain letters and numbers only.') };
+            }
+            if (rule === 'no_spaces' && /\s/.test(val)) {
+                return { valid: false, value: val, message: field.validationMessage || (label + ' cannot contain spaces.') };
+            }
+            if (rule === 'roblox_username') {
+                var cleanRbx = val.replace(/^@+/, '').trim();
+                if (cleanRbx.length < 3 || cleanRbx.length > 20 || !/^[A-Za-z0-9_]+$/.test(cleanRbx)) {
+                    return {
+                        valid: false,
+                        value: val,
+                        message: field.validationMessage || (label + ' must be 3–20 characters (letters, numbers, underscore).')
+                    };
+                }
+            }
+            if (rule === 'custom_regex' && field.validationPattern) {
+                try {
+                    var re = new RegExp(field.validationPattern);
+                    if (!re.test(val)) {
+                        return { valid: false, value: val, message: field.validationMessage || (label + ' format is invalid.') };
+                    }
+                } catch (e) {}
+            }
+
+            return { valid: true, value: val, message: '' };
+        }
+
+        function attachRobloxLiveVerifyToInput(inputEl, cardEl) {
+            if (!inputEl || !cardEl) return;
+            var rbxTimer = null;
+            var runVerify = function () {
+                var rawVal = String(inputEl.value || '').replace(/^@+/, '').trim();
+                if (!rawVal) {
+                    cardEl.style.display = 'none';
+                    return;
+                }
+                if (rawVal.length < 3 || !/^[A-Za-z0-9_]+$/.test(rawVal)) {
+                    cardEl.className = 'roblox-verify-card invalid';
+                    cardEl.style.display = 'flex';
+                    cardEl.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Enter a valid Roblox username (letters, numbers, _).</span>';
+                    return;
+                }
+                if (typeof google === 'undefined' || !google.script || !google.script.run) return;
+                cardEl.className = 'roblox-verify-card';
+                cardEl.style.display = 'flex';
+                cardEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:#f7d875;"></i><span>Checking Roblox profile...</span>';
+                google.script.run
+                    .withSuccessHandler(function (res) {
+                        var curVal = String(inputEl.value || '').replace(/^@+/, '').trim();
+                        if (curVal.toLowerCase() !== rawVal.toLowerCase()) return;
+                        if (res && res.found) {
+                            cardEl.className = 'roblox-verify-card valid';
+                            cardEl.innerHTML =
+                                (res.avatarUrl ? '<img src="' + escapeHtml(res.avatarUrl) + '" alt="' + escapeHtml(res.username) + '" />' : '<i class="fas fa-check-circle" style="color:#4caf50;font-size:18px;"></i>') +
+                                '<div><div style="color:#e8edf5;font-weight:700;">' + escapeHtml(res.displayName || res.username) + ' <span style="color:#66bb6a;font-size:11px;">✓ Verified</span></div>' +
+                                '<div style="font-size:11px;color:#8aa1c0;">@' + escapeHtml(res.username) + '</div></div>';
+                        } else {
+                            cardEl.className = 'roblox-verify-card invalid';
+                            cardEl.innerHTML = '<i class="fas fa-user-times"></i><span>Roblox user <strong>@' + escapeHtml(rawVal) + '</strong> not found. Please double-check spelling.</span>';
+                        }
+                    })
+                    .withFailureHandler(function () {
+                        cardEl.style.display = 'none';
+                    })
+                    .lookupRobloxUser(rawVal);
+            };
+            inputEl.addEventListener('input', function () {
+                clearTimeout(rbxTimer);
+                rbxTimer = setTimeout(runVerify, 550);
+            });
+            inputEl.addEventListener('blur', function () {
+                clearTimeout(rbxTimer);
+                runVerify();
+            });
+            if (inputEl.value.trim()) {
+                setTimeout(runVerify, 120);
+            }
+        }
+
+        function renderDynamicCheckoutFieldsInto(container, cartList, reqsMap, options) {
+            if (!container) return;
+            options = options || {};
+            var isPreview = !!options.isPreview;
+            var savedVals = isPreview ? {} : getSavedDynReqValues();
             var hasSavedMatch = false;
             var html = '';
-            var order = ['roblox', 'ml', 'pubg', 'other'];
-            for (var k = 0; k < order.length; k++) {
-                var type = order[k];
-                if (!typesPresent.has(type)) continue;
-                var config = GAME_TYPES[type];
-                html += '<div class="game-id-section" data-gametype="' + type + '">';
-                html += '<div class="game-id-header"><i class="fas ' + config.icon + '"></i> ' + config.label + ' Account</div>';
-                for (var f = 0; f < config.fields.length; f++) {
-                    var field = config.fields[f];
-                    if (savedIds[field.id]) hasSavedMatch = true;
-                    html += '<div class="field">';
-                    html += '<label for="' + field.id + '">' + field.label + (field.required ? ' *' : '') + '</label>';
-                    html += '<input type="text" id="' + field.id + '" placeholder="' + field.placeholder + '" autocomplete="off" />';
-                    if (field.id === 'robloxUsername') {
-                        html += '<div id="robloxVerifyStatus" class="roblox-verify-card" style="display:none;"></div>';
-                    }
-                    html += '</div>';
+            var renderTargets = [];
+
+            for (var i = 0; i < cartList.length; i++) {
+                var item = cartList[i];
+                var pid = String(item.id || '').trim();
+                var cfg = reqsMap ? reqsMap[pid] : null;
+                if (!cfg || !cfg.requirementEnabled || !Array.isArray(cfg.fields) || cfg.fields.length === 0) {
+                    continue;
                 }
+
+                var qty = Math.max(1, parseInt(item.quantity, 10) || 1);
+                var mode = cfg.collectionMode === 'per_unit' ? 'per_unit' : 'per_order_item';
+                var unitIndices = [];
+                if (mode === 'per_unit') {
+                    for (var u = 1; u <= qty; u++) unitIndices.push(u);
+                } else {
+                    unitIndices.push(0);
+                }
+
+                var titleLabel = escapeHtml(item.title || ('Product #' + pid)) +
+                    (item.variantLabel ? ' <span style="color:#8aa1c0;font-weight:500;">(' + escapeHtml(item.variantLabel) + ')</span>' : '');
+                var qtyBadge = '<span style="margin-left:auto;font-size:11px;color:#8aa1c0;font-weight:600;">Qty: ' + qty +
+                    (mode === 'per_unit' && qty > 1 ? ' • Per Unit' : '') + '</span>';
+
+                html += '<div class="game-id-section dyn-req-product-card" data-item-index="' + i + '" data-product-id="' + escapeHtml(pid) + '" data-collection-mode="' + mode + '">';
+                html += '<div class="game-id-header"><i class="fas fa-gamepad"></i> <span>' + titleLabel + '</span>' + qtyBadge + '</div>';
+
+                for (var ui = 0; ui < unitIndices.length; ui++) {
+                    var unitIndex = unitIndices[ui];
+                    var showUnitHeader = (mode === 'per_unit' && qty > 1);
+                    if (showUnitHeader) {
+                        html += '<div class="dyn-req-unit-group" data-unit-index="' + unitIndex + '">';
+                        html += '<div class="dyn-req-unit-title"><i class="fas fa-layer-group"></i> Unit #' + unitIndex + ' of ' + qty + '</div>';
+                    }
+
+                    for (var fi = 0; fi < cfg.fields.length; fi++) {
+                        var field = cfg.fields[fi];
+                        var domId = (isPreview ? 'dynPrev_' : 'dynReq_') + i + '_' + unitIndex + '_' + fi;
+                        var errId = domId + '_err';
+                        var savedKey = pid + '::' + field.fieldId;
+                        var prefill = '';
+                        if (!isPreview) {
+                            if (savedVals[savedKey]) prefill = savedVals[savedKey];
+                            else if (field.validationRule === 'roblox_username' && savedVals['__rule__roblox_username']) prefill = savedVals['__rule__roblox_username'];
+                            if (prefill && field.inputType === 'dropdown' && (!Array.isArray(field.options) || field.options.indexOf(prefill) === -1)) {
+                                prefill = '';
+                            }
+                            if (prefill) hasSavedMatch = true;
+                        }
+
+                        html += '<div class="field">';
+                        html += '<label for="' + escapeHtml(domId) + '">' + escapeHtml(field.label) +
+                            (field.required ? ' <span style="color:#ff6b6b;">*</span>' : ' <span style="color:#6a7f9e;font-weight:500;text-transform:none;">(Optional)</span>') +
+                            '</label>';
+
+                        if (field.inputType === 'dropdown') {
+                            html += '<select id="' + escapeHtml(domId) + '" class="dyn-req-input" data-item-index="' + i + '" data-product-id="' + escapeHtml(pid) + '" data-unit-index="' + unitIndex + '" data-field-id="' + escapeHtml(field.fieldId) + '" data-err-id="' + escapeHtml(errId) + '">';
+                            html += '<option value="">' + escapeHtml(field.placeholder || ('-- Select ' + field.label + ' --')) + '</option>';
+                            var opts = Array.isArray(field.options) ? field.options : [];
+                            for (var oi = 0; oi < opts.length; oi++) {
+                                var optVal = String(opts[oi]);
+                                var selAttr = (prefill && prefill === optVal) ? ' selected' : '';
+                                html += '<option value="' + escapeHtml(optVal) + '"' + selAttr + '>' + escapeHtml(optVal) + '</option>';
+                            }
+                            html += '</select>';
+                        } else {
+                            var inputModeAttr = field.inputType === 'number' ? ' inputmode="decimal"' : '';
+                            var maxLenAttr = (field.maxLength && Number(field.maxLength) > 0) ? ' maxlength="' + Number(field.maxLength) + '"' : '';
+                            html += '<input type="text" id="' + escapeHtml(domId) + '" class="dyn-req-input" autocomplete="off"' +
+                                inputModeAttr + maxLenAttr +
+                                ' placeholder="' + escapeHtml(field.placeholder || '') + '"' +
+                                ' value="' + escapeHtml(prefill) + '"' +
+                                ' data-item-index="' + i + '" data-product-id="' + escapeHtml(pid) + '" data-unit-index="' + unitIndex + '" data-field-id="' + escapeHtml(field.fieldId) + '" data-err-id="' + escapeHtml(errId) + '" />';
+                        }
+
+                        if (field.instructions) {
+                            html += '<div class="dyn-req-instructions"><i class="fas fa-info-circle" style="color:#38bdf8;margin-right:4px;"></i>' + escapeHtml(field.instructions) + '</div>';
+                        }
+                        if (!isPreview && field.validationRule === 'roblox_username') {
+                            var rbxStatusId = domId + '_rbx';
+                            html += '<div id="' + escapeHtml(rbxStatusId) + '" class="roblox-verify-card" style="display:none;"></div>';
+                            renderTargets.push({ domId: domId, rbxStatusId: rbxStatusId });
+                        }
+                        html += '<div id="' + escapeHtml(errId) + '" class="dyn-req-field-error"></div>';
+                        html += '</div>';
+                    }
+
+                    if (showUnitHeader) {
+                        html += '</div>';
+                    }
+                }
+
                 html += '</div>';
             }
 
-            if (hasSavedMatch) {
+            if (!html) {
+                container.innerHTML = isPreview
+                    ? '<div style="color:#8aa1c0;font-size:12.5px;padding:8px 2px;">No customer information fields are required for this product at checkout.</div>'
+                    : '';
+                return;
+            }
+
+            if (!isPreview && hasSavedMatch) {
                 html = '<div class="saved-gameid-bar" id="savedGameIdBar">' +
-                    '<span><i class="fas fa-magic"></i> Auto-filled your saved Game IDs</span>' +
+                    '<span><i class="fas fa-magic"></i> Auto-filled your saved game details</span>' +
                     '<button type="button" class="saved-gameid-clear" id="clearSavedGameIdsBtn">Clear</button>' +
                 '</div>' + html;
             }
-            container.innerHTML = html;
 
-            // Safely set saved values & auto-save on input
-            var allGameInputs = container.querySelectorAll('.game-id-section input');
-            for (var ai = 0; ai < allGameInputs.length; ai++) {
-                var inp = allGameInputs[ai];
-                if (savedIds[inp.id]) inp.value = savedIds[inp.id];
-                inp.addEventListener('input', function () {
-                    var patch = {};
-                    patch[this.id] = this.value.trim();
-                    saveGameIdsToStorage(patch);
-                });
+            container.innerHTML = html;
+            if (isPreview) return;
+
+            var allInputs = container.querySelectorAll('.dyn-req-input');
+            for (var ai = 0; ai < allInputs.length; ai++) {
+                (function (el) {
+                    var clearErr = function () {
+                        el.classList.remove('dyn-req-invalid');
+                        var errEl = document.getElementById(el.dataset.errId);
+                        if (errEl) errEl.textContent = '';
+                    };
+                    el.addEventListener('input', clearErr);
+                    el.addEventListener('change', clearErr);
+                })(allInputs[ai]);
             }
 
             var clrBtn = document.getElementById('clearSavedGameIdsBtn');
             if (clrBtn) {
                 clrBtn.addEventListener('click', function () {
-                    clearSavedGameIds();
-                    for (var ci = 0; ci < allGameInputs.length; ci++) {
-                        allGameInputs[ci].value = '';
+                    clearSavedDynReqValues();
+                    for (var ci = 0; ci < allInputs.length; ci++) {
+                        allInputs[ci].value = '';
+                        allInputs[ci].classList.remove('dyn-req-invalid');
+                        var eEl = document.getElementById(allInputs[ci].dataset.errId);
+                        if (eEl) eEl.textContent = '';
                     }
-                    var rbxCardEl = document.getElementById('robloxVerifyStatus');
-                    if (rbxCardEl) rbxCardEl.style.display = 'none';
+                    container.querySelectorAll('.roblox-verify-card').forEach(function (rc) {
+                        rc.style.display = 'none';
+                    });
                     var barEl = document.getElementById('savedGameIdBar');
                     if (barEl) barEl.style.display = 'none';
-                    showToast('Saved Game IDs cleared.');
+                    showToast('Saved game details cleared.');
                 });
             }
 
-            var rbxInput = document.getElementById('robloxUsername');
-            var rbxCard = document.getElementById('robloxVerifyStatus');
-            if (rbxInput && rbxCard) {
-                var rbxTimer = null;
-                var runRobloxVerify = function () {
-                    var rawVal = String(rbxInput.value || '').replace(/^@+/, '').trim();
-                    if (!rawVal) {
-                        rbxCard.style.display = 'none';
-                        return;
-                    }
-                    if (rawVal.length < 3 || !/^[A-Za-z0-9_]+$/.test(rawVal)) {
-                        rbxCard.className = 'roblox-verify-card invalid';
-                        rbxCard.style.display = 'flex';
-                        rbxCard.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Enter a valid Roblox username (letters, numbers, _).</span>';
-                        return;
-                    }
-                    if (typeof google === 'undefined' || !google.script || !google.script.run) return;
-                    rbxCard.className = 'roblox-verify-card';
-                    rbxCard.style.display = 'flex';
-                    rbxCard.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:#f7d875;"></i><span>Checking Roblox profile...</span>';
-                    google.script.run
-                        .withSuccessHandler(function (res) {
-                            var curVal = String(rbxInput.value || '').replace(/^@+/, '').trim();
-                            if (curVal.toLowerCase() !== rawVal.toLowerCase()) return;
-                            if (res && res.found) {
-                                rbxCard.className = 'roblox-verify-card valid';
-                                rbxCard.innerHTML =
-                                    (res.avatarUrl ? '<img src="' + escapeHtml(res.avatarUrl) + '" alt="' + escapeHtml(res.username) + '" />' : '<i class="fas fa-check-circle" style="color:#4caf50;font-size:18px;"></i>') +
-                                    '<div><div style="color:#e8edf5;font-weight:700;">' + escapeHtml(res.displayName || res.username) + ' <span style="color:#66bb6a;font-size:11px;">✓ Verified</span></div>' +
-                                    '<div style="font-size:11px;color:#8aa1c0;">@' + escapeHtml(res.username) + '</div></div>';
-                            } else {
-                                rbxCard.className = 'roblox-verify-card invalid';
-                                rbxCard.innerHTML = '<i class="fas fa-user-times"></i><span>Roblox user <strong>@' + escapeHtml(rawVal) + '</strong> not found. Please double-check spelling.</span>';
-                            }
-                        })
-                        .withFailureHandler(function () {
-                            rbxCard.style.display = 'none';
-                        })
-                        .lookupRobloxUser(rawVal);
-                };
-                rbxInput.addEventListener('input', function () {
-                    clearTimeout(rbxTimer);
-                    rbxTimer = setTimeout(runRobloxVerify, 550);
-                });
-                rbxInput.addEventListener('blur', function () {
-                    clearTimeout(rbxTimer);
-                    runRobloxVerify();
-                });
-                if (rbxInput.value.trim()) {
-                    setTimeout(runRobloxVerify, 120);
+            for (var rt = 0; rt < renderTargets.length; rt++) {
+                attachRobloxLiveVerifyToInput(
+                    document.getElementById(renderTargets[rt].domId),
+                    document.getElementById(renderTargets[rt].rbxStatusId)
+                );
+            }
+        }
+
+        function loadAndBuildCheckoutRequirements() {
+            var container = document.getElementById('gameIdFields');
+            if (!container) return;
+
+            if (!Array.isArray(cart) || cart.length === 0) {
+                container.innerHTML = '';
+                window._checkoutReqsMap = {};
+                window._checkoutReqsLoaded = true;
+                window._checkoutReqsLoading = false;
+                return;
+            }
+
+            var seen = {};
+            var productIds = [];
+            for (var i = 0; i < cart.length; i++) {
+                var pid = String(cart[i].id || '').trim();
+                if (pid && !seen[pid]) {
+                    seen[pid] = true;
+                    productIds.push(pid);
                 }
             }
+
+            var seq = ++window._checkoutReqsRequestSeq;
+            window._checkoutReqsLoaded = false;
+            window._checkoutReqsLoading = true;
+            container.innerHTML = '<div class="dyn-req-loading"><span><i class="fas fa-spinner fa-spin" style="color:#f7d875;margin-right:8px;"></i>Loading required product details...</span></div>';
+
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    if (seq !== window._checkoutReqsRequestSeq) return;
+                    window._checkoutReqsLoading = false;
+                    if (!res || res.success === false) {
+                        window._checkoutReqsLoaded = false;
+                        container.innerHTML = '<div class="dyn-req-error-box">' +
+                            '<span><i class="fas fa-exclamation-triangle"></i> Could not load product requirements: ' + escapeHtml((res && res.message) || 'Unknown error') + '</span>' +
+                            '<button type="button" class="dyn-req-btn sm" id="retryLoadReqsBtn"><i class="fas fa-sync-alt"></i> Retry</button>' +
+                        '</div>';
+                        var rb = document.getElementById('retryLoadReqsBtn');
+                        if (rb) rb.addEventListener('click', loadAndBuildCheckoutRequirements);
+                        return;
+                    }
+                    window._checkoutReqsMap = res.requirements || {};
+                    window._checkoutReqsLoaded = true;
+                    renderDynamicCheckoutFieldsInto(container, cart, window._checkoutReqsMap, { isPreview: false });
+                })
+                .withFailureHandler(function (err) {
+                    if (seq !== window._checkoutReqsRequestSeq) return;
+                    window._checkoutReqsLoading = false;
+                    window._checkoutReqsLoaded = false;
+                    container.innerHTML = '<div class="dyn-req-error-box">' +
+                        '<span><i class="fas fa-exclamation-triangle"></i> Could not load product requirements: ' + escapeHtml((err && err.message) || 'Network error') + '</span>' +
+                        '<button type="button" class="dyn-req-btn sm" id="retryLoadReqsBtn"><i class="fas fa-sync-alt"></i> Retry</button>' +
+                    '</div>';
+                    var rb2 = document.getElementById('retryLoadReqsBtn');
+                    if (rb2) rb2.addEventListener('click', loadAndBuildCheckoutRequirements);
+                })
+                .getProductRequirementsBatch(productIds);
+        }
+
+        function validateAndCollectDynamicCheckoutFields(container, cartList, reqsMap) {
+            container = container || document.getElementById('gameIdFields');
+            cartList = cartList || cart;
+            reqsMap = reqsMap || window._checkoutReqsMap || {};
+
+            var errors = [];
+            var firstInvalidEl = null;
+            var submittedRequirements = [];
+            var legacyGameIds = { roblox: {}, ml: {}, pubg: {}, other: {} };
+
+            for (var i = 0; i < cartList.length; i++) {
+                var item = cartList[i];
+                var pid = String(item.id || '').trim();
+                var cfg = reqsMap[pid];
+                if (!cfg || !cfg.requirementEnabled || !Array.isArray(cfg.fields) || cfg.fields.length === 0) {
+                    continue;
+                }
+
+                var qty = Math.max(1, parseInt(item.quantity, 10) || 1);
+                var mode = cfg.collectionMode === 'per_unit' ? 'per_unit' : 'per_order_item';
+                var unitIndices = mode === 'per_unit'
+                    ? (function () { var a = []; for (var u = 1; u <= qty; u++) a.push(u); return a; })()
+                    : [0];
+
+                var unitSubmissions = [];
+
+                for (var ui = 0; ui < unitIndices.length; ui++) {
+                    var unitIndex = unitIndices[ui];
+                    var values = {};
+
+                    for (var fi = 0; fi < cfg.fields.length; fi++) {
+                        var field = cfg.fields[fi];
+                        var el = container
+                            ? container.querySelector('.dyn-req-input[data-item-index="' + i + '"][data-unit-index="' + unitIndex + '"][data-field-id="' + field.fieldId + '"]')
+                            : null;
+                        var rawVal = el ? el.value : '';
+                        var check = validateSingleDynamicFieldValue(field, rawVal);
+
+                        var errEl = el ? document.getElementById(el.dataset.errId) : null;
+                        if (!check.valid) {
+                            if (el) el.classList.add('dyn-req-invalid');
+                            if (errEl) errEl.textContent = check.message;
+                            if (!firstInvalidEl && el) firstInvalidEl = el;
+                            var unitTag = (mode === 'per_unit' && qty > 1) ? (' (Unit #' + unitIndex + ')') : '';
+                            errors.push((item.title || 'Product') + unitTag + ': ' + check.message);
+                        } else {
+                            if (el) el.classList.remove('dyn-req-invalid');
+                            if (errEl) errEl.textContent = '';
+                            values[field.fieldId] = check.value;
+
+                            if (check.value) {
+                                var lblLow = String(field.label || '').toLowerCase();
+                                if (field.validationRule === 'roblox_username' || /roblox\s*user/i.test(lblLow)) {
+                                    if (!legacyGameIds.roblox.robloxUsername) legacyGameIds.roblox.robloxUsername = check.value.replace(/^@+/, '');
+                                } else if (/roblox\s*nick/i.test(lblLow)) {
+                                    if (!legacyGameIds.roblox.robloxNickname) legacyGameIds.roblox.robloxNickname = check.value;
+                                }
+                            }
+                        }
+                    }
+
+                    unitSubmissions.push({
+                        unitIndex: unitIndex,
+                        values: values
+                    });
+                }
+
+                submittedRequirements.push({
+                    itemIndex: i,
+                    productId: pid,
+                    units: unitSubmissions
+                });
+            }
+
+            return {
+                valid: errors.length === 0,
+                errors: errors,
+                firstInvalidEl: firstInvalidEl,
+                submittedRequirements: submittedRequirements,
+                legacyGameIds: legacyGameIds
+            };
         }
 
         checkoutCancel.addEventListener('click', function() { checkoutOverlay.classList.remove('open'); });
@@ -15323,25 +16038,30 @@ checkoutBtn.addEventListener('click', function() {
             }
             document.getElementById('paymentMethodError').textContent = '';
 
-            var gameIds = {};
-            var sections2 = document.querySelectorAll('.game-id-section');
-            for (var s = 0; s < sections2.length; s++) {
-                var type = sections2[s].dataset.gametype;
-                var config = GAME_TYPES[type];
-                if (!config) continue;
-                gameIds[type] = {};
-                for (var f = 0; f < config.fields.length; f++) {
-                    var field = config.fields[f];
-                    var el = document.getElementById(field.id);
-                    var val = el ? el.value.trim() : '';
-                    if (field.required && !val) {
-                        checkoutError.textContent = field.label + ' is required.';
-                        if (el) el.focus();
-                        return;
-                    }
-                    gameIds[type][field.id] = val;
-                }
+            if (window._checkoutReqsLoading) {
+                checkoutError.textContent = 'Please wait for product requirements to finish loading.';
+                return;
             }
+            if (!window._checkoutReqsLoaded) {
+                checkoutError.textContent = 'Product requirements could not be loaded. Please click Retry above.';
+                return;
+            }
+
+            var reqValidation = validateAndCollectDynamicCheckoutFields(
+                document.getElementById('gameIdFields'),
+                cart,
+                window._checkoutReqsMap
+            );
+            if (!reqValidation.valid) {
+                checkoutError.textContent = reqValidation.errors[0] || 'Please fix the highlighted game details above.';
+                if (reqValidation.firstInvalidEl) {
+                    reqValidation.firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    reqValidation.firstInvalidEl.focus();
+                }
+                return;
+            }
+            var gameIds = reqValidation.legacyGameIds || {};
+            var submittedRequirements = reqValidation.submittedRequirements || [];
 
             // ✅ Validate shipping fields if cart has physical items
             var hasPhysicalItem = cartHasPhysicalItems();
@@ -15407,10 +16127,14 @@ checkoutBtn.addEventListener('click', function() {
 
             checkoutError.textContent = '';
             var customerName = customer ? customer.name : '';
+            if (!window._checkoutSubmissionToken) {
+                window._checkoutSubmissionToken = 'SUB-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+            }
             var customerData = {
                 name: customerName,
                 phone: phone,
-                email: email
+                email: email,
+                _submissionToken: window._checkoutSubmissionToken
             };
 
             // ✅ Pass variants to backend
@@ -15495,7 +16219,8 @@ var promoData = appliedPromo ? {
                         var itemsSummary = items.map(function(it) {
                             return it.title + (it.variantLabel ? ' (' + it.variantLabel + ')' : '') + ' × ' + it.quantity;
                         }).join(', ');
-                        saveGameIdsToStorage(gameIds);
+                        saveDynReqValues(submittedRequirements, window._checkoutReqsMap);
+                        window._checkoutSubmissionToken = '';
                         var contactToSave = { phone: customerData.phone || '', email: customerData.email || '' };
                         if (hasPhysicalItem && shippingData) {
                             contactToSave.shippingName = shippingData.name || '';
@@ -15545,12 +16270,16 @@ var promoData = appliedPromo ? {
                         }
                     })
                     .withFailureHandler(function(err) {
-                        checkoutError.textContent = 'Error placing order. Please try again.';
+                        var errMsg = (err && err.message) ? err.message : 'Error placing order. Please try again.';
+                        checkoutError.textContent = errMsg;
+                        if (String(errMsg).toLowerCase().indexOf('duplicate') === -1) {
+                            window._checkoutSubmissionToken = 'SUB-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+                        }
                         console.error(err);
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
                     })
-                    .placeOrder(customerData, items, total2, promoData, gameIds, selectedPaymentMethod, pointsToRedeem, shippingData, hasPhysicalItem, agentCodeFromUrl || '', backorderAccepted);
+                    .placeOrder(customerData, items, total2, promoData, gameIds, selectedPaymentMethod, pointsToRedeem, shippingData, hasPhysicalItem, agentCodeFromUrl || '', backorderAccepted, submittedRequirements);
             }
 
             var robuxRequiredNow = getCartRobuxRequired();
@@ -16737,8 +17466,13 @@ if (cart.length > 0) {
 
             for (var i = 0; i < pageItems.length; i++) {
                 var g = pageItems[i];
-                var typeLabel = (g.productType === 'physical') ? '📦 Physical' : '💾 Digital';
+                var typeLabel = (g.productType === 'physical') ? '📦 Physical' : (g.productType === 'gift_code' ? '🎁 Gift Code' : '💾 Digital');
                 var variantIcon = (g.hasVariants) ? ' <i class="fas fa-layer-group" style="color:#f7d875;font-size:11px;" title="Has variants"></i>' : '';
+                var reqCfg = g.requirementsConfig;
+                var reqFieldCnt = (reqCfg && reqCfg.requirementEnabled && Array.isArray(reqCfg.fields)) ? reqCfg.fields.length : 0;
+                var reqPill = reqFieldCnt > 0
+                    ? '<br><span class="dyn-req-badge-pill"><i class="fas fa-id-card"></i> ' + reqFieldCnt + ' field' + (reqFieldCnt !== 1 ? 's' : '') + '</span>'
+                    : '<br><span class="dyn-req-badge-pill none">No ID req</span>';
 
                 html += '<tr>';
                 html += '<td>' + highlightText(g.id, query) + '</td>';
@@ -16769,7 +17503,7 @@ if (cart.length > 0) {
                 html += '<td>' + (g.discount || 0) + '%</td>';
                 var qtyColor = (g.quantity || 0) <= 5 ? 'color:#ff6b6b;font-weight:700;' : '';
                 html += '<td style="' + qtyColor + '">' + (g.quantity || 0) + '</td>';
-                html += '<td style="font-size:11px;">' + typeLabel + '</td>';
+                html += '<td style="font-size:11px;">' + typeLabel + reqPill + '</td>';
                 html += '<td>' +
                     '<button class="action-btn edit-btn" data-id="' + g.id + '" title="Edit"><i class="fas fa-edit"></i></button> ' +
                     '<button class="action-btn delete-btn" data-id="' + g.id + '" title="Delete"><i class="fas fa-trash-alt"></i></button>' +
@@ -16875,7 +17609,24 @@ if (cart.length > 0) {
             editImage.value = game.image || '';
             editBadge.value = game.badge || '';
             editAdditionalImages.value = (game.additionalImages || []).join(', ');
-            document.getElementById('editGameType').value = game.gameType || 'roblox';
+            document.getElementById('editGameType').value = game.gameType || 'other';
+            if (window.ProductReqAdminEditor) {
+                window.ProductReqAdminEditor.load('edit', game.requirementsConfig || null, game.id);
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    (function (targetGameId) {
+                        google.script.run
+                            .withSuccessHandler(function (res) {
+                                if (!res || !res.success || !res.config) return;
+                                if (String(editId.value) !== String(targetGameId)) return;
+                                if (!editOverlay.classList.contains('open')) return;
+                                if (window.ProductReqAdminEditor && !window.ProductReqAdminEditor.isDirty('edit')) {
+                                    window.ProductReqAdminEditor.load('edit', res.config, targetGameId);
+                                }
+                            })
+                            .getProductRequirements(targetGameId);
+                    })(game.id);
+                }
+            }
 
             var errorEl = document.getElementById('editFormError');
             if (errorEl) errorEl.style.display = 'none';
@@ -17108,6 +17859,14 @@ var data = {
             if (!data.title) errors.push('Title is required.');
             if (isNaN(data.price) || data.price < 0) errors.push('Valid price is required.');
             if (isNaN(data.cost) || data.cost < 0) errors.push('Valid cost is required.');
+            if (window.ProductReqAdminEditor) {
+                var editReqCheck = window.ProductReqAdminEditor.commitAndValidate('edit');
+                if (!editReqCheck.valid) {
+                    errors.push(editReqCheck.message);
+                } else {
+                    data.requirementsConfig = editReqCheck.config;
+                }
+            }
 
             if (errors.length > 0) {
                 errorEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + errors.join(' ');
@@ -17149,7 +17908,7 @@ var data = {
                     errorEl.innerHTML = '<i class="fas fa-times-circle"></i> Error: ' + err.message;
                     errorEl.style.display = 'block';
                 })
-                .updateGame(id, data);
+                .updateGame(id, data, window._nexAdminPwdSession || '');
         });
 
         // ================================================================
@@ -17268,6 +18027,14 @@ if (!hasVariants) {
     if (isNaN(data.price) || data.price < 0) errors.push('Valid price is required.');
     if (isNaN(data.cost)  || data.cost  < 0) errors.push('Valid cost is required.');
 }
+if (window.ProductReqAdminEditor) {
+    var addReqCheck = window.ProductReqAdminEditor.commitAndValidate('add');
+    if (!addReqCheck.valid) {
+        errors.push(addReqCheck.message);
+    } else {
+        data.requirementsConfig = addReqCheck.config;
+    }
+}
 
             if (errors.length > 0) {
                 adminStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + errors.join(' ');
@@ -17282,11 +18049,19 @@ if (!hasVariants) {
 
             google.script.run
                 .withSuccessHandler(function(updatedData) {
-                    allGames = updatedData;
+                    if (updatedData && !Array.isArray(updatedData) && updatedData.success === false) {
+                        adminStatus.innerHTML = '<i class="fas fa-times-circle"></i> ' + escapeHtml(updatedData.message || 'Error adding game.');
+                        adminStatus.style.color = '#ff6b6b';
+                        return;
+                    }
+                    allGames = Array.isArray(updatedData) ? updatedData : allGames;
                     renderAll();
                     renderAdminList();
                     resetVariantEditor('add');
+                    if (window.ProductReqAdminEditor) window.ProductReqAdminEditor.reset('add');
                     addGameForm.reset();
+                    var gtEl = document.getElementById('gameType');
+                    if (gtEl) gtEl.value = 'other';
                     document.getElementById('quantity').value = 0;
                     adminStatus.innerHTML = '<i class="fas fa-check-circle"></i> Game added!';
                     adminStatus.style.color = '#4caf50';
@@ -17300,7 +18075,7 @@ if (!hasVariants) {
                     adminStatus.style.color = '#ff6b6b';
                     console.error(err);
                 })
-                .addGame(data);
+                .addGame(data, window._nexAdminPwdSession || '');
         });
 
         // ================================================================
@@ -17485,8 +18260,11 @@ function loadOrders() {
                 }
                 var waHref = buildAdminWhatsAppLink(o['Phone'], oid, o['Customer Name'], payStatusRaw);
                 if (waHref) {
-                    html += '<a href="' + waHref + '" target="_blank" rel="noopener noreferrer" class="wa-mini-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>';
+                    html += '<a href="' + waHref + '" target="_blank" rel="noopener noreferrer" class="wa-mini-btn"><i class="fab fa-whatsapp"></i> WA</a>';
                 }
+                var hasDynReqs = Array.isArray(o._requirements) && o._requirements.length > 0;
+                html += '<button type="button" class="dyn-req-btn sm view-order-details-btn" data-orderid="' + escapeHtml(oid) + '">' +
+                    '<i class="fas fa-id-card"></i> ' + (hasDynReqs ? 'Game Info' : 'Details') + '</button>';
                 html += '</div></td>';
 
                 var rbReq = parseInt(o['Robux Required'], 10) || 0;
@@ -17528,6 +18306,16 @@ function loadOrders() {
                 });
             }
             // 👆 END NEW 👆
+
+            // Bind Order Details / Game Info buttons
+            var detailBtns = ordersList.querySelectorAll('.view-order-details-btn');
+            for (var db = 0; db < detailBtns.length; db++) {
+                detailBtns[db].addEventListener('click', function() {
+                    if (typeof openAdminOrderDetailModal === 'function') {
+                        openAdminOrderDetailModal(this.dataset.orderid);
+                    }
+                });
+            }
 
             // Mark as Shipped
             var shipBtns = ordersList.querySelectorAll('.mark-shipped-btn');
@@ -17771,6 +18559,7 @@ function loadOrders() {
                 html2 += '<td><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">' +
                          '<button class="approve-btn" data-orderid="' + orderId + '" ' + approveDisabled + ' title="' + approveTitle + '"><i class="fas fa-check"></i> Approve</button>' +
                          '<button class="cancel-btn" data-orderid="' + orderId + '"><i class="fas fa-times"></i> Reject</button>' +
+                         '<button type="button" class="dyn-req-btn sm approval-view-details-btn" data-orderid="' + escapeApprovalHtml(orderId) + '"><i class="fas fa-id-card"></i> Info</button>' +
                          (waAppHref ? '<a href="' + waAppHref + '" target="_blank" rel="noopener noreferrer" class="wa-mini-btn"><i class="fab fa-whatsapp"></i> WA</a>' : '') +
                          '</div></td>';
                 html2 += '</tr>';
@@ -17799,6 +18588,14 @@ function loadOrders() {
                 cancelBtns[cb].addEventListener('click', function() {
                     var oid = this.dataset.orderid;
                     showConfirmModal('reject', oid);
+                });
+            }
+            var appDetailBtns = approvalList.querySelectorAll('.approval-view-details-btn');
+            for (var adb = 0; adb < appDetailBtns.length; adb++) {
+                appDetailBtns[adb].addEventListener('click', function() {
+                    if (typeof openAdminOrderDetailModal === 'function') {
+                        openAdminOrderDetailModal(this.dataset.orderid);
+                    }
                 });
             }
         }
@@ -18190,6 +18987,9 @@ function loadOrders() {
                         html += '<div><strong>Total:</strong> ' + CURRENCY + ' ' + total + '</div>';
                         html += '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + escapeHtml(status) + '</span></div>';
                         html += trackInfo;
+                        if (typeof renderCustomerOrderRequirementsHtml === 'function' && Array.isArray(o._requirements) && o._requirements.length > 0) {
+                            html += renderCustomerOrderRequirementsHtml(o);
+                        }
                         html += '<div><strong>Date:</strong> ' + escapeHtml(date) + '</div>';
                         html += payBtn;
                         html += '</div>';
@@ -19015,6 +19815,10 @@ function renderOrderList(tab) {
                 (trackingNum ? '<button type="button" class="sbz-copy-btn" onclick="copyToClipboard(\'' + escapeHtml(trackingNum) + '\')"><i class="fas fa-copy"></i> Copy</button>' : '') +
                 (trackingUrl ? '<a href="' + escapeHtml(trackingUrl) + '" target="_blank" rel="noopener noreferrer" class="wa-mini-btn" style="border-color:#38bdf8;color:#38bdf8;background:rgba(56,189,248,0.12);"><i class="fas fa-external-link-alt"></i> Track Parcel</a>' : '') +
                 '</div></div>';
+        }
+
+        if (typeof renderCustomerOrderRequirementsHtml === 'function' && Array.isArray(order._requirements) && order._requirements.length > 0) {
+            html += renderCustomerOrderRequirementsHtml(order);
         }
 
         html += '<div class="order-actions">';
@@ -27160,6 +27964,754 @@ loadMyAccount = function () {
 
     apply_nex2_language(_nex2State.lang);
     setTimeout(loadNex4Up2Bootstrap, 700);
+})();
+
+// ================================================================
+// 🧩 DYNAMIC PRODUCT-BASED GAME ID REQUIREMENT SYSTEM (ADMIN + ORDERS)
+// ================================================================
+(function initDynamicProductRequirementsModule() {
+    var INPUT_TYPE_LABELS = { text: 'Text', number: 'Number', dropdown: 'Dropdown' };
+    var RULE_LABELS = {
+        none: 'None',
+        digits_only: 'Digits Only',
+        alphanumeric: 'Alphanumeric',
+        no_spaces: 'No Spaces',
+        roblox_username: 'Roblox Username (Live Verify)',
+        custom_regex: 'Custom Regex'
+    };
+
+    function _cloneFields(arr) {
+        return JSON.parse(JSON.stringify(Array.isArray(arr) ? arr : []));
+    }
+
+    function _makeEmptyField() {
+        return {
+            fieldId: 'fld_' + Math.random().toString(36).slice(2, 10),
+            label: '',
+            inputType: 'text',
+            required: true,
+            placeholder: '',
+            instructions: '',
+            options: [],
+            minLength: '',
+            maxLength: '',
+            validationRule: 'none',
+            validationPattern: '',
+            validationMessage: ''
+        };
+    }
+
+    function _defaultEditorState() {
+        return {
+            productId: null,
+            enabled: false,
+            collectionMode: 'per_order_item',
+            fields: [],
+            editingIndex: -1,
+            draftField: null,
+            editorError: '',
+            previewOpen: false,
+            previewQty: 1,
+            dirty: false,
+            dragIndex: -1,
+            savingDirect: false
+        };
+    }
+
+    var states = {
+        add: _defaultEditorState(),
+        edit: _defaultEditorState()
+    };
+
+    function _getConfigFromState(ctx) {
+        var st = states[ctx];
+        return {
+            requirementEnabled: !!st.enabled,
+            collectionMode: st.collectionMode === 'per_unit' ? 'per_unit' : 'per_order_item',
+            fields: st.fields.map(function (f) {
+                return {
+                    fieldId: f.fieldId,
+                    label: String(f.label || '').trim(),
+                    inputType: INPUT_TYPE_LABELS[f.inputType] ? f.inputType : 'text',
+                    required: f.required !== false,
+                    placeholder: String(f.placeholder || '').trim(),
+                    instructions: String(f.instructions || '').trim(),
+                    options: f.inputType === 'dropdown' ? (Array.isArray(f.options) ? f.options.slice() : []) : [],
+                    minLength: (f.minLength !== '' && f.minLength !== null && f.minLength !== undefined) ? parseInt(f.minLength, 10) : null,
+                    maxLength: (f.maxLength !== '' && f.maxLength !== null && f.maxLength !== undefined) ? parseInt(f.maxLength, 10) : null,
+                    validationRule: RULE_LABELS[f.validationRule] ? f.validationRule : 'none',
+                    validationPattern: f.validationRule === 'custom_regex' ? String(f.validationPattern || '').trim() : '',
+                    validationMessage: String(f.validationMessage || '').trim()
+                };
+            })
+        };
+    }
+
+    function _readDraftFromDom(ctx) {
+        var root = document.getElementById(ctx + 'ReqConfigSection');
+        if (!root) return null;
+        var labelEl = root.querySelector('[data-dyn-ed="label"]');
+        if (!labelEl) return null;
+
+        var typeEl = root.querySelector('[data-dyn-ed="inputType"]');
+        var reqEl = root.querySelector('[data-dyn-ed="required"]');
+        var phEl = root.querySelector('[data-dyn-ed="placeholder"]');
+        var instEl = root.querySelector('[data-dyn-ed="instructions"]');
+        var optsEl = root.querySelector('[data-dyn-ed="options"]');
+        var minEl = root.querySelector('[data-dyn-ed="minLength"]');
+        var maxEl = root.querySelector('[data-dyn-ed="maxLength"]');
+        var ruleEl = root.querySelector('[data-dyn-ed="validationRule"]');
+        var patEl = root.querySelector('[data-dyn-ed="validationPattern"]');
+        var msgEl = root.querySelector('[data-dyn-ed="validationMessage"]');
+
+        var inputType = typeEl ? typeEl.value : 'text';
+        var optsArr = [];
+        if (inputType === 'dropdown' && optsEl) {
+            var seen = {};
+            String(optsEl.value || '').split(/[\n,]+/).forEach(function (s) {
+                var clean = s.trim();
+                if (clean && !seen[clean]) { seen[clean] = true; optsArr.push(clean); }
+            });
+        }
+
+        var prevField = (states[ctx].draftField && states[ctx].draftField.fieldId)
+            ? states[ctx].draftField
+            : _makeEmptyField();
+
+        return {
+            fieldId: prevField.fieldId,
+            label: labelEl.value.trim(),
+            inputType: inputType,
+            required: reqEl ? reqEl.checked : true,
+            placeholder: phEl ? phEl.value.trim() : '',
+            instructions: instEl ? instEl.value.trim() : '',
+            options: optsArr,
+            minLength: minEl && minEl.value !== '' ? parseInt(minEl.value, 10) : '',
+            maxLength: maxEl && maxEl.value !== '' ? parseInt(maxEl.value, 10) : '',
+            validationRule: ruleEl ? ruleEl.value : 'none',
+            validationPattern: patEl ? patEl.value.trim() : '',
+            validationMessage: msgEl ? msgEl.value.trim() : ''
+        };
+    }
+
+    function _validateFieldDef(f) {
+        if (!f.label) return 'Field Label is required.';
+        if (f.label.length > 80) return 'Field Label must be 80 characters or fewer.';
+        if (_PR_CLIENT_PASSWORD_RE.test(f.label) || _PR_CLIENT_PASSWORD_RE.test(f.placeholder || '')) {
+            return 'Security policy: Passwords / login credentials cannot be collected as ordinary Game ID fields. Use a dedicated secure workflow.';
+        }
+        if (f.inputType === 'dropdown' && (!Array.isArray(f.options) || f.options.length === 0)) {
+            return 'Dropdown fields require at least one option (comma or newline separated).';
+        }
+        var hasMin = f.minLength !== '' && f.minLength !== null && f.minLength !== undefined && !isNaN(f.minLength);
+        var hasMax = f.maxLength !== '' && f.maxLength !== null && f.maxLength !== undefined && !isNaN(f.maxLength);
+        if (hasMin && Number(f.minLength) < 0) return 'Minimum length cannot be negative.';
+        if (hasMax && Number(f.maxLength) < 1) return 'Maximum length must be at least 1.';
+        if (hasMin && hasMax && Number(f.minLength) > Number(f.maxLength)) {
+            return 'Minimum length cannot exceed Maximum length.';
+        }
+        if (f.validationRule === 'custom_regex') {
+            if (!f.validationPattern) return 'Custom Regex rule requires a regex pattern.';
+            try { new RegExp(f.validationPattern); }
+            catch (e) { return 'Invalid custom regex pattern: ' + e.message; }
+        }
+        return '';
+    }
+
+    function _commitDraftField(ctx) {
+        var st = states[ctx];
+        var draft = _readDraftFromDom(ctx);
+        if (!draft) return { valid: true };
+        var err = _validateFieldDef(draft);
+        if (err) {
+            st.draftField = draft;
+            st.editorError = err;
+            renderEditor(ctx);
+            return { valid: false, message: err };
+        }
+        if (st.editingIndex >= 0 && st.editingIndex < st.fields.length) {
+            st.fields[st.editingIndex] = draft;
+        } else {
+            st.fields.push(draft);
+        }
+        st.editingIndex = -1;
+        st.draftField = null;
+        st.editorError = '';
+        st.dirty = true;
+        renderEditor(ctx);
+        return { valid: true };
+    }
+
+    function _renderPreview(ctx) {
+        var root = document.getElementById(ctx + 'ReqConfigSection');
+        if (!root) return;
+        var previewMount = root.querySelector('[data-dyn-preview-body]');
+        if (!previewMount) return;
+
+        var st = states[ctx];
+        var cfg = _getConfigFromState(ctx);
+        var titleEl = document.getElementById(ctx === 'edit' ? 'editTitle' : 'title');
+        var prodTitle = (titleEl && titleEl.value.trim()) ? titleEl.value.trim() : 'Sample Product';
+        var fakeCart = [{ id: 'preview', title: prodTitle, quantity: st.previewQty || 1, variantLabel: '' }];
+        var fakeMap = { preview: cfg };
+        renderDynamicCheckoutFieldsInto(previewMount, fakeCart, fakeMap, { isPreview: true });
+    }
+
+    function renderEditor(ctx) {
+        var root = document.getElementById(ctx + 'ReqConfigSection');
+        if (!root) return;
+        var st = states[ctx];
+
+        var html = '<div class="admin-form-section-header" style="justify-content:space-between;flex-wrap:wrap;">' +
+            '<span style="display:inline-flex;align-items:center;gap:10px;"><i class="fas fa-id-card"></i> Customer Information Requirements</span>' +
+            '<span style="font-size:11px;color:#8aa1c0;font-weight:600;text-transform:none;">' +
+                (st.enabled ? (st.fields.length + ' field' + (st.fields.length !== 1 ? 's' : '') + ' active') : 'Disabled (no fields at checkout)') +
+            '</span>' +
+        '</div>';
+
+        html += '<div class="dyn-req-top-bar">' +
+            '<label class="dyn-req-switch-label">' +
+                '<span class="dyn-req-switch"><input type="checkbox" data-dyn-act="toggle-enabled"' + (st.enabled ? ' checked' : '') + ' /><span class="dyn-req-slider"></span></span>' +
+                '<span>Require customer Game ID / details at checkout</span>' +
+            '</label>' +
+            '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+                '<button type="button" class="dyn-req-btn" data-dyn-act="toggle-preview"><i class="fas fa-eye"></i> ' + (st.previewOpen ? 'Hide Checkout Preview' : 'Preview Checkout Form') + '</button>' +
+                (ctx === 'edit' && st.productId
+                    ? '<button type="button" class="dyn-req-btn primary" data-dyn-act="save-direct"' + (st.savingDirect ? ' disabled' : '') + '>' +
+                        (st.savingDirect ? '<i class="fas fa-spinner fa-spin"></i> Saving...' : '<i class="fas fa-save"></i> Save Requirements') +
+                      '</button>'
+                    : '') +
+            '</div>' +
+        '</div>';
+
+        if (!st.enabled) {
+            html += '<div style="font-size:12.5px;color:#8aa1c0;padding:4px 2px 8px;">' +
+                'Requirements are currently <strong>disabled</strong> for this product. Customers will not be asked for Game IDs at checkout (ideal for Gift Cards or Physical items).' +
+            '</div>';
+        } else {
+            html += '<div class="dyn-req-security-note">' +
+                '<i class="fas fa-shield-alt" style="color:#38bdf8;margin-top:2px;"></i>' +
+                '<span>Configure per-product fields customers fill in during checkout. <strong>Security:</strong> Never collect account passwords or login credentials as ordinary Game ID fields.</span>' +
+            '</div>';
+
+            html += '<div style="font-size:12px;font-weight:700;color:#8aa1c0;text-transform:uppercase;margin-bottom:6px;">Collection Mode</div>' +
+                '<div class="dyn-req-mode-group">' +
+                    '<label class="dyn-req-mode-opt">' +
+                        '<input type="radio" name="' + ctx + 'DynCollectionMode" value="per_order_item"' + (st.collectionMode !== 'per_unit' ? ' checked' : '') + ' />' +
+                        '<div><span class="dyn-req-mode-title">Once per order item (Default)</span><span class="dyn-req-mode-sub">Customer fills these fields once even if Quantity &gt; 1.</span></div>' +
+                    '</label>' +
+                    '<label class="dyn-req-mode-opt">' +
+                        '<input type="radio" name="' + ctx + 'DynCollectionMode" value="per_unit"' + (st.collectionMode === 'per_unit' ? ' checked' : '') + ' />' +
+                        '<div><span class="dyn-req-mode-title">Separately for every purchased unit</span><span class="dyn-req-mode-sub">Renders Unit #1, Unit #2, ... when Quantity &gt; 1.</span></div>' +
+                    '</label>' +
+                '</div>';
+
+            html += '<div class="dyn-req-toolbar">' +
+                '<span style="font-size:12px;font-weight:700;color:#8aa1c0;text-transform:uppercase;"><i class="fas fa-arrows-alt-v" style="margin-right:5px;"></i>Configured Fields (Drag to Reorder)</span>' +
+                '<button type="button" class="dyn-req-btn primary" data-dyn-act="add-field"><i class="fas fa-plus"></i> Add Field</button>' +
+            '</div>';
+
+            if (st.fields.length === 0) {
+                html += '<div style="background:#0b0e14;border:1px dashed #2a3a52;border-radius:12px;padding:14px;text-align:center;color:#8aa1c0;font-size:12.5px;margin-bottom:12px;">' +
+                    'No fields configured yet. Click <strong>+ Add Field</strong> to add User ID, Zone ID, Server Dropdown, etc.' +
+                '</div>';
+            } else {
+                html += '<div class="dyn-req-fields-list">';
+                for (var i = 0; i < st.fields.length; i++) {
+                    var f = st.fields[i];
+                    var metaParts = [];
+                    if (f.placeholder) metaParts.push('Placeholder: "' + escapeHtml(f.placeholder) + '"');
+                    if (f.inputType === 'dropdown') metaParts.push('Options: ' + escapeHtml((f.options || []).join(', ')));
+                    if (f.minLength !== '' && f.minLength !== null && f.minLength !== undefined) metaParts.push('Min: ' + f.minLength);
+                    if (f.maxLength !== '' && f.maxLength !== null && f.maxLength !== undefined) metaParts.push('Max: ' + f.maxLength);
+                    if (f.validationRule && f.validationRule !== 'none') metaParts.push('Rule: ' + escapeHtml(RULE_LABELS[f.validationRule] || f.validationRule));
+
+                    html += '<div class="dyn-req-field-card" draggable="true" data-dyn-idx="' + i + '">' +
+                        '<div class="dyn-req-drag-handle" title="Drag to reorder"><i class="fas fa-grip-vertical"></i></div>' +
+                        '<div class="dyn-req-field-main">' +
+                            '<div class="dyn-req-field-title-row">' +
+                                '<span>' + escapeHtml(f.label) + '</span>' +
+                                '<span class="dyn-req-tag type">' + escapeHtml(INPUT_TYPE_LABELS[f.inputType] || 'Text') + '</span>' +
+                                '<span class="dyn-req-tag ' + (f.required ? 'req' : 'opt') + '">' + (f.required ? 'Required' : 'Optional') + '</span>' +
+                            '</div>' +
+                            (metaParts.length ? '<div class="dyn-req-field-meta">' + metaParts.join(' • ') + '</div>' : '') +
+                            (f.instructions ? '<div class="dyn-req-field-meta" style="color:#7dd3fc;">Hint: ' + escapeHtml(f.instructions) + '</div>' : '') +
+                        '</div>' +
+                        '<div class="dyn-req-field-actions">' +
+                            '<button type="button" class="dyn-req-btn sm" data-dyn-act="move-up" data-dyn-idx="' + i + '"' + (i === 0 ? ' disabled' : '') + ' title="Move Up"><i class="fas fa-arrow-up"></i></button>' +
+                            '<button type="button" class="dyn-req-btn sm" data-dyn-act="move-down" data-dyn-idx="' + i + '"' + (i === st.fields.length - 1 ? ' disabled' : '') + ' title="Move Down"><i class="fas fa-arrow-down"></i></button>' +
+                            '<button type="button" class="dyn-req-btn sm" data-dyn-act="edit-field" data-dyn-idx="' + i + '" title="Edit Field"><i class="fas fa-edit"></i> Edit</button>' +
+                            '<button type="button" class="dyn-req-btn sm danger" data-dyn-act="del-field" data-dyn-idx="' + i + '" title="Delete Field"><i class="fas fa-trash"></i></button>' +
+                        '</div>' +
+                    '</div>';
+                }
+                html += '</div>';
+            }
+
+            if (st.draftField) {
+                var df = st.draftField;
+                var isEditingExisting = st.editingIndex >= 0;
+                html += '<div class="dyn-req-field-editor">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+                        '<strong style="color:#f7d875;font-size:13px;"><i class="fas fa-sliders-h"></i> ' + (isEditingExisting ? 'Edit Field' : 'New Field') + '</strong>' +
+                        '<button type="button" class="dyn-req-btn sm" data-dyn-act="cancel-draft"><i class="fas fa-times"></i> Cancel</button>' +
+                    '</div>' +
+                    '<div class="dyn-req-field-editor-grid">' +
+                        '<div><label>Field Label *</label><input type="text" data-dyn-ed="label" value="' + escapeHtml(df.label || '') + '" placeholder="e.g. User ID, Zone ID, Server" /></div>' +
+                        '<div><label>Input Type *</label><select data-dyn-ed="inputType">' +
+                            '<option value="text"' + (df.inputType === 'text' ? ' selected' : '') + '>Text</option>' +
+                            '<option value="number"' + (df.inputType === 'number' ? ' selected' : '') + '>Number</option>' +
+                            '<option value="dropdown"' + (df.inputType === 'dropdown' ? ' selected' : '') + '>Dropdown</option>' +
+                        '</select></div>' +
+                        '<div style="display:flex;align-items:flex-end;padding-bottom:6px;">' +
+                            '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;text-transform:none;font-size:12.5px;color:#e8edf5;">' +
+                                '<input type="checkbox" data-dyn-ed="required"' + (df.required !== false ? ' checked' : '') + ' style="width:auto;accent-color:#f7d875;" /> Required field' +
+                            '</label>' +
+                        '</div>' +
+                        '<div><label>Placeholder</label><input type="text" data-dyn-ed="placeholder" value="' + escapeHtml(df.placeholder || '') + '" placeholder="e.g. 123456789" /></div>' +
+                        '<div class="full"><label>Customer Instructions</label><input type="text" data-dyn-ed="instructions" value="' + escapeHtml(df.instructions || '') + '" placeholder="Optional helper guide shown under the field" /></div>' +
+                        '<div class="full" style="' + (df.inputType === 'dropdown' ? '' : 'display:none;') + '">' +
+                            '<label>Dropdown Options (one per line or comma-separated) *</label>' +
+                            '<textarea rows="3" data-dyn-ed="options" placeholder="Asia\nAmerica\nEurope\nTW/HK/MO">' + escapeHtml(Array.isArray(df.options) ? df.options.join('\n') : '') + '</textarea>' +
+                        '</div>' +
+                        '<div><label>Minimum Length</label><input type="number" min="0" max="500" data-dyn-ed="minLength" value="' + (df.minLength !== null && df.minLength !== undefined ? escapeHtml(df.minLength) : '') + '" placeholder="Optional" /></div>' +
+                        '<div><label>Maximum Length</label><input type="number" min="1" max="500" data-dyn-ed="maxLength" value="' + (df.maxLength !== null && df.maxLength !== undefined ? escapeHtml(df.maxLength) : '') + '" placeholder="Optional" /></div>' +
+                        '<div><label>Validation Rule</label><select data-dyn-ed="validationRule">' +
+                            '<option value="none"' + (df.validationRule === 'none' ? ' selected' : '') + '>None</option>' +
+                            '<option value="digits_only"' + (df.validationRule === 'digits_only' ? ' selected' : '') + '>Digits Only</option>' +
+                            '<option value="alphanumeric"' + (df.validationRule === 'alphanumeric' ? ' selected' : '') + '>Alphanumeric Only</option>' +
+                            '<option value="no_spaces"' + (df.validationRule === 'no_spaces' ? ' selected' : '') + '>No Spaces</option>' +
+                            '<option value="roblox_username"' + (df.validationRule === 'roblox_username' ? ' selected' : '') + '>Roblox Username (Live Verify)</option>' +
+                            '<option value="custom_regex"' + (df.validationRule === 'custom_regex' ? ' selected' : '') + '>Custom Regex</option>' +
+                        '</select></div>' +
+                        '<div style="' + (df.validationRule === 'custom_regex' ? '' : 'display:none;') + '"><label>Custom Regex Pattern *</label><input type="text" data-dyn-ed="validationPattern" value="' + escapeHtml(df.validationPattern || '') + '" placeholder="e.g. ^[A-Z0-9]{6,12}$" /></div>' +
+                        '<div class="full" style="' + (df.validationRule && df.validationRule !== 'none' ? '' : 'display:none;') + '"><label>Custom Validation Error Message (Optional)</label><input type="text" data-dyn-ed="validationMessage" value="' + escapeHtml(df.validationMessage || '') + '" placeholder="Shown if rule check fails" /></div>' +
+                    '</div>' +
+                    (st.editorError ? '<div class="dyn-req-field-error" style="margin-top:8px;">' + escapeHtml(st.editorError) + '</div>' : '') +
+                    '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;">' +
+                        '<button type="button" class="dyn-req-btn" data-dyn-act="cancel-draft">Cancel</button>' +
+                        '<button type="button" class="dyn-req-btn primary" data-dyn-act="save-draft"><i class="fas fa-check"></i> ' + (isEditingExisting ? 'Update Field' : 'Add to List') + '</button>' +
+                    '</div>' +
+                '</div>';
+            }
+        }
+
+        if (st.previewOpen) {
+            html += '<div class="dyn-req-preview-box">' +
+                '<div class="dyn-req-preview-head">' +
+                    '<span><i class="fas fa-desktop"></i> Customer Checkout Preview</span>' +
+                    '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;color:#8aa1c0;">Preview Qty: ' +
+                        [1, 2, 3].map(function (q) {
+                            return '<button type="button" class="dyn-req-btn sm' + (st.previewQty === q ? ' primary' : '') + '" data-dyn-act="preview-qty" data-qty="' + q + '">' + q + '</button>';
+                        }).join('') +
+                    '</span>' +
+                '</div>' +
+                '<div data-dyn-preview-body></div>' +
+            '</div>';
+        }
+
+        root.innerHTML = html;
+        if (st.previewOpen) _renderPreview(ctx);
+        _bindEditorEvents(ctx, root);
+    }
+
+    function _bindEditorEvents(ctx, root) {
+        var st = states[ctx];
+
+        var enabledCb = root.querySelector('[data-dyn-act="toggle-enabled"]');
+        if (enabledCb) {
+            enabledCb.addEventListener('change', function () {
+                st.enabled = this.checked;
+                st.dirty = true;
+                renderEditor(ctx);
+            });
+        }
+
+        root.querySelectorAll('input[name="' + ctx + 'DynCollectionMode"]').forEach(function (r) {
+            r.addEventListener('change', function () {
+                st.collectionMode = this.value === 'per_unit' ? 'per_unit' : 'per_order_item';
+                st.dirty = true;
+                if (st.previewOpen) _renderPreview(ctx);
+            });
+        });
+
+        root.querySelectorAll('[data-dyn-act]').forEach(function (btn) {
+            if (btn.tagName === 'INPUT') return;
+            btn.addEventListener('click', function () {
+                var act = this.getAttribute('data-dyn-act');
+                var idx = parseInt(this.getAttribute('data-dyn-idx'), 10);
+
+                if (act === 'toggle-preview') {
+                    st.previewOpen = !st.previewOpen;
+                    renderEditor(ctx);
+                } else if (act === 'preview-qty') {
+                    st.previewQty = parseInt(this.getAttribute('data-qty'), 10) || 1;
+                    renderEditor(ctx);
+                } else if (act === 'add-field') {
+                    st.editingIndex = -1;
+                    st.draftField = _makeEmptyField();
+                    st.editorError = '';
+                    renderEditor(ctx);
+                } else if (act === 'edit-field' && !isNaN(idx) && st.fields[idx]) {
+                    st.editingIndex = idx;
+                    st.draftField = JSON.parse(JSON.stringify(st.fields[idx]));
+                    st.editorError = '';
+                    renderEditor(ctx);
+                } else if (act === 'del-field' && !isNaN(idx)) {
+                    st.fields.splice(idx, 1);
+                    if (st.editingIndex === idx) { st.editingIndex = -1; st.draftField = null; }
+                    st.dirty = true;
+                    renderEditor(ctx);
+                } else if (act === 'move-up' && !isNaN(idx) && idx > 0) {
+                    var tmpUp = st.fields[idx - 1];
+                    st.fields[idx - 1] = st.fields[idx];
+                    st.fields[idx] = tmpUp;
+                    st.dirty = true;
+                    renderEditor(ctx);
+                } else if (act === 'move-down' && !isNaN(idx) && idx < st.fields.length - 1) {
+                    var tmpDn = st.fields[idx + 1];
+                    st.fields[idx + 1] = st.fields[idx];
+                    st.fields[idx] = tmpDn;
+                    st.dirty = true;
+                    renderEditor(ctx);
+                } else if (act === 'cancel-draft') {
+                    st.editingIndex = -1;
+                    st.draftField = null;
+                    st.editorError = '';
+                    renderEditor(ctx);
+                } else if (act === 'save-draft') {
+                    _commitDraftField(ctx);
+                } else if (act === 'save-direct') {
+                    if (st.draftField) {
+                        var commitRes = _commitDraftField(ctx);
+                        if (!commitRes.valid) return;
+                    }
+                    if (!st.productId) return;
+                    var cfg = _getConfigFromState(ctx);
+                    st.savingDirect = true;
+                    renderEditor(ctx);
+                    google.script.run
+                        .withSuccessHandler(function (res) {
+                            st.savingDirect = false;
+                            if (res && res.success) {
+                                st.dirty = false;
+                                for (var gi = 0; gi < allGames.length; gi++) {
+                                    if (String(allGames[gi].id) === String(st.productId)) {
+                                        allGames[gi].requirementsConfig = res.config;
+                                        break;
+                                    }
+                                }
+                                renderAdminList();
+                                showToast('✅ Product requirements saved!');
+                            } else {
+                                showToast('❌ ' + ((res && res.message) || 'Save failed.'));
+                            }
+                            renderEditor(ctx);
+                        })
+                        .withFailureHandler(function (err) {
+                            st.savingDirect = false;
+                            showToast('❌ ' + ((err && err.message) || 'Network error.'));
+                            renderEditor(ctx);
+                        })
+                        .saveProductRequirements(st.productId, cfg, window._nexAdminPwdSession || '');
+                }
+            });
+        });
+
+        var typeSel = root.querySelector('[data-dyn-ed="inputType"]');
+        var ruleSel = root.querySelector('[data-dyn-ed="validationRule"]');
+        if (typeSel) {
+            typeSel.addEventListener('change', function () {
+                st.draftField = _readDraftFromDom(ctx) || st.draftField;
+                st.draftField.inputType = this.value;
+                renderEditor(ctx);
+            });
+        }
+        if (ruleSel) {
+            ruleSel.addEventListener('change', function () {
+                st.draftField = _readDraftFromDom(ctx) || st.draftField;
+                st.draftField.validationRule = this.value;
+                renderEditor(ctx);
+            });
+        }
+
+        // Drag-and-drop field reordering
+        var cards = root.querySelectorAll('.dyn-req-field-card');
+        cards.forEach(function (card) {
+            card.addEventListener('dragstart', function (ev) {
+                st.dragIndex = parseInt(this.getAttribute('data-dyn-idx'), 10);
+                this.classList.add('dragging');
+                if (ev.dataTransfer) {
+                    ev.dataTransfer.effectAllowed = 'move';
+                    ev.dataTransfer.setData('text/plain', String(st.dragIndex));
+                }
+            });
+            card.addEventListener('dragend', function () {
+                this.classList.remove('dragging');
+                root.querySelectorAll('.dyn-req-field-card').forEach(function (c) { c.classList.remove('drag-over'); });
+                st.dragIndex = -1;
+            });
+            card.addEventListener('dragover', function (ev) {
+                ev.preventDefault();
+                this.classList.add('drag-over');
+            });
+            card.addEventListener('dragleave', function () {
+                this.classList.remove('drag-over');
+            });
+            card.addEventListener('drop', function (ev) {
+                ev.preventDefault();
+                this.classList.remove('drag-over');
+                var fromIdx = st.dragIndex;
+                var toIdx = parseInt(this.getAttribute('data-dyn-idx'), 10);
+                if (isNaN(fromIdx) || isNaN(toIdx) || fromIdx === toIdx) return;
+                var moved = st.fields.splice(fromIdx, 1)[0];
+                st.fields.splice(toIdx, 0, moved);
+                st.dirty = true;
+                renderEditor(ctx);
+            });
+        });
+    }
+
+    window.ProductReqAdminEditor = {
+        load: function (ctx, config, productId) {
+            var st = _defaultEditorState();
+            st.productId = productId !== undefined && productId !== null ? productId : null;
+            if (config && typeof config === 'object') {
+                st.enabled = !!config.requirementEnabled;
+                st.collectionMode = config.collectionMode === 'per_unit' ? 'per_unit' : 'per_order_item';
+                st.fields = _cloneFields(config.fields);
+            }
+            states[ctx] = st;
+            renderEditor(ctx);
+        },
+        reset: function (ctx) {
+            states[ctx] = _defaultEditorState();
+            renderEditor(ctx);
+        },
+        isDirty: function (ctx) {
+            return !!(states[ctx] && states[ctx].dirty);
+        },
+        getConfig: function (ctx) {
+            return _getConfigFromState(ctx);
+        },
+        commitAndValidate: function (ctx) {
+            var st = states[ctx];
+            if (st && st.draftField) {
+                var cRes = _commitDraftField(ctx);
+                if (!cRes.valid) return cRes;
+            }
+            if (st && st.enabled) {
+                for (var i = 0; i < st.fields.length; i++) {
+                    var err = _validateFieldDef(st.fields[i]);
+                    if (err) return { valid: false, message: err };
+                }
+            }
+            return { valid: true, config: _getConfigFromState(ctx) };
+        }
+    };
+
+    renderEditor('add');
+    renderEditor('edit');
+})();
+
+function copyOrderReqValue(val, btnEl) {
+    var txt = String(val !== undefined && val !== null ? val : '');
+    function markCopied() {
+        if (btnEl) {
+            var prev = btnEl.innerHTML;
+            btnEl.classList.add('copied');
+            btnEl.innerHTML = '<i class="fas fa-check"></i> Copied';
+            setTimeout(function () {
+                btnEl.classList.remove('copied');
+                btnEl.innerHTML = prev;
+            }, 1400);
+        }
+        showToast('Copied: ' + txt);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(markCopied).catch(function () {
+            copyToClipboard(txt);
+            markCopied();
+        });
+    } else {
+        copyToClipboard(txt);
+        markCopied();
+    }
+}
+
+function renderCustomerOrderRequirementsHtml(order) {
+    var items = order && Array.isArray(order._requirements) ? order._requirements : [];
+    if (items.length === 0) return '';
+    var html = '<div class="dyn-req-customer-box">';
+    html += '<div style="font-weight:700;color:#7dd3fc;font-size:12px;margin-bottom:6px;"><i class="fas fa-gamepad"></i> Submitted Game Information</div>';
+    for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        html += '<div style="margin-bottom:6px;">';
+        html += '<div style="font-weight:700;color:#f7d875;font-size:12.5px;">' + escapeHtml(it.productTitle || ('Product #' + it.productId)) + '</div>';
+        var units = Array.isArray(it.units) ? it.units : [];
+        for (var u = 0; u < units.length; u++) {
+            var unit = units[u];
+            if (it.collectionMode === 'per_unit' && it.quantity > 1 && unit.unitIndex > 0) {
+                html += '<div style="font-size:11px;color:#7dd3fc;margin-top:3px;padding-left:6px;">Unit #' + unit.unitIndex + '</div>';
+            }
+            var fields = Array.isArray(unit.fields) ? unit.fields : [];
+            for (var f = 0; f < fields.length; f++) {
+                html += '<div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:2px 0 2px 8px;color:#cfd9e8;">' +
+                    '<span style="color:#8aa1c0;">' + escapeHtml(fields[f].fieldLabel) + ':</span>' +
+                    '<span style="font-weight:600;word-break:break-all;text-align:right;">' + escapeHtml(fields[f].submittedValue) + '</span>' +
+                '</div>';
+            }
+        }
+        html += '</div>';
+    }
+    html += '</div>';
+    return html;
+}
+
+function _buildAdminReqDetailsHtml(items, legacyFields) {
+    if (Array.isArray(items) && items.length > 0) {
+        var out = '';
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            var allLines = [];
+            out += '<div class="dyn-req-order-product-box">';
+            out += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">';
+            out += '<strong style="color:#f7d875;font-size:13.5px;"><i class="fas fa-box-open"></i> ' + escapeHtml(it.productTitle || ('Product #' + it.productId)) + '</strong>';
+            out += '<button type="button" class="dyn-req-copy-btn" data-copy-all-idx="' + i + '"><i class="fas fa-copy"></i> Copy All</button>';
+            out += '</div>';
+
+            var units = Array.isArray(it.units) ? it.units : [];
+            for (var u = 0; u < units.length; u++) {
+                var unit = units[u];
+                if (it.collectionMode === 'per_unit' && it.quantity > 1 && unit.unitIndex > 0) {
+                    out += '<div style="font-size:11.5px;font-weight:700;color:#7dd3fc;margin:6px 0 4px;">Unit #' + unit.unitIndex + '</div>';
+                    allLines.push('Unit #' + unit.unitIndex + ':');
+                }
+                var fields = Array.isArray(unit.fields) ? unit.fields : [];
+                for (var f = 0; f < fields.length; f++) {
+                    var lbl = fields[f].fieldLabel || '';
+                    var val = fields[f].submittedValue || '';
+                    allLines.push(lbl + ': ' + val);
+                    out += '<div class="dyn-req-kv-row">' +
+                        '<span class="dyn-req-kv-label">' + escapeHtml(lbl) + '</span>' +
+                        '<div style="display:flex;align-items:center;gap:8px;min-width:0;">' +
+                            '<span class="dyn-req-kv-val">' + escapeHtml(val) + '</span>' +
+                            '<button type="button" class="dyn-req-copy-btn" data-copy-val="' + escapeHtml(val) + '"><i class="fas fa-copy"></i> Copy</button>' +
+                        '</div>' +
+                    '</div>';
+                }
+            }
+            out += '<textarea style="display:none;" data-copy-all-text="' + i + '">' + escapeHtml(allLines.join('\n')) + '</textarea>';
+            out += '</div>';
+        }
+        return out;
+    }
+
+    if (Array.isArray(legacyFields) && legacyFields.length > 0) {
+        var lHtml = '<div class="dyn-req-order-product-box">' +
+            '<div style="font-size:12px;font-weight:700;color:#8aa1c0;margin-bottom:6px;">Legacy Submitted Game IDs</div>';
+        for (var li = 0; li < legacyFields.length; li++) {
+            lHtml += '<div class="dyn-req-kv-row">' +
+                '<span class="dyn-req-kv-label">' + escapeHtml(legacyFields[li].fieldLabel) + '</span>' +
+                '<div style="display:flex;align-items:center;gap:8px;">' +
+                    '<span class="dyn-req-kv-val">' + escapeHtml(legacyFields[li].submittedValue) + '</span>' +
+                    '<button type="button" class="dyn-req-copy-btn" data-copy-val="' + escapeHtml(legacyFields[li].submittedValue) + '"><i class="fas fa-copy"></i> Copy</button>' +
+                '</div>' +
+            '</div>';
+        }
+        lHtml += '</div>';
+        return lHtml;
+    }
+
+    return '<div style="color:#8aa1c0;font-size:13px;padding:10px 0;">No customer information fields were submitted for this order.</div>';
+}
+
+function _bindAdminOrderDetailCopyButtons(container) {
+    if (!container) return;
+    container.querySelectorAll('[data-copy-val]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            copyOrderReqValue(this.getAttribute('data-copy-val'), this);
+        });
+    });
+    container.querySelectorAll('[data-copy-all-idx]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var idx = this.getAttribute('data-copy-all-idx');
+            var ta = container.querySelector('[data-copy-all-text="' + idx + '"]');
+            if (ta) copyOrderReqValue(ta.value, this);
+        });
+    });
+}
+
+function openAdminOrderDetailModal(orderId) {
+    var overlay = document.getElementById('adminOrderDetailOverlay');
+    var idEl = document.getElementById('adminOrderDetailId');
+    var subEl = document.getElementById('adminOrderDetailSub');
+    var bodyEl = document.getElementById('adminOrderDetailBody');
+    if (!overlay || !bodyEl) return;
+
+    var allPool = (Array.isArray(window._adminAllOrdersCache) ? window._adminAllOrdersCache : [])
+        .concat(Array.isArray(approvalAllOrders) ? approvalAllOrders : []);
+    var order = null;
+    for (var i = 0; i < allPool.length; i++) {
+        if (String(allPool[i]['Order ID'] || '') === String(orderId)) { order = allPool[i]; break; }
+    }
+
+    if (idEl) idEl.textContent = '#' + orderId;
+    if (subEl) subEl.textContent = order ? ((order['Date'] || '') + ' • ' + (order['Payment Status'] || '')) : '';
+
+    var legacyFallback = [];
+    if (order) {
+        [['Roblox Username', order['Roblox Username']], ['Roblox Nickname', order['Roblox Nickname']],
+         ['ML User ID', order['ML User ID']], ['ML Zone ID', order['ML Zone ID']],
+         ['PUBG User ID', order['PUBG User ID']], ['PUBG Nickname', order['PUBG Nickname']],
+         ['Account ID', order['Other Account ID']]].forEach(function (p) {
+            if (String(p[1] || '').trim()) legacyFallback.push({ fieldLabel: p[0], submittedValue: String(p[1]).trim() });
+        });
+    }
+
+    var metaHtml = order ? (
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:14px;font-size:12.5px;">' +
+            '<div><span style="color:#6a7f9e;">Customer:</span> <strong>' + escapeHtml(order['Customer Name'] || '-') + '</strong></div>' +
+            '<div><span style="color:#6a7f9e;">Email:</span> <strong>' + escapeHtml(order['Email'] || '-') + '</strong></div>' +
+            '<div><span style="color:#6a7f9e;">Phone:</span> <strong>' + escapeHtml(order['Phone'] || '-') + '</strong></div>' +
+            '<div><span style="color:#6a7f9e;">Total:</span> <strong style="color:#f7d875;">' + CURRENCY + ' ' + parseFloat(order['Total (RM)'] || 0).toFixed(2) + '</strong></div>' +
+            '<div style="grid-column:1 / -1;"><span style="color:#6a7f9e;">Items:</span> ' + escapeHtml(order['Items'] || '-') + '</div>' +
+        '</div>'
+    ) : '';
+
+    var initialItems = order && Array.isArray(order._requirements) ? order._requirements : [];
+    bodyEl.innerHTML = metaHtml +
+        '<div style="font-size:12px;font-weight:700;color:#8aa1c0;text-transform:uppercase;letter-spacing:0.5px;">Customer Submitted Information</div>' +
+        '<div id="adminOrderDetailReqsContainer">' + _buildAdminReqDetailsHtml(initialItems, legacyFallback) + '</div>';
+    _bindAdminOrderDetailCopyButtons(document.getElementById('adminOrderDetailReqsContainer'));
+    overlay.classList.add('open');
+
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+            .withSuccessHandler(function (res) {
+                var rc = document.getElementById('adminOrderDetailReqsContainer');
+                if (!rc || !res || !res.success) return;
+                rc.innerHTML = _buildAdminReqDetailsHtml(res.items || [], res.legacyFields || []);
+                _bindAdminOrderDetailCopyButtons(rc);
+            })
+            .getOrderRequirements(orderId, '', window._nexAdminPwdSession || '');
+    }
+}
+
+(function setupAdminOrderDetailModal() {
+    var overlay = document.getElementById('adminOrderDetailOverlay');
+    var closeBtn = document.getElementById('adminOrderDetailClose');
+    if (closeBtn && overlay) {
+        closeBtn.addEventListener('click', function () { overlay.classList.remove('open'); });
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) overlay.classList.remove('open');
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && overlay.classList.contains('open')) {
+                overlay.classList.remove('open');
+            }
+        });
+    }
 })();
 
     </script>
