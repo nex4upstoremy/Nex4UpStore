@@ -11091,6 +11091,103 @@ header,
     flex-wrap: wrap;
     margin-bottom: 10px;
 }
+
+/* Phase 7: Admin Ops, SLA & System Error Monitor */
+.nex-ops-workflow-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 14px;
+    background: var(--nex-surface, #151E2B);
+    border: 1px solid #24344d;
+    border-radius: 16px;
+}
+.nex-ops-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.nex-ops-kpi-card {
+    background: var(--nex-surface, #151E2B);
+    border: 1px solid #24344d;
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+.nex-ops-kpi-card .ops-val {
+    font-size: 21px;
+    font-weight: 800;
+    color: #fff;
+    margin: 4px 0 2px;
+}
+.nex-ops-kpi-card .ops-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: #8aa1c0;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.nex-ops-kpi-card .ops-sub {
+    font-size: 11.5px;
+    color: #9bb3d1;
+}
+.nex-ops-panel {
+    background: var(--nex-surface, #151E2B);
+    border: 1px solid #24344d;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 20px;
+}
+.nex-ops-table-wrap {
+    overflow-x: auto;
+    max-width: 100%;
+}
+.nex-ops-ref-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: rgba(86, 185, 233, 0.14);
+    color: #56B9E9;
+    border: 1px solid rgba(86, 185, 233, 0.35);
+    cursor: pointer;
+    white-space: nowrap;
+}
+.nex-ops-status-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.nex-ops-status-pill.open { background: rgba(229, 107, 112, 0.18); color: #f87171; border: 1px solid rgba(229, 107, 112, 0.4); }
+.nex-ops-status-pill.resolved { background: rgba(84, 184, 106, 0.18); color: #4ade80; border: 1px solid rgba(84, 184, 106, 0.4); }
+.nex-ops-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+.nex-ops-bar-row {
+    margin-bottom: 10px;
+}
+.nex-ops-bar-track {
+    height: 7px;
+    border-radius: 999px;
+    background: #0b111d;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.nex-ops-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #56B9E9, #E8C568);
+}
     </style>
 <script>
 (function() {
@@ -11338,6 +11435,10 @@ header,
             </div>
             <div class="sidebar-item" data-section="community-hub">
                 <i class="fas fa-shield-alt"></i> Community, Frames &amp; Dev
+            </div>
+            <div class="sidebar-item" data-section="ops-monitor">
+                <i class="fas fa-heartbeat"></i> Ops, SLA &amp; Error Monitor
+                <span class="sidebar-badge" id="adminOpsAlertBadge" style="display:none;">0</span>
             </div>
             <!-- ✅ NEW: Backup Sidebar Item -->
             <div class="sidebar-item" data-section="backup">
@@ -12857,6 +12958,116 @@ header,
                         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
                             <button type="button" class="submit-btn" id="nexCmsAnnDraftBtn" style="background:#1B2737;color:#E9B94E;border:1px solid #E9B94E;"><i class="fas fa-save"></i> Save Draft</button>
                             <button type="button" class="submit-btn" id="nexCmsAnnPublishBtn"><i class="fas fa-rocket"></i> Confirm &amp; Publish Announcement</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== PHASE 7: ADMIN OPS, SYSTEM ERROR MONITOR & ANALYTICS ===== -->
+                <div class="admin-section" id="section-ops-monitor">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <h2 style="margin:0;"><i class="fas fa-heartbeat" style="color:var(--nex-gold,#E8C568);"></i> Operational Workflows &amp; System Error Monitor</h2>
+                            <p style="margin:4px 0 0;color:var(--nex-text-secondary,#91A0B5);font-size:13px;">Trace customer <code>NX-...</code> Reference IDs, flush live storefront caches, and monitor SLA &amp; loyalty distribution.</p>
+                        </div>
+                        <span id="nexOpsLastUpdated" style="font-size:12px;color:#8aa1c0;">Ready (local telemetry synced)</span>
+                    </div>
+
+                    <div class="nex-ops-workflow-bar">
+                        <button type="button" class="submit-btn" id="nexOpsRefreshBtn" style="padding:9px 14px;font-size:12.5px;"><i class="fas fa-sync-alt"></i> Refresh Telemetry</button>
+                        <button type="button" class="submit-btn" id="nexOpsFlushCacheBtn" style="padding:9px 14px;font-size:12.5px;background:#1B2737;color:#56B9E9;border:1px solid #56B9E9;"><i class="fas fa-bolt"></i> Flush All Live Caches</button>
+                        <button type="button" class="submit-btn" id="nexOpsGoApprovalBtn" style="padding:9px 14px;font-size:12.5px;background:#1B2737;color:#E8C568;border:1px solid #E8C568;"><i class="fas fa-check-double"></i> Payment Approval</button>
+                        <button type="button" class="submit-btn" id="nexOpsGoQueueBtn" style="padding:9px 14px;font-size:12.5px;background:#1B2737;color:#E8C568;border:1px solid #E8C568;"><i class="fas fa-stream"></i> FIFO Orders Queue</button>
+                        <button type="button" class="submit-btn" id="nexOpsGoCreatorsBtn" style="padding:9px 14px;font-size:12.5px;background:#1B2737;color:#c084fc;border:1px solid #c084fc;"><i class="fas fa-video"></i> Creator Submissions</button>
+                        <button type="button" class="submit-btn" id="nexOpsExportCsvBtn" style="padding:9px 14px;font-size:12.5px;background:#16291b;color:#4ade80;border:1px solid #2e7d32;"><i class="fas fa-file-csv"></i> Export Error CSV</button>
+                    </div>
+
+                    <div class="nex-ops-kpi-grid" id="nexOpsKpiGrid">
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #f87171;">
+                            <div class="ops-lbl">Open System Errors</div>
+                            <div class="ops-val" id="nexOpsKpiOpenErrors">0</div>
+                            <div class="ops-sub" id="nexOpsKpiOpenErrorsSub">Reference IDs (NX-...)</div>
+                        </div>
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #E8C568;">
+                            <div class="ops-lbl">Active Queue &amp; SLA (&gt;2h)</div>
+                            <div class="ops-val" id="nexOpsKpiQueueSla">0 / 0</div>
+                            <div class="ops-sub" id="nexOpsKpiQueueSlaSub">Processing / Delayed</div>
+                        </div>
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #c084fc;">
+                            <div class="ops-lbl">Pending Approvals &amp; Clips</div>
+                            <div class="ops-val" id="nexOpsKpiPendingMods">0</div>
+                            <div class="ops-sub" id="nexOpsKpiPendingModsSub">Payments + Creators + Reports</div>
+                        </div>
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #4ade80;">
+                            <div class="ops-lbl">Verified Paid Orders</div>
+                            <div class="ops-val" id="nexOpsKpiPaymentMix">0</div>
+                            <div class="ops-sub" id="nexOpsKpiPaymentMixSub">RM 0.00 gross</div>
+                        </div>
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #56B9E9;">
+                            <div class="ops-lbl">NEX Points &amp; Coupons</div>
+                            <div class="ops-val" id="nexOpsKpiLoyaltyPts">0</div>
+                            <div class="ops-sub" id="nexOpsKpiLoyaltyPtsSub">0 active promos • 0 claims</div>
+                        </div>
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #38bdf8;">
+                            <div class="ops-lbl">Registered Gamers</div>
+                            <div class="ops-val" id="nexOpsKpiCustomerTiers">0</div>
+                            <div class="ops-sub" id="nexOpsKpiCustomerTiersSub">5-Tier Loyalty Members</div>
+                        </div>
+                    </div>
+
+                    <div class="nex-ops-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+                            <h3 style="margin:0;font-size:15.5px;color:#fff;"><i class="fas fa-bug" style="color:#f87171;"></i> System Error Monitor (<code>Reference ID: NX-...</code>)</h3>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <button type="button" class="cancel-btn" id="nexOpsSimulateRefBtn" style="padding:7px 12px;border-radius:10px;font-size:12px;"><i class="fas fa-vial"></i> Test Log NX-Ref</button>
+                                <button type="button" class="submit-btn" id="nexOpsResolveAllBtn" style="padding:7px 13px;font-size:12px;"><i class="fas fa-check-circle"></i> Resolve All Open</button>
+                            </div>
+                        </div>
+                        <div class="form-row" style="margin-bottom:12px;">
+                            <div class="field" style="flex:2;min-width:220px;">
+                                <label>Lookup by Reference ID (NX-...), Action, or Diagnostic Summary</label>
+                                <input type="text" id="nexOpsErrorSearchInput" placeholder="e.g. NX-4A9K2 or placeOrder..." />
+                            </div>
+                            <div class="field" style="min-width:160px;">
+                                <label>Error Status</label>
+                                <select id="nexOpsErrorStatusFilter">
+                                    <option value="All">All Errors</option>
+                                    <option value="Open">Open Only</option>
+                                    <option value="Resolved">Resolved Only</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="nex-ops-table-wrap">
+                            <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+                                <thead>
+                                    <tr style="border-bottom:1px solid #24344d;color:#8aa1c0;text-align:left;">
+                                        <th style="padding:9px 8px;">Reference ID</th>
+                                        <th style="padding:9px 8px;">Timestamp</th>
+                                        <th style="padding:9px 8px;">Action</th>
+                                        <th style="padding:9px 8px;">Diagnostic Summary</th>
+                                        <th style="padding:9px 8px;">Source</th>
+                                        <th style="padding:9px 8px;">Status</th>
+                                        <th style="padding:9px 8px;text-align:right;">Resolve</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="nexOpsErrorTableBody">
+                                    <tr><td colspan="7" style="padding:18px;text-align:center;color:#6a7f9e;">No error Reference IDs logged yet.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="nex-ops-analytics-grid">
+                        <div class="nex-ops-panel" style="margin-bottom:0;">
+                            <h3 style="margin:0 0 12px;font-size:15px;color:#fff;"><i class="fas fa-credit-card" style="color:#4ade80;"></i> Payment Channel Breakdown</h3>
+                            <div id="nexOpsPaymentMixBody" style="font-size:12.5px;color:#9bb3d1;">Click <strong>Refresh Telemetry</strong> to load live payment mix.</div>
+                        </div>
+                        <div class="nex-ops-panel" style="margin-bottom:0;">
+                            <h3 style="margin:0 0 12px;font-size:15px;color:#fff;"><i class="fas fa-layer-group" style="color:#E8C568;"></i> 5-Tier Loyalty Distribution</h3>
+                            <div id="nexOpsTierDistBody" style="font-size:12.5px;color:#9bb3d1;">Click <strong>Refresh Telemetry</strong> to load customer tier counts.</div>
+                        </div>
+                        <div class="nex-ops-panel" style="margin-bottom:0;">
+                            <h3 style="margin:0 0 12px;font-size:15px;color:#fff;"><i class="fas fa-clipboard-list" style="color:#56B9E9;"></i> Recent Admin Audit Trail</h3>
+                            <div id="nexOpsAuditTrailBody" style="font-size:12px;color:#9bb3d1;max-height:260px;overflow-y:auto;">Click <strong>Refresh Telemetry</strong> to load recent operational events.</div>
                         </div>
                     </div>
                 </div>
@@ -14786,12 +14997,46 @@ window.NexErrorHandler = (function() {
             refId: refId || generateRefId(),
             time: new Date().toISOString(),
             action: String(action || 'unknown'),
-            rawMsg: String(rawMsg || '').slice(0, 320)
+            rawMsg: String(rawMsg || '').slice(0, 320),
+            status: 'Open',
+            source: 'Local Browser'
         };
         window._nexAdminErrorLog.unshift(entry);
         if (window._nexAdminErrorLog.length > 50) window._nexAdminErrorLog.length = 50;
         try { localStorage.setItem(LOG_KEY, JSON.stringify(window._nexAdminErrorLog)); } catch (e) {}
+        if (window.NexAdminOpsMonitor && typeof window.NexAdminOpsMonitor.renderErrors === 'function') {
+            try { window.NexAdminOpsMonitor.renderErrors(); } catch (_) {}
+        }
+        if (entry.action !== 'reportClientSystemError' && !window._nexSkipRemoteErrorSync) {
+            setTimeout(function() {
+                try {
+                    if (typeof google === 'undefined' || !google.script || !google.script.run) return;
+                    var ctxEmail = 'guest';
+                    try {
+                        var storedC = JSON.parse(localStorage.getItem('nex4up_customer') || 'null');
+                        if (storedC && storedC.email) ctxEmail = String(storedC.email);
+                    } catch (_) {}
+                    google.script.run
+                        .withFailureHandler(function() {})
+                        .reportClientSystemError(entry.refId, entry.action, entry.rawMsg, ctxEmail);
+                } catch (_) {}
+            }, 50);
+        }
         return entry.refId;
+    }
+
+    function markLocalStatus(refId, nextStatus) {
+        var clean = String(refId || '').trim().toUpperCase();
+        var updated = false;
+        window._nexAdminErrorLog.forEach(function(item) {
+            if (String(item.refId || '').toUpperCase() === clean) {
+                item.status = nextStatus;
+                updated = true;
+            }
+        });
+        if (updated) {
+            try { localStorage.setItem(LOG_KEY, JSON.stringify(window._nexAdminErrorLog)); } catch (e) {}
+        }
     }
 
     function toCustomerMessage(errOrMsg, action) {
@@ -14822,6 +15067,8 @@ window.NexErrorHandler = (function() {
     return {
         generateRefId: generateRefId,
         logAdminError: logAdminError,
+        markLocalStatus: markLocalStatus,
+        getErrorLog: function() { return window._nexAdminErrorLog || []; },
         toCustomerMessage: toCustomerMessage
     };
 })();
@@ -14839,7 +15086,7 @@ window.NexAsyncBtn = (function() {
         getRobuxInventoryDashboard: 1, getPendingReferralCoupon: 1,
         getAdvancedSalesSummary: 1, getSalesTeamSummary: 1, getAdminPromoCodes: 1,
         getCostSettings: 1, getBackupHistory: 1, adminGetCommunityDashboard: 1,
-        getEnhancedCommunityBootstrap: 1
+        getEnhancedCommunityBootstrap: 1, reportClientSystemError: 1, getAdminOperationalDashboard: 1
     };
 
     var ACTION_LABELS = {
@@ -14866,7 +15113,9 @@ window.NexAsyncBtn = (function() {
         deleteAdminPromoCode: 'Deleting...',
         saveProductRequirements: 'Saving...',
         updateOrderStatus: 'Updating...',
-        bulkUpdateOrderStatuses: 'Updating...'
+        bulkUpdateOrderStatuses: 'Updating...',
+        resolveAdminSystemError: 'Updating...',
+        runAdminQuickWorkflow: 'Running...'
     };
 
     var _lastTrigger = { el: null, ts: 0 };
@@ -14875,7 +15124,7 @@ window.NexAsyncBtn = (function() {
     function _isTrackableBtn(el) {
         if (!el || !el.tagName) return false;
         if (el.dataset && el.dataset.noAsync === '1') return false;
-        return el.matches('button[type="submit"], .submit-btn, .place-order-btn, .apply-promo-btn, .auth-submit, .action-btn, .rate-btn, .nex2-top-promo-btn, .nex2-send-otp-btn, .dyn-req-btn.primary, .toggle-promo-btn, .del-promo-btn, .prb-lookup-btn, #nex2FrameActionBtn, #nex2SaveFaqBtn, #nex2SaveDevBtn, #nex2SaveGamingAccBtn, #nex2GaVerifyRbxBtn, #nex2SavePrivacyBtn');
+        return el.matches('button[type="submit"], .submit-btn, .place-order-btn, .apply-promo-btn, .auth-submit, .action-btn, .rate-btn, .nex2-top-promo-btn, .nex2-send-otp-btn, .dyn-req-btn.primary, .toggle-promo-btn, .del-promo-btn, .prb-lookup-btn, #nex2FrameActionBtn, #nex2SaveFaqBtn, #nex2SaveDevBtn, #nex2SaveGamingAccBtn, #nex2GaVerifyRbxBtn, #nex2SavePrivacyBtn, #nexOpsFlushCacheBtn, #nexOpsResolveAllBtn');
     }
 
     if (typeof document !== 'undefined') {
@@ -15331,6 +15580,7 @@ var agentCodeFromUrl = null;
             'sales-team': document.getElementById('section-sales-team'), // ✅ ADD THIS LINE
             'creator-campaigns': document.getElementById('section-creator-campaigns'),
             'community-hub': document.getElementById('section-community-hub'),
+            'ops-monitor': document.getElementById('section-ops-monitor'),
             'backup': document.getElementById('section-backup'),
             'change-password': document.getElementById('section-change-password')
         };
@@ -18646,6 +18896,8 @@ if (cart.length > 0) {
                         loadRobuxInventory();
                     } else if (section === 'creator-campaigns' || section === 'community-hub') {
                         if (typeof loadNex4Up2AdminDashboard === 'function') loadNex4Up2AdminDashboard();
+                    } else if (section === 'ops-monitor') {
+                        if (typeof window.loadAdminOpsMonitor === 'function') window.loadAdminOpsMonitor();
                     }
                 }
             });
@@ -31781,6 +32033,362 @@ window.NexRewardsUi = (function () {
         loadCustomerLoyalty: loadCustomerLoyalty,
         loadAdminTiers: loadAdminTiers,
         getTiers: getTiers
+    };
+})();
+
+// ================================================================
+// 🛠️ PHASE 7: ADMIN OPS MONITOR, ERROR REFERENCE ID LOG & ANALYTICS
+// ================================================================
+window.NexAdminOpsMonitor = (function () {
+    var _cloudErrors = [];
+    var _lastMetrics = null;
+    var _lastAuditLogs = [];
+    var _bound = false;
+
+    function _esc(s) {
+        if (typeof escapeHtml === 'function') return escapeHtml(s);
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function _mergeErrors() {
+        var byRef = {};
+        (_cloudErrors || []).forEach(function (e) {
+            if (!e || !e.refId) return;
+            var k = String(e.refId).toUpperCase();
+            byRef[k] = Object.assign({}, e, { refId: k, source: 'Cloud' });
+        });
+        var local = (window.NexErrorHandler && typeof window.NexErrorHandler.getErrorLog === 'function')
+            ? window.NexErrorHandler.getErrorLog()
+            : (window._nexAdminErrorLog || []);
+        (local || []).forEach(function (l) {
+            if (!l || !l.refId) return;
+            var k = String(l.refId).toUpperCase();
+            if (byRef[k]) {
+                byRef[k].source = 'Local + Cloud';
+            } else {
+                byRef[k] = {
+                    refId: k,
+                    timestamp: String(l.time || ''),
+                    action: String(l.action || ''),
+                    summary: String(l.rawMsg || '').slice(0, 140),
+                    details: String(l.rawMsg || ''),
+                    userContext: 'local',
+                    status: String(l.status || 'Open'),
+                    resolvedAt: '',
+                    adminNotes: '',
+                    source: 'Local Browser'
+                };
+            }
+        });
+        return Object.keys(byRef).map(function (k) { return byRef[k]; }).sort(function (a, b) {
+            return String(b.timestamp || '').localeCompare(String(a.timestamp || ''));
+        });
+    }
+
+    function renderErrors() {
+        var tbody = document.getElementById('nexOpsErrorTableBody');
+        var qEl = document.getElementById('nexOpsErrorSearchInput');
+        var stEl = document.getElementById('nexOpsErrorStatusFilter');
+        var q = qEl ? String(qEl.value || '').trim().toLowerCase() : '';
+        var stFilter = stEl ? String(stEl.value || 'All').toLowerCase() : 'all';
+
+        var merged = _mergeErrors();
+        var openCnt = merged.filter(function (x) { return String(x.status || '').toLowerCase() !== 'resolved'; }).length;
+
+        var kpiErrEl = document.getElementById('nexOpsKpiOpenErrors');
+        if (kpiErrEl) kpiErrEl.textContent = String(openCnt);
+
+        var navBadge = document.getElementById('adminOpsAlertBadge');
+        if (navBadge) {
+            navBadge.textContent = String(openCnt);
+            navBadge.style.display = openCnt > 0 ? 'inline-flex' : 'none';
+        }
+
+        if (!tbody) return;
+        var filtered = merged.filter(function (row) {
+            var rSt = String(row.status || 'Open').toLowerCase();
+            if (stFilter !== 'all' && rSt !== stFilter) return false;
+            if (q) {
+                var hay = (row.refId + ' ' + row.action + ' ' + row.summary + ' ' + row.details).toLowerCase();
+                if (hay.indexOf(q) === -1) return false;
+            }
+            return true;
+        });
+
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="padding:18px;text-align:center;color:#6a7f9e;">No matching Reference ID errors found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.slice(0, 100).map(function (row) {
+            var isRes = String(row.status || 'Open').toLowerCase() === 'resolved';
+            var nextAction = isRes ? 'Open' : 'Resolved';
+            var btnLabel = isRes ? 'Reopen' : '✓ Resolve';
+            return '<tr style="border-bottom:1px solid #1e2a3a;">' +
+                '<td style="padding:9px 8px;"><button type="button" class="nex-ops-ref-badge" data-ops-copy-ref="' + _esc(row.refId) + '" title="Click to copy Reference ID">' + _esc(row.refId) + ' <i class="far fa-copy"></i></button></td>' +
+                '<td style="padding:9px 8px;color:#8aa1c0;white-space:nowrap;">' + _esc(String(row.timestamp || '').replace('T', ' ').slice(0, 19)) + '</td>' +
+                '<td style="padding:9px 8px;color:#fff;font-weight:700;">' + _esc(row.action || '-') + '</td>' +
+                '<td style="padding:9px 8px;color:#cbd5e1;max-width:320px;word-break:break-word;">' + _esc(row.summary || row.details || '-') + '</td>' +
+                '<td style="padding:9px 8px;color:#9bb3d1;">' + _esc(row.source || 'Cloud') + '</td>' +
+                '<td style="padding:9px 8px;"><span class="nex-ops-status-pill ' + (isRes ? 'resolved' : 'open') + '">' + _esc(row.status || 'Open') + '</span></td>' +
+                '<td style="padding:9px 8px;text-align:right;"><button type="button" class="submit-btn" data-ops-resolve-ref="' + _esc(row.refId) + '" data-ops-next-status="' + _esc(nextAction) + '" style="padding:5px 10px;font-size:11.5px;' + (isRes ? 'background:#1B2737;color:#9bb3d1;border:1px solid #2b3c57;' : '') + '">' + btnLabel + '</button></td>' +
+                '</tr>';
+        }).join('');
+    }
+
+    function renderAnalytics(metrics, auditLogs) {
+        if (metrics) {
+            var qEl = document.getElementById('nexOpsKpiQueueSla');
+            var qSub = document.getElementById('nexOpsKpiQueueSlaSub');
+            if (qEl) qEl.textContent = (metrics.processingQueueCount || 0) + ' / ' + (metrics.slaDelayedOver2hCount || 0);
+            if (qSub) qSub.textContent = (metrics.awaitingVerificationCount || 0) + ' awaiting verify • ' + (metrics.completedTodayCount || 0) + ' done today';
+
+            var modTot = (metrics.awaitingVerificationCount || 0) + (metrics.pendingCreatorSubmissionsCount || 0) + (metrics.openCommunityReportsCount || 0);
+            var modEl = document.getElementById('nexOpsKpiPendingMods');
+            var modSub = document.getElementById('nexOpsKpiPendingModsSub');
+            if (modEl) modEl.textContent = String(modTot);
+            if (modSub) modSub.textContent = (metrics.awaitingVerificationCount || 0) + ' pays • ' + (metrics.pendingCreatorSubmissionsCount || 0) + ' clips • ' + (metrics.openCommunityReportsCount || 0) + ' reports';
+
+            var pmEl = document.getElementById('nexOpsKpiPaymentMix');
+            var pmSub = document.getElementById('nexOpsKpiPaymentMixSub');
+            if (pmEl) pmEl.textContent = String(metrics.paidOrdersTotalCount || 0);
+            if (pmSub) pmSub.textContent = 'RM ' + (parseFloat(metrics.grossRevenueRm) || 0).toFixed(2) + ' verified';
+
+            var lpEl = document.getElementById('nexOpsKpiLoyaltyPts');
+            var lpSub = document.getElementById('nexOpsKpiLoyaltyPtsSub');
+            if (lpEl) lpEl.textContent = (parseInt(metrics.totalPointsCirculating, 10) || 0).toLocaleString();
+            if (lpSub) lpSub.textContent = (metrics.activeCouponsCount || 0) + ' active promos • ' + (metrics.totalRedemptionsCount || 0) + ' claims';
+
+            var ctEl = document.getElementById('nexOpsKpiCustomerTiers');
+            var ctSub = document.getElementById('nexOpsKpiCustomerTiersSub');
+            var td = metrics.tierDistribution || {};
+            if (ctEl) ctEl.textContent = String(metrics.totalCustomersCount || 0);
+            if (ctSub) ctSub.textContent = (td.diamond || 0) + ' Diamond • ' + (td.platinum || 0) + ' Platinum • ' + (td.gold || 0) + ' Gold';
+
+            var pmBody = document.getElementById('nexOpsPaymentMixBody');
+            if (pmBody && metrics.paymentMethodBreakdown) {
+                var pb = metrics.paymentMethodBreakdown;
+                var totalCnt = 0;
+                Object.keys(pb).forEach(function (k) { totalCnt += (pb[k].count || 0); });
+                pmBody.innerHTML = Object.keys(pb).map(function (ch) {
+                    var cnt = pb[ch].count || 0;
+                    var rm = parseFloat(pb[ch].revenueRm) || 0;
+                    var pct = totalCnt > 0 ? Math.round((cnt / totalCnt) * 100) : 0;
+                    return '<div class="nex-ops-bar-row">' +
+                        '<div style="display:flex;justify-content:space-between;"><strong style="color:#fff;">' + _esc(ch) + '</strong><span>' + cnt + ' orders • RM ' + rm.toFixed(2) + ' (' + pct + '%)</span></div>' +
+                        '<div class="nex-ops-bar-track"><div class="nex-ops-bar-fill" style="width:' + Math.max(2, pct) + '%;"></div></div>' +
+                        '</div>';
+                }).join('');
+            }
+
+            var tdBody = document.getElementById('nexOpsTierDistBody');
+            if (tdBody) {
+                var tierKeys = [
+                    { key: 'diamond', label: 'Diamond Legend' },
+                    { key: 'platinum', label: 'Platinum VIP' },
+                    { key: 'gold', label: 'Gold Elite' },
+                    { key: 'silver', label: 'Silver Warrior' },
+                    { key: 'bronze', label: 'Bronze Member' }
+                ];
+                var custTot = Math.max(1, metrics.totalCustomersCount || 0);
+                tdBody.innerHTML = tierKeys.map(function (t) {
+                    var c = td[t.key] || 0;
+                    var pct = metrics.totalCustomersCount > 0 ? Math.round((c / custTot) * 100) : 0;
+                    return '<div class="nex-ops-bar-row">' +
+                        '<div style="display:flex;justify-content:space-between;"><strong style="color:#E8C568;">' + _esc(t.label) + '</strong><span>' + c + ' gamers (' + pct + '%)</span></div>' +
+                        '<div class="nex-ops-bar-track"><div class="nex-ops-bar-fill" style="width:' + Math.max(2, pct) + '%;"></div></div>' +
+                        '</div>';
+                }).join('');
+            }
+        }
+
+        var audBody = document.getElementById('nexOpsAuditTrailBody');
+        if (audBody && Array.isArray(auditLogs)) {
+            audBody.innerHTML = auditLogs.length ? auditLogs.map(function (a) {
+                return '<div style="padding:8px 0;border-bottom:1px solid #1e2a3a;">' +
+                    '<div style="display:flex;justify-content:space-between;gap:6px;"><strong style="color:#56B9E9;">' + _esc(a.category) + ' • ' + _esc(a.action) + '</strong><span style="color:#6a7f9e;font-size:11px;">' + _esc(a.timestamp) + '</span></div>' +
+                    '<div style="color:#cbd5e1;margin-top:2px;">' + _esc(a.summary) + '</div>' +
+                    '</div>';
+            }).join('') : '<div style="color:#6a7f9e;">No operational audit events recorded yet.</div>';
+        }
+    }
+
+    function loadDashboard() {
+        renderErrors();
+        var pwd = window._nexAdminPwdSession || '';
+        if (!pwd) return;
+        var stLbl = document.getElementById('nexOpsLastUpdated');
+        if (stLbl) stLbl.textContent = 'Refreshing cloud telemetry...';
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (!res || !res.success) {
+                    if (stLbl) stLbl.textContent = (res && res.message) || 'Could not load cloud telemetry.';
+                    return;
+                }
+                _cloudErrors = res.errorLogs || [];
+                _lastMetrics = res.workflowMetrics || null;
+                _lastAuditLogs = res.auditLogs || [];
+                renderErrors();
+                renderAnalytics(_lastMetrics, _lastAuditLogs);
+                if (stLbl) stLbl.textContent = 'Synced: ' + (res.generatedAt || 'Now');
+            })
+            .withFailureHandler(function (err) {
+                var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getAdminOperationalDashboard') : 'Unable to sync ops telemetry.';
+                if (stLbl) stLbl.textContent = msg;
+            })
+            .getAdminOperationalDashboard(pwd, {});
+    }
+
+    function exportErrorsCsv() {
+        var rows = _mergeErrors();
+        var lines = [['Reference ID', 'Timestamp', 'Action', 'Status', 'Source', 'Summary'].join(',')];
+        rows.forEach(function (r) {
+            var line = [r.refId, r.timestamp, r.action, r.status, r.source, r.summary].map(function (v) {
+                return '"' + String(v || '').replace(/"/g, '""') + '"';
+            }).join(',');
+            lines.push(line);
+        });
+        var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'nex4up_error_monitor_' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
+
+    function bindEvents() {
+        if (_bound) return;
+        _bound = true;
+
+        var sIn = document.getElementById('nexOpsErrorSearchInput');
+        var sSt = document.getElementById('nexOpsErrorStatusFilter');
+        if (sIn) sIn.addEventListener('input', renderErrors);
+        if (sSt) sSt.addEventListener('change', renderErrors);
+
+        var refBtn = document.getElementById('nexOpsRefreshBtn');
+        if (refBtn) refBtn.addEventListener('click', loadDashboard);
+
+        var expBtn = document.getElementById('nexOpsExportCsvBtn');
+        if (expBtn) expBtn.addEventListener('click', exportErrorsCsv);
+
+        var simBtn = document.getElementById('nexOpsSimulateRefBtn');
+        if (simBtn) {
+            simBtn.addEventListener('click', function () {
+                if (window.NexErrorHandler) {
+                    var rId = window.NexErrorHandler.logAdminError('adminOpsDiagnosticTest', 'Simulated diagnostic check triggered from Ops Monitor.');
+                    renderErrors();
+                    if (typeof showToast === 'function') showToast('Logged Reference ID: ' + rId);
+                }
+            });
+        }
+
+        var flushBtn = document.getElementById('nexOpsFlushCacheBtn');
+        if (flushBtn) {
+            flushBtn.addEventListener('click', function () {
+                var pwd = window._nexAdminPwdSession || '';
+                if (!pwd) { if (typeof showToast === 'function') showToast('Sign in to Admin to flush live caches.'); return; }
+                google.script.run
+                    .withSuccessHandler(function (res) {
+                        if (typeof showToast === 'function') showToast((res && res.message) || 'Caches flushed.');
+                        if (res && res.success) loadDashboard();
+                    })
+                    .withFailureHandler(function (err) {
+                        var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'runAdminQuickWorkflow') : 'Could not flush caches.';
+                        if (typeof showToast === 'function') showToast(msg);
+                    })
+                    .runAdminQuickWorkflow('flush_all_caches', {}, pwd);
+            });
+        }
+
+        var resAllBtn = document.getElementById('nexOpsResolveAllBtn');
+        if (resAllBtn) {
+            resAllBtn.addEventListener('click', function () {
+                (window._nexAdminErrorLog || []).forEach(function (e) { e.status = 'Resolved'; });
+                try { localStorage.setItem('nex4up_admin_error_log_v1', JSON.stringify(window._nexAdminErrorLog || [])); } catch (_) {}
+                var pwd = window._nexAdminPwdSession || '';
+                if (!pwd) {
+                    renderErrors();
+                    if (typeof showToast === 'function') showToast('Local errors marked Resolved.');
+                    return;
+                }
+                google.script.run
+                    .withSuccessHandler(function (res) {
+                        if (typeof showToast === 'function') showToast((res && res.message) || 'All open errors resolved.');
+                        loadDashboard();
+                    })
+                    .withFailureHandler(function (err) {
+                        var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'runAdminQuickWorkflow') : 'Could not bulk resolve.';
+                        if (typeof showToast === 'function') showToast(msg);
+                    })
+                    .runAdminQuickWorkflow('resolve_all_open_errors', {}, pwd);
+            });
+        }
+
+        [['nexOpsGoApprovalBtn', 'payment-approval'], ['nexOpsGoQueueBtn', 'orders'], ['nexOpsGoCreatorsBtn', 'creator-campaigns']].forEach(function (pair) {
+            var btn = document.getElementById(pair[0]);
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    var navEl = document.querySelector('#sidebar .sidebar-item[data-section="' + pair[1] + '"]');
+                    if (navEl) navEl.click();
+                });
+            }
+        });
+
+        var tbody = document.getElementById('nexOpsErrorTableBody');
+        if (tbody) {
+            tbody.addEventListener('click', function (e) {
+                var copyBtn = e.target.closest('[data-ops-copy-ref]');
+                if (copyBtn) {
+                    var ref = copyBtn.getAttribute('data-ops-copy-ref') || '';
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(ref).catch(function () {});
+                    }
+                    if (typeof showToast === 'function') showToast('Copied ' + ref);
+                    return;
+                }
+                var resBtn = e.target.closest('[data-ops-resolve-ref]');
+                if (resBtn) {
+                    var rId = resBtn.getAttribute('data-ops-resolve-ref') || '';
+                    var nextSt = resBtn.getAttribute('data-ops-next-status') || 'Resolved';
+                    if (window.NexErrorHandler && window.NexErrorHandler.markLocalStatus) {
+                        window.NexErrorHandler.markLocalStatus(rId, nextSt);
+                    }
+                    (_cloudErrors || []).forEach(function (c) {
+                        if (String(c.refId || '').toUpperCase() === String(rId).toUpperCase()) c.status = nextSt;
+                    });
+                    renderErrors();
+                    var pwd = window._nexAdminPwdSession || '';
+                    if (pwd) {
+                        google.script.run
+                            .withSuccessHandler(function () { loadDashboard(); })
+                            .resolveAdminSystemError(rId, nextSt, 'Updated in Ops Monitor', pwd);
+                    }
+                }
+            });
+        }
+
+        renderErrors();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindEvents);
+    } else {
+        bindEvents();
+    }
+
+    window.loadAdminOpsMonitor = loadDashboard;
+    return {
+        loadDashboard: loadDashboard,
+        renderErrors: renderErrors,
+        renderAnalytics: renderAnalytics,
+        exportErrorsCsv: exportErrorsCsv
     };
 })();
 
