@@ -10900,6 +10900,62 @@ header,
     color: #56B9E9;
     border: 1px solid rgba(86, 185, 233, 0.38);
 }
+/* ============================================================
+   PHASE 5: 5-TIER NEX POINTS & REWARDS ECOSYSTEM STYLES
+   ============================================================ */
+.nex-wallet-roadmap-card {
+    background: linear-gradient(145deg, #151E2B 0%, #101722 100%);
+    border: 1px solid #26364f;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 16px;
+}
+.nex-tier-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+}
+.nex-tier-milestone-box {
+    background: #0d141f;
+    border: 1px solid #223047;
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.nex-tier-milestone-box.unlocked {
+    border-color: rgba(84, 184, 106, 0.45);
+}
+.nex-tier-milestone-box.current {
+    border-color: var(--nex-gold, #E8C568);
+    background: rgba(232, 197, 104, 0.08);
+    box-shadow: 0 4px 16px rgba(232, 197, 104, 0.14);
+}
+.nex-redeem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.nex-redeem-card {
+    background: var(--nex-surface, #151E2B);
+    border: 1px solid #26364f;
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+}
+.nex-ledger-filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
     </style>
 <script>
 (function() {
@@ -12008,6 +12064,20 @@ header,
                         <p style="color:#6a7f9e;">Loading settings...</p>
                     </div>
 
+                    <div id="adminLoyaltyTierManager" style="margin-top:26px; background:var(--nex-surface,#151E2B); border:1px solid #24344d; border-radius:16px; padding:22px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+                            <div>
+                                <h3 style="margin:0;color:var(--nex-gold,#E8C568);"><i class="fas fa-crown"></i> 5-Tier NEX Loyalty Thresholds &amp; Perks</h3>
+                                <p style="margin:4px 0 0;font-size:12.5px;color:#91A0B5;">Configure points thresholds, earning multipliers &amp; perk summaries for Starter through Diamond tiers.</p>
+                            </div>
+                            <button type="button" class="submit-btn" id="adminSaveLoyaltyTiersBtn" style="padding:9px 16px;font-size:13px;"><i class="fas fa-save"></i> Save 5-Tier Config</button>
+                        </div>
+                        <div class="orders-container" id="adminLoyaltyTiersTableWrap">
+                            <p style="color:#6a7f9e;text-align:center;padding:12px;">Open Referral Settings &amp; Loyalty to load tiers...</p>
+                        </div>
+                        <div id="adminLoyaltyTiersStatus" style="margin-top:8px;font-size:12.5px;min-height:18px;"></div>
+                    </div>
+
                     <div id="adminPromoManagerContainer" style="margin-top:28px; background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:22px;">
                         <h3 style="margin:0 0 14px; color:#f7d875;"><i class="fas fa-tags"></i> Audience-Restricted Coupon &amp; Promo Manager</h3>
                         <form id="adminPromoForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:12px; align-items:end; margin-bottom:18px;">
@@ -12868,8 +12938,59 @@ header,
                         <!-- PANE 4: WALLET POINTS, COINS & VOUCHERS -->
                         <div class="nex2-acc-pane" id="nex2AccPaneWallet">
                             <div class="nex2-acc-pane-head">
-                                <h2><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Wallet &amp; Vouchers</h2>
+                                <h2><i class="fas fa-coins" style="color:#f7d875;"></i> NEX Wallet &amp; 5-Tier Rewards</h2>
                                 <span style="font-size:12px;color:#8aa1c0;">100 Points = RM 1.00 Discount</span>
+                            </div>
+
+                            <!-- 5-Tier Roadmap & Non-Demoting Progress -->
+                            <div class="nex-wallet-roadmap-card" id="nexWalletTierRoadmapCard">
+                                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                                    <div>
+                                        <span id="nexWalletTierBadge" class="nex2-rarity-pill" style="background:rgba(232,197,104,0.16);color:#E8C568;"><i class="fas fa-crown"></i> Starter Tier</span>
+                                        <div style="margin-top:6px;font-size:13px;color:#91A0B5;" id="nexWalletTierSub">Lifetime Tier XP never drops when you spend points!</div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <div style="font-size:20px;font-weight:800;color:#E8C568;" id="nexWalletBalPoints">0 Pts</div>
+                                        <div style="font-size:12px;color:#56B9E9;" id="nexWalletBalRm">= RM 0.00 Store Credit</div>
+                                    </div>
+                                </div>
+                                <div class="nx-vip-progress-wrap" style="margin-top:12px;">
+                                    <div class="nx-vip-progress-labels">
+                                        <span id="nexWalletXpLabel">0 Lifetime Pts</span>
+                                        <span id="nexWalletNextLabel">Next: Bronze (100 Pts)</span>
+                                    </div>
+                                    <div class="nx-vip-progress-bar"><div class="nx-vip-progress-fill" id="nexWalletProgressBar" style="width:6%;"></div></div>
+                                </div>
+                                <div class="nex-tier-steps-grid" id="nexWalletTierGrid"></div>
+                            </div>
+
+                            <!-- Instant Points-to-Voucher Redemption -->
+                            <h3 style="font-size:15px;margin-bottom:10px;"><i class="fas fa-gift" style="color:#E8C568;"></i> Redeem Points for Instant Vouchers</h3>
+                            <div class="nex-redeem-grid" id="nexWalletRedeemBar">
+                                <div class="nex-redeem-card">
+                                    <div>
+                                        <div style="font-size:12px;color:#56B9E9;font-weight:700;">100 NEX Points</div>
+                                        <div style="font-size:16px;font-weight:800;color:#F2F4F8;margin-top:2px;">RM 1.00 Voucher</div>
+                                        <div style="font-size:11.5px;color:#91A0B5;margin-top:3px;">Personal code valid 90 days</div>
+                                    </div>
+                                    <button type="button" class="submit-btn nex-redeem-voucher-btn" data-pts-cost="100" style="padding:8px 12px;font-size:12px;"><i class="fas fa-exchange-alt"></i> Redeem 100 Pts</button>
+                                </div>
+                                <div class="nex-redeem-card">
+                                    <div>
+                                        <div style="font-size:12px;color:#56B9E9;font-weight:700;">500 NEX Points</div>
+                                        <div style="font-size:16px;font-weight:800;color:#F2F4F8;margin-top:2px;">RM 5.00 Voucher</div>
+                                        <div style="font-size:11.5px;color:#91A0B5;margin-top:3px;">Personal code valid 90 days</div>
+                                    </div>
+                                    <button type="button" class="submit-btn nex-redeem-voucher-btn" data-pts-cost="500" style="padding:8px 12px;font-size:12px;"><i class="fas fa-exchange-alt"></i> Redeem 500 Pts</button>
+                                </div>
+                                <div class="nex-redeem-card">
+                                    <div>
+                                        <div style="font-size:12px;color:#E8C568;font-weight:700;">1,000 NEX Points</div>
+                                        <div style="font-size:16px;font-weight:800;color:#F2F4F8;margin-top:2px;">RM 10.00 Voucher</div>
+                                        <div style="font-size:11.5px;color:#91A0B5;margin-top:3px;">Personal code valid 90 days</div>
+                                    </div>
+                                    <button type="button" class="submit-btn nex-redeem-voucher-btn" data-pts-cost="1000" style="padding:8px 12px;font-size:12px;"><i class="fas fa-exchange-alt"></i> Redeem 1,000 Pts</button>
+                                </div>
                             </div>
 
                             <div style="background:#0b111d;border:1px solid #1e2a3a;border-radius:16px;padding:14px 16px;margin-bottom:16px;">
@@ -12883,7 +13004,14 @@ header,
                                 <p style="color:#6a7f9e;font-size:13px;">Loading available vouchers...</p>
                             </div>
 
-                            <h3 style="font-size:15px;margin-bottom:10px;"><i class="fas fa-history" style="color:#38bdf8;"></i> Recent Points Activity</h3>
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+                                <h3 style="font-size:15px;margin:0;"><i class="fas fa-history" style="color:#38bdf8;"></i> Points &amp; Redemption History</h3>
+                                <div class="nex-ledger-filter-row" id="nexWalletLedgerFilters" style="margin-bottom:0;">
+                                    <button type="button" class="nex-qtab-btn active" data-lfilter="all">All</button>
+                                    <button type="button" class="nex-qtab-btn" data-lfilter="earned">Earned (+Pts)</button>
+                                    <button type="button" class="nex-qtab-btn" data-lfilter="spent">Spent (-Pts)</button>
+                                </div>
+                            </div>
                             <div id="nex2WalletLedgerList" style="background:#0b111d;border:1px solid #1e2a3a;border-radius:14px;padding:4px 8px;">
                                 <p style="color:#6a7f9e;font-size:13px;padding:12px;">Loading points history...</p>
                             </div>
@@ -15341,7 +15469,7 @@ function loadGames() {
         grid.innerHTML = createSkeletonCards(6);
     }
 
-    function applyFreshData(gamesData, genresData, cmsData, queueData) {
+    function applyFreshData(gamesData, genresData, cmsData, queueData, loyaltyData) {
         allGames = Array.isArray(gamesData) ? gamesData : [];
         genreImages = genresData || {};
         _saveStoreLocalCache(allGames, genreImages);
@@ -15350,6 +15478,9 @@ function loadGames() {
         }
         if (queueData && window.NexQueueUi && typeof window.NexQueueUi.applyPublicSummary === 'function') {
             window.NexQueueUi.applyPublicSummary(queueData);
+        }
+        if (loyaltyData && Array.isArray(loyaltyData.tiers) && window.NexRewardsUi && typeof window.NexRewardsUi.applyPublicConfig === 'function') {
+            window.NexRewardsUi.applyPublicConfig(loyaltyData);
         }
         renderAll();
         renderAdminList();
@@ -15409,7 +15540,7 @@ function loadGames() {
     google.script.run
         .withSuccessHandler(function (res) {
             if (res && Array.isArray(res.games)) {
-                applyFreshData(res.games, res.genreImages || {}, res.cmsContent || null, res.queueSummary || null);
+                applyFreshData(res.games, res.genreImages || {}, res.cmsContent || null, res.queueSummary || null, res.loyaltyConfig || null);
             } else {
                 // Backward compatibility if GAS hasn't deployed getStoreBootstrapData yet
                 loadGamesParallelFallback();
@@ -22021,6 +22152,7 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
         // ================================================================
         function loadReferralConfig() {
             if (!isAdmin) return;
+            if (window.NexRewardsUi && typeof window.NexRewardsUi.loadAdminTiers === 'function') { window.NexRewardsUi.loadAdminTiers(); }
             var container = document.getElementById('referralConfigContainer');
             container.innerHTML = '<p style="color:#6a7f9e;">Loading settings...</p>';
             google.script.run
@@ -26403,12 +26535,18 @@ var _cachedIsPartnerAgent = null;
 var _cachedPartnerEmail = '';
 
 window.NEX_DEFAULT_TIER_THRESHOLDS = [
-    { key: 'starter', label: 'Starter', icon: 'fa-seedling', minXp: 0, color: '#91A0B5' },
-    { key: 'bronze',  label: 'Bronze',  icon: 'fa-shield-alt', minXp: 100, color: '#cd7f32' },
-    { key: 'silver',  label: 'Silver',  icon: 'fa-medal', minXp: 500, color: '#cbd5e1' },
-    { key: 'gold',    label: 'Gold',    icon: 'fa-crown', minXp: 1500, color: '#E8C568' },
-    { key: 'diamond', label: 'Diamond', icon: 'fa-gem', minXp: 3000, color: '#56B9E9' }
+    { key: 'starter', label: 'Starter', icon: 'fa-seedling',   minXp: 0,    multiplier: 1.0,  frameId: 'frame_default', perk: '100 Pts = RM 1.00 Store Credit + Default Frame', color: '#91A0B5' },
+    { key: 'bronze',  label: 'Bronze',  icon: 'fa-shield-alt', minXp: 100,  multiplier: 1.05, frameId: 'frame_neon',    perk: '+5% Bonus Points on Verified Orders + Bronze Badge', color: '#cd7f32' },
+    { key: 'silver',  label: 'Silver',  icon: 'fa-medal',      minXp: 500,  multiplier: 1.10, frameId: 'frame_premium', perk: '+10% Bonus Points + Premium Frame Milestone', color: '#cbd5e1' },
+    { key: 'gold',    label: 'Gold',    icon: 'fa-crown',      minXp: 1500, multiplier: 1.15, frameId: 'frame_galaxy',  perk: '+15% Bonus Points + Priority Queue Support', color: '#E8C568' },
+    { key: 'diamond', label: 'Diamond', icon: 'fa-gem',        minXp: 3000, multiplier: 1.25, frameId: 'frame_vip',     perk: '+25% Bonus Points + Exclusive VIP Mythic Frame', color: '#56B9E9' }
 ];
+try {
+    var _cachedLoyalty = JSON.parse(localStorage.getItem('nex4up_loyalty_cfg_v1') || 'null');
+    if (_cachedLoyalty && Array.isArray(_cachedLoyalty.tiers) && _cachedLoyalty.tiers.length === 5) {
+        window._nexTierThresholds = _cachedLoyalty.tiers;
+    }
+} catch (e) {}
 
 window.getNexTierInfo = function(xpOrPts) {
     var val = Math.max(0, parseInt(xpOrPts, 10) || 0);
@@ -26427,11 +26565,16 @@ window.getNexTierInfo = function(xpOrPts) {
         ? Math.min(100, Math.max(6, Math.round(((val - baseMin) / Math.max(1, nextMin - baseMin)) * 100)))
         : 100;
     return {
+        tierIndex: curIdx,
         key: cur.key,
         label: cur.label,
         pillLabel: cur.label + ' Tier',
-        icon: cur.icon,
+        icon: cur.icon || 'fa-crown',
         color: cur.color || '#E8C568',
+        multiplier: parseFloat(cur.multiplier) || 1.0,
+        frameId: cur.frameId || 'frame_default',
+        perk: cur.perk || '',
+        baseMin: baseMin,
         xp: val,
         nextMin: nextMin,
         nextLabel: next ? ('Next: ' + next.label + ' (' + nextMin.toLocaleString() + ' Pts)') : 'Top Tier Unlocked',
@@ -26443,7 +26586,8 @@ window.getNexTierInfo = function(xpOrPts) {
 function getVipTierInfoByPoints(pts, totalSpent) {
     var p = parseInt(pts, 10) || 0;
     var spent = parseFloat(totalSpent || (customer && customer.totalSpent) || 0) || 0;
-    var xp = Math.max(p, Math.round(spent));
+    var lifetime = parseInt((customer && customer.lifetimePoints) || 0, 10) || 0;
+    var xp = Math.max(p, lifetime, Math.round(spent));
     var t = window.getNexTierInfo(xp);
     return { label: t.pillLabel, icon: t.icon, color: t.color };
 }
@@ -27126,7 +27270,8 @@ window.renderNexVipBanner = function (pts) {
     if (!customer || !customer.email) return;
     var p = parseInt(pts, 10) || 0;
     var spent = parseFloat(customer.totalSpent || 0) || 0;
-    var tierVal = Math.max(p, Math.round(spent));
+    var lifetime = parseInt(customer.lifetimePoints || 0, 10) || 0;
+    var tierVal = Math.max(p, lifetime, Math.round(spent));
     var tierInfo = (typeof window.getNexTierInfo === 'function')
         ? window.getNexTierInfo(tierVal)
         : { label: 'Starter', nextLabel: 'Next: Bronze (100 Pts)', nextMin: 100, pct: Math.min(100, Math.round((tierVal / 100) * 100)), isMax: false };
@@ -27887,7 +28032,8 @@ window.renderNexVipBanner = function (pts) {
         // Unified 5-Tier progression synchronized across Dropdown, VIP Banner & Sidebar
         var ptsNum = parseInt(customer.points, 10) || 0;
         var spentApprox = parseFloat(customer.totalSpent || 0) || 0;
-        var xpVal = Math.max(ptsNum, Math.round(spentApprox));
+        var lifetimeApprox = parseInt(customer.lifetimePoints || 0, 10) || 0;
+        var xpVal = Math.max(ptsNum, lifetimeApprox, Math.round(spentApprox));
         var tierInfo = (typeof window.getNexTierInfo === 'function')
             ? window.getNexTierInfo(xpVal)
             : { label: 'Starter', nextLabel: 'Next: Bronze (100 Pts)', nextMin: 100, pct: 0, isMax: false };
@@ -28013,7 +28159,9 @@ window.renderNexVipBanner = function (pts) {
                         '<button type="button" class="nex2-top-promo-btn" onclick="copyToClipboard(\'' + escapeHtml(v.code) + '\')">Copy</button></div></div>';
                 }).join('') : '<div style="grid-column:1/-1;color:#6a7f9e;font-size:13px;padding:12px;">No active store vouchers available right now. Refer friends or submit creator videos to unlock vouchers!</div>';
             }
-            if (lEl) {
+            if (window.NexRewardsUi && typeof window.NexRewardsUi.setLedgerAndRender === 'function') {
+                window.NexRewardsUi.setLedgerAndRender(res.ledger || [], pts);
+            } else if (lEl) {
                 var ledger = res.ledger || [];
                 lEl.innerHTML = ledger.length ? ledger.map(function(item) {
                     var chg = parseInt(item.pointsChange, 10) || 0;
@@ -28024,6 +28172,9 @@ window.renderNexVipBanner = function (pts) {
                 }).join('') : '<p style="color:#6a7f9e;font-size:13px;padding:12px;">No Wallet Points transactions yet — complete orders or leave product reviews to earn points!</p>';
             }
         }).getCustomerWalletAndVouchers(customer.email, customer.sessionToken);
+        if (window.NexRewardsUi && typeof window.NexRewardsUi.loadCustomerLoyalty === 'function') {
+            window.NexRewardsUi.loadCustomerLoyalty();
+        }
     }
 
     function render_nex2_faqs() {
@@ -30826,6 +30977,263 @@ window.NexQueueUi = (function () {
         getAdminMeta: getAdminMeta,
         refreshAdminQueue: refreshAdminQueue,
         applyAdminQueueFilter: applyAdminQueueFilter
+    };
+})();
+
+// ================================================================
+// PHASE 5: 5-TIER NEX POINTS & REWARDS ECOSYSTEM CONTROLLER
+// ================================================================
+window.NexRewardsUi = (function () {
+    var CACHE_KEY = 'nex4up_loyalty_cfg_v1';
+    var _ledgerCache = [];
+    var _ledgerFilter = 'all';
+    var _lifetimeXp = null;
+
+    function getTiers() {
+        return (Array.isArray(window._nexTierThresholds) && window._nexTierThresholds.length === 5)
+            ? window._nexTierThresholds
+            : window.NEX_DEFAULT_TIER_THRESHOLDS;
+    }
+
+    function applyPublicConfig(cfg) {
+        if (!cfg || !Array.isArray(cfg.tiers) || cfg.tiers.length !== 5) return;
+        window._nexTierThresholds = cfg.tiers;
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(cfg)); } catch (e) {}
+        if (typeof updateProfileDropdown === 'function') updateProfileDropdown();
+        if (typeof customer !== 'undefined' && customer) {
+            renderRoadmap(parseInt(customer.points, 10) || 0, _lifetimeXp);
+        }
+    }
+
+    function renderRoadmap(balancePts, lifetimePts) {
+        var tiers = getTiers();
+        var pts = Math.max(0, parseInt(balancePts, 10) || 0);
+        var xp = (lifetimePts !== null && lifetimePts !== undefined)
+            ? Math.max(pts, parseInt(lifetimePts, 10) || 0)
+            : Math.max(pts, (typeof customer !== 'undefined' && customer && parseInt(customer.lifetimePoints, 10)) || 0);
+        var info = window.getNexTierInfo(xp);
+
+        var badgeEl = document.getElementById('nexWalletTierBadge');
+        var balPtsEl = document.getElementById('nexWalletBalPoints');
+        var balRmEl = document.getElementById('nexWalletBalRm');
+        var xpLblEl = document.getElementById('nexWalletXpLabel');
+        var nextLblEl = document.getElementById('nexWalletNextLabel');
+        var barEl = document.getElementById('nexWalletProgressBar');
+        var gridEl = document.getElementById('nexWalletTierGrid');
+
+        if (badgeEl) {
+            badgeEl.innerHTML = '<i class="fas ' + escapeHtml(info.icon) + '"></i> ' + escapeHtml(info.label) + ' Tier (' + (info.multiplier || 1).toFixed(2).replace(/\.00$/, '.0') + 'x)';
+            badgeEl.style.color = info.color || '#E8C568';
+        }
+        if (balPtsEl) balPtsEl.textContent = pts.toLocaleString() + ' Pts';
+        if (balRmEl) balRmEl.textContent = '= RM ' + (pts * 0.01).toFixed(2) + ' Store Credit';
+        if (xpLblEl) xpLblEl.textContent = xp.toLocaleString() + ' Lifetime Pts';
+        if (nextLblEl) nextLblEl.textContent = info.nextLabel;
+        if (barEl) barEl.style.width = (info.pct || 6) + '%';
+
+        if (gridEl) {
+            gridEl.innerHTML = tiers.map(function (t, idx) {
+                var minReq = parseInt(t.minXp, 10) || 0;
+                var unlocked = xp >= minReq;
+                var isCur = (t.key === info.key);
+                var cls = 'nex-tier-milestone-box' + (unlocked ? ' unlocked' : '') + (isCur ? ' current' : '');
+                return '<div class="' + cls + '">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">' +
+                    '<strong style="font-size:12.5px;color:' + escapeHtml(t.color || '#E8C568') + ';"><i class="fas ' + escapeHtml(t.icon || 'fa-crown') + '"></i> ' + escapeHtml(t.label) + '</strong>' +
+                    '<span style="font-size:10.5px;color:#91A0B5;">' + (parseFloat(t.multiplier) || 1).toFixed(2) + 'x</span>' +
+                    '</div>' +
+                    '<div style="font-size:11px;font-weight:700;color:#F2F4F8;">' + minReq.toLocaleString() + '+ Pts</div>' +
+                    '<div style="font-size:10.5px;color:#91A0B5;line-height:1.35;">' + escapeHtml(t.perk || '') + '</div>' +
+                    '<div style="font-size:10px;font-weight:700;color:' + (isCur ? '#E8C568' : (unlocked ? '#54B86A' : '#6a7f9e')) + ';">' +
+                    (isCur ? '★ Current Tier' : (unlocked ? '✓ Unlocked' : ('Need ' + (minReq - xp).toLocaleString() + ' Pts'))) +
+                    '</div></div>';
+            }).join('');
+        }
+
+        document.querySelectorAll('.nex-redeem-voucher-btn').forEach(function (btn) {
+            var cost = parseInt(btn.getAttribute('data-pts-cost'), 10) || 0;
+            btn.disabled = pts < cost;
+        });
+    }
+
+    function renderLedger() {
+        var lEl = document.getElementById('nex2WalletLedgerList');
+        if (!lEl) return;
+        var filtered = _ledgerCache.filter(function (item) {
+            var chg = parseInt(item.pointsChange, 10) || 0;
+            if (_ledgerFilter === 'earned') return chg > 0;
+            if (_ledgerFilter === 'spent') return chg < 0;
+            return true;
+        });
+        lEl.innerHTML = filtered.length ? filtered.map(function (item) {
+            var chg = parseInt(item.pointsChange, 10) || 0;
+            return '<div class="nex2-ledger-row">' +
+                '<div><div style="font-weight:700;color:#fff;">' + escapeHtml(item.reason || 'Points Update') + '</div>' +
+                '<div style="font-size:11px;color:#6a7f9e;">' + escapeHtml(item.date || '') + (item.orderId ? ' • ' + escapeHtml(item.orderId) : '') + '</div></div>' +
+                '<strong style="color:' + (chg >= 0 ? '#54B86A' : '#E56B70') + ';">' + (chg >= 0 ? '+' : '') + chg + ' Pts</strong></div>';
+        }).join('') : '<p style="color:#6a7f9e;font-size:13px;padding:12px;">No matching points transactions found.</p>';
+    }
+
+    function setLedgerAndRender(ledger, pts) {
+        _ledgerCache = Array.isArray(ledger) ? ledger : [];
+        renderLedger();
+        renderRoadmap(pts, _lifetimeXp);
+    }
+
+    function loadCustomerLoyalty() {
+        if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) return;
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (!res || !res.success) return;
+                if (Array.isArray(res.tiers) && res.tiers.length === 5) applyPublicConfig({ tiers: res.tiers });
+                _lifetimeXp = parseInt(res.lifetimeEarnedPoints, 10) || 0;
+                customer.points = parseInt(res.pointsBalance, 10) || 0;
+                customer.lifetimePoints = _lifetimeXp;
+                if (Array.isArray(res.unlockedFrames)) customer.unlockedFrames = res.unlockedFrames;
+                renderRoadmap(customer.points, _lifetimeXp);
+                if (typeof window.renderNexVipBanner === 'function') window.renderNexVipBanner(customer.points);
+            })
+            .getCustomerLoyaltyStatus(customer.email, customer.sessionToken);
+    }
+
+    function renderAdminTiersTable(tiers) {
+        var wrap = document.getElementById('adminLoyaltyTiersTableWrap');
+        if (!wrap) return;
+        var list = (Array.isArray(tiers) && tiers.length === 5) ? tiers : getTiers();
+        var html = '<table><thead><tr><th>Tier</th><th>Label</th><th>Min Points</th><th>Multiplier</th><th>Perk Summary</th></tr></thead><tbody>';
+        list.forEach(function (t, i) {
+            html += '<tr data-tier-key="' + escapeHtml(t.key) + '">' +
+                '<td><strong style="color:' + escapeHtml(t.color || '#E8C568') + ';"><i class="fas ' + escapeHtml(t.icon || 'fa-crown') + '"></i> ' + escapeHtml(t.key.toUpperCase()) + '</strong></td>' +
+                '<td><input type="text" class="adm-tier-label" value="' + escapeHtml(t.label) + '" style="width:110px;" /></td>' +
+                '<td><input type="number" class="adm-tier-minxp" value="' + (parseInt(t.minXp, 10) || 0) + '" min="0" ' + (i === 0 ? 'readonly title="Starter always begins at 0"' : '') + ' style="width:95px;" /></td>' +
+                '<td><input type="number" class="adm-tier-mult" step="0.05" min="1" max="5" value="' + (parseFloat(t.multiplier) || 1.0) + '" style="width:80px;" /></td>' +
+                '<td><input type="text" class="adm-tier-perk" value="' + escapeHtml(t.perk || '') + '" style="width:100%;min-width:210px;" /></td>' +
+                '</tr>';
+        });
+        html += '</tbody></table>';
+        wrap.innerHTML = html;
+    }
+
+    function loadAdminTiers() {
+        renderAdminTiersTable(getTiers());
+        if (typeof google === 'undefined' || !google.script || !google.script.run) return;
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (res && Array.isArray(res.tiers) && res.tiers.length === 5) {
+                    applyPublicConfig(res);
+                    renderAdminTiersTable(res.tiers);
+                }
+            })
+            .getPublicLoyaltyConfig(true);
+    }
+
+    function bindEvents() {
+        var filters = document.getElementById('nexWalletLedgerFilters');
+        if (filters) {
+            filters.addEventListener('click', function (e) {
+                var btn = e.target.closest('[data-lfilter]');
+                if (!btn) return;
+                _ledgerFilter = btn.getAttribute('data-lfilter') || 'all';
+                filters.querySelectorAll('[data-lfilter]').forEach(function (b) {
+                    b.classList.toggle('active', b === btn);
+                });
+                renderLedger();
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            var redeemBtn = e.target.closest('.nex-redeem-voucher-btn');
+            if (!redeemBtn) return;
+            if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                if (typeof showToast === 'function') showToast('Please sign in first to redeem NEX Points.');
+                return;
+            }
+            var cost = parseInt(redeemBtn.getAttribute('data-pts-cost'), 10) || 0;
+            if (!confirm('Redeem ' + cost + ' NEX Points for an instant RM ' + (cost / 100).toFixed(2) + ' store voucher?')) return;
+            redeemBtn.disabled = true;
+            var orig = redeemBtn.innerHTML;
+            redeemBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redeeming...';
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    redeemBtn.innerHTML = orig;
+                    if (res && res.success) {
+                        customer.points = parseInt(res.newPointsBalance, 10) || 0;
+                        try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
+                        if (typeof showToast === 'function') showToast(res.message || 'Voucher redeemed!');
+                        if (typeof load_wallet_and_vouchers === 'function') load_wallet_and_vouchers();
+                        if (typeof refreshHeaderPointsPill === 'function') refreshHeaderPointsPill();
+                        if (typeof updateProfileDropdown === 'function') updateProfileDropdown();
+                    } else {
+                        redeemBtn.disabled = false;
+                        if (typeof showToast === 'function') showToast((res && res.message) || 'Could not redeem points.');
+                    }
+                })
+                .withFailureHandler(function (err) {
+                    redeemBtn.disabled = false;
+                    redeemBtn.innerHTML = orig;
+                    var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'redeemPointsForRewardVoucher') : 'Unable to redeem voucher right now.';
+                    if (typeof showToast === 'function') showToast(msg);
+                })
+                .redeemPointsForRewardVoucher(customer.email, customer.sessionToken, cost);
+        });
+
+        var saveAdminBtn = document.getElementById('adminSaveLoyaltyTiersBtn');
+        if (saveAdminBtn) {
+            saveAdminBtn.addEventListener('click', function () {
+                var rows = document.querySelectorAll('#adminLoyaltyTiersTableWrap tr[data-tier-key]');
+                var payload = [];
+                var baseTiers = getTiers();
+                rows.forEach(function (tr, i) {
+                    var k = tr.getAttribute('data-tier-key');
+                    var def = baseTiers[i] || {};
+                    payload.push({
+                        key: k,
+                        label: (tr.querySelector('.adm-tier-label')?.value || def.label || k).trim(),
+                        minXp: parseInt(tr.querySelector('.adm-tier-minxp')?.value || '0', 10) || 0,
+                        multiplier: parseFloat(tr.querySelector('.adm-tier-mult')?.value || '1') || 1.0,
+                        perk: (tr.querySelector('.adm-tier-perk')?.value || '').trim(),
+                        frameId: def.frameId || 'frame_default',
+                        color: def.color || '#E8C568',
+                        icon: def.icon || 'fa-crown'
+                    });
+                });
+                var stEl = document.getElementById('adminLoyaltyTiersStatus');
+                if (stEl) { stEl.textContent = 'Saving 5-tier config...'; stEl.style.color = '#56B9E9'; }
+                google.script.run
+                    .withSuccessHandler(function (res) {
+                        if (res && res.success) {
+                            applyPublicConfig(res);
+                            renderAdminTiersTable(res.tiers);
+                            if (stEl) { stEl.textContent = res.message || 'Saved!'; stEl.style.color = '#54B86A'; }
+                            if (typeof showToast === 'function') showToast(res.message || 'Saved 5-tier config.');
+                        } else {
+                            var m = (res && res.message) || 'Could not save config.';
+                            if (stEl) { stEl.textContent = m; stEl.style.color = '#E56B70'; }
+                            if (typeof showToast === 'function') showToast(m);
+                        }
+                    })
+                    .withFailureHandler(function (err) {
+                        var fm = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'saveAdminLoyaltyTiers') : 'Could not save tier config.';
+                        if (stEl) { stEl.textContent = fm; stEl.style.color = '#E56B70'; }
+                    })
+                    .saveAdminLoyaltyTiers(payload, window._nexAdminPwdSession || '');
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindEvents);
+    } else {
+        bindEvents();
+    }
+
+    return {
+        applyPublicConfig: applyPublicConfig,
+        renderRoadmap: renderRoadmap,
+        setLedgerAndRender: setLedgerAndRender,
+        loadCustomerLoyalty: loadCustomerLoyalty,
+        loadAdminTiers: loadAdminTiers,
+        getTiers: getTiers
     };
 })();
 
