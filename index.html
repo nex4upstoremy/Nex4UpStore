@@ -10694,6 +10694,11 @@ header,
     font-size: 10.5px;
     color: var(--nex-text-secondary, #91A0B5);
     padding: 0 4px;
+    min-width: 60px;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -10792,6 +10797,108 @@ header,
         flex-direction: column;
         align-items: flex-start;
     }
+}
+/* ============================================================
+   PHASE 4: COUPON AUDIENCE BADGES & REAL FULFILMENT QUEUE UI
+   ============================================================ */
+.nex-queue-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 6px;
+}
+.nex-queue-pill.waiting {
+    background: rgba(232, 197, 104, 0.14);
+    color: var(--nex-gold, #E8C568);
+    border: 1px solid rgba(232, 197, 104, 0.35);
+}
+.nex-queue-pill.processing {
+    background: rgba(86, 185, 233, 0.14);
+    color: var(--nex-blue, #56B9E9);
+    border: 1px solid rgba(86, 185, 233, 0.38);
+}
+.nex-queue-pill.completed {
+    background: rgba(84, 184, 106, 0.14);
+    color: var(--nex-success, #54B86A);
+    border: 1px solid rgba(84, 184, 106, 0.35);
+}
+.nex-queue-pill.sla-delayed {
+    background: rgba(229, 107, 112, 0.16);
+    color: var(--nex-error, #E56B70);
+    border: 1px solid rgba(229, 107, 112, 0.4);
+}
+.nex-admin-queue-panel {
+    background: var(--nex-surface, #151E2B);
+    border: 1px solid #24344d;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+.nex-admin-queue-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.nex-admin-queue-kpi {
+    background: #101722;
+    border: 1px solid #223047;
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+.nex-admin-queue-kpi .qk-num {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--nex-text-primary, #F2F4F8);
+}
+.nex-admin-queue-kpi .qk-lbl {
+    font-size: 11.5px;
+    color: var(--nex-text-secondary, #91A0B5);
+    margin-top: 2px;
+}
+.nex-admin-queue-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.nex-qtab-btn {
+    background: #101722;
+    border: 1px solid #26364f;
+    color: var(--nex-text-secondary, #91A0B5);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.nex-qtab-btn.active {
+    background: var(--nex-gold, #E8C568);
+    color: #0b0e14;
+    border-color: var(--nex-gold, #E8C568);
+}
+.nex-audience-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+}
+.nex-audience-pill.everyone {
+    background: rgba(84, 184, 106, 0.14);
+    color: #54B86A;
+    border: 1px solid rgba(84, 184, 106, 0.35);
+}
+.nex-audience-pill.specific {
+    background: rgba(86, 185, 233, 0.15);
+    color: #56B9E9;
+    border: 1px solid rgba(86, 185, 233, 0.38);
 }
     </style>
 <script>
@@ -11146,7 +11253,7 @@ header,
                     <div class="mp-trust-strip">
                         <div class="mp-trust-item">
                             <div class="mp-trust-icon"><i class="fas fa-bolt"></i></div>
-                            <div class="mp-trust-text"><strong>Fast Processing</strong><span>1–2 hrs (9AM–12PM Daily)</span></div>
+                            <div class="mp-trust-text"><strong>Fast Processing</strong><span id="nexLiveQueueTrustText">1–2 hrs (9AM–12PM Daily)</span></div>
                         </div>
                         <div class="mp-trust-item">
                             <div class="mp-trust-icon"><i class="fas fa-shield-alt"></i></div>
@@ -11678,6 +11785,37 @@ header,
                             <button class="submit-btn" id="refreshOrdersBtn" style="padding:8px 20px; font-size:14px;"><i class="fas fa-sync-alt"></i> Refresh</button>
                         </div>
                     </div>
+                    <div class="nex-admin-queue-panel" id="adminFulfilmentQueuePanel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+                            <strong style="color:var(--nex-gold,#E8C568);font-size:13.5px;"><i class="fas fa-stream"></i> Live FIFO Fulfilment Queue &amp; SLA Monitor (Target: &le; 2 hrs)</strong>
+                            <span id="adminQueueUpdatedAt" style="font-size:11px;color:var(--nex-text-secondary,#91A0B5);">Loading queue metrics...</span>
+                        </div>
+                        <div class="nex-admin-queue-kpis">
+                            <div class="nex-admin-queue-kpi" style="border-left:3px solid #E8C568;">
+                                <div class="qk-num" id="adminQWaitingCount" style="color:#E8C568;">0</div>
+                                <div class="qk-lbl">Waiting Verification</div>
+                            </div>
+                            <div class="nex-admin-queue-kpi" style="border-left:3px solid #56B9E9;">
+                                <div class="qk-num" id="adminQProcessingCount" style="color:#56B9E9;">0</div>
+                                <div class="qk-lbl">Processing Queue (FIFO)</div>
+                            </div>
+                            <div class="nex-admin-queue-kpi" style="border-left:3px solid #E56B70;">
+                                <div class="qk-num" id="adminQSlaAlertCount" style="color:#E56B70;">0</div>
+                                <div class="qk-lbl">SLA Delayed (&gt;2 hrs)</div>
+                            </div>
+                            <div class="nex-admin-queue-kpi" style="border-left:3px solid #54B86A;">
+                                <div class="qk-num" id="adminQCompletedTodayCount" style="color:#54B86A;">0</div>
+                                <div class="qk-lbl">Completed Today</div>
+                            </div>
+                        </div>
+                        <div class="nex-admin-queue-tabs" id="adminQueueFilterTabs">
+                            <button type="button" class="nex-qtab-btn active" data-qfilter="all">All Orders</button>
+                            <button type="button" class="nex-qtab-btn" data-qfilter="Waiting">Waiting Verification</button>
+                            <button type="button" class="nex-qtab-btn" data-qfilter="Processing">Processing Queue (FIFO)</button>
+                            <button type="button" class="nex-qtab-btn" data-qfilter="sla">SLA Alert (&gt;2h)</button>
+                            <button type="button" class="nex-qtab-btn" data-qfilter="Completed">Completed</button>
+                        </div>
+                    </div>
                     <div class="admin-bulk-bar" id="ordersBulkBar">
                         <label class="admin-bulk-left" style="cursor:pointer;">
                             <input type="checkbox" id="ordersSelectAll" /> Select All
@@ -11871,17 +12009,34 @@ header,
                     </div>
 
                     <div id="adminPromoManagerContainer" style="margin-top:28px; background:#121821; border:1px solid #1e2a3a; border-radius:16px; padding:22px;">
-                        <h3 style="margin:0 0 14px; color:#f7d875;"><i class="fas fa-tags"></i> Promo Code Manager</h3>
-                        <form id="adminPromoForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:12px; align-items:end; margin-bottom:18px;">
-                            <div class="field"><label>Code *</label><input type="text" id="promoMgrCode" required placeholder="e.g. RAYAFREE" style="text-transform:uppercase;" /></div>
+                        <h3 style="margin:0 0 14px; color:#f7d875;"><i class="fas fa-tags"></i> Audience-Restricted Coupon &amp; Promo Manager</h3>
+                        <form id="adminPromoForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:12px; align-items:end; margin-bottom:18px;">
+                            <div class="field"><label>Code *</label><input type="text" id="promoMgrCode" required placeholder="e.g. VIPREWARD" style="text-transform:uppercase;" /></div>
                             <div class="field"><label>Type</label><select id="promoMgrType"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed (RM)</option></select></div>
                             <div class="field"><label>Discount Value *</label><input type="number" id="promoMgrValue" step="0.01" min="0.01" required placeholder="10" /></div>
                             <div class="field"><label>Min Order (RM)</label><input type="number" id="promoMgrMinOrder" step="0.01" min="0" value="0" /></div>
-                            <div class="field"><label>Usage Limit (0=Off)</label><input type="number" id="promoMgrLimit" step="1" min="0" value="100" /></div>
+                            <div class="field"><label>Max Per Customer</label><input type="number" id="promoMgrMaxPerUser" step="1" min="0" value="1" title="0 = unlimited per user" /></div>
+                            <div class="field"><label>Global Limit (0=Off)</label><input type="number" id="promoMgrLimit" step="1" min="0" value="100" /></div>
                             <div class="field"><label>Expiry Date</label><input type="date" id="promoMgrExpiry" /></div>
-                            <button type="submit" class="submit-btn" id="promoMgrSaveBtn" style="height:42px; justify-content:center;"><i class="fas fa-plus"></i> Save Promo</button>
+                            <div class="field">
+                                <label>Audience Eligibility</label>
+                                <select id="promoMgrAudience">
+                                    <option value="everyone">Everyone (Public)</option>
+                                    <option value="specific_users">Specific Username(s) / Email(s) Only</option>
+                                </select>
+                            </div>
+                            <div class="field" id="promoMgrAllowedWrap" style="display:none; grid-column: 1 / -1;">
+                                <label>Allowed Usernames / Emails (comma-separated, requires login)</label>
+                                <input type="text" id="promoMgrAllowedUsers" placeholder="e.g. DaKsTARs465, ali_gamer, player@gmail.com" />
+                            </div>
+                            <div class="field" style="grid-column: span 2;">
+                                <label>Description (optional)</label>
+                                <input type="text" id="promoMgrDescription" placeholder="e.g. Exclusive VIP cashback voucher" />
+                            </div>
+                            <button type="submit" class="submit-btn" id="promoMgrSaveBtn" style="height:42px; justify-content:center;"><i class="fas fa-plus"></i> Save Coupon</button>
                         </form>
                         <div class="orders-container" id="adminPromoList"><p style="color:#6a7f9e; text-align:center; padding:16px;">Loading promo codes...</p></div>
+                        <div id="adminCouponHistoryBox" style="display:none; margin-top:16px; background:#0d141f; border:1px solid #26364f; border-radius:12px; padding:14px;"></div>
                     </div>
                 </div>
 
@@ -15186,12 +15341,15 @@ function loadGames() {
         grid.innerHTML = createSkeletonCards(6);
     }
 
-    function applyFreshData(gamesData, genresData, cmsData) {
+    function applyFreshData(gamesData, genresData, cmsData, queueData) {
         allGames = Array.isArray(gamesData) ? gamesData : [];
         genreImages = genresData || {};
         _saveStoreLocalCache(allGames, genreImages);
         if (cmsData && window.NexBannerCarousel && typeof window.NexBannerCarousel.applyPublicCms === 'function') {
             window.NexBannerCarousel.applyPublicCms(cmsData);
+        }
+        if (queueData && window.NexQueueUi && typeof window.NexQueueUi.applyPublicSummary === 'function') {
+            window.NexQueueUi.applyPublicSummary(queueData);
         }
         renderAll();
         renderAdminList();
@@ -15251,7 +15409,7 @@ function loadGames() {
     google.script.run
         .withSuccessHandler(function (res) {
             if (res && Array.isArray(res.games)) {
-                applyFreshData(res.games, res.genreImages || {}, res.cmsContent || null);
+                applyFreshData(res.games, res.genreImages || {}, res.cmsContent || null, res.queueSummary || null);
             } else {
                 // Backward compatibility if GAS hasn't deployed getStoreBootstrapData yet
                 loadGamesParallelFallback();
@@ -16183,6 +16341,18 @@ function updateCheckoutSummary() {
     var discountAmount = 0;
     var discountLabel = '';
 
+    if (appliedPromo && !appliedPromo.isFirstPurchase) {
+        if ((appliedPromo.minOrder && subtotal < appliedPromo.minOrder) ||
+            (appliedPromo.audienceType === 'specific_users' && (!customer || !customer.sessionToken))) {
+            appliedPromo = null;
+            var pFb = document.getElementById('promoFeedback');
+            if (pFb) {
+                pFb.textContent = 'Coupon removed (cart total or account sign-in requirement no longer met).';
+                pFb.className = 'promo-feedback error';
+            }
+        }
+    }
+
     if (appliedPromo) {
 
         // Automatic first-purchase coupon:
@@ -16957,7 +17127,9 @@ checkoutBtn.addEventListener('click', function() {
                         appliedPromo = {
                             code: result.code,
                             discountType: result.discountType,
-                            discountValue: result.discountValue
+                            discountValue: result.discountValue,
+                            minOrder: parseFloat(result.minOrder) || 0,
+                            audienceType: result.audienceType || 'everyone'
                         };
 
                         btn.classList.remove('loading');
@@ -16993,7 +17165,19 @@ checkoutBtn.addEventListener('click', function() {
                     feedback.textContent = 'Error validating promo code.';
                     feedback.className = 'promo-feedback error';
                 })
-                .validatePromoCode(code);
+                .validatePromoCode(
+                    code,
+                    (customer && customer.email) || (checkoutEmail && checkoutEmail.value.trim()) || '',
+                    (function () {
+                        var sub = 0;
+                        for (var ci = 0; ci < cart.length; ci++) {
+                            var cp = cart[ci].discount ? cart[ci].price * (1 - cart[ci].discount / 100) : cart[ci].price;
+                            sub += cp * cart[ci].quantity;
+                        }
+                        return Math.round(sub * 100) / 100;
+                    })(),
+                    (customer && customer.sessionToken) || ''
+                );
         });
 
         checkoutForm.addEventListener('submit', function(e) {
@@ -17112,6 +17296,7 @@ checkoutBtn.addEventListener('click', function() {
                 name: customerName,
                 phone: phone,
                 email: email,
+                sessionToken: (customer && customer.sessionToken) || '',
                 _submissionToken: window._checkoutSubmissionToken
             };
 
@@ -19107,6 +19292,7 @@ function loadOrders() {
     google.script.run
         .withSuccessHandler(function(orders) {
             window._adminAllOrdersCache = orders || [];
+            if (window.NexQueueUi && typeof window.NexQueueUi.refreshAdminQueue === 'function') { window.NexQueueUi.refreshAdminQueue(); }
             if (!orders || orders.length === 0) {
                 ordersList.innerHTML = '<div class="empty-msg">No orders yet.</div>';
                 return;
@@ -19131,12 +19317,17 @@ function loadOrders() {
             for (var i = 0; i < orders.length; i++) {
                 var o = orders[i];
                 var oid = o['Order ID'] || '';
-                html += '<tr>';
+                var qMeta = window.NexQueueUi ? window.NexQueueUi.getAdminMeta(o) : { stage: '', cls: '', posLabel: '' };
+                html += '<tr class="admin-order-row" data-orderid="' + escapeHtml(oid) + '" data-qstage="' + escapeHtml(qMeta.stage) + '" data-qsla="' + (qMeta.isSlaDelayed ? '1' : '0') + '">';
                 html += '<td><input type="checkbox" class="admin-order-check" data-orderid="' + escapeHtml(oid) + '" /></td>';
                 cols.forEach(c => {
                     var v = o[c.key] || '';
                     if (c.key === 'Total (RM)') v = CURRENCY + ' ' + parseFloat(v || 0).toFixed(2);
-                    html += '<td>' + v + '</td>';
+                    if (c.key === 'Order ID') {
+                        html += '<td><div>' + escapeHtml(v) + '</div><div class="admin-q-slot" data-qoid="' + escapeHtml(oid) + '" style="margin-top:3px;">' + (qMeta.posLabel || '') + '</div></td>';
+                    } else {
+                        html += '<td>' + v + '</td>';
+                    }
                 });
 
                 var payStatusRaw = String(o['Payment Status'] || 'Awaiting Payment').trim();
@@ -19853,12 +20044,15 @@ function loadOrders() {
                         }
                         trackResults.innerHTML =
                             '<div class="order-item">' +
-                                '<div class="order-id">' + escapeHtml(res.orderId) + '</div>' +
+                                '<div class="order-id">' + escapeHtml(res.orderId) + '<span id="nexTrackLiveQueueBadge"></span></div>' +
                                 (res.items ? '<div><strong>Items:</strong> ' + escapeHtml(res.items) + '</div>' : '') +
                                 '<div><strong>Method:</strong> ' + escapeHtml(res.paymentMethod || '-') + ' | <strong>Total:</strong> ' + CURRENCY + ' ' + (parseFloat(res.amount) || 0).toFixed(2) + '</div>' +
                                 '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + escapeHtml(st) + '</span></div>' +
                                 stepsHtml + actionBtn +
                             '</div>';
+                        if (window.NexQueueUi && typeof window.NexQueueUi.fetchOrderQueueBadge === 'function') {
+                            window.NexQueueUi.fetchOrderQueueBadge(res.orderId, 'nexTrackLiveQueueBadge');
+                        }
                     })
                     .withFailureHandler(function(err) {
                         trackResults.innerHTML = '<p style="color:var(--nex-danger,#E56B70);">' + escapeHtml(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'trackOrderById') : 'Unable to load order status right now.') + '</p>';
@@ -20355,6 +20549,8 @@ function renderReviews(reviews) {
         // ================================================================
         function logoutCustomer() {
             customer = null;
+            appliedPromo = null;
+            window._nexMyOrdersQueueMap = {};
             wishlistIds = new Set();
             try { localStorage.removeItem('nex4up_customer'); } catch (e) {}
             updateProfileBadge(0);
@@ -20491,6 +20687,9 @@ function loadMyOrders() {
             render_pending_receipt_banner();
             renderOrderTabCounts();
             renderOrderList(activeOrderTab);
+            if (window.NexQueueUi && typeof window.NexQueueUi.fetchCustomerQueueMap === 'function' && customer && customer.email) {
+                window.NexQueueUi.fetchCustomerQueueMap(customer.email);
+            }
         })
         .withFailureHandler(function(err) {
             var friendlyOrdFail = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getMyOrdersData') : 'Unable to load your orders right now.';
@@ -20632,8 +20831,10 @@ function renderOrderList(tab) {
         var reviewedIds = order._reviewedProductIds || [];
 
         html += '<div class="order-card">';
+        var qCard = (window._nexMyOrdersQueueMap && window._nexMyOrdersQueueMap[orderId]) || null;
+        var qPill = (qCard && window.NexQueueUi) ? window.NexQueueUi.renderQueuePillHtml(qCard) : '';
         html += '<div class="order-header">';
-        html += '<span class="order-id">' + orderId + '</span>';
+        html += '<span class="order-id">' + escapeHtml(orderId) + qPill + '</span>';
         html += '<span class="order-date">' + date + '</span>';
         html += '</div>';
 
@@ -20667,7 +20868,7 @@ function renderOrderList(tab) {
             if (paySt === 'Awaiting Verification' || String(order['Receipt Number'] || '').trim()) curStep = 2;
             if (paySt === 'Paid' || status === 'Paid' || status === 'To Ship') curStep = 3;
             if (fulSt === 'Shipped' || fulSt === 'Delivered' || order['Customer Received At'] || order._tab === 'To Receive' || order._tab === 'To Review') curStep = 4;
-            var stepLabels = ['Order Placed', 'Payment Sent', 'Verified', 'Completed'];
+            var stepLabels = ['Order Placed', 'Waiting in Queue', 'Processing', 'Completed'];
             html += '<div class="order-progress-track">';
             for (var sp = 1; sp <= 4; sp++) {
                 var spCls = sp < curStep ? 'done' : (sp === curStep ? 'active' : '');
@@ -24826,51 +25027,110 @@ document.getElementById('addAgentBtn')?.addEventListener('click', function() {
     }).addSalesperson(email, name, code, rate, payoutInfo);
 });
 
-// Admin: Promo Code & Voucher Manager
+// Admin: Audience-Restricted Coupon & Promo Code Manager V2
+(function initAdminPromoAudienceToggle() {
+    var audSel = document.getElementById('promoMgrAudience');
+    var wrap = document.getElementById('promoMgrAllowedWrap');
+    if (audSel && wrap) {
+        audSel.addEventListener('change', function () {
+            wrap.style.display = (audSel.value === 'specific_users') ? 'block' : 'none';
+        });
+    }
+})();
+
+window._adminPromoCache = [];
+
 function loadAdminPromoCodes() {
     if (!isAdmin) return;
     var container = document.getElementById('adminPromoList');
     if (!container) return;
-    container.innerHTML = '<p style="text-align:center;color:#6a7f9e;padding:12px;">Loading promo codes...</p>';
+    container.innerHTML = '<p style="text-align:center;color:#6a7f9e;padding:12px;">Loading coupons...</p>';
     google.script.run
-        .withSuccessHandler(function(promos) {
-            promos = promos || [];
+        .withSuccessHandler(function(res) {
+            var promos = Array.isArray(res) ? res : ((res && Array.isArray(res.promos)) ? res.promos : []);
+            window._adminPromoCache = promos;
             if (promos.length === 0) {
                 container.innerHTML = '<p style="text-align:center;color:#6a7f9e;padding:16px;">No promo codes yet.</p>';
                 return;
             }
-            var html = '<table><thead><tr><th>Code</th><th>Discount</th><th>Min Order</th><th>Usage</th><th>Expiry</th><th>Actions</th></tr></thead><tbody>';
+            var html = '<table><thead><tr><th>Code</th><th>Discount</th><th>Audience</th><th>Limits</th><th>Expiry</th><th>Actions</th></tr></thead><tbody>';
             promos.forEach(function(p) {
                 var discText = p.discountType === 'percentage' ? (p.discountValue + '%') : ('RM ' + (parseFloat(p.discountValue) || 0).toFixed(2));
-                var isOff = p.usageLimit === 0;
+                var isOff = parseInt(p.usageLimit, 10) === 0;
+                var isSpec = (p.audienceType === 'specific_users');
+                var audHtml = isSpec
+                    ? '<span class="nex-audience-pill specific"><i class="fas fa-lock"></i> ' + escapeHtmlForAdmin(p.allowedUsers || 'Restricted') + '</span>'
+                    : '<span class="nex-audience-pill everyone"><i class="fas fa-globe"></i> Everyone</span>';
+                var maxPerStr = (parseInt(p.maxPerCustomer, 10) > 0) ? (p.maxPerCustomer + 'x/user') : 'Unlim/user';
+                var minStr = (parseFloat(p.minOrder) > 0) ? (' · Min RM ' + parseFloat(p.minOrder).toFixed(2)) : '';
                 html += '<tr>' +
-                    '<td style="font-family:monospace;color:#f7d875;font-weight:700;">' + escapeHtmlForAdmin(p.code) + (isOff ? ' <span style="color:#ff6b6b;font-size:10px;">(Disabled)</span>' : '') + '</td>' +
-                    '<td>' + discText + '</td>' +
-                    '<td>RM ' + (parseFloat(p.minOrder) || 0).toFixed(2) + '</td>' +
-                    '<td>' + (p.usedCount || 0) + ' / ' + p.usageLimit + '</td>' +
+                    '<td style="font-family:monospace;color:#f7d875;font-weight:700;">' + escapeHtmlForAdmin(p.code) + (isOff ? ' <span style="color:#E56B70;font-size:10px;">(Disabled)</span>' : '') + '</td>' +
+                    '<td>' + discText + '<div style="font-size:10.5px;color:#91A0B5;">' + escapeHtmlForAdmin(p.description || '') + '</div></td>' +
+                    '<td>' + audHtml + '</td>' +
+                    '<td>' + (p.usedCount || 0) + ' / ' + p.usageLimit + '<div style="font-size:10.5px;color:#91A0B5;">' + escapeHtmlForAdmin(maxPerStr + minStr) + '</div></td>' +
                     '<td>' + escapeHtmlForAdmin(p.expiryDate || '-') + '</td>' +
-                    '<td><div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-                        '<button type="button" class="toggle-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" data-type="' + escapeHtmlForAdmin(p.discountType) + '" data-val="' + p.discountValue + '" data-min="' + p.minOrder + '" data-exp="' + escapeHtmlForAdmin(p.expiryDate || '') + '" data-next="' + (isOff ? 100 : 0) + '" style="background:#1e2a3a;color:' + (isOff ? '#4caf50' : '#ffa726') + ';border:1px solid #2a3a52;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:700;">' + (isOff ? 'Enable' : 'Disable') + '</button>' +
-                        '<button type="button" class="del-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:rgba(255,107,107,0.14);color:#ff6b6b;border:1px solid rgba(255,107,107,0.35);border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:700;">Delete</button>' +
+                    '<td><div style="display:flex;gap:5px;flex-wrap:wrap;">' +
+                        '<button type="button" class="edit-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:#1B2737;color:#E8C568;border:1px solid #2e425f;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Edit</button>' +
+                        '<button type="button" class="log-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:#1B2737;color:#56B9E9;border:1px solid #2e425f;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Log</button>' +
+                        '<button type="button" class="toggle-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" data-next="' + (isOff ? 100 : 0) + '" style="background:#1e2a3a;color:' + (isOff ? '#54B86A' : '#E9B94E') + ';border:1px solid #2a3a52;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">' + (isOff ? 'Enable' : 'Disable') + '</button>' +
+                        '<button type="button" class="del-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:rgba(229,107,112,0.14);color:#E56B70;border:1px solid rgba(229,107,112,0.35);border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Delete</button>' +
                     '</div></td>' +
                 '</tr>';
             });
             html += '</tbody></table>';
             container.innerHTML = html;
 
+            container.querySelectorAll('.edit-promo-btn').forEach(function(b) {
+                b.addEventListener('click', function() {
+                    var item = (window._adminPromoCache || []).find(function(x) { return x.code === b.dataset.code; });
+                    if (!item) return;
+                    document.getElementById('promoMgrCode').value = item.code || '';
+                    document.getElementById('promoMgrType').value = item.discountType || 'percentage';
+                    document.getElementById('promoMgrValue').value = item.discountValue || '';
+                    document.getElementById('promoMgrMinOrder').value = item.minOrder || 0;
+                    if (document.getElementById('promoMgrMaxPerUser')) document.getElementById('promoMgrMaxPerUser').value = (item.maxPerCustomer !== undefined ? item.maxPerCustomer : 1);
+                    document.getElementById('promoMgrLimit').value = (item.usageLimit !== undefined ? item.usageLimit : 100);
+                    document.getElementById('promoMgrExpiry').value = item.expiryDate || '';
+                    var audEl = document.getElementById('promoMgrAudience');
+                    var allowWrap = document.getElementById('promoMgrAllowedWrap');
+                    if (audEl) audEl.value = item.audienceType || 'everyone';
+                    if (allowWrap) allowWrap.style.display = (audEl && audEl.value === 'specific_users') ? 'block' : 'none';
+                    if (document.getElementById('promoMgrAllowedUsers')) document.getElementById('promoMgrAllowedUsers').value = item.allowedUsers || '';
+                    if (document.getElementById('promoMgrDescription')) document.getElementById('promoMgrDescription').value = item.description || '';
+                    document.getElementById('promoMgrCode').focus();
+                });
+            });
+
+            container.querySelectorAll('.log-promo-btn').forEach(function(b) {
+                b.addEventListener('click', function() {
+                    var box = document.getElementById('adminCouponHistoryBox');
+                    if (!box) return;
+                    box.style.display = 'block';
+                    box.innerHTML = '<div style="color:#91A0B5;font-size:12.5px;"><i class="fas fa-spinner fa-spin"></i> Loading redemption audit for ' + escapeHtmlForAdmin(b.dataset.code) + '...</div>';
+                    google.script.run.withSuccessHandler(function(r) {
+                        var rows = (r && r.redemptions) || [];
+                        if (rows.length === 0) {
+                            box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;"><strong style="color:#E8C568;">Redemption History: ' + escapeHtmlForAdmin(b.dataset.code) + '</strong><button type="button" onclick="this.closest(\'#adminCouponHistoryBox\').style.display=\'none\'" style="background:none;border:none;color:#91A0B5;cursor:pointer;">Close</button></div><p style="color:#91A0B5;font-size:12.5px;margin:8px 0 0;">No redemptions recorded yet.</p>';
+                            return;
+                        }
+                        box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong style="color:#E8C568;">Redemption History: ' + escapeHtmlForAdmin(b.dataset.code) + ' (' + rows.length + ')</strong><button type="button" onclick="this.closest(\'#adminCouponHistoryBox\').style.display=\'none\'" style="background:none;border:none;color:#91A0B5;cursor:pointer;">Close</button></div>' +
+                            '<table><thead><tr><th>Email</th><th>Order ID</th><th>Discount</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
+                            rows.map(function(row) {
+                                return '<tr><td>' + escapeHtmlForAdmin(row.email) + '</td><td>' + escapeHtmlForAdmin(row.orderId) + '</td><td>RM ' + (parseFloat(row.discountAmount) || 0).toFixed(2) + '</td><td>' + escapeHtmlForAdmin(row.status) + '</td><td>' + escapeHtmlForAdmin(row.usedAt) + '</td></tr>';
+                            }).join('') + '</tbody></table>';
+                    }).getCouponRedemptionHistory(b.dataset.code, window._nexAdminPwdSession || '');
+                });
+            });
+
             container.querySelectorAll('.toggle-promo-btn').forEach(function(b) {
                 b.addEventListener('click', function() {
+                    var item = (window._adminPromoCache || []).find(function(x) { return x.code === b.dataset.code; });
+                    if (!item) return;
+                    var upd = Object.assign({}, item, { usageLimit: parseInt(b.dataset.next, 10) });
                     google.script.run.withSuccessHandler(function(r) {
-                        showToast((r && r.message) || 'Updated promo');
+                        showToast((r && r.message) || 'Updated coupon');
                         loadAdminPromoCodes();
-                    }).saveAdminPromoCode({
-                        code: b.dataset.code,
-                        discountType: b.dataset.type,
-                        discountValue: b.dataset.val,
-                        minOrder: b.dataset.min,
-                        expiryDate: b.dataset.exp,
-                        usageLimit: b.dataset.next
-                    });
+                    }).saveAdminPromoCodeV2(upd, window._nexAdminPwdSession || '');
                 });
             });
 
@@ -24880,11 +25140,11 @@ function loadAdminPromoCodes() {
                     google.script.run.withSuccessHandler(function(r) {
                         showToast((r && r.message) || 'Deleted');
                         loadAdminPromoCodes();
-                    }).deleteAdminPromoCode(b.dataset.code);
+                    }).deleteAdminPromoCode(b.dataset.code, window._nexAdminPwdSession || '');
                 });
             });
         })
-        .getAdminPromoCodes();
+        .getAdminPromoCodesV2(window._nexAdminPwdSession || '');
 }
 
 document.getElementById('adminPromoForm')?.addEventListener('submit', function(e) {
@@ -24894,17 +25154,23 @@ document.getElementById('adminPromoForm')?.addEventListener('submit', function(e
         discountType: document.getElementById('promoMgrType').value,
         discountValue: document.getElementById('promoMgrValue').value,
         minOrder: document.getElementById('promoMgrMinOrder').value,
+        maxPerCustomer: document.getElementById('promoMgrMaxPerUser')?.value || 1,
         usageLimit: document.getElementById('promoMgrLimit').value,
-        expiryDate: document.getElementById('promoMgrExpiry').value
+        expiryDate: document.getElementById('promoMgrExpiry').value,
+        audienceType: document.getElementById('promoMgrAudience')?.value || 'everyone',
+        allowedUsers: document.getElementById('promoMgrAllowedUsers')?.value || '',
+        description: document.getElementById('promoMgrDescription')?.value || ''
     };
     google.script.run.withSuccessHandler(function(res) {
-        showToast((res && res.message) || 'Saved promo code.');
+        showToast((res && res.message) || 'Saved coupon.');
         if (res && res.success) {
             document.getElementById('adminPromoForm').reset();
             document.getElementById('promoMgrLimit').value = 100;
+            if (document.getElementById('promoMgrMaxPerUser')) document.getElementById('promoMgrMaxPerUser').value = 1;
+            if (document.getElementById('promoMgrAllowedWrap')) document.getElementById('promoMgrAllowedWrap').style.display = 'none';
             loadAdminPromoCodes();
         }
-    }).saveAdminPromoCode(payload);
+    }).saveAdminPromoCodeV2(payload, window._nexAdminPwdSession || '');
 });
 
 // 4. Connect Sidebar Click to load Sales Team Admin view
@@ -29682,6 +29948,7 @@ window.NexBannerCarousel = (function () {
     var _pausedByHover = false;
     var _pausedByFocus = false;
     var _pausedByTouch = false;
+    var _hasUserInteracted = false;
     var _bound = false;
 
     function isBannerScheduleActive(b, nowMs, includeDrafts) {
@@ -29911,17 +30178,17 @@ window.NexBannerCarousel = (function () {
             setTimeout(function () { _pausedByTouch = false; startRotation(); }, 2500);
         }, { passive: true });
         root.addEventListener('keydown', function (e) {
-            if (e.key === 'ArrowRight') { e.preventDefault(); renderSlide(_currentIndex + 1); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); renderSlide(_currentIndex - 1); }
+            if (e.key === 'ArrowRight') { e.preventDefault(); _hasUserInteracted = true; renderSlide(_currentIndex + 1); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); _hasUserInteracted = true; renderSlide(_currentIndex - 1); }
         });
 
         root.addEventListener('click', function (e) {
             var prev = e.target.closest('#nexHeroPrevBtn');
-            if (prev) { renderSlide(_currentIndex - 1); startRotation(); return; }
+            if (prev) { _hasUserInteracted = true; renderSlide(_currentIndex - 1); startRotation(); return; }
             var next = e.target.closest('#nexHeroNextBtn');
-            if (next) { renderSlide(_currentIndex + 1); startRotation(); return; }
+            if (next) { _hasUserInteracted = true; renderSlide(_currentIndex + 1); startRotation(); return; }
             var dot = e.target.closest('[data-slide-idx]');
-            if (dot) { renderSlide(parseInt(dot.getAttribute('data-slide-idx'), 10) || 0); startRotation(); return; }
+            if (dot) { _hasUserInteracted = true; renderSlide(parseInt(dot.getAttribute('data-slide-idx'), 10) || 0); startRotation(); return; }
             var cta = e.target.closest('[data-cms-cta]');
             if (cta) {
                 var s = _slides[_currentIndex];
@@ -29954,7 +30221,8 @@ window.NexBannerCarousel = (function () {
         if (cmsPayload && cmsPayload.announcement) {
             applyAnnouncementToDom(cmsPayload.announcement);
         }
-        renderSlide(0);
+        var targetIdx = _hasUserInteracted ? Math.min(_currentIndex, _slides.length - 1) : 0;
+        renderSlide(targetIdx);
         startRotation();
     }
 
@@ -30387,6 +30655,178 @@ window.NexBannerCarousel = (function () {
         window.NexBannerCarousel.init();
         bindAdminCmsEvents();
     }
+})();
+
+// ================================================================
+// PHASE 4: REAL DATABASE-DRIVEN ORDER FULFILMENT QUEUE UI
+// ================================================================
+window.NexQueueUi = (function () {
+    var _activeFilter = 'all';
+    var _queueData = null;
+
+    function classifyLocalStage(order) {
+        var p = String((order && order['Payment Status']) || '').trim();
+        var f = String((order && order['Fulfilment Status']) || '').trim();
+        var rec = String((order && order['Receipt Number']) || '').trim();
+        if (p === 'Cancelled' || p === 'Refunded' || f === 'Cancelled') return 'Cancelled';
+        if (f === 'Shipped' || f === 'Delivered' || f === 'Completed') return 'Completed';
+        if (p === 'Paid') return 'Processing';
+        if (p === 'Awaiting Verification' || p === 'Pending' || (p === 'Awaiting Payment' && rec !== '')) return 'Waiting';
+        return 'Awaiting Payment';
+    }
+
+    function applyPublicSummary(summary) {
+        if (!summary) return;
+        var el = document.getElementById('nexLiveQueueTrustText');
+        if (!el) return;
+        var activeCount = parseInt(summary.totalActiveQueue, 10) || 0;
+        var sla = summary.slaWindowText || '1–2 hrs (9AM–12PM Daily)';
+        el.textContent = activeCount > 0
+            ? (activeCount + ' in queue • ' + sla)
+            : ('Queue Clear • ' + sla);
+    }
+
+    function renderQueuePillHtml(qInfo) {
+        if (!qInfo || !qInfo.queueStage) return '';
+        var st = qInfo.queueStage;
+        var pos = parseInt(qInfo.queuePosition, 10) || 0;
+        var tot = parseInt(qInfo.totalActiveQueue, 10) || 0;
+        if (st === 'Processing') {
+            return '<span class="nex-queue-pill processing"><i class="fas fa-cogs"></i> Processing' +
+                (pos > 0 ? (' · Queue #' + pos + (tot > 0 ? ' of ' + tot : '')) : '') + '</span>';
+        }
+        if (st === 'Waiting') {
+            return '<span class="nex-queue-pill waiting"><i class="fas fa-clock"></i> Waiting in Queue' +
+                (pos > 0 ? (' · #' + pos + (tot > 0 ? ' of ' + tot : '')) : '') + '</span>';
+        }
+        if (st === 'Completed') {
+            return '<span class="nex-queue-pill completed"><i class="fas fa-check-circle"></i> Completed</span>';
+        }
+        return '';
+    }
+
+    function fetchOrderQueueBadge(orderId, targetElId) {
+        if (!orderId || typeof google === 'undefined' || !google.script || !google.script.run) return;
+        google.script.run
+            .withSuccessHandler(function (res) {
+                var el = document.getElementById(targetElId);
+                if (!el || !res || !res.success) return;
+                el.innerHTML = renderQueuePillHtml(res);
+            })
+            .getOrderQueueStatus(orderId, '');
+    }
+
+    function fetchCustomerQueueMap(email) {
+        if (!email || typeof google === 'undefined' || !google.script || !google.script.run) return;
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (!res || !res.success || !res.ordersQueueMap) return;
+                window._nexMyOrdersQueueMap = res.ordersQueueMap;
+                if (typeof renderOrderList === 'function' && typeof activeOrderTab !== 'undefined') {
+                    renderOrderList(activeOrderTab);
+                }
+            })
+            .getOrderQueueStatus('', email);
+    }
+
+    function getAdminMeta(order) {
+        var oid = String((order && order['Order ID']) || '').trim();
+        var st = classifyLocalStage(order);
+        var fromServer = null;
+        if (_queueData) {
+            fromServer = (_queueData.processingOrders || []).find(function (x) { return x.orderId === oid; }) ||
+                         (_queueData.waitingOrders || []).find(function (x) { return x.orderId === oid; });
+        }
+        var stage = (fromServer && fromServer.queueStage) || st;
+        var pos = (fromServer && fromServer.queuePosition) || 0;
+        var mins = (fromServer && fromServer.elapsedMinutes) || 0;
+        var delayed = Boolean(fromServer && fromServer.isSlaDelayed);
+        var badgeHtml = '';
+        if (stage === 'Processing' || stage === 'Waiting') {
+            var pillCls = delayed ? 'sla-delayed' : (stage === 'Processing' ? 'processing' : 'waiting');
+            var timeTxt = mins >= 60 ? (Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm') : (mins + 'm');
+            badgeHtml = '<span class="nex-queue-pill ' + pillCls + '" style="margin-left:0;">' +
+                (pos > 0 ? ('Queue #' + pos + ' · ') : '') + escapeHtml(stage) + (mins > 0 ? (' · ' + timeTxt) : '') +
+                (delayed ? ' ⚠️ SLA' : '') + '</span>';
+        }
+        return { stage: stage, isSlaDelayed: delayed, posLabel: badgeHtml, badgeHtml: badgeHtml };
+    }
+
+    function applyAdminQueueFilter(filterKey) {
+        _activeFilter = filterKey || 'all';
+        document.querySelectorAll('#adminQueueFilterTabs .nex-qtab-btn').forEach(function (b) {
+            b.classList.toggle('active', b.getAttribute('data-qfilter') === _activeFilter);
+        });
+        var rows = document.querySelectorAll('#ordersList tr.admin-order-row');
+        rows.forEach(function (tr) {
+            var st = tr.getAttribute('data-qstage') || '';
+            var sla = tr.getAttribute('data-qsla') === '1';
+            var show = true;
+            if (_activeFilter === 'sla') show = sla;
+            else if (_activeFilter !== 'all') show = (st === _activeFilter);
+            tr.style.display = show ? '' : 'none';
+        });
+    }
+
+    function refreshAdminQueue() {
+        if (!window._nexAdminPwdSession || typeof google === 'undefined' || !google.script || !google.script.run) return;
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (!res || !res.success) return;
+                _queueData = res;
+                var w = document.getElementById('adminQWaitingCount');
+                var p = document.getElementById('adminQProcessingCount');
+                var s = document.getElementById('adminQSlaAlertCount');
+                var c = document.getElementById('adminQCompletedTodayCount');
+                var u = document.getElementById('adminQueueUpdatedAt');
+                if (w) w.textContent = res.waitingCount || 0;
+                if (p) p.textContent = res.processingCount || 0;
+                if (s) s.textContent = res.slaDelayedCount || 0;
+                if (c) c.textContent = res.completedTodayCount || 0;
+                if (u) u.textContent = 'Updated: ' + (res.updatedAt || 'just now');
+                applyPublicSummary(res);
+                // Re-apply queue badges on rendered rows if already drawn
+                document.querySelectorAll('#ordersList tr.admin-order-row').forEach(function (tr) {
+                    var oid = tr.getAttribute('data-orderid');
+                    var meta = getAdminMeta({ 'Order ID': oid });
+                    if (meta && meta.stage) {
+                        tr.setAttribute('data-qstage', meta.stage);
+                        tr.setAttribute('data-qsla', meta.isSlaDelayed ? '1' : '0');
+                        var slot = tr.querySelector('.admin-q-slot');
+                        if (slot && meta.badgeHtml) slot.innerHTML = meta.badgeHtml;
+                    }
+                });
+                applyAdminQueueFilter(_activeFilter);
+            })
+            .getAdminFulfilmentQueue(window._nexAdminPwdSession);
+    }
+
+    function bindTabs() {
+        var tabs = document.getElementById('adminQueueFilterTabs');
+        if (tabs) {
+            tabs.addEventListener('click', function (e) {
+                var btn = e.target.closest('[data-qfilter]');
+                if (btn) applyAdminQueueFilter(btn.getAttribute('data-qfilter'));
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindTabs);
+    } else {
+        bindTabs();
+    }
+
+    return {
+        classifyLocalStage: classifyLocalStage,
+        applyPublicSummary: applyPublicSummary,
+        renderQueuePillHtml: renderQueuePillHtml,
+        fetchOrderQueueBadge: fetchOrderQueueBadge,
+        fetchCustomerQueueMap: fetchCustomerQueueMap,
+        getAdminMeta: getAdminMeta,
+        refreshAdminQueue: refreshAdminQueue,
+        applyAdminQueueFilter: applyAdminQueueFilter
+    };
 })();
 
     </script>
