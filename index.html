@@ -11188,6 +11188,67 @@ header,
     border-radius: 999px;
     background: linear-gradient(90deg, #56B9E9, #E8C568);
 }
+
+/* Phase 8: Marketing Studio & Approval Gate Modal */
+.nex-mkt-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 14px;
+}
+.nex-mkt-post-card {
+    background: var(--nex-bg-navy, #101722);
+    border: 1px solid #24344d;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.nex-mkt-ch-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+}
+.nex-mkt-ch-pill.threads { background: rgba(242, 244, 248, 0.14); color: #F2F4F8; border: 1px solid rgba(242, 244, 248, 0.35); }
+.nex-mkt-ch-pill.instagram { background: rgba(244, 114, 182, 0.16); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.4); }
+.nex-mkt-ch-pill.tiktok { background: rgba(86, 185, 233, 0.16); color: #56B9E9; border: 1px solid rgba(86, 185, 233, 0.4); }
+.nex-mkt-st-pill {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.16);
+    color: #cbd5e1;
+}
+.nex-mkt-st-pill.pending { background: rgba(232, 197, 104, 0.18); color: #E8C568; }
+.nex-mkt-st-pill.approved { background: rgba(86, 185, 233, 0.18); color: #56B9E9; }
+.nex-mkt-st-pill.published { background: rgba(84, 184, 106, 0.2); color: #4ade80; }
+.nex-mkt-gate-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 9, 16, 0.78);
+    backdrop-filter: blur(4px);
+    z-index: 1250;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.nex-mkt-gate-backdrop.open { display: flex; }
+.nex-mkt-gate-box {
+    width: 100%;
+    max-width: 520px;
+    background: var(--nex-surface, #151E2B);
+    border: 1px solid var(--nex-gold, #E8C568);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
     </style>
 <script>
 (function() {
@@ -11439,6 +11500,9 @@ header,
             <div class="sidebar-item" data-section="ops-monitor">
                 <i class="fas fa-heartbeat"></i> Ops, SLA &amp; Error Monitor
                 <span class="sidebar-badge" id="adminOpsAlertBadge" style="display:none;">0</span>
+            </div>
+            <div class="sidebar-item" data-section="marketing-studio">
+                <i class="fas fa-bullhorn"></i> Marketing Studio
             </div>
             <!-- ✅ NEW: Backup Sidebar Item -->
             <div class="sidebar-item" data-section="backup">
@@ -13068,6 +13132,128 @@ header,
                         <div class="nex-ops-panel" style="margin-bottom:0;">
                             <h3 style="margin:0 0 12px;font-size:15px;color:#fff;"><i class="fas fa-clipboard-list" style="color:#56B9E9;"></i> Recent Admin Audit Trail</h3>
                             <div id="nexOpsAuditTrailBody" style="font-size:12px;color:#9bb3d1;max-height:260px;overflow-y:auto;">Click <strong>Refresh Telemetry</strong> to load recent operational events.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== PHASE 8: MARKETING STUDIO (THREADS, INSTAGRAM & TIKTOK) ===== -->
+                <div class="admin-section" id="section-marketing-studio">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <h2 style="margin:0;"><i class="fas fa-bullhorn" style="color:var(--nex-gold,#E8C568);"></i> Marketing Studio &amp; Referral UTM Attribution</h2>
+                            <p style="margin:4px 0 0;color:var(--nex-text-secondary,#91A0B5);font-size:13px;">Plan organic campaigns across <strong>Threads</strong>, <strong>Instagram</strong> &amp; <strong>TikTok</strong>, generate tracked UTM links, and publish only after explicit admin approval.</p>
+                        </div>
+                        <button type="button" class="submit-btn" id="nexMktRefreshBtn" style="padding:9px 15px;font-size:12.5px;"><i class="fas fa-sync-alt"></i> Refresh Campaigns</button>
+                    </div>
+
+                    <div class="nex-ops-kpi-grid" style="margin-bottom:18px;">
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #E8C568;">
+                            <div class="ops-lbl">Total Campaigns</div>
+                            <div class="ops-val" id="nexMktKpiTotalPosts">3</div>
+                            <div class="ops-sub">Threads • Instagram • TikTok</div>
+                        </div>
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #56B9E9;">
+                            <div class="ops-lbl">Approved / Live</div>
+                            <div class="ops-val" id="nexMktKpiApproved">0</div>
+                            <div class="ops-sub">Approval-gated ready &amp; live</div>
+                        </div>
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #f472b6;">
+                            <div class="ops-lbl">Tracked UTM Clicks</div>
+                            <div class="ops-val" id="nexMktKpiClicks">0</div>
+                            <div class="ops-sub">Storefront campaign arrivals</div>
+                        </div>
+                        <div class="nex-ops-kpi-card" style="border-left:3px solid #4ade80;">
+                            <div class="ops-lbl">UTM Orders &amp; Revenue</div>
+                            <div class="ops-val" id="nexMktKpiConversions">0</div>
+                            <div class="ops-sub" id="nexMktKpiRevenueSub">RM 0.00 attributed</div>
+                        </div>
+                    </div>
+
+                    <div class="nex-ops-panel" id="nexMktComposerCard">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+                            <h3 style="margin:0;font-size:15.5px;color:#fff;"><i class="fas fa-pen-nib" style="color:#56B9E9;"></i> Multi-Channel Post Composer &amp; UTM Builder</h3>
+                            <button type="button" class="cancel-btn" id="nexMktTemplateBtn" style="padding:7px 12px;border-radius:10px;font-size:12px;"><i class="fas fa-magic"></i> Generate Channel Hook</button>
+                        </div>
+                        <input type="hidden" id="nexMktPostId" value="" />
+                        <div class="form-row">
+                            <div class="field"><label>Campaign Title *</label><input type="text" id="nexMktTitleInput" placeholder="e.g. Weekend Robux Flash Drop" /></div>
+                            <div class="field">
+                                <label>Channel</label>
+                                <select id="nexMktChannelSelect">
+                                    <option value="Threads">Threads</option>
+                                    <option value="Instagram">Instagram</option>
+                                    <option value="TikTok">TikTok</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>UTM Campaign Tag</label><input type="text" id="nexMktCampaignTagInput" placeholder="nex4up_robux_drop" /></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field"><label>Scheduled Date/Time (Optional)</label><input type="datetime-local" id="nexMktScheduleInput" /></div>
+                            <div class="field"><label>Media / Creative Asset URL</label><input type="text" id="nexMktMediaUrlInput" placeholder="https://..." /></div>
+                            <div class="field"><label>CTA Target URL</label><input type="text" id="nexMktCtaUrlInput" value="https://nex4upstoremy.github.io/Nex4UpStore/" /></div>
+                        </div>
+                        <div class="field" style="margin-bottom:10px;"><label>Post Caption / Hook *</label><textarea id="nexMktCaptionInput" rows="3" placeholder="Write engaging copy tailored to Threads, Instagram, or TikTok..."></textarea></div>
+                        <div class="form-row">
+                            <div class="field"><label>Hashtags</label><input type="text" id="nexMktHashtagsInput" placeholder="#NEX4UP #RobloxMalaysia #RobuxMY" /></div>
+                            <div class="field" style="flex:2;">
+                                <label>Live Generated Referral UTM Link</label>
+                                <div style="display:flex;gap:8px;">
+                                    <input type="text" id="nexMktUtmPreviewInput" readonly value="https://nex4upstoremy.github.io/Nex4UpStore/?utm_source=threads&utm_medium=social&utm_campaign=nex4up_promo&utm_content=MKT-NEW" />
+                                    <button type="button" class="cancel-btn" id="nexMktCopyUtmBtn" style="padding:8px 12px;border-radius:10px;white-space:nowrap;"><i class="far fa-copy"></i> Copy UTM</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                            <button type="button" class="submit-btn" id="nexMktSaveDraftBtn" style="background:#1B2737;color:#E8C568;border:1px solid #E8C568;"><i class="fas fa-save"></i> Save Draft</button>
+                            <button type="button" class="submit-btn" id="nexMktSubmitApprovalBtn" style="background:#1B2737;color:#56B9E9;border:1px solid #56B9E9;"><i class="fas fa-paper-plane"></i> Submit for Approval</button>
+                            <button type="button" class="submit-btn" id="nexMktOpenGateBtn"><i class="fas fa-check-shield"></i> Approve / Publish Gate</button>
+                            <button type="button" class="cancel-btn" id="nexMktResetFormBtn" style="padding:9px 14px;border-radius:12px;">Reset Composer</button>
+                        </div>
+                        <div id="nexMktComposerStatus" style="margin-top:10px;font-size:12.5px;min-height:18px;"></div>
+                    </div>
+
+                    <div class="nex-ops-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+                            <div class="nex2-pills-bar" style="margin-bottom:0;" id="nexMktChannelPills">
+                                <button type="button" class="nex2-pill-btn active" data-mkt-channel="All">All Channels</button>
+                                <button type="button" class="nex2-pill-btn" data-mkt-channel="Threads">Threads</button>
+                                <button type="button" class="nex2-pill-btn" data-mkt-channel="Instagram">Instagram</button>
+                                <button type="button" class="nex2-pill-btn" data-mkt-channel="TikTok">TikTok</button>
+                            </div>
+                            <select id="nexMktStatusFilter" style="background:#0b111d;border:1px solid #24344d;color:#e8edf5;padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:600;">
+                                <option value="All">All Statuses</option>
+                                <option value="Draft">Draft</option>
+                                <option value="Pending Approval">Pending Approval</option>
+                                <option value="Approved / Scheduled">Approved / Scheduled</option>
+                                <option value="Published">Published</option>
+                            </select>
+                        </div>
+                        <div class="nex-mkt-calendar-grid" id="nexMktCalendarList"></div>
+                    </div>
+
+                    <div class="nex-ops-panel" style="margin-bottom:0;">
+                        <h3 style="margin:0 0 12px;font-size:15px;color:#fff;"><i class="fas fa-chart-bar" style="color:#4ade80;"></i> Channel UTM Attribution Breakdown</h3>
+                        <div id="nexMktChannelAttributionBody" style="font-size:12.5px;color:#9bb3d1;">Loading channel UTM attribution...</div>
+                    </div>
+                </div>
+
+                <!-- Explicit Approval & Publish Gate Modal for Marketing Studio -->
+                <div class="nex-mkt-gate-backdrop" id="nexMktApprovalGateModal" role="dialog" aria-modal="true" aria-labelledby="nexMktGateHeading">
+                    <div class="nex-mkt-gate-box">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <h3 id="nexMktGateHeading" style="margin:0;color:var(--nex-gold,#E8C568);font-size:16.5px;"><i class="fas fa-shield-alt"></i> Marketing Approval &amp; Publish Gate</h3>
+                            <button type="button" id="nexMktGateCancelX" style="background:none;border:none;color:#91A0B5;font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
+                        </div>
+                        <p style="font-size:12.5px;color:#9bb3d1;margin-bottom:10px;">No campaign post can go live without explicit admin sign-off. Review channel copy &amp; UTM link below:</p>
+                        <div id="nexMktGateSummaryBox" style="background:#101722;border:1px solid #24344d;border-radius:12px;padding:12px;font-size:12.5px;color:#F2F4F8;margin-bottom:12px;line-height:1.5;"></div>
+                        <div class="field" style="margin-bottom:14px;">
+                            <label style="font-size:12px;color:#9bb3d1;font-weight:700;">Live Published Post URL (Required only when marking Published)</label>
+                            <input type="text" id="nexMktPublishedUrlInput" placeholder="https://www.threads.net/@nex4up/post/..." style="width:100%;padding:9px 11px;border-radius:10px;background:#0b111d;border:1px solid #24344d;color:#fff;margin-top:4px;" />
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                            <button type="button" class="cancel-btn" id="nexMktCancelGateBtn" style="padding:9px 14px;border-radius:10px;">Cancel</button>
+                            <button type="button" class="submit-btn" id="nexMktConfirmApproveBtn" style="background:#1B2737;color:#56B9E9;border:1px solid #56B9E9;"><i class="fas fa-calendar-check"></i> Approve &amp; Schedule</button>
+                            <button type="button" class="submit-btn" id="nexMktConfirmPublishBtn"><i class="fas fa-rocket"></i> Confirm Published Live</button>
                         </div>
                     </div>
                 </div>
@@ -15086,7 +15272,8 @@ window.NexAsyncBtn = (function() {
         getRobuxInventoryDashboard: 1, getPendingReferralCoupon: 1,
         getAdvancedSalesSummary: 1, getSalesTeamSummary: 1, getAdminPromoCodes: 1,
         getCostSettings: 1, getBackupHistory: 1, adminGetCommunityDashboard: 1,
-        getEnhancedCommunityBootstrap: 1, reportClientSystemError: 1, getAdminOperationalDashboard: 1
+        getEnhancedCommunityBootstrap: 1, reportClientSystemError: 1, getAdminOperationalDashboard: 1,
+        getAdminMarketingStudio: 1, recordMarketingUtmEvent: 1
     };
 
     var ACTION_LABELS = {
@@ -15115,7 +15302,10 @@ window.NexAsyncBtn = (function() {
         updateOrderStatus: 'Updating...',
         bulkUpdateOrderStatuses: 'Updating...',
         resolveAdminSystemError: 'Updating...',
-        runAdminQuickWorkflow: 'Running...'
+        runAdminQuickWorkflow: 'Running...',
+        saveAdminMarketingPost: 'Saving...',
+        approveOrPublishMarketingPost: 'Publishing...',
+        deleteAdminMarketingPost: 'Deleting...'
     };
 
     var _lastTrigger = { el: null, ts: 0 };
@@ -15124,7 +15314,7 @@ window.NexAsyncBtn = (function() {
     function _isTrackableBtn(el) {
         if (!el || !el.tagName) return false;
         if (el.dataset && el.dataset.noAsync === '1') return false;
-        return el.matches('button[type="submit"], .submit-btn, .place-order-btn, .apply-promo-btn, .auth-submit, .action-btn, .rate-btn, .nex2-top-promo-btn, .nex2-send-otp-btn, .dyn-req-btn.primary, .toggle-promo-btn, .del-promo-btn, .prb-lookup-btn, #nex2FrameActionBtn, #nex2SaveFaqBtn, #nex2SaveDevBtn, #nex2SaveGamingAccBtn, #nex2GaVerifyRbxBtn, #nex2SavePrivacyBtn, #nexOpsFlushCacheBtn, #nexOpsResolveAllBtn');
+        return el.matches('button[type="submit"], .submit-btn, .place-order-btn, .apply-promo-btn, .auth-submit, .action-btn, .rate-btn, .nex2-top-promo-btn, .nex2-send-otp-btn, .dyn-req-btn.primary, .toggle-promo-btn, .del-promo-btn, .prb-lookup-btn, #nex2FrameActionBtn, #nex2SaveFaqBtn, #nex2SaveDevBtn, #nex2SaveGamingAccBtn, #nex2GaVerifyRbxBtn, #nex2SavePrivacyBtn, #nexOpsFlushCacheBtn, #nexOpsResolveAllBtn, #nexMktSaveDraftBtn, #nexMktSubmitApprovalBtn, #nexMktConfirmApproveBtn, #nexMktConfirmPublishBtn');
     }
 
     if (typeof document !== 'undefined') {
@@ -15581,6 +15771,7 @@ var agentCodeFromUrl = null;
             'creator-campaigns': document.getElementById('section-creator-campaigns'),
             'community-hub': document.getElementById('section-community-hub'),
             'ops-monitor': document.getElementById('section-ops-monitor'),
+            'marketing-studio': document.getElementById('section-marketing-studio'),
             'backup': document.getElementById('section-backup'),
             'change-password': document.getElementById('section-change-password')
         };
@@ -17966,6 +18157,9 @@ var promoData = appliedPromo ? {
                             email: customerData.email || '',
                             createdAt: Date.now()
                         });
+                        if (window.NexMarketingStudio && typeof window.NexMarketingStudio.trackConversionIfAttributed === 'function') {
+                            window.NexMarketingStudio.trackConversionIfAttributed(orderId, paidAmount);
+                        }
                         cart = [];
                         appliedPromo = null;
                         renderCart();
@@ -18898,6 +19092,8 @@ if (cart.length > 0) {
                         if (typeof loadNex4Up2AdminDashboard === 'function') loadNex4Up2AdminDashboard();
                     } else if (section === 'ops-monitor') {
                         if (typeof window.loadAdminOpsMonitor === 'function') window.loadAdminOpsMonitor();
+                    } else if (section === 'marketing-studio') {
+                        if (typeof window.loadAdminMarketingStudio === 'function') window.loadAdminMarketingStudio();
                     }
                 }
             });
@@ -32389,6 +32585,418 @@ window.NexAdminOpsMonitor = (function () {
         renderErrors: renderErrors,
         renderAnalytics: renderAnalytics,
         exportErrorsCsv: exportErrorsCsv
+    };
+})();
+
+// ================================================================
+// 📣 PHASE 8: MARKETING STUDIO (THREADS, INSTAGRAM & TIKTOK) & UTM
+// ================================================================
+window.NexMarketingStudio = (function () {
+    var UTM_STORE_KEY = 'nex4up_active_utm_v1';
+    var UTM_VISIT_SENT_KEY = 'nex4up_utm_visit_sent_v1';
+    var DEFAULT_SEEDS = [
+        {
+            postId: 'MKT-THREADS-01',
+            title: 'Instant MY Robux Stock Drop Thread',
+            channel: 'Threads',
+            campaignTag: 'nex4up_robux_drop',
+            caption: 'Fresh verified Robux stock is LIVE on NEX4UP Store! No password needed, fast MY queue ETA & 5-Tier NEX Points cashback on every top-up.',
+            hashtags: '#NEX4UP #RobloxMalaysia #RobuxMY #GamingMY',
+            ctaTargetUrl: 'https://nex4upstoremy.github.io/Nex4UpStore/',
+            utmCode: '?utm_source=threads&utm_medium=social&utm_campaign=nex4up_robux_drop&utm_content=MKT-THREADS-01',
+            scheduledAt: '',
+            status: 'Draft',
+            approvedBy: '',
+            publishedPostUrl: '',
+            clicksCount: 0,
+            conversionsCount: 0,
+            revenueRm: 0
+        },
+        {
+            postId: 'MKT-IG-01',
+            title: 'Weekly Gaming Top-Up Leaderboard Carousel',
+            channel: 'Instagram',
+            campaignTag: 'nex4up_weekly_leaderboard',
+            caption: 'This Week Rankings are heating up! Climb the verified Robux & MLBB boards to unlock exclusive profile frames & Diamond rewards.',
+            hashtags: '#NEX4UP #MLBBMalaysia #PUBGM #GamersMY',
+            ctaTargetUrl: 'https://nex4upstoremy.github.io/Nex4UpStore/',
+            utmCode: '?utm_source=instagram&utm_medium=social&utm_campaign=nex4up_weekly_leaderboard&utm_content=MKT-IG-01',
+            scheduledAt: '',
+            status: 'Draft',
+            approvedBy: '',
+            publishedPostUrl: '',
+            clicksCount: 0,
+            conversionsCount: 0,
+            revenueRm: 0
+        },
+        {
+            postId: 'MKT-TIKTOK-01',
+            title: 'RM 1 to RM 10 NEX Points Cashback Hook',
+            channel: 'TikTok',
+            campaignTag: 'nex4up_points_rewards',
+            caption: 'Stop leaving free RM vouchers behind — top up on NEX4UP, collect NEX Points & redeem personal checkout coupons in 1 tap!',
+            hashtags: '#NEX4UP #RobloxTikTok #TopUpMurah #MalaysiaGaming',
+            ctaTargetUrl: 'https://nex4upstoremy.github.io/Nex4UpStore/',
+            utmCode: '?utm_source=tiktok&utm_medium=social&utm_campaign=nex4up_points_rewards&utm_content=MKT-TIKTOK-01',
+            scheduledAt: '',
+            status: 'Draft',
+            approvedBy: '',
+            publishedPostUrl: '',
+            clicksCount: 0,
+            conversionsCount: 0,
+            revenueRm: 0
+        }
+    ];
+
+    var _posts = DEFAULT_SEEDS.slice();
+    var _utmTotals = { totalClicks: 0, totalConversions: 0, totalRevenueRm: 0, byChannel: {} };
+    var _activeChannel = 'All';
+    var _gatePostId = '';
+    var _bound = false;
+
+    function _esc(s) {
+        if (typeof escapeHtml === 'function') return escapeHtml(s);
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function _slug(raw) {
+        return String(raw || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '_').replace(/^_+|_+$/g, '') || 'nex4up_promo';
+    }
+
+    function buildFullUtmUrl(baseUrl, channel, campTag, postId) {
+        var cleanBase = String(baseUrl || 'https://nex4upstoremy.github.io/Nex4UpStore/').trim().split('?')[0] || 'https://nex4upstoremy.github.io/Nex4UpStore/';
+        var src = String(channel || 'Threads').trim().toLowerCase();
+        var camp = _slug(campTag || 'nex4up_promo');
+        var content = encodeURIComponent(String(postId || 'MKT-NEW').trim().toUpperCase());
+        return cleanBase + '?utm_source=' + encodeURIComponent(src) + '&utm_medium=social&utm_campaign=' + encodeURIComponent(camp) + '&utm_content=' + content;
+    }
+
+    function updateUtmPreview() {
+        var pid = (document.getElementById('nexMktPostId')?.value || 'MKT-NEW').trim();
+        var ch = document.getElementById('nexMktChannelSelect')?.value || 'Threads';
+        var tag = document.getElementById('nexMktCampaignTagInput')?.value || document.getElementById('nexMktTitleInput')?.value || 'nex4up_promo';
+        var cta = document.getElementById('nexMktCtaUrlInput')?.value || 'https://nex4upstoremy.github.io/Nex4UpStore/';
+        var outEl = document.getElementById('nexMktUtmPreviewInput');
+        if (outEl) outEl.value = buildFullUtmUrl(cta, ch, tag, pid);
+    }
+
+    function captureUtmOnStorefront() {
+        try {
+            if (typeof window === 'undefined' || !window.location || !window.location.search) return;
+            var params = new URLSearchParams(window.location.search);
+            var src = (params.get('utm_source') || '').trim().toLowerCase();
+            var med = (params.get('utm_medium') || 'social').trim().toLowerCase();
+            var camp = (params.get('utm_campaign') || '').trim();
+            var content = (params.get('utm_content') || '').trim();
+            if (!src && !camp && !content) return;
+
+            var utmObj = { utmSource: src || 'other', utmMedium: med, utmCampaign: camp, utmContent: content, capturedAt: Date.now() };
+            sessionStorage.setItem(UTM_STORE_KEY, JSON.stringify(utmObj));
+            if (!sessionStorage.getItem(UTM_VISIT_SENT_KEY)) {
+                sessionStorage.setItem(UTM_VISIT_SENT_KEY, '1');
+                setTimeout(function () {
+                    if (typeof google !== 'undefined' && google.script && google.script.run) {
+                        google.script.run.withFailureHandler(function () {}).recordMarketingUtmEvent(Object.assign({}, utmObj, { eventType: 'visit' }));
+                    }
+                }, 400);
+            }
+        } catch (_) {}
+    }
+
+    function trackConversionIfAttributed(orderId, revenueRm) {
+        try {
+            var raw = sessionStorage.getItem(UTM_STORE_KEY);
+            if (!raw) return;
+            var utm = JSON.parse(raw);
+            if (!utm || (!utm.utmCampaign && !utm.utmContent && utm.utmSource === 'other')) return;
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run.withFailureHandler(function () {}).recordMarketingUtmEvent(Object.assign({}, utm, {
+                    eventType: 'conversion',
+                    orderId: String(orderId || ''),
+                    revenueRm: parseFloat(revenueRm) || 0
+                }));
+            }
+        } catch (_) {}
+    }
+
+    function renderStudio() {
+        var totalEl = document.getElementById('nexMktKpiTotalPosts');
+        var appEl = document.getElementById('nexMktKpiApproved');
+        var clkEl = document.getElementById('nexMktKpiClicks');
+        var convEl = document.getElementById('nexMktKpiConversions');
+        var revSub = document.getElementById('nexMktKpiRevenueSub');
+
+        var approvedCnt = _posts.filter(function (p) { return p.status === 'Approved / Scheduled' || p.status === 'Published'; }).length;
+        if (totalEl) totalEl.textContent = String(_posts.length);
+        if (appEl) appEl.textContent = String(approvedCnt);
+        if (clkEl) clkEl.textContent = String(_utmTotals.totalClicks || 0);
+        if (convEl) convEl.textContent = String(_utmTotals.totalConversions || 0);
+        if (revSub) revSub.textContent = 'RM ' + (parseFloat(_utmTotals.totalRevenueRm) || 0).toFixed(2) + ' attributed';
+
+        var stFilter = document.getElementById('nexMktStatusFilter')?.value || 'All';
+        var filtered = _posts.filter(function (p) {
+            if (_activeChannel !== 'All' && p.channel !== _activeChannel) return false;
+            if (stFilter !== 'All' && p.status !== stFilter) return false;
+            return true;
+        });
+
+        var listEl = document.getElementById('nexMktCalendarList');
+        if (listEl) {
+            listEl.innerHTML = filtered.length ? filtered.map(function (p) {
+                var chLow = String(p.channel || 'threads').toLowerCase();
+                var stCls = p.status === 'Published' ? 'published' : (p.status === 'Approved / Scheduled' ? 'approved' : (p.status === 'Pending Approval' ? 'pending' : ''));
+                var fullUrl = buildFullUtmUrl(p.ctaTargetUrl, p.channel, p.campaignTag, p.postId);
+                return '<div class="nex-mkt-post-card" data-mkt-card="' + _esc(p.postId) + '">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                    '<span class="nex-mkt-ch-pill ' + _esc(chLow) + '">' + _esc(p.channel) + '</span>' +
+                    '<span class="nex-mkt-st-pill ' + stCls + '">' + _esc(p.status) + '</span>' +
+                    '</div>' +
+                    '<strong style="color:#fff;font-size:14px;">' + _esc(p.title) + '</strong>' +
+                    '<div style="font-size:12px;color:#cbd5e1;line-height:1.45;">' + _esc(p.caption) + '</div>' +
+                    (p.hashtags ? '<div style="font-size:11.5px;color:#56B9E9;">' + _esc(p.hashtags) + '</div>' : '') +
+                    '<div style="font-size:11px;color:#8aa1c0;">Clicks: <strong>' + (p.clicksCount || 0) + '</strong> • Orders: <strong>' + (p.conversionsCount || 0) + '</strong> • RM ' + (parseFloat(p.revenueRm) || 0).toFixed(2) + '</div>' +
+                    (p.scheduledAt ? '<div style="font-size:11px;color:#E8C568;"><i class="far fa-clock"></i> ' + _esc(p.scheduledAt) + '</div>' : '') +
+                    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:6px;">' +
+                    '<button type="button" class="cancel-btn" data-mkt-edit="' + _esc(p.postId) + '" style="padding:5px 10px;font-size:11.5px;border-radius:8px;">Edit</button>' +
+                    '<button type="button" class="submit-btn" data-mkt-gate="' + _esc(p.postId) + '" style="padding:5px 10px;font-size:11.5px;border-radius:8px;">Approval Gate</button>' +
+                    '<button type="button" class="cancel-btn" data-mkt-copy="' + _esc(fullUrl) + '" style="padding:5px 10px;font-size:11.5px;border-radius:8px;">Copy UTM</button>' +
+                    '<button type="button" class="cancel-btn" data-mkt-del="' + _esc(p.postId) + '" style="padding:5px 9px;font-size:11.5px;border-radius:8px;color:#f87171;">Delete</button>' +
+                    '</div>' +
+                    '</div>';
+            }).join('') : '<div style="grid-column:1/-1;text-align:center;color:#6a7f9e;padding:20px;">No campaigns match the selected channel or status.</div>';
+        }
+
+        var attrEl = document.getElementById('nexMktChannelAttributionBody');
+        if (attrEl) {
+            var chList = ['Threads', 'Instagram', 'TikTok'];
+            var maxClk = Math.max(1, _utmTotals.totalClicks || 1);
+            attrEl.innerHTML = chList.map(function (ch) {
+                var stat = (_utmTotals.byChannel && _utmTotals.byChannel[ch]) || { clicks: 0, conversions: 0, revenueRm: 0 };
+                var pct = _utmTotals.totalClicks > 0 ? Math.round((stat.clicks / maxClk) * 100) : 0;
+                return '<div class="nex-ops-bar-row">' +
+                    '<div style="display:flex;justify-content:space-between;"><strong style="color:#fff;">' + _esc(ch) + '</strong><span>' + stat.clicks + ' clicks • ' + stat.conversions + ' conversions • RM ' + (parseFloat(stat.revenueRm) || 0).toFixed(2) + '</span></div>' +
+                    '<div class="nex-ops-bar-track"><div class="nex-ops-bar-fill" style="width:' + Math.max(2, pct) + '%;"></div></div>' +
+                    '</div>';
+            }).join('');
+        }
+    }
+
+    function loadStudio() {
+        renderStudio();
+        var pwd = window._nexAdminPwdSession || '';
+        if (!pwd) return;
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (!res || !res.success) return;
+                if (Array.isArray(res.posts) && res.posts.length) _posts = res.posts;
+                if (res.utmTotals) _utmTotals = res.utmTotals;
+                renderStudio();
+            })
+            .withFailureHandler(function () {})
+            .getAdminMarketingStudio(pwd);
+    }
+
+    function openGateModal(postId) {
+        var modal = document.getElementById('nexMktApprovalGateModal');
+        var box = document.getElementById('nexMktGateSummaryBox');
+        var pubIn = document.getElementById('nexMktPublishedUrlInput');
+        if (!modal || !box) return;
+        var post = _posts.find(function (p) { return p.postId === postId; });
+        if (!post) {
+            if (typeof showToast === 'function') showToast('Save the campaign draft first before opening the Approval Gate.');
+            return;
+        }
+        _gatePostId = post.postId;
+        var utmUrl = buildFullUtmUrl(post.ctaTargetUrl, post.channel, post.campaignTag, post.postId);
+        box.innerHTML = '<div><strong>' + _esc(post.channel) + ':</strong> ' + _esc(post.title) + ' (' + _esc(post.status) + ')</div>' +
+            '<div style="color:#9bb3d1;margin-top:6px;">' + _esc(post.caption) + '</div>' +
+            '<div style="color:#56B9E9;font-size:11px;margin-top:8px;word-break:break-all;">UTM: ' + _esc(utmUrl) + '</div>';
+        if (pubIn) pubIn.value = post.publishedPostUrl || '';
+        modal.classList.add('open');
+    }
+
+    function saveComposer(targetStatus) {
+        var stEl = document.getElementById('nexMktComposerStatus');
+        var title = (document.getElementById('nexMktTitleInput')?.value || '').trim();
+        if (!title) {
+            if (stEl) { stEl.textContent = 'Campaign title is required.'; stEl.style.color = '#f87171'; }
+            return;
+        }
+        var pwd = window._nexAdminPwdSession || '';
+        if (!pwd) {
+            if (typeof showToast === 'function') showToast('Admin login required to save campaigns.');
+            return;
+        }
+        var payload = {
+            postId: (document.getElementById('nexMktPostId')?.value || '').trim(),
+            title: title,
+            channel: document.getElementById('nexMktChannelSelect')?.value || 'Threads',
+            campaignTag: (document.getElementById('nexMktCampaignTagInput')?.value || '').trim(),
+            scheduledAt: (document.getElementById('nexMktScheduleInput')?.value || '').trim(),
+            mediaUrl: (document.getElementById('nexMktMediaUrlInput')?.value || '').trim(),
+            ctaTargetUrl: (document.getElementById('nexMktCtaUrlInput')?.value || '').trim(),
+            caption: (document.getElementById('nexMktCaptionInput')?.value || '').trim(),
+            hashtags: (document.getElementById('nexMktHashtagsInput')?.value || '').trim(),
+            status: targetStatus
+        };
+        if (stEl) { stEl.textContent = 'Saving campaign...'; stEl.style.color = '#56B9E9'; }
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (res && res.success) {
+                    if (document.getElementById('nexMktPostId') && res.post) document.getElementById('nexMktPostId').value = res.post.postId;
+                    updateUtmPreview();
+                    if (stEl) { stEl.textContent = res.message || 'Saved!'; stEl.style.color = '#4ade80'; }
+                    loadStudio();
+                } else {
+                    if (stEl) { stEl.textContent = (res && res.message) || 'Could not save.'; stEl.style.color = '#f87171'; }
+                }
+            })
+            .withFailureHandler(function (err) {
+                var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'saveAdminMarketingPost') : 'Save failed.';
+                if (stEl) { stEl.textContent = msg; stEl.style.color = '#f87171'; }
+            })
+            .saveAdminMarketingPost(payload, pwd);
+    }
+
+    function bindEvents() {
+        if (_bound) return;
+        _bound = true;
+
+        ['nexMktTitleInput', 'nexMktChannelSelect', 'nexMktCampaignTagInput', 'nexMktCtaUrlInput'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', updateUtmPreview);
+        });
+
+        document.getElementById('nexMktStatusFilter')?.addEventListener('change', renderStudio);
+        document.getElementById('nexMktRefreshBtn')?.addEventListener('click', loadStudio);
+        document.getElementById('nexMktSaveDraftBtn')?.addEventListener('click', function () { saveComposer('Draft'); });
+        document.getElementById('nexMktSubmitApprovalBtn')?.addEventListener('click', function () { saveComposer('Pending Approval'); });
+        document.getElementById('nexMktOpenGateBtn')?.addEventListener('click', function () {
+            var pid = (document.getElementById('nexMktPostId')?.value || '').trim();
+            openGateModal(pid || (_posts[0] && _posts[0].postId));
+        });
+        document.getElementById('nexMktResetFormBtn')?.addEventListener('click', function () {
+            ['nexMktPostId', 'nexMktTitleInput', 'nexMktCampaignTagInput', 'nexMktScheduleInput', 'nexMktMediaUrlInput', 'nexMktCaptionInput', 'nexMktHashtagsInput'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            updateUtmPreview();
+        });
+        document.getElementById('nexMktTemplateBtn')?.addEventListener('click', function () {
+            var ch = document.getElementById('nexMktChannelSelect')?.value || 'Threads';
+            var hooks = {
+                Threads: { title: 'MY Gamer Question: Next Game Pass Drop?', cap: 'Drop your Roblox username below or claim fast verified Robux on NEX4UP Store with MY queue tracking!', tags: '#NEX4UP #RobloxMalaysia #ThreadsMY' },
+                Instagram: { title: 'New Featured Bundle Visual Carousel', cap: 'Zero password needed. Real MY support 9AM-12AM & instant 5-Tier NEX Points on every top-up!', tags: '#NEX4UP #MLBBMalaysia #GamingMY' },
+                TikTok: { title: 'POV: Instant Top-Up Under 2 Hours', cap: 'How Malaysian gamers earn free RM 10 cashback vouchers on NEX4UP — link in bio!', tags: '#NEX4UP #RobloxTikTok #TopUpMurah' }
+            };
+            var h = hooks[ch] || hooks.Threads;
+            if (!document.getElementById('nexMktTitleInput')?.value) document.getElementById('nexMktTitleInput').value = h.title;
+            document.getElementById('nexMktCaptionInput').value = h.cap;
+            document.getElementById('nexMktHashtagsInput').value = h.tags;
+            updateUtmPreview();
+        });
+        document.getElementById('nexMktCopyUtmBtn')?.addEventListener('click', function () {
+            var val = document.getElementById('nexMktUtmPreviewInput')?.value || '';
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(val).catch(function () {});
+            if (typeof showToast === 'function') showToast('Copied referral UTM URL!');
+        });
+
+        var pillsWrap = document.getElementById('nexMktChannelPills');
+        if (pillsWrap) {
+            pillsWrap.addEventListener('click', function (e) {
+                var btn = e.target.closest('[data-mkt-channel]');
+                if (!btn) return;
+                _activeChannel = btn.getAttribute('data-mkt-channel') || 'All';
+                pillsWrap.querySelectorAll('[data-mkt-channel]').forEach(function (b) { b.classList.toggle('active', b === btn); });
+                renderStudio();
+            });
+        }
+
+        var calList = document.getElementById('nexMktCalendarList');
+        if (calList) {
+            calList.addEventListener('click', function (e) {
+                var editBtn = e.target.closest('[data-mkt-edit]');
+                if (editBtn) {
+                    var p = _posts.find(function (x) { return x.postId === editBtn.getAttribute('data-mkt-edit'); });
+                    if (p) {
+                        document.getElementById('nexMktPostId').value = p.postId;
+                        document.getElementById('nexMktTitleInput').value = p.title;
+                        document.getElementById('nexMktChannelSelect').value = p.channel;
+                        document.getElementById('nexMktCampaignTagInput').value = p.campaignTag;
+                        document.getElementById('nexMktScheduleInput').value = p.scheduledAt || '';
+                        document.getElementById('nexMktMediaUrlInput').value = p.mediaUrl || '';
+                        document.getElementById('nexMktCtaUrlInput').value = p.ctaTargetUrl || 'https://nex4upstoremy.github.io/Nex4UpStore/';
+                        document.getElementById('nexMktCaptionInput').value = p.caption || '';
+                        document.getElementById('nexMktHashtagsInput').value = p.hashtags || '';
+                        updateUtmPreview();
+                        document.getElementById('nexMktComposerCard')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    return;
+                }
+                var gateBtn = e.target.closest('[data-mkt-gate]');
+                if (gateBtn) { openGateModal(gateBtn.getAttribute('data-mkt-gate')); return; }
+                var copyBtn = e.target.closest('[data-mkt-copy]');
+                if (copyBtn) {
+                    var u = copyBtn.getAttribute('data-mkt-copy') || '';
+                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).catch(function () {});
+                    if (typeof showToast === 'function') showToast('Copied UTM link!');
+                    return;
+                }
+                var delBtn = e.target.closest('[data-mkt-del]');
+                if (delBtn) {
+                    var pwd = window._nexAdminPwdSession || '';
+                    if (!pwd) return;
+                    google.script.run.withSuccessHandler(function () { loadStudio(); }).deleteAdminMarketingPost(delBtn.getAttribute('data-mkt-del'), pwd);
+                }
+            });
+        }
+
+        function closeGate() {
+            document.getElementById('nexMktApprovalGateModal')?.classList.remove('open');
+        }
+        document.getElementById('nexMktCancelGateBtn')?.addEventListener('click', closeGate);
+        document.getElementById('nexMktGateCancelX')?.addEventListener('click', closeGate);
+
+        function runGateDecision(statusChoice) {
+            var pwd = window._nexAdminPwdSession || '';
+            if (!pwd || !_gatePostId) return;
+            var pubUrl = (document.getElementById('nexMktPublishedUrlInput')?.value || '').trim();
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    closeGate();
+                    if (typeof showToast === 'function') showToast((res && res.message) || 'Updated post status.');
+                    loadStudio();
+                })
+                .withFailureHandler(function (err) {
+                    var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'approveOrPublishMarketingPost') : 'Approval failed.';
+                    if (typeof showToast === 'function') showToast(msg);
+                })
+                .approveOrPublishMarketingPost(_gatePostId, statusChoice, pubUrl, pwd);
+        }
+        document.getElementById('nexMktConfirmApproveBtn')?.addEventListener('click', function () { runGateDecision('Approved / Scheduled'); });
+        document.getElementById('nexMktConfirmPublishBtn')?.addEventListener('click', function () { runGateDecision('Published'); });
+
+        updateUtmPreview();
+        renderStudio();
+        captureUtmOnStorefront();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindEvents);
+    } else {
+        bindEvents();
+    }
+
+    window.loadAdminMarketingStudio = loadStudio;
+    return {
+        loadStudio: loadStudio,
+        renderStudio: renderStudio,
+        buildFullUtmUrl: buildFullUtmUrl,
+        trackConversionIfAttributed: trackConversionIfAttributed
     };
 })();
 
