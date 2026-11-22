@@ -9071,8 +9071,8 @@
     position: absolute;
     right: 0;
     top: 46px;
-    width: 320px;
-    max-width: 90vw;
+    width: 364px;
+    max-width: 92vw;
     background: #121821;
     border: 1px solid #2a3a52;
     border-radius: 16px;
@@ -9081,6 +9081,17 @@
     overflow: hidden;
 }
 .nex2-notif-dropdown.open { display: block; }
+@media (max-width: 768px) {
+    .nex2-notif-dropdown {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        top: 112px;
+        width: auto;
+        max-width: none;
+        z-index: 950;
+    }
+}
 .nex2-notif-head {
     padding: 12px 14px;
     border-bottom: 1px solid #1e2a3a;
@@ -9089,6 +9100,58 @@
     align-items: center;
     font-weight: 700;
     font-size: 13px;
+}
+.nex2-notif-cats {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #1e2a3a;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: rgba(16, 23, 34, 0.72);
+}
+.nex2-notif-cats::-webkit-scrollbar { display: none; }
+.nex2-notif-cat-chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    border: 1px solid #27364d;
+    background: #0f1724;
+    color: #9bb3d1;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.16s ease;
+    white-space: nowrap;
+}
+.nex2-notif-cat-chip:hover { border-color: #56B9E9; color: #fff; }
+.nex2-notif-cat-chip.active {
+    background: rgba(86, 185, 233, 0.16);
+    border-color: #56B9E9;
+    color: #fff;
+}
+.nex2-notif-cat-cnt {
+    font-size: 9.5px;
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: rgba(232, 197, 104, 0.22);
+    color: #E8C568;
+}
+.nex2-notif-cat-tag {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.35px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(86, 185, 233, 0.14);
+    color: #56B9E9;
+    margin-bottom: 3px;
 }
 .nex2-notif-list { max-height: 320px; overflow-y: auto; }
 .nex2-notif-item {
@@ -9099,6 +9162,78 @@
 }
 .nex2-notif-item:hover { background: rgba(56, 189, 248, 0.08); }
 .nex2-notif-item.unread { border-left: 3px solid #38bdf8; background: rgba(56, 189, 248, 0.06); }
+
+/* Phase 6 Community Enhancements: Rank Movement, Creator Badges & Privacy Card */
+.nex2-rank-move {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+.nex2-rank-move.up { background: rgba(74, 222, 128, 0.14); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.32); }
+.nex2-rank-move.down { background: rgba(248, 113, 113, 0.14); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.32); }
+.nex2-rank-move.new { background: rgba(232, 197, 104, 0.16); color: #E8C568; border: 1px solid rgba(232, 197, 104, 0.42); }
+.nex2-rank-move.flat { background: rgba(148, 163, 184, 0.12); color: #94a3b8; }
+.nex2-creator-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(168, 85, 247, 0.18);
+    color: #e9d5ff;
+    border: 1px solid rgba(192, 132, 252, 0.45);
+    margin: 2px 3px 2px 0;
+}
+.nex2-tier-badge-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(232, 197, 104, 0.14);
+    color: #E8C568;
+    border: 1px solid rgba(232, 197, 104, 0.35);
+    margin: 2px 3px 2px 0;
+}
+.nex2-privacy-card {
+    background: #101722;
+    border: 1px solid #24344d;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+}
+.nex2-privacy-opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+}
+.nex2-privacy-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    border: 1px solid #24344d;
+    background: #151E2B;
+    cursor: pointer;
+    transition: border-color 0.16s ease, background 0.16s ease;
+}
+.nex2-privacy-opt:hover { border-color: #56B9E9; }
+.nex2-privacy-opt input[type="radio"] { margin-top: 3px; accent-color: #56B9E9; }
+.nex2-privacy-opt strong { display: block; color: #fff; font-size: 12.5px; }
+.nex2-privacy-opt span { display: block; color: #8aa1c0; font-size: 11px; line-height: 1.4; margin-top: 2px; }
 
 /* Universal Circular Framed Avatar Component */
 .nex2-framed-avatar {
@@ -11103,6 +11238,16 @@ header,
                         <span><i class="fas fa-bell" style="color:#f7d875;"></i> Notifications</span>
                         <button type="button" id="nex2MarkAllReadBtn" style="background:none;border:none;color:#38bdf8;font-size:11.5px;cursor:pointer;font-weight:700;">Mark Read</button>
                     </div>
+                    <div class="nex2-notif-cats" id="nex2NotifCategoryBar" role="tablist" aria-label="Notification Categories">
+                        <button type="button" class="nex2-notif-cat-chip active" data-notif-cat="all">All</button>
+                        <button type="button" class="nex2-notif-cat-chip" data-notif-cat="orders">Orders</button>
+                        <button type="button" class="nex2-notif-cat-chip" data-notif-cat="points">Points</button>
+                        <button type="button" class="nex2-notif-cat-chip" data-notif-cat="coupons">Coupons</button>
+                        <button type="button" class="nex2-notif-cat-chip" data-notif-cat="frames">Frames</button>
+                        <button type="button" class="nex2-notif-cat-chip" data-notif-cat="creators">Creators</button>
+                        <button type="button" class="nex2-notif-cat-chip" data-notif-cat="community">Social</button>
+                        <button type="button" class="nex2-notif-cat-chip" data-notif-cat="system">System</button>
+                    </div>
                     <div class="nex2-notif-list" id="nex2NotifList">
                         <div style="padding:18px;text-align:center;color:#6a7f9e;font-size:12.5px;">No new notifications yet.</div>
                     </div>
@@ -13085,6 +13230,34 @@ header,
                                 <button type="button" class="submit-btn" id="nex2CommOpenFullBtn" style="padding:8px 14px;font-size:12.5px;">Open Community Hub &rarr;</button>
                             </div>
                             <div id="nex2CommProfileSummary" style="background:#0b111d;border:1px solid #1e2a3a;border-radius:16px;padding:16px;margin-bottom:14px;"></div>
+                            <div class="nex2-privacy-card" id="nex2PrivacyControlCard">
+                                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                                    <h3 style="margin:0;font-size:14.5px;color:#fff;"><i class="fas fa-user-shield" style="color:#56B9E9;"></i> Player Discovery &amp; Leaderboard Privacy</h3>
+                                    <span id="nex2PrivacyCurrentBadge" class="nex2-rarity-pill" style="background:rgba(86,185,233,0.14);color:#56B9E9;">Public Profile</span>
+                                </div>
+                                <div class="nex2-privacy-opts">
+                                    <label class="nex2-privacy-opt">
+                                        <input type="radio" name="nex2PrivacyMode" value="public" checked />
+                                        <div><strong>Public Profile</strong><span>Appear in Find Players, Rankings, and allow gamer profile views.</span></div>
+                                    </label>
+                                    <label class="nex2-privacy-opt">
+                                        <input type="radio" name="nex2PrivacyMode" value="leaderboard_only" />
+                                        <div><strong>Leaderboard Only</strong><span>Show masked stats on Rankings only; hide from Find Players.</span></div>
+                                    </label>
+                                    <label class="nex2-privacy-opt">
+                                        <input type="radio" name="nex2PrivacyMode" value="private" />
+                                        <div><strong>Completely Private</strong><span>Anonymous on Rankings &amp; completely hidden from Find Players.</span></div>
+                                    </label>
+                                </div>
+                                <label class="nex2-fav-game-chip" style="border-color:rgba(86,185,233,0.35);margin-bottom:12px;display:inline-flex;">
+                                    <input type="checkbox" id="nex2PrivacyShowSocials" checked />
+                                    Display my Instagram / TikTok / YouTube handles on my public profile
+                                </label>
+                                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                                    <button type="button" class="submit-btn" id="nex2SavePrivacyBtn" style="padding:9px 15px;font-size:12.5px;"><i class="fas fa-shield-alt"></i> Save Privacy Settings</button>
+                                    <span id="nex2PrivacySaveStatus" style="font-size:12px;color:#8aa1c0;"></span>
+                                </div>
+                            </div>
                             <button type="button" class="submit-btn" id="nex2CommEditTriggerBtn"><i class="fas fa-edit"></i> Edit Gamer Bio, Socials &amp; Favorite Games</button>
                         </div>
 
@@ -13250,6 +13423,7 @@ header,
                     </div>
                     <div class="nex2-pills-bar" style="margin-bottom:0;" id="nex2RankTimePills">
                         <button type="button" class="nex2-pill-btn active" data-rank-time="allTime">All Time</button>
+                        <button type="button" class="nex2-pill-btn" data-rank-time="weekly">This Week</button>
                         <button type="button" class="nex2-pill-btn" data-rank-time="monthly">This Month</button>
                     </div>
                 </div>
@@ -13422,6 +13596,13 @@ header,
                                     <option value="Ranked / Competitive">Ranked / Competitive</option>
                                     <option value="Grinder / Trading">Grinder / Trading</option>
                                     <option value="Content Creator">Content Creator</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Player Role</label>
+                                <select id="nex2FindRoleSelect">
+                                    <option value="All">All Gamers</option>
+                                    <option value="creators">Verified Creators Only</option>
                                 </select>
                             </div>
                             <div class="field">
@@ -14657,7 +14838,8 @@ window.NexAsyncBtn = (function() {
         getCustomerReview: 1, getWishlist: 1, getRobuxStockForCheckout: 1,
         getRobuxInventoryDashboard: 1, getPendingReferralCoupon: 1,
         getAdvancedSalesSummary: 1, getSalesTeamSummary: 1, getAdminPromoCodes: 1,
-        getCostSettings: 1, getBackupHistory: 1, adminGetCommunityDashboard: 1
+        getCostSettings: 1, getBackupHistory: 1, adminGetCommunityDashboard: 1,
+        getEnhancedCommunityBootstrap: 1
     };
 
     var ACTION_LABELS = {
@@ -14672,6 +14854,7 @@ window.NexAsyncBtn = (function() {
         validatePromoCode: 'Applying...',
         updateCustomerProfile: 'Saving...',
         updateGamerProfile: 'Saving...',
+        updateCustomerPrivacySettings: 'Saving...',
         saveGamingAccountsProfile: 'Saving...',
         addReview: 'Submitting...',
         addReviewWithReward: 'Submitting...',
@@ -14692,7 +14875,7 @@ window.NexAsyncBtn = (function() {
     function _isTrackableBtn(el) {
         if (!el || !el.tagName) return false;
         if (el.dataset && el.dataset.noAsync === '1') return false;
-        return el.matches('button[type="submit"], .submit-btn, .place-order-btn, .apply-promo-btn, .auth-submit, .action-btn, .rate-btn, .nex2-top-promo-btn, .nex2-send-otp-btn, .dyn-req-btn.primary, .toggle-promo-btn, .del-promo-btn, .prb-lookup-btn, #nex2FrameActionBtn, #nex2SaveFaqBtn, #nex2SaveDevBtn, #nex2SaveGamingAccBtn, #nex2GaVerifyRbxBtn');
+        return el.matches('button[type="submit"], .submit-btn, .place-order-btn, .apply-promo-btn, .auth-submit, .action-btn, .rate-btn, .nex2-top-promo-btn, .nex2-send-otp-btn, .dyn-req-btn.primary, .toggle-promo-btn, .del-promo-btn, .prb-lookup-btn, #nex2FrameActionBtn, #nex2SaveFaqBtn, #nex2SaveDevBtn, #nex2SaveGamingAccBtn, #nex2GaVerifyRbxBtn, #nex2SavePrivacyBtn');
     }
 
     if (typeof document !== 'undefined') {
@@ -27335,6 +27518,7 @@ window.renderNexVipBanner = function (pts) {
         rankTime: 'allTime',
         commMode: 'feed',
         feedFilter: 'All',
+        notifCategory: 'all',
         faqCat: 'All',
         faqSearch: '',
         previewFrameId: 'frame_default',
@@ -27904,20 +28088,35 @@ window.renderNexVipBanner = function (pts) {
     function render_nex2_notifications() {
         var listEl = document.getElementById('nex2NotifList');
         var badge = document.getElementById('nex2NotifBadge');
-        var notifs = (_nex2State.data && _nex2State.data.myData && _nex2State.data.myData.notifications) || [];
-        var unread = notifs.filter(function(n) { return !n.read; }).length;
+        var rawNotifs = (_nex2State.data && _nex2State.data.myData && _nex2State.data.myData.notifications) || [];
+        var p6 = window.NexCommunityPhase6;
+        var notifs = rawNotifs.map(function(n) {
+            var cat = (n && n.category) || (p6 ? p6.classifyNotificationCategory(n) : 'system');
+            return Object.assign({}, n, { category: cat });
+        });
+        var unreadTotal = notifs.filter(function(n) { return !n.read; }).length;
         if (badge) {
-            badge.textContent = unread;
-            badge.style.display = unread > 0 ? 'inline-flex' : 'none';
+            badge.textContent = unreadTotal;
+            badge.style.display = unreadTotal > 0 ? 'inline-flex' : 'none';
         }
+        var activeCat = _nex2State.notifCategory || 'all';
+        var catBar = document.getElementById('nex2NotifCategoryBar');
+        if (catBar && p6) {
+            p6.renderNotifCategoryBar(catBar, notifs, activeCat);
+        }
+        var filtered = activeCat === 'all' ? notifs : notifs.filter(function(n) { return n.category === activeCat; });
+        var catLabelMap = p6 ? p6.NOTIF_LABELS : {};
         if (listEl) {
-            listEl.innerHTML = notifs.length ? notifs.map(function(n) {
+            listEl.innerHTML = filtered.length ? filtered.map(function(n) {
+                var catLabel = catLabelMap[n.category] || 'System';
                 return '<div class="nex2-notif-item ' + (!n.read ? 'unread' : '') + '" data-notif-tab="' + escapeHtml(n.targetTab || 'account') + '">' +
+                    '<span class="nex2-notif-cat-tag">' + escapeHtml(catLabel) + '</span>' +
                     '<div style="font-weight:700;color:#fff;">' + escapeHtml(n.title) + '</div>' +
                     '<div style="color:#9bb3d1;font-size:11.5px;margin-top:2px;">' + escapeHtml(n.message) + '</div>' +
                     '<div style="color:#6a7f9e;font-size:10px;margin-top:4px;">' + escapeHtml(n.createdAt) + '</div>' +
                     '</div>';
-            }).join('') : '<div style="padding:18px;text-align:center;color:#6a7f9e;font-size:12.5px;">No notifications yet.</div>';
+            }).join('') : '<div style="padding:18px;text-align:center;color:#6a7f9e;font-size:12.5px;">' +
+                (notifs.length ? 'No notifications in this category yet.' : 'No new notifications yet.') + '</div>';
         }
     }
 
@@ -28058,16 +28257,22 @@ window.renderNexVipBanner = function (pts) {
         var cSum = document.getElementById('nex2CommProfileSummary');
         if (cSum) {
             var favs = Array.isArray(customer.favoriteGames) ? customer.favoriteGames : [];
+            var isCustCreator = Array.isArray(customer.badges) && customer.badges.indexOf('NEX Creator') !== -1;
+            var pMode = customer.privacyMode || (customer.publicProfile === false ? 'private' : 'public');
+            var pLabel = pMode === 'private' ? '🔒 Completely Private' : (pMode === 'leaderboard_only' ? '🏆 Leaderboard Only' : '🌐 Public Profile');
             cSum.innerHTML =
                 '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px;">' +
                 render_framed_avatar_html({ size: 64, frameId: customer.equippedFrameId || 'frame_default', avatarUrl: (customer.avatarMode === 'roblox' && rbxAv) ? rbxAv : (customer.profileImage || rbxAv), name: customer.name }) +
-                '<div><div style="font-size:16px;font-weight:800;color:#fff;">' + escapeHtml(customer.name || '-') + '</div>' +
+                '<div><div style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' + escapeHtml(customer.name || '-') +
+                (isCustCreator ? '<span class="nex2-creator-badge">🎬 Creator</span>' : '') +
+                '<span class="nex2-rarity-pill" style="background:rgba(86,185,233,0.14);color:#56B9E9;">' + escapeHtml(pLabel) + '</span></div>' +
                 '<div style="font-size:12.5px;color:#38bdf8;">' + (rbxUname ? ('Roblox: @' + escapeHtml(rbxUname)) : 'Roblox not linked yet') + ' • ' + escapeHtml(customer.playstyle || 'Casual') + '</div></div></div>' +
                 (customer.bio ? '<p style="font-size:13px;color:#cbd5e1;margin-bottom:10px;">' + escapeHtml(customer.bio) + '</p>' : '<p style="font-size:12.5px;color:#6a7f9e;margin-bottom:10px;">Add a Gamer Bio &amp; social handles so teammates can recognize you on Find Players.</p>') +
                 '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
                 (favs.length ? favs.map(function(g) { return '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.14);color:#38bdf8;">' + escapeHtml(g) + '</span>'; }).join('') : '<span style="font-size:12px;color:#8aa1c0;">No favorite games selected yet</span>') +
                 '</div>';
         }
+        if (window.NexCommunityPhase6) window.NexCommunityPhase6.syncPrivacyControlsUi();
 
         // Gaming Accounts pane population
         var gaPrev = document.getElementById('nex2GaRobloxPreview');
@@ -28218,6 +28423,7 @@ window.renderNexVipBanner = function (pts) {
         render_nex2_frame_studio();
         sync_account_sidebar_and_gaming_panel();
         sync_profile_form_fields();
+        if (window.NexCommunityPhase6) window.NexCommunityPhase6.afterRenderAll();
     }
 
     window.loadNex4Up2Bootstrap = function() {
@@ -28289,23 +28495,27 @@ window.renderNexVipBanner = function (pts) {
         var body = document.getElementById('nex2PlayerModalBody');
         if (!modal || !body) return;
         if (!pl) {
-            showToast('This player has set their profile to leaderboard-only privacy mode.');
+            showToast('This player has set their profile to leaderboard-only or private mode.');
             return;
         }
         var myData = _nex2State.data.myData || {};
         var isFlw = (myData.followingEmails || []).indexOf(pl.email) !== -1;
         var isMe = customer && customer.email && customer.email.toLowerCase() === pl.email;
+        var p6 = window.NexCommunityPhase6;
+        var badgeRowHtml = p6 ? p6.formatCreatorAndTierHtml(pl) : '';
+        var showSocials = pl.showSocialHandles !== false;
         body.innerHTML =
             render_framed_avatar_html({ size: 108, frameId: pl.equippedFrameId, avatarUrl: pl.avatarUrl, name: pl.displayName }) +
             '<h3 style="margin-top:10px;color:#fff;font-size:20px;">' + escapeHtml(pl.displayName) + '</h3>' +
+            (badgeRowHtml ? '<div style="margin:6px 0;">' + badgeRowHtml + '</div>' : '') +
             (pl.robloxUsername ? '<div style="color:#38bdf8;font-size:13px;font-weight:700;margin-top:3px;">Roblox: @' + escapeHtml(pl.robloxUsername) + '</div>' : '') +
             '<div style="font-size:12px;color:#f7d875;margin-top:4px;">' + escapeHtml(pl.playstyle || 'Casual Gamer') + '</div>' +
             (pl.bio ? '<p style="font-size:13px;color:#cbd5e1;margin:12px 0;">' + escapeHtml(pl.bio) + '</p>' : '') +
-            '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:10px 0;font-size:12px;">' +
+            (showSocials ? '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:10px 0;font-size:12px;">' +
             (pl.instagramHandle ? '<span style="color:#f472b6;">📸 @' + escapeHtml(pl.instagramHandle) + '</span>' : '') +
             (pl.tiktokHandle ? '<span style="color:#38bdf8;">🎵 @' + escapeHtml(pl.tiktokHandle) + '</span>' : '') +
             (pl.youtubeHandle ? '<span style="color:#ff6b6b;">▶ ' + escapeHtml(pl.youtubeHandle) + '</span>' : '') +
-            '</div>' +
+            '</div>' : '<div style="font-size:11.5px;color:#6a7f9e;margin:8px 0;">Social handles hidden by player privacy setting.</div>') +
             '<div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:14px;">' +
             (pl.favoriteGames || []).map(function(g) { return '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">' + escapeHtml(g) + '</span>'; }).join('') +
             '</div>' +
@@ -28542,9 +28752,28 @@ window.renderNexVipBanner = function (pts) {
             apply_nex2_language(_nex2State.lang === 'EN' ? 'BM' : 'EN');
             return;
         }
+        var openNotifDd = document.getElementById('nex2NotifDropdown');
+        if (openNotifDd && openNotifDd.classList.contains('open') && !e.target.closest('#nex2NotifWrap')) {
+            openNotifDd.classList.remove('open');
+        }
         if (e.target.closest('#nex2NotifBtn')) {
             var dd = document.getElementById('nex2NotifDropdown');
-            if (dd) dd.classList.toggle('open');
+            if (dd) {
+                var willOpen = !dd.classList.contains('open');
+                dd.classList.toggle('open');
+                if (willOpen && window.innerWidth <= 768) {
+                    var nBtnRect = e.target.closest('#nex2NotifBtn').getBoundingClientRect();
+                    dd.style.top = Math.min(window.innerHeight - 180, Math.max(52, Math.round(nBtnRect.bottom + 8))) + 'px';
+                } else {
+                    dd.style.top = '';
+                }
+            }
+            return;
+        }
+        var notifCatBtn = e.target.closest('[data-notif-cat]');
+        if (notifCatBtn) {
+            _nex2State.notifCategory = notifCatBtn.getAttribute('data-notif-cat') || 'all';
+            render_nex2_notifications();
             return;
         }
         if (e.target.closest('#nex2MarkAllReadBtn')) {
@@ -28561,6 +28790,10 @@ window.renderNexVipBanner = function (pts) {
             else switch_nex2_tab(tTab);
             return;
         }
+        if (e.target.closest('#nex2SavePrivacyBtn')) {
+            if (window.NexCommunityPhase6) window.NexCommunityPhase6.savePrivacySettings();
+            return;
+        }
 
         // Rankings filters
         var rkCat = e.target.closest('[data-rank-cat]');
@@ -28568,6 +28801,7 @@ window.renderNexVipBanner = function (pts) {
             _nex2State.rankCat = rkCat.getAttribute('data-rank-cat');
             document.querySelectorAll('[data-rank-cat]').forEach(function(b) { b.classList.toggle('active', b === rkCat); });
             render_nex2_rankings();
+            if (window.NexCommunityPhase6) window.NexCommunityPhase6.enhanceRankingsDom();
             return;
         }
         var rkTime = e.target.closest('[data-rank-time]');
@@ -28575,6 +28809,7 @@ window.renderNexVipBanner = function (pts) {
             _nex2State.rankTime = rkTime.getAttribute('data-rank-time');
             document.querySelectorAll('[data-rank-time]').forEach(function(b) { b.classList.toggle('active', b === rkTime); });
             render_nex2_rankings();
+            if (window.NexCommunityPhase6) window.NexCommunityPhase6.enhanceRankingsDom();
             return;
         }
 
@@ -28598,6 +28833,7 @@ window.renderNexVipBanner = function (pts) {
             var pv = document.getElementById('nex2CommPlayersView');
             if (fv) fv.style.display = _nex2State.commMode === 'feed' ? 'block' : 'none';
             if (pv) pv.style.display = _nex2State.commMode === 'players' ? 'block' : 'none';
+            if (window.NexCommunityPhase6) window.NexCommunityPhase6.afterRenderAll();
             return;
         }
         var ffBtn = e.target.closest('[data-feed-filter]');
@@ -28605,6 +28841,7 @@ window.renderNexVipBanner = function (pts) {
             _nex2State.feedFilter = ffBtn.getAttribute('data-feed-filter');
             document.querySelectorAll('[data-feed-filter]').forEach(function(b) { b.classList.toggle('active', b === ffBtn); });
             render_nex2_community_hub();
+            if (window.NexCommunityPhase6) window.NexCommunityPhase6.enhanceFindPlayersDom();
             return;
         }
 
@@ -29223,9 +29460,14 @@ window.renderNexVipBanner = function (pts) {
         });
     }
 
-    ['nex2FindGameSelect', 'nex2FindStyleSelect', 'nex2FindSearchInput'].forEach(function(id) {
+    ['nex2FindGameSelect', 'nex2FindStyleSelect', 'nex2FindRoleSelect', 'nex2FindSearchInput'].forEach(function(id) {
         var el = document.getElementById(id);
-        if (el) el.addEventListener(id === 'nex2FindSearchInput' ? 'input' : 'change', render_nex2_community_hub);
+        if (el) {
+            el.addEventListener(id === 'nex2FindSearchInput' ? 'input' : 'change', function() {
+                render_nex2_community_hub();
+                if (window.NexCommunityPhase6) window.NexCommunityPhase6.enhanceFindPlayersDom();
+            });
+        }
     });
 
     ['nex2OrderSearchInput', 'nex2OrderCategoryFilter', 'nex2OrderDateFilter'].forEach(function(id) {
@@ -29247,6 +29489,311 @@ window.renderNexVipBanner = function (pts) {
 
     var gaRbxEl = document.getElementById('nex2GaRobloxUsername');
     if (gaRbxEl) gaRbxEl.addEventListener('input', function() { this.dataset.dirty = '1'; });
+
+    // ---------- Phase 6: Community Hub, Weekly/Monthly Leaderboards, Creator Badges, Privacy & 7-Cat Notifications ----------
+    window.NexCommunityPhase6 = (function() {
+        var NOTIF_CATEGORIES = [
+            { key: 'all', label: 'All' },
+            { key: 'orders', label: 'Orders' },
+            { key: 'points', label: 'Points' },
+            { key: 'coupons', label: 'Coupons' },
+            { key: 'frames', label: 'Frames' },
+            { key: 'creators', label: 'Creators' },
+            { key: 'community', label: 'Social' },
+            { key: 'system', label: 'System' }
+        ];
+        var NOTIF_LABELS = {
+            all: 'All',
+            orders: 'Orders',
+            points: 'Points',
+            coupons: 'Coupons',
+            frames: 'Frames',
+            creators: 'Creators',
+            community: 'Social',
+            system: 'System'
+        };
+        var TIER_DISPLAY = {
+            bronze: 'Bronze',
+            silver: 'Silver',
+            gold: 'Gold',
+            platinum: 'Platinum',
+            diamond: 'Diamond'
+        };
+
+        function classifyNotificationCategory(n) {
+            if (!n || typeof n !== 'object') return 'system';
+            var rawCat = String(n.category || '').trim().toLowerCase();
+            if (NOTIF_LABELS[rawCat] && rawCat !== 'all') return rawCat;
+            var tp = String(n.type || '').trim().toLowerCase();
+            var ttl = String(n.title || '').trim().toLowerCase();
+            var msg = String(n.message || '').trim().toLowerCase();
+            var tab = String(n.targetTab || '').trim().toLowerCase();
+            var combined = tp + ' ' + ttl + ' ' + msg + ' ' + tab;
+            if (/\b(frames?|avatar\s+borders?|champion\s+frame|badge\s+unlock\w*|tier\s+unlock\w*)\b/i.test(combined)) return 'frames';
+            if (/\b(orders?|queues?|fulfil\w*|receipts?|shipped|robux\s+deliver\w*|tracking)\b/i.test(combined)) return 'orders';
+            if (/\b(coupons?|vouchers?|promos?|discount\s+codes?|redeem\w*)\b/i.test(combined) && tp.indexOf('frame') === -1) return 'coupons';
+            if (/\b(campaigns?|creators?|submissions?|videos?|tiktok|youtube|reels)\b/i.test(combined) || tab === 'creators') return 'creators';
+            if (/\b(points?|pts|tiers?|loyalty|check-?in|xp|cashback)\b/i.test(combined)) return 'points';
+            if (/\b(follow\w*|likes?|comments?|community|posts?|players?|repl(?:y|ies))\b/i.test(combined) || tab === 'community') return 'community';
+            return 'system';
+        }
+
+        function renderNotifCategoryBar(barEl, notifs, activeCat) {
+            if (!barEl) return;
+            var counts = { all: 0 };
+            var unreadCounts = { all: 0 };
+            NOTIF_CATEGORIES.forEach(function(c) { counts[c.key] = 0; unreadCounts[c.key] = 0; });
+            (notifs || []).forEach(function(n) {
+                var cat = classifyNotificationCategory(n);
+                counts.all++;
+                counts[cat] = (counts[cat] || 0) + 1;
+                if (!n.read) {
+                    unreadCounts.all++;
+                    unreadCounts[cat] = (unreadCounts[cat] || 0) + 1;
+                }
+            });
+            barEl.querySelectorAll('[data-notif-cat]').forEach(function(btn) {
+                var key = btn.getAttribute('data-notif-cat') || 'all';
+                btn.classList.toggle('active', key === activeCat);
+                var label = NOTIF_LABELS[key] || key;
+                var cnt = unreadCounts[key] > 0 ? unreadCounts[key] : counts[key];
+                btn.innerHTML = escapeHtml(label) + (cnt > 0 ? ' <span class="nex2-notif-cat-cnt">' + cnt + '</span>' : '');
+            });
+        }
+
+        function formatRankDeltaHtml(entry) {
+            if (!entry || typeof entry !== 'object') return '';
+            if (entry.isNew) return '<span class="nex2-rank-move new">★ NEW</span>';
+            var d = parseInt(entry.rankDelta, 10);
+            if (!isNaN(d) && d > 0) return '<span class="nex2-rank-move up">▲ +' + d + '</span>';
+            if (!isNaN(d) && d < 0) return '<span class="nex2-rank-move down">▼ ' + d + '</span>';
+            return '<span class="nex2-rank-move flat">—</span>';
+        }
+
+        function formatCreatorAndTierHtml(entry) {
+            if (!entry || typeof entry !== 'object') return '';
+            var html = '';
+            var isCreator = !!(entry.isCreator || (parseInt(entry.creatorApprovedCount, 10) || 0) > 0 || (Array.isArray(entry.badges) && entry.badges.indexOf('NEX Creator') !== -1));
+            if (isCreator) {
+                html += '<span class="nex2-creator-badge">🎬 Creator</span>';
+            }
+            var tKey = String(entry.tierKey || '').trim().toLowerCase();
+            if (!tKey && typeof window.getNexTierInfo === 'function' && entry.pointsBalance !== undefined) {
+                var ti = window.getNexTierInfo(entry.pointsBalance);
+                tKey = ti && ti.key ? String(ti.key).toLowerCase() : '';
+            }
+            if (tKey && TIER_DISPLAY[tKey]) {
+                html += '<span class="nex2-tier-badge-sm">' + escapeHtml(TIER_DISPLAY[tKey]) + '</span>';
+            }
+            return html;
+        }
+
+        function enhanceRankingsDom() {
+            var lbs = _nex2State.data && _nex2State.data.leaderboards;
+            if (!lbs) return;
+            var scopeData = lbs[_nex2State.rankTime] || lbs.monthly || lbs.allTime || {};
+            var list = scopeData[_nex2State.rankCat] || [];
+
+            var podium = document.getElementById('nex2RankPodium');
+            if (podium) {
+                podium.querySelectorAll('.nex2-podium-card').forEach(function(card, fallbackIdx) {
+                    var oldM = card.querySelector('.nex2-p6-podium-meta');
+                    if (oldM) oldM.remove();
+                    var idx = card.classList.contains('pos1') ? 0 : (card.classList.contains('pos2') ? 1 : (card.classList.contains('pos3') ? 2 : fallbackIdx));
+                    var entry = list[idx];
+                    if (!entry) return;
+                    if (entry.privacyMode === 'private') card.setAttribute('data-player-email', '');
+                    var metaHtml = formatRankDeltaHtml(entry) + ' ' + formatCreatorAndTierHtml(entry);
+                    if (metaHtml.trim()) {
+                        var wrap = document.createElement('div');
+                        wrap.className = 'nex2-p6-podium-meta';
+                        wrap.style.cssText = 'margin-top:7px;display:flex;justify-content:center;flex-wrap:wrap;gap:4px;';
+                        wrap.innerHTML = metaHtml;
+                        card.appendChild(wrap);
+                    }
+                });
+            }
+
+            var tbody = document.getElementById('nex2RankTableBody');
+            if (tbody) {
+                tbody.querySelectorAll('tr').forEach(function(tr) {
+                    var tds = tr.querySelectorAll('td');
+                    if (tds.length < 4) return;
+                    tds[0].querySelectorAll('.nex2-rank-move').forEach(function(el) { el.remove(); });
+                    tds[1].querySelectorAll('.nex2-p6-row-meta').forEach(function(el) { el.remove(); });
+                    var rankNum = parseInt(tds[0].textContent.replace(/[^0-9]/g, ''), 10);
+                    var entry = !isNaN(rankNum) && rankNum > 0 ? list[rankNum - 1] : null;
+                    if (!entry) return;
+                    if (entry.privacyMode === 'private') tr.setAttribute('data-player-email', '');
+                    var deltaHtml = formatRankDeltaHtml(entry);
+                    if (deltaHtml) tds[0].insertAdjacentHTML('beforeend', deltaHtml);
+                    var badgesHtml = formatCreatorAndTierHtml(entry);
+                    if (badgesHtml) tds[1].insertAdjacentHTML('beforeend', '<div class="nex2-p6-row-meta" style="margin-top:3px;">' + badgesHtml + '</div>');
+                });
+            }
+
+            var homeGrid = document.getElementById('nex2HomeRankGrid');
+            var overallList = (lbs.allTime && lbs.allTime.overall) || [];
+            if (homeGrid) {
+                homeGrid.querySelectorAll('.nex2-rank-mini-card').forEach(function(card, idx) {
+                    var oldHm = card.querySelector('.nex2-p6-home-meta');
+                    if (oldHm) oldHm.remove();
+                    var entry = overallList[idx];
+                    if (!entry) return;
+                    var extra = formatCreatorAndTierHtml(entry);
+                    if (extra) {
+                        var dv = document.createElement('div');
+                        dv.className = 'nex2-p6-home-meta';
+                        dv.style.cssText = 'margin-top:4px;display:flex;flex-wrap:wrap;gap:3px;';
+                        dv.innerHTML = extra;
+                        card.appendChild(dv);
+                    }
+                });
+            }
+        }
+
+        function enhanceFindPlayersDom() {
+            var grid = document.getElementById('nex2FindPlayersGrid');
+            var roleSel = document.getElementById('nex2FindRoleSelect');
+            var roleVal = (roleSel && roleSel.value) || 'All';
+            var players = (_nex2State.data && _nex2State.data.players) || [];
+            var byEmail = {};
+            players.forEach(function(p) { if (p && p.email) byEmail[p.email.toLowerCase()] = p; });
+
+            if (grid) {
+                var prevEmpty = grid.querySelector('.nex2-p6-empty-creators');
+                if (prevEmpty) prevEmpty.remove();
+                var visCount = 0;
+                Array.prototype.slice.call(grid.children).forEach(function(card) {
+                    if (card.classList && card.classList.contains('nex2-p6-empty-creators')) return;
+                    var emailNode = card.hasAttribute('data-player-email') ? card : card.querySelector('[data-player-email]');
+                    if (!emailNode) return;
+                    var em = (emailNode.getAttribute('data-player-email') || '').toLowerCase();
+                    var pl = byEmail[em];
+                    var isCreator = !!(pl && (pl.isCreator || (parseInt(pl.creatorApprovedCount, 10) || 0) > 0 || (Array.isArray(pl.badges) && pl.badges.indexOf('NEX Creator') !== -1)));
+                    if (roleVal === 'creators' && !isCreator) {
+                        card.remove();
+                        return;
+                    }
+                    card.style.display = '';
+                    visCount++;
+                    var oldB = card.querySelector('.nex2-p6-card-badges');
+                    if (oldB) oldB.remove();
+                    if (pl) {
+                        var bHtml = formatCreatorAndTierHtml(pl);
+                        if (bHtml) {
+                            var div = document.createElement('div');
+                            div.className = 'nex2-p6-card-badges';
+                            div.style.cssText = 'margin:6px 0 4px;display:flex;flex-wrap:wrap;gap:4px;';
+                            div.innerHTML = bHtml;
+                            card.insertBefore(div, card.children[1] || null);
+                        }
+                    }
+                });
+                if (roleVal === 'creators' && visCount === 0) {
+                    var msgEl = document.createElement('div');
+                    msgEl.className = 'nex2-p6-empty-creators';
+                    msgEl.style.cssText = 'grid-column:1/-1;text-align:center;color:#8aa1c0;padding:18px;background:#151E2B;border:1px solid #24344d;border-radius:14px;';
+                    msgEl.textContent = 'No Verified Creators match your current filter yet.';
+                    grid.appendChild(msgEl);
+                }
+            }
+
+            var feedList = document.getElementById('nex2PostsFeedList');
+            var posts = (_nex2State.data && _nex2State.data.posts) || [];
+            if (feedList && posts.length) {
+                var postById = {};
+                posts.forEach(function(p) { if (p && p.postId) postById[p.postId] = p; });
+                feedList.querySelectorAll('[data-post-id], [data-like-post]').forEach(function(el) {
+                    var pid = el.getAttribute('data-post-id') || el.getAttribute('data-like-post');
+                    var card = el.closest('.nex2-panel-card') || el;
+                    var post = postById[pid];
+                    if (!card || !post || !post.isCreator || card.querySelector('.nex2-p6-post-creator')) return;
+                    var titleEl = card.querySelector('strong');
+                    if (titleEl) {
+                        titleEl.insertAdjacentHTML('afterend', ' <span class="nex2-creator-badge nex2-p6-post-creator">🎬 Creator</span>');
+                    }
+                });
+            }
+        }
+
+        function syncPrivacyControlsUi() {
+            var card = document.getElementById('nex2PrivacyControlCard');
+            if (!card) return;
+            var myPriv = _nex2State.data && _nex2State.data.myData && _nex2State.data.myData.privacy;
+            var mode = (myPriv && myPriv.privacyMode) || (customer && customer.privacyMode) || ((customer && customer.publicProfile === false) ? 'private' : 'public');
+            var showSocials = myPriv ? (myPriv.showSocialHandles !== false) : (customer ? customer.showSocialHandles !== false : true);
+            card.querySelectorAll('input[name="nex2PrivacyMode"]').forEach(function(r) {
+                r.checked = (r.value === mode);
+            });
+            var socChk = document.getElementById('nex2PrivacyShowSocials');
+            if (socChk) socChk.checked = !!showSocials;
+            var editPub = document.getElementById('editPublicProfile');
+            if (editPub) editPub.checked = (mode === 'public');
+            var badgeEl = document.getElementById('nex2PrivacyCurrentBadge');
+            if (badgeEl) {
+                badgeEl.textContent = mode === 'private' ? 'Completely Private' : (mode === 'leaderboard_only' ? 'Leaderboard Only' : 'Public Profile');
+            }
+        }
+
+        function savePrivacySettings() {
+            var stEl = document.getElementById('nex2PrivacySaveStatus');
+            if (!customer || !customer.email || !customer.sessionToken) {
+                if (typeof showToast === 'function') showToast('Please sign in first to save privacy settings.');
+                return;
+            }
+            var card = document.getElementById('nex2PrivacyControlCard');
+            var checked = card ? card.querySelector('input[name="nex2PrivacyMode"]:checked') : null;
+            var mode = checked ? checked.value : 'public';
+            var socChk = document.getElementById('nex2PrivacyShowSocials');
+            var showSocials = socChk ? !!socChk.checked : true;
+            if (stEl) { stEl.textContent = 'Saving privacy settings...'; stEl.style.color = '#56B9E9'; }
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res && res.success) {
+                        customer.privacyMode = res.privacyMode || mode;
+                        customer.publicProfile = (customer.privacyMode === 'public');
+                        customer.showSocialHandles = (res.showSocialHandles !== false);
+                        try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (_) {}
+                        syncPrivacyControlsUi();
+                        if (typeof sync_account_sidebar_and_gaming_panel === 'function') sync_account_sidebar_and_gaming_panel();
+                        if (stEl) { stEl.textContent = 'Saved!'; stEl.style.color = '#4ade80'; }
+                        if (typeof showToast === 'function') showToast(res.message || 'Privacy settings updated.');
+                        if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap();
+                    } else {
+                        var errM = (res && res.message) || 'Could not update privacy settings.';
+                        if (stEl) { stEl.textContent = errM; stEl.style.color = '#E56B70'; }
+                        if (typeof showToast === 'function') showToast(errM);
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'updateCustomerPrivacySettings') : 'Unable to save privacy settings right now.';
+                    if (stEl) { stEl.textContent = msg; stEl.style.color = '#E56B70'; }
+                    if (typeof showToast === 'function') showToast(msg);
+                })
+                .updateCustomerPrivacySettings(customer.email, { privacyMode: mode, showSocialHandles: showSocials }, customer.sessionToken);
+        }
+
+        function afterRenderAll() {
+            enhanceRankingsDom();
+            enhanceFindPlayersDom();
+            syncPrivacyControlsUi();
+        }
+
+        return {
+            NOTIF_CATEGORIES: NOTIF_CATEGORIES,
+            NOTIF_LABELS: NOTIF_LABELS,
+            classifyNotificationCategory: classifyNotificationCategory,
+            renderNotifCategoryBar: renderNotifCategoryBar,
+            formatRankDeltaHtml: formatRankDeltaHtml,
+            formatCreatorAndTierHtml: formatCreatorAndTierHtml,
+            enhanceRankingsDom: enhanceRankingsDom,
+            enhanceFindPlayersDom: enhanceFindPlayersDom,
+            syncPrivacyControlsUi: syncPrivacyControlsUi,
+            savePrivacySettings: savePrivacySettings,
+            afterRenderAll: afterRenderAll
+        };
+    })();
 
     apply_nex2_language(_nex2State.lang);
     setTimeout(loadNex4Up2Bootstrap, 700);
