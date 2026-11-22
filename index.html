@@ -4207,6 +4207,7 @@
     
     box-shadow: 0 8px 24px rgba(0,0,0,0.6);
     pointer-events: none;
+    animation: floatBubbleRight 3s ease-in-out infinite;
     z-index: 999;
 }
 
@@ -4235,9 +4236,9 @@
     z-index: 1;
 }
 
-@keyframes floatBubbleUp {
-    0%, 100% { transform: translateX(-50%) translateY(-10px); }
-    50%      { transform: translateX(-50%) translateY(-15px); }
+@keyframes floatBubbleRight {
+    0%, 100% { transform: translateY(-10px); }
+    50%      { transform: translateY(-15px); }
 }
 
 /* ✅ MOBILE FRIENDLY: Show bubble on phones and adjust size */
@@ -4278,9 +4279,11 @@
 
         .mascot-eye {
             width: 12px; height: 22px;
-            background: #101722;
+            background: #0b0e14;
             border-radius: 10px;
+            animation: blinkMascot 4s infinite;
         }
+        .mascot-eye:nth-child(2) { animation-delay: 0.15s; }
 
         @keyframes blinkMascot {
             0%, 90%, 100% { transform: scaleY(1); }
@@ -10151,26 +10154,69 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .nex2-faq-item.open .nex2-faq-a { display: block; }
 
 @media (max-width: 960px) {
-    .nex2-account-layout { grid-template-columns: 1fr; }
-    .nex2-account-sidebar { position: static; }
+    .nex2-account-layout { grid-template-columns: minmax(0, 1fr) !important; width: 100%; max-width: 100%; }
+    .nex2-account-sidebar { position: static; min-width: 0 !important; max-width: 100% !important; width: 100%; box-sizing: border-box; }
+    .nex2-account-main, .nex2-acc-pane { min-width: 0 !important; max-width: 100% !important; width: 100%; box-sizing: border-box; }
     .nex2-side-menu {
+        display: flex;
         flex-direction: row;
-        overflow-x: auto;
-        scrollbar-width: none;
-        padding-bottom: 4px;
+        flex-wrap: nowrap;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
+        width: 100%;
+        max-width: 100%;
+        padding-bottom: 8px;
         gap: 6px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(86, 185, 233, 0.5) rgba(15, 23, 36, 0.6);
     }
-    .nex2-side-menu::-webkit-scrollbar { display: none; }
+    .nex2-side-menu::-webkit-scrollbar { height: 4px; display: block; }
+    .nex2-side-menu::-webkit-scrollbar-thumb { background: rgba(86, 185, 233, 0.5); border-radius: 999px; }
     .nex2-side-nav-btn { width: auto; white-space: nowrap; flex-shrink: 0; padding: 8px 12px; }
     .nex2-side-divider { display: none; }
 }
 @media (max-width: 768px) {
-    .nex2-account-main { padding: 14px; }
+    #myAccountSection {
+        padding-bottom: 92px !important;
+        max-width: 100% !important;
+        overflow-x: clip;
+    }
+    .nex2-account-main { padding: 14px; overflow-y: visible; }
     .nex2-account-sidebar { padding: 14px; }
     .nex2-orders-toolbar { grid-template-columns: 1fr; }
     .nex2-hero-banner { padding: 16px; border-radius: 16px; }
     .nex2-hero-banner h2 { font-size: 19px; }
     .nex2-home-rank-strip { padding: 14px; border-radius: 16px; }
+    .nex2-rank-strip-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .nex2-rank-mini-card { padding: 10px; gap: 9px; min-width: 0; }
+    #myAccountSection input,
+    #myAccountSection select,
+    #myAccountSection textarea {
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+    #myAccountSection .form-row,
+    #myAccountSection .nex2-privacy-opts,
+    #myAccountSection .nex-redeem-grid,
+    #myAccountSection .nex-tier-roadmap-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+    #myAccountSection .nex2-fav-game-chip {
+        max-width: 100%;
+        white-space: normal;
+        border-radius: 12px;
+        line-height: 1.35;
+    }
+    #myAccountSection .account-actions,
+    #myAccountSection .edit-profile-form .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    #myAccountSection .nex2-acc-user-top {
+        flex-wrap: wrap;
+    }
 }
 
 /* ============================================================
@@ -10698,19 +10744,23 @@ header,
     background: linear-gradient(135deg, #d7b151, var(--nex-gold)) !important;
     color: #0b1019 !important;
 }
-.add-btn,
+.add-btn {
+    background: #f7d875 !important;
+    color: #0b0e14 !important;
+}
+.add-btn:hover {
+    background: #ffe08a !important;
+}
 .select-options-btn {
-    background: var(--nex-blue) !important;
-    color: #08121d !important;
+    background: linear-gradient(135deg, #f59e0b, #f7d875) !important;
+    color: #0b0e14 !important;
+    border-color: #f7d875 !important;
 }
 .add-btn.in-cart {
-    background: var(--nex-success) !important;
-    color: #08121d !important;
-}
-.mascot-fab {
-    background: linear-gradient(135deg, #1b2737, #101722) !important;
-    border: 2px solid var(--nex-gold) !important;
-    padding: 3px;
+    background: linear-gradient(135deg, #ff9800, #f59e0b) !important;
+    color: #0b0e14 !important;
+    border: 1px solid #ffb74d !important;
+    font-weight: 800 !important;
 }
 /* ============================================================
    PHASE 3: HOMEPAGE 3-BANNER CAROUSEL & ADMIN CMS STYLES
@@ -14957,7 +15007,10 @@ header,
         <div class="mascot-bubble" id="mascotBubble">Need help? Reach us! 👋</div>
         
         <div class="mascot-face">
-            <img id="chatMascotImg" class="mascot-avatar-img" src="assets/mascot/mascot-headshot.png" alt="NEX4UP Mascot DaKsTARs465" width="64" height="64" decoding="async" onerror="if(window._nexMascotFallback)window._nexMascotFallback(this);" />
+            <div class="mascot-eyes" id="mascotEyes">
+                <div class="mascot-eye"></div>
+                <div class="mascot-eye"></div>
+            </div>
         </div>
         <span class="chat-fab-badge" id="chatFabBadge" style="display:none;">0</span>
     </button>
@@ -16007,6 +16060,7 @@ function showStoreView() {
             banner.style.display = 'flex'; // Show if not registered
         }
     }
+    if (typeof window.syncChatFabVisibility === 'function') window.syncChatFabVisibility();
 }
 
         function showMyAccount(initialPane) {
@@ -16024,6 +16078,7 @@ function showStoreView() {
             loadMyAccount();
             loadMyOrders();
             loadReferralData();
+            if (typeof window.syncChatFabVisibility === 'function') window.syncChatFabVisibility();
         }
 
         function showWishlist() {
@@ -16036,6 +16091,7 @@ function showStoreView() {
             myAccountSection.classList.remove('visible');
             myAccountSection.style.display = 'none';
             loadWishlist();
+            if (typeof window.syncChatFabVisibility === 'function') window.syncChatFabVisibility();
         }
 
         function showAdminView() {
@@ -16049,6 +16105,7 @@ function showStoreView() {
             myAccountSection.style.display = 'none';
             wishlistSection.classList.remove('visible');
             wishlistSection.style.display = 'none';
+            if (typeof window.syncChatFabVisibility === 'function') window.syncChatFabVisibility();
         }
 
         // ================================================================
@@ -24835,12 +24892,45 @@ function resetVariantEditor(ctx) {
             };
             reader.readAsDataURL(file);
         }
-        // Mascot uses official DaKsTARs465 image asset (mouse eye tracking removed for CPU efficiency)
+        // Original Animated Robot Mascot Eye Tracking & View-Scoped Visibility
+        window.syncChatFabVisibility = function() {
+            var fab = document.getElementById('chatFab');
+            if (!fab) return;
+            var pub = document.getElementById('publicView');
+            var myAcc = document.getElementById('myAccountSection');
+            var wish = document.getElementById('wishlistSection');
+            var ag = document.getElementById('agentDashboardSection');
+            var isStore = !!(pub && pub.style.display !== 'none') &&
+                (!myAcc || !myAcc.classList.contains('visible')) &&
+                (!wish || !wish.classList.contains('visible')) &&
+                (!ag || ag.style.display !== 'block') &&
+                !document.querySelector('.nex2-view-section.active');
+            fab.style.display = isStore ? 'flex' : 'none';
+        };
 
+        document.addEventListener('mousemove', function(e) {
+            var eyes = document.getElementById('mascotEyes');
+            var fab = document.getElementById('chatFab');
+            if (!eyes || !fab || fab.style.display === 'none') return;
+            var rect = fab.getBoundingClientRect();
+            var fabX = rect.left + rect.width / 2;
+            var fabY = rect.top + rect.height / 2;
+            var deltaX = e.clientX - fabX;
+            var deltaY = e.clientY - fabY;
+            var angle = Math.atan2(deltaY, deltaX);
+            var distance = Math.min(6, Math.hypot(deltaX, deltaY) / 20);
+            eyes.style.transform = 'translate(' + (Math.cos(angle) * distance) + 'px, ' + (Math.sin(angle) * distance) + 'px)';
+        });
+
+        document.addEventListener('mouseleave', function() {
+            var eyes = document.getElementById('mascotEyes');
+            if (eyes) eyes.style.transform = 'translate(0px, 0px)';
+        });
 
         (function setupChatWidget() {
             var fab = document.getElementById('chatFab');
             if (!fab) return;
+            window.syncChatFabVisibility();
             fab.addEventListener('click', openChatWidget);
             document.querySelectorAll('#nexbotQuickActions .nexbot-chip').forEach(function(chip) {
                 chip.addEventListener('click', function() {
@@ -25468,6 +25558,7 @@ function showAgentDashboard(targetEmail) {
 
     var sec = document.getElementById('agentDashboardSection');
     if (sec) sec.style.display = 'block';
+    if (typeof window.syncChatFabVisibility === 'function') window.syncChatFabVisibility();
 
     // Update header title
     var titleEl = sec.querySelector('.account-header h2');
@@ -28112,6 +28203,7 @@ window.renderNexVipBanner = function (pts) {
             if (tabName === 'faq') render_nex2_faqs();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        if (typeof window.syncChatFabVisibility === 'function') window.syncChatFabVisibility();
     }
 
     function render_coins_grid_into(containerId) {
@@ -28642,9 +28734,15 @@ window.renderNexVipBanner = function (pts) {
         document.querySelectorAll('#myAccountSection .nex2-acc-pane').forEach(function(el) {
             el.classList.toggle('active', el.id === valid[targetPane]);
         });
+        var activeSideBtn = null;
         document.querySelectorAll('#nex2AccountSideMenu [data-acc-pane]').forEach(function(btn) {
-            btn.classList.toggle('active', btn.getAttribute('data-acc-pane') === targetPane);
+            var isMatch = btn.getAttribute('data-acc-pane') === targetPane;
+            btn.classList.toggle('active', isMatch);
+            if (isMatch) activeSideBtn = btn;
         });
+        if (activeSideBtn && typeof activeSideBtn.scrollIntoView === 'function') {
+            try { activeSideBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch (_) {}
+        }
         if (targetPane === 'wallet') load_wallet_and_vouchers();
         if (targetPane === 'referrals' && typeof loadReferralData === 'function') loadReferralData();
         if (targetPane === 'frames') render_nex2_frame_studio();
@@ -30081,22 +30179,8 @@ window.renderNexVipBanner = function (pts) {
             }
 
             var homeGrid = document.getElementById('nex2HomeRankGrid');
-            var overallList = (lbs.allTime && lbs.allTime.overall) || [];
             if (homeGrid) {
-                homeGrid.querySelectorAll('.nex2-rank-mini-card').forEach(function(card, idx) {
-                    var oldHm = card.querySelector('.nex2-p6-home-meta');
-                    if (oldHm) oldHm.remove();
-                    var entry = overallList[idx];
-                    if (!entry) return;
-                    var extra = formatCreatorAndTierHtml(entry);
-                    if (extra) {
-                        var dv = document.createElement('div');
-                        dv.className = 'nex2-p6-home-meta';
-                        dv.style.cssText = 'margin-top:4px;display:flex;flex-wrap:wrap;gap:3px;';
-                        dv.innerHTML = extra;
-                        card.appendChild(dv);
-                    }
-                });
+                homeGrid.querySelectorAll('.nex2-p6-home-meta').forEach(function(el) { el.remove(); });
             }
         }
 
