@@ -13,10 +13,122 @@
     <!-- ✅ Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- ✅ Image Cropper -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+    <!-- ✅ Image Cropper (non-render-blocking) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" /></noscript>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js" defer></script>
     <style>
+        /* ============================================================
+           OFFICIAL NEX4UP BRAND IDENTITY & PERFORMANCE TOKENS (Phase 1-2)
+           ============================================================ */
+        :root {
+            --nex-bg-navy: #101722;
+            --nex-navy: #101722;
+            --nex-gold: #E8C568;
+            --nex-blue: #56B9E9;
+            --nex-surface: #151E2B;
+            --nex-elevated: #1B2737;
+            --nex-text-primary: #F2F4F8;
+            --nex-text-secondary: #91A0B5;
+            --nex-success: #54B86A;
+            --nex-warning: #E9B94E;
+            --nex-error: #E56B70;
+            --nex-border: #243347;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        .nex-btn-loading { opacity: 0.78 !important; cursor: wait !important; pointer-events: none !important; }
+        .nex-btn-success { background: var(--nex-success) !important; color: #0B121C !important; border-color: var(--nex-success) !important; }
+        .nex-btn-error { background: var(--nex-error) !important; color: #FFFFFF !important; border-color: var(--nex-error) !important; }
+        .nex-friendly-error-card {
+            background: rgba(229, 107, 112, 0.09);
+            border: 1px solid rgba(229, 107, 112, 0.35);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin: 16px 0;
+            color: var(--nex-text-primary);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .nex-friendly-error-card .nex-err-ref {
+            font-size: 11.5px;
+            color: var(--nex-text-secondary);
+            margin-top: 4px;
+            font-family: ui-monospace, SFMono-Regular, monospace;
+        }
+        .nex-retry-btn {
+            background: var(--nex-blue);
+            color: #08101A;
+            border: none;
+            border-radius: 40px;
+            padding: 9px 18px;
+            font-size: 12.5px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .nex-retry-btn:hover { opacity: 0.92; }
+        .nex-delivery-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(86, 185, 233, 0.12);
+            color: var(--nex-blue);
+            border: 1px solid rgba(86, 185, 233, 0.28);
+            margin-left: 4px;
+        }
+        .nex-delivery-pill.in-stock {
+            background: rgba(84, 184, 106, 0.13);
+            color: var(--nex-success);
+            border-color: rgba(84, 184, 106, 0.32);
+        }
+        .nex-mascot-spot {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--nex-elevated);
+            border: 1px solid rgba(232, 197, 104, 0.3);
+            border-radius: 14px;
+            padding: 10px 12px;
+        }
+        .nex-mascot-spot img {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #101722;
+            border: 1px solid rgba(232, 197, 104, 0.45);
+            flex-shrink: 0;
+        }
+        .nex-shield-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(84, 184, 106, 0.14);
+            border: 1px solid rgba(84, 184, 106, 0.35);
+            color: var(--nex-success);
+            font-size: 11px;
+            font-weight: 700;
+        }
         /* ============================================================
            IMAGE UPLOAD UI (Admin Add/Edit Game)
            ============================================================ */
@@ -4073,8 +4185,9 @@
 .mascot-bubble {
     position: absolute;
     bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-10px);
+    right: 0;
+    left: auto;
+    transform: translateY(-10px);
     background: #121821;
     color: #f7d875;
     border: 1px solid #f7d875;
@@ -4094,7 +4207,6 @@
     
     box-shadow: 0 8px 24px rgba(0,0,0,0.6);
     pointer-events: none;
-    animation: floatBubbleUp 3s ease-in-out infinite;
     z-index: 999;
 }
 
@@ -4102,9 +4214,10 @@
 .mascot-bubble::after {
     content: '';
     position: absolute;
-    left: 50%;
+    right: 24px;
+    left: auto;
     top: 100%;
-    transform: translateX(-50%);
+    transform: none;
     border-width: 7px 7px 0 7px;
     border-style: solid;
     border-color: #f7d875 transparent transparent transparent;
@@ -4112,9 +4225,10 @@
 .mascot-bubble::before {
     content: '';
     position: absolute;
-    left: 50%;
+    right: 24px;
+    left: auto;
     top: 100%;
-    transform: translateX(-50%) translateY(1px);
+    transform: translateY(1px);
     border-width: 6px 6px 0 6px;
     border-style: solid;
     border-color: #121821 transparent transparent transparent;
@@ -4146,6 +4260,15 @@
             width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             position: relative;
+            border-radius: inherit;
+            overflow: hidden;
+        }
+        .mascot-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: inherit;
         }
 
         .mascot-eyes {
@@ -4155,11 +4278,9 @@
 
         .mascot-eye {
             width: 12px; height: 22px;
-            background: #0b0e14;
+            background: #101722;
             border-radius: 10px;
-            animation: blinkMascot 4s infinite;
         }
-        .mascot-eye:nth-child(2) { animation-delay: 0.15s; }
 
         @keyframes blinkMascot {
             0%, 90%, 100% { transform: scaleY(1); }
@@ -10363,7 +10484,188 @@ html, body { max-width: 100%; overflow-x: hidden; }
     .dyn-req-kv-row { flex-wrap: wrap; }
     .dyn-req-order-detail-panel { padding: 16px; }
 }
+
+/* ============================================================
+   OFFICIAL NEX4UP DESIGN SYSTEM THEME ALIGNMENT (Phase 1-2)
+   Palette: Midnight Navy #101722, Champagne Gold #E8C568,
+            Electric Blue #56B9E9, Card Surface #151E2B,
+            Elevated Surface #1B2737, Text #F2F4F8 / #91A0B5
+   ============================================================ */
+body {
+    background-color: var(--nex-bg-navy) !important;
+    color: var(--nex-text-primary) !important;
+}
+header,
+.nex2-primary-nav,
+.nex2-mobile-bottom-nav {
+    background-color: var(--nex-surface) !important;
+    border-color: var(--nex-border) !important;
+}
+.game-card,
+.genre-card,
+.mp-trust-item,
+.nex2-panel-card,
+.nex2-home-rank-strip,
+.order-card,
+.cart-panel,
+.checkout-panel,
+.auth-panel,
+.profile-panel,
+.account-container,
+.profile-dropdown-content,
+.nex2-notif-dropdown,
+.dyn-req-order-detail-panel {
+    background-color: var(--nex-surface) !important;
+    border-color: var(--nex-border) !important;
+    color: var(--nex-text-primary) !important;
+}
+.mp-hero-side,
+.nx-pm-wallet-box,
+.nex2-tier-card,
+.nex2-wallet-summary-card,
+.nex2-ov-card,
+.dyn-req-admin-section,
+.dyn-req-field-editor {
+    background-color: var(--nex-elevated) !important;
+    border-color: var(--nex-border) !important;
+}
+.game-card .category,
+.game-card .desc,
+.stock-info,
+.mp-trust-text span,
+.mp-hero-main p,
+.nx-pm-sub,
+.dyn-req-instructions {
+    color: var(--nex-text-secondary) !important;
+}
+.mp-hero-main h1 span,
+.game-card .price,
+.logo-text-accent,
+.mp-hero-stats-row .num {
+    color: var(--nex-gold) !important;
+}
+.nav-cat-btn i,
+.track-btn,
+.nex2-nav-btn.active,
+.nex2-pill-btn.active,
+.nx-pm-icon {
+    color: var(--nex-blue) !important;
+}
+.nex2-nav-btn.active {
+    background: rgba(86, 185, 233, 0.14) !important;
+    border-color: rgba(86, 185, 233, 0.4) !important;
+}
+.mp-cta-primary,
+.checkout-btn,
+.place-order-btn,
+.submit-btn,
+.auth-submit {
+    background: linear-gradient(135deg, #d7b151, var(--nex-gold)) !important;
+    color: #0b1019 !important;
+}
+.add-btn,
+.select-options-btn {
+    background: var(--nex-blue) !important;
+    color: #08121d !important;
+}
+.add-btn.in-cart {
+    background: var(--nex-success) !important;
+    color: #08121d !important;
+}
+.mascot-fab {
+    background: linear-gradient(135deg, #1b2737, #101722) !important;
+    border: 2px solid var(--nex-gold) !important;
+    padding: 3px;
+}
     </style>
+<script>
+(function() {
+    var metrics = window._nexPerfMetrics = {
+        lcpMs: null,
+        clsScore: 0,
+        inpMs: null,
+        domInteractiveMs: null,
+        domContentLoadedMs: null,
+        firstPaintMs: null,
+        getStartupGasCalls: function() {
+            try {
+                if (!window.performance || !performance.getEntriesByType) return [];
+                return performance.getEntriesByType('resource').filter(function(r) {
+                    var n = String(r.name || '');
+                    return n.indexOf('script.google.com') !== -1 || n.indexOf('script.googleusercontent.com') !== -1;
+                }).map(function(r) {
+                    return { url: String(r.name).split('?')[0], startTime: Math.round(r.startTime), duration: Math.round(r.duration) };
+                });
+            } catch (e) { return []; }
+        }
+    };
+    try {
+        if ('PerformanceObserver' in window) {
+            try {
+                new PerformanceObserver(function(list) {
+                    var entries = list.getEntries();
+                    if (entries.length) metrics.lcpMs = Math.round(entries[entries.length - 1].startTime);
+                }).observe({ type: 'largest-contentful-paint', buffered: true });
+            } catch (e) {}
+            try {
+                new PerformanceObserver(function(list) {
+                    list.getEntries().forEach(function(e) {
+                        if (!e.hadRecentInput) metrics.clsScore = Math.round((metrics.clsScore + e.value) * 10000) / 10000;
+                    });
+                }).observe({ type: 'layout-shift', buffered: true });
+            } catch (e) {}
+            try {
+                new PerformanceObserver(function(list) {
+                    list.getEntries().forEach(function(e) {
+                        if (metrics.inpMs === null || e.duration > metrics.inpMs) metrics.inpMs = Math.round(e.duration);
+                    });
+                }).observe({ type: 'event', buffered: true, durationThreshold: 16 });
+            } catch (e) {}
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+                if (nav) {
+                    metrics.domInteractiveMs = Math.round(nav.domInteractive);
+                    metrics.domContentLoadedMs = Math.round(nav.domContentLoadedEventEnd);
+                }
+                var paints = performance.getEntriesByType && performance.getEntriesByType('paint');
+                if (paints && paints.length) metrics.firstPaintMs = Math.round(paints[0].startTime);
+            } catch (e) {}
+            syncDiagAttr();
+        });
+        function syncDiagAttr() {
+            try {
+                if (!document.head) return;
+                var m = document.getElementById('nexPerfDiagMeta');
+                if (!m) {
+                    m = document.createElement('meta');
+                    m.id = 'nexPerfDiagMeta';
+                    m.setAttribute('name', 'nex-perf-diag');
+                    document.head.appendChild(m);
+                }
+                var calls = metrics.getStartupGasCalls();
+                m.setAttribute('content', JSON.stringify({
+                    lcpMs: metrics.lcpMs,
+                    clsScore: metrics.clsScore,
+                    inpMs: metrics.inpMs,
+                    domInteractiveMs: metrics.domInteractiveMs,
+                    domContentLoadedMs: metrics.domContentLoadedMs,
+                    firstPaintMs: metrics.firstPaintMs,
+                    gasStartupCalls: calls.length,
+                    bodyBg: document.body ? window.getComputedStyle(document.body).backgroundColor : null,
+                    scrollWidth: document.documentElement ? document.documentElement.scrollWidth : null,
+                    innerWidth: window.innerWidth
+                }));
+            } catch (e) {}
+        }
+        metrics.syncDiagAttr = syncDiagAttr;
+        window.addEventListener('load', syncDiagAttr);
+        setTimeout(syncDiagAttr, 1500);
+        setTimeout(syncDiagAttr, 3500);
+    } catch (e) {}
+})();
+</script>
 </head>
 <body>
 
@@ -10561,27 +10863,36 @@ html, body { max-width: 100%; overflow-x: hidden; }
                     <div class="mp-hero-grid">
                         <div class="mp-hero-main">
                             <div>
-                                <div class="mp-hero-tag"><i class="fas fa-bolt"></i> Malaysia's Digital Gaming Marketplace</div>
-                                <h1>Your Gaming Needs <span> All in One Place </span></h1>
-                                <p>Welcome to Nex4Up &rarr; your destination for gaming top-ups, digital products and exclusive gaming deals.
- &rarr; Explore Roblox Robux, Game Top-Ups, Verified Accounts, Gift Codes and Exclusive Merchandise, all in one convenient marketplace. &amp; EAffordable Prices. Reliable Service. Better Gaming Experiences.</p>
+                                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+                                    <div class="mp-hero-tag" style="margin-bottom:0;"><i class="fas fa-bolt"></i> Malaysia's Digital Gaming Marketplace</div>
+                                    <span class="nex-shield-badge"><i class="fas fa-shield-alt"></i> 100% Account Safe &bull; No Password Needed</span>
+                                </div>
+                                <h1>Your Gaming Needs <span>All in One Place</span></h1>
+                                <p>Welcome to NEX4UP — your trusted destination for Robux top-ups, game credits, verified items, gift codes, and gamer gear. Affordable prices, reliable delivery, and real-time order tracking.</p>
                             </div>
                             <div class="mp-hero-actions">
                                 <button type="button" class="mp-cta-primary" id="heroBrowseCatBtn">
                                     <i class="fas fa-gamepad"></i> Browse Categories
                                 </button>
                                 <button type="button" class="mp-cta-secondary" id="heroHotSellingBtn">
-                                    <i class="fas fa-fire" style="color:#ff6b6b;"></i> Hot Selling
+                                    <i class="fas fa-fire" style="color:var(--nex-error);"></i> Hot Selling
                                 </button>
                             </div>
                         </div>
 
                         <div class="mp-hero-side">
-                            <div id="referralBanner" style="background:rgba(247,216,117,0.07); border:1px dashed rgba(247,216,117,0.45); border-radius:16px; padding:14px 16px; display:flex; align-items:flex-start; gap:12px;">
-                                <i class="fas fa-gift" style="color:#f7d875; font-size:24px; margin-top:2px;"></i>
-                                <div style="font-size:13px; line-height:1.5;">
-                                    <div style="font-weight:800; color:#f7d875; font-size:14px;">New User Special — 10% OFF!</div>
-                                    <span style="color:#b0c8e0;">Register an account and enjoy an automatic <strong style="color:#f7d875;">10% welcome discount</strong> on your first order.</span>
+                            <div class="nex-mascot-spot">
+                                <img id="nexHeroMascotImg" src="assets/mascot/mascot-bust.png" alt="NEX4UP Official Mascot DaKsTARs465" width="52" height="52" decoding="async" onerror="if(window._nexMascotFallback)window._nexMascotFallback(this);" />
+                                <div style="min-width:0;flex:1;">
+                                    <div style="font-size:12px;font-weight:800;color:var(--nex-gold);letter-spacing:0.2px;"><i class="fas fa-shield-check"></i> NEX4UP Verified Safe Delivery</div>
+                                    <div style="font-size:11.5px;color:var(--nex-text-secondary);line-height:1.4;margin-top:2px;">Official Guide <strong>@DaKsTARs465</strong> &bull; Earn NEX Points on every verified purchase &amp; review.</div>
+                                </div>
+                            </div>
+                            <div id="referralBanner" style="background:rgba(232,197,104,0.08); border:1px dashed rgba(232,197,104,0.45); border-radius:16px; padding:12px 14px; display:flex; align-items:flex-start; gap:12px;">
+                                <i class="fas fa-gift" style="color:var(--nex-gold); font-size:22px; margin-top:2px;"></i>
+                                <div style="font-size:12.5px; line-height:1.5;">
+                                    <div style="font-weight:800; color:var(--nex-gold); font-size:13.5px;">New User Special — 10% OFF!</div>
+                                    <span style="color:var(--nex-text-secondary);">Register an account and enjoy an automatic <strong style="color:var(--nex-gold);">10% welcome discount</strong> on your first order.</span>
                                 </div>
                             </div>
 
@@ -13060,19 +13371,19 @@ html, body { max-width: 100%; overflow-x: hidden; }
                         <label class="payment-method-option" data-method="mae">
                             <input type="radio" name="paymentMethod" value="mae" />
                             <span class="pm-check"><i class="fas fa-check"></i></span>
-                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHOYpS3G_bIUHBJNp_xKD1_7NxSF3J66qxMX1VzWrq5g&s=10" alt="MAE" />
+                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHOYpS3G_bIUHBJNp_xKD1_7NxSF3J66qxMX1VzWrq5g&s=10" alt="MAE" loading="lazy" decoding="async" />
                             <span class="pm-name">MAE</span>
                         </label>
                         <label class="payment-method-option" data-method="tng">
                             <input type="radio" name="paymentMethod" value="tng" />
                             <span class="pm-check"><i class="fas fa-check"></i></span>
-                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPQhtet5iK5zwJYL00UIrGJUvz3_NlK4y5urak093NHg&s=10" alt="Touch 'n Go" />
+                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPQhtet5iK5zwJYL00UIrGJUvz3_NlK4y5urak093NHg&s=10" alt="Touch 'n Go" loading="lazy" decoding="async" />
                             <span class="pm-name">TNG</span>
                         </label>
                         <label class="payment-method-option" data-method="shopee">
                             <input type="radio" name="paymentMethod" value="shopee" />
                             <span class="pm-check"><i class="fas fa-check"></i></span>
-                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" />
+                            <img class="pm-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFq33crd_kI94tdFeErTUE_xbU3NBrQGCNO4JxvnMD2Q&s=10" alt="ShopeePay" loading="lazy" decoding="async" />
                             <span class="pm-name">ShopeePay</span>
                         </label>
                         <label class="payment-method-option" data-method="sociabuzz">
@@ -13361,10 +13672,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
         <div class="mascot-bubble" id="mascotBubble">Need help? Reach us! 👋</div>
         
         <div class="mascot-face">
-            <div class="mascot-eyes" id="mascotEyes">
-                <div class="mascot-eye"></div>
-                <div class="mascot-eye"></div>
-            </div>
+            <img id="chatMascotImg" class="mascot-avatar-img" src="assets/mascot/mascot-headshot.png" alt="NEX4UP Mascot DaKsTARs465" width="64" height="64" decoding="async" onerror="if(window._nexMascotFallback)window._nexMascotFallback(this);" />
         </div>
         <span class="chat-fab-badge" id="chatFabBadge" style="display:none;">0</span>
     </button>
@@ -13447,7 +13755,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
             <!-- Column 1: Brand + About -->
             <div class="footer-col">
                 <div class="footer-brand">
-                    <img src="https://lh3.googleusercontent.com/d/1ZfT9IOAc2kL7pF1dUVRdq9p7AKez3a47" alt="N4" class="footer-logo-icon" />
+                    <img src="https://lh3.googleusercontent.com/d/1ZfT9IOAc2kL7pF1dUVRdq9p7AKez3a47" alt="N4" class="footer-logo-icon" loading="lazy" decoding="async" />
                     <div class="footer-logo-text">
                         <span class="logo-text-light">NEX</span><span class="logo-text-accent">4</span><span class="logo-text-light">UP</span>
                     </div>
@@ -13540,22 +13848,248 @@ html, body { max-width: 100%; overflow-x: hidden; }
     <!-- ===== JAVASCRIPT ===== -->
     <script>
       // ================================================================
-// 🌐 DUAL-MODE SHIM
-// If we're NOT inside GAS, fake google.script.run so all existing
-// code works unchanged. Calls are forwarded to the GAS Web App.
+// 🌐 DUAL-MODE SHIM + UNIVERSAL ERROR, ASYNC BUTTON & MASCOT CORE
 // ================================================================
-// ⚠️ Replace with YOUR deployment ID after Step 6
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbxbVyH2UNLt7pkaoOjOFfShaEqtDQ1nll7YtuuMLvjd9QeHaTetj35eW6DWG25XuxK0/exec';
 
 var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.run);
 
+window.NEX4UP_MASCOT = {
+    username: 'DaKsTARs465',
+    userId: 573141367,
+    headshot: 'assets/mascot/mascot-headshot.png',
+    bust: 'assets/mascot/mascot-bust.png',
+    full: 'assets/mascot/mascot-full.png',
+    fallbackSvg: "data:image/svg+xml;utf8," + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">' +
+        '<rect width="120" height="120" rx="22" fill="#101722"/>' +
+        '<path d="M26 42 Q60 12 94 42 L98 68 Q92 74 84 62 L84 36 L36 36 L36 62 Q28 74 22 68 Z" fill="#E86A17"/>' +
+        '<path d="M35 28 Q60 18 85 28 L83 42 Q60 36 37 42 Z" fill="#FF842B"/>' +
+        '<polygon points="48,30 53,36 44,36" fill="#101722"/><polygon points="72,30 76,36 67,36" fill="#101722"/>' +
+        '<path d="M46 40 L52 38 L58 40 L64 38 L74 40" stroke="#101722" stroke-width="2.2" fill="none"/>' +
+        '<rect x="37" y="40" width="46" height="40" rx="9" fill="#090B0F" stroke="#222C3A" stroke-width="1.5"/>' +
+        '<circle cx="49" cy="57" r="5" fill="#F2F4F8"/><circle cx="71" cy="57" r="5" fill="#F2F4F8"/>' +
+        '<path d="M51 68 Q60 75 69 68" stroke="#F2F4F8" stroke-width="3.2" stroke-linecap="round" fill="none"/>' +
+        '<rect x="30" y="82" width="60" height="32" rx="10" fill="#151922"/>' +
+        '<path d="M44 92 L53 96 L46 100 Z M76 92 L67 96 L74 100 Z M48 104 Q60 112 72 104" fill="#FF7B1F"/>' +
+        '</svg>'
+    )
+};
+window._nexMascotFallback = function(imgEl) {
+    if (!imgEl || imgEl.dataset.nexFallback) return;
+    imgEl.dataset.nexFallback = '1';
+    imgEl.src = window.NEX4UP_MASCOT.fallbackSvg;
+};
+
+window.NexErrorHandler = (function() {
+    var LOG_KEY = 'nex4up_admin_error_log_v1';
+    window._nexAdminErrorLog = window._nexAdminErrorLog || [];
+    try {
+        var saved = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
+        if (Array.isArray(saved)) window._nexAdminErrorLog = saved;
+    } catch (e) {}
+
+    function generateRefId() {
+        return 'NX-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+    }
+
+    function logAdminError(action, rawMsg, refId) {
+        var entry = {
+            refId: refId || generateRefId(),
+            time: new Date().toISOString(),
+            action: String(action || 'unknown'),
+            rawMsg: String(rawMsg || '').slice(0, 320)
+        };
+        window._nexAdminErrorLog.unshift(entry);
+        if (window._nexAdminErrorLog.length > 50) window._nexAdminErrorLog.length = 50;
+        try { localStorage.setItem(LOG_KEY, JSON.stringify(window._nexAdminErrorLog)); } catch (e) {}
+        return entry.refId;
+    }
+
+    function toCustomerMessage(errOrMsg, action) {
+        var raw = (errOrMsg && errOrMsg.message) ? String(errOrMsg.message) : String(errOrMsg || '');
+        var clean = raw.replace(/^Error placing order:\s*/i, '').replace(/^Error:\s*/i, '').trim();
+        if (!clean) {
+            var rIdEmpty = logAdminError(action, 'Empty error response');
+            return 'Something went wrong. Please try again. Reference ID: ' + rIdEmpty;
+        }
+        if (/failed to fetch|networkerror|network request|request timed out|aborted|offline|circuit open|backend unavailable|http 5\d\d/i.test(clean)) {
+            logAdminError(action, raw);
+            return 'Unable to connect. Please check your connection and try again.';
+        }
+        if (/session.*expired|invalid session|expired.*token|please log in again|log in again/i.test(clean)) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (/script\.google\.com|apps script|spreadsheetapp|lockservice|htmlservice|bad json|returned html|referenceerror|typeerror|syntaxerror|cannot read propert|exception:|stack|\.gs:|\.html:|http 4\d\d|unauthorized:\s*admin/i.test(clean)) {
+            var rIdTech = logAdminError(action, raw);
+            return 'An unexpected error occurred. Please try again. Reference ID: ' + rIdTech;
+        }
+        if (/password|incorrect|wrong|invalid|expired|limit|minimum|required|duplicate|not found|already|insufficient|stock|points|email|phone|otp|code|banned|must be|select a valid|field/i.test(clean)) {
+            return clean;
+        }
+        var rIdGen = logAdminError(action, raw);
+        return 'Something went wrong. Please try again. Reference ID: ' + rIdGen;
+    }
+
+    return {
+        generateRefId: generateRefId,
+        logAdminError: logAdminError,
+        toCustomerMessage: toCustomerMessage
+    };
+})();
+
+window.NexAsyncBtn = (function() {
+    var BG_ACTIONS = {
+        getStoreBootstrapData: 1, getGamesData: 1, getGenreImages: 1, getNex4Up2Bootstrap: 1,
+        getCustomerPoints: 1, getCustomerUnreadCount: 1, getAdminUnreadCount: 1,
+        getMessages: 1, getAllConversations: 1, getWishlistIds: 1, getSalesTeam: 1,
+        lookupRobloxUser: 1, getPaymentQRs: 1, getProductRequirements: 1,
+        getProductRequirementsBatch: 1, getOrderRequirements: 1, getMyOrdersData: 1,
+        getOrdersData: 1, getCustomerOrders: 1, getCustomerWalletAndVouchers: 1,
+        getCustomerReferralData: 1, getReferralConfig: 1, getReviews: 1,
+        getCustomerReview: 1, getWishlist: 1, getRobuxStockForCheckout: 1,
+        getRobuxInventoryDashboard: 1, getPendingReferralCoupon: 1,
+        getAdvancedSalesSummary: 1, getSalesTeamSummary: 1, getAdminPromoCodes: 1,
+        getCostSettings: 1, getBackupHistory: 1, adminGetCommunityDashboard: 1
+    };
+
+    var ACTION_LABELS = {
+        loginCustomer: 'Signing in...',
+        createAccountWithOtp: 'Creating account...',
+        verifyEmailOtpLogin: 'Verifying...',
+        sendAuthEmailOtp: 'Sending code...',
+        resetOrChangePasswordWithOtp: 'Updating password...',
+        placeOrder: 'Placing order...',
+        uploadReceipt: 'Uploading...',
+        confirmSociaBuzzPayment: 'Confirming...',
+        validatePromoCode: 'Applying...',
+        updateCustomerProfile: 'Saving...',
+        updateGamerProfile: 'Saving...',
+        saveGamingAccountsProfile: 'Saving...',
+        addReview: 'Submitting...',
+        addReviewWithReward: 'Submitting...',
+        redeemProfileFrame: 'Redeeming...',
+        equipProfileFrame: 'Equipping...',
+        submitCreatorCampaign: 'Submitting...',
+        createCommunityPost: 'Posting...',
+        saveAdminPromoCode: 'Saving...',
+        deleteAdminPromoCode: 'Deleting...',
+        saveProductRequirements: 'Saving...',
+        updateOrderStatus: 'Updating...',
+        bulkUpdateOrderStatuses: 'Updating...'
+    };
+
+    var _lastTrigger = { el: null, ts: 0 };
+    var _btnTimers = new WeakMap();
+
+    function _isTrackableBtn(el) {
+        if (!el || !el.tagName) return false;
+        if (el.dataset && el.dataset.noAsync === '1') return false;
+        return el.matches('button[type="submit"], .submit-btn, .place-order-btn, .apply-promo-btn, .auth-submit, .action-btn, .rate-btn, .nex2-top-promo-btn, .nex2-send-otp-btn, .dyn-req-btn.primary, .toggle-promo-btn, .del-promo-btn, .prb-lookup-btn, #nex2FrameActionBtn, #nex2SaveFaqBtn, #nex2SaveDevBtn, #nex2SaveGamingAccBtn, #nex2GaVerifyRbxBtn');
+    }
+
+    if (typeof document !== 'undefined') {
+        document.addEventListener('click', function(ev) {
+            var btn = ev.target && ev.target.closest ? ev.target.closest('button, input[type="submit"]') : null;
+            if (_isTrackableBtn(btn)) {
+                _lastTrigger = { el: btn, ts: Date.now() };
+            }
+        }, true);
+        document.addEventListener('submit', function(ev) {
+            var form = ev.target;
+            var btn = form && form.querySelector ? form.querySelector('button[type="submit"], .submit-btn, .auth-submit, .place-order-btn') : null;
+            if (_isTrackableBtn(btn)) {
+                _lastTrigger = { el: btn, ts: Date.now() };
+            }
+        }, true);
+    }
+
+    function _clearTimers(btn) {
+        var t = _btnTimers.get(btn);
+        if (t) {
+            clearTimeout(t.safety);
+            clearTimeout(t.revert);
+            _btnTimers.delete(btn);
+        }
+    }
+
+    function setLoading(btn, label) {
+        if (!btn) return;
+        _clearTimers(btn);
+        if (!btn.dataset.nexOrigHtml) {
+            btn.dataset.nexOrigHtml = btn.innerHTML;
+            btn.dataset.nexOrigDisabled = btn.disabled ? '1' : '0';
+        }
+        btn.classList.remove('nex-btn-success', 'nex-btn-error');
+        btn.classList.add('nex-btn-loading');
+        btn.disabled = true;
+        var txt = label || 'Processing...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + txt;
+        var safety = setTimeout(function() { restore(btn); }, 26000);
+        _btnTimers.set(btn, { safety: safety, revert: null });
+    }
+
+    function setSuccess(btn, label) {
+        if (!btn) return;
+        _clearTimers(btn);
+        btn.classList.remove('nex-btn-loading', 'nex-btn-error');
+        btn.classList.add('nex-btn-success');
+        if (label) btn.innerHTML = '<i class="fas fa-check"></i> ' + label;
+        var rev = setTimeout(function() { restore(btn); }, 900);
+        _btnTimers.set(btn, { safety: null, revert: rev });
+    }
+
+    function setError(btn, label) {
+        if (!btn) return;
+        _clearTimers(btn);
+        btn.classList.remove('nex-btn-loading', 'nex-btn-success');
+        btn.classList.add('nex-btn-error');
+        btn.disabled = false;
+        if (label) btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + label;
+        var rev = setTimeout(function() { restore(btn); }, 1100);
+        _btnTimers.set(btn, { safety: null, revert: rev });
+    }
+
+    function restore(btn) {
+        if (!btn) return;
+        _clearTimers(btn);
+        btn.classList.remove('nex-btn-loading', 'nex-btn-success', 'nex-btn-error');
+        if (btn.dataset.nexOrigHtml !== undefined) {
+            btn.innerHTML = btn.dataset.nexOrigHtml;
+            btn.disabled = btn.dataset.nexOrigDisabled === '1';
+            delete btn.dataset.nexOrigHtml;
+            delete btn.dataset.nexOrigDisabled;
+        } else {
+            btn.disabled = false;
+        }
+    }
+
+    function captureForAction(actionName) {
+        if (BG_ACTIONS[actionName]) return null;
+        if (_lastTrigger.el && (Date.now() - _lastTrigger.ts) < 250 && document.contains(_lastTrigger.el)) {
+            var targetBtn = _lastTrigger.el;
+            _lastTrigger = { el: null, ts: 0 };
+            setLoading(targetBtn, ACTION_LABELS[actionName] || 'Processing...');
+            return targetBtn;
+        }
+        return null;
+    }
+
+    return {
+        setLoading: setLoading,
+        setSuccess: setSuccess,
+        setError: setError,
+        restore: restore,
+        captureForAction: captureForAction
+    };
+})();
+
 (function installGASShim() {
     if (IS_GAS) return;
 
-    console.log('🚀 Running in GitHub/fetch mode → GAS:', GAS_URL);
-
-    // Global circuit breaker — after 2 consecutive total failures, stop hammering
+    // Global circuit breaker — auto-recovers after 12s so transient blips can retry
     window._gasBroken = false;
+    window._gasBrokenAt = 0;
     window._gasFailStreak = 0;
 
     function makeChain(success, failure) {
@@ -13569,11 +14103,20 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
                 }
                 return function() {
                     var args = Array.prototype.slice.call(arguments);
+                    var activeBtn = window.NexAsyncBtn ? window.NexAsyncBtn.captureForAction(prop) : null;
 
-                    // Circuit breaker: if the endpoint is confirmed dead, fail instantly.
                     if (window._gasBroken) {
-                        if (failure) failure(new Error('Backend unavailable (circuit open)'));
-                        return;
+                        if (Date.now() - (window._gasBrokenAt || 0) > 12000) {
+                            window._gasBroken = false;
+                            window._gasFailStreak = 0;
+                        } else {
+                            if (activeBtn) window.NexAsyncBtn.setError(activeBtn, 'Retry');
+                            if (failure) {
+                                var brkErr = new Error('Unable to connect. Please check your connection and try again.');
+                                failure(brkErr);
+                            }
+                            return;
+                        }
                     }
 
                     var formData = new URLSearchParams();
@@ -13599,33 +14142,39 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
                             return res.text();
                         })
                         .then(function (text) {
-                            // Detect sign-in / permission HTML response (the #1 GAS gotcha)
                             if (text.trim().charAt(0) === '<') {
-                                throw new Error(
-                                    'Backend returned HTML instead of JSON — deployment is not set to "Anyone".'
-                                );
+                                throw new Error('Backend returned HTML instead of JSON');
                             }
                             var data;
                             try { data = JSON.parse(text); }
-                            catch (e) { throw new Error('Bad JSON: ' + text.slice(0, 100)); }
+                            catch (e) { throw new Error('Bad JSON response'); }
 
                             window._gasFailStreak = 0;
+                            window._gasBroken = false;
+
+                            if (data && typeof data === 'object' && data.success === false) {
+                                if (activeBtn) window.NexAsyncBtn.setError(activeBtn, 'Try Again');
+                                if (data.message && !(typeof isAdmin !== 'undefined' && isAdmin) && !(typeof IS_ADMIN_MODE !== 'undefined' && IS_ADMIN_MODE)) {
+                                    data.message = window.NexErrorHandler.toCustomerMessage(data.message, prop);
+                                }
+                            } else if (activeBtn) {
+                                window.NexAsyncBtn.setSuccess(activeBtn, 'Done');
+                            }
+
                             if (success) {
                                 try {
                                     success(data);
                                 } catch (cbErr) {
-                                    console.error('Callback error (' + prop + '):', cbErr);
+                                    if (window.NexErrorHandler) window.NexErrorHandler.logAdminError(prop + ':cb', cbErr && cbErr.message);
                                 }
                             }
                         })
                         .catch(function (err) {
                             clearTimeout(timeoutId);
-                            if (err.name === 'AbortError') err = new Error('Request timed out (25s)');
+                            if (err && err.name === 'AbortError') err = new Error('Request timed out');
 
-                            // Retry once for transient network blips
                             if (attempt < maxAttempts &&
-                                (err.name === 'TypeError' || err.message.indexOf('HTTP 5') === 0)) {
-                                console.warn('🔄 Retry ' + attempt + '/' + maxAttempts + ' for ' + prop);
+                                (err.name === 'TypeError' || String(err.message || '').indexOf('HTTP 5') === 0)) {
                                 setTimeout(doFetch, 800);
                                 return;
                             }
@@ -13633,12 +14182,18 @@ var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.ru
                             window._gasFailStreak++;
                             if (window._gasFailStreak >= 3) {
                                 window._gasBroken = true;
-                                console.error('🔴 Backend unreachable — circuit opened. Run deploy fix.');
+                                window._gasBrokenAt = Date.now();
                                 if (typeof showBackendError === 'function') showBackendError(err);
                             }
 
-                            console.error('API error (' + prop + '):', err);
-                            if (failure) failure(err);
+                            var rawMsg = (err && err.message) ? err.message : String(err || '');
+                            var friendlyMsg = window.NexErrorHandler
+                                ? window.NexErrorHandler.toCustomerMessage(rawMsg, prop)
+                                : 'Unable to connect. Please try again.';
+                            if (window.NexErrorHandler) window.NexErrorHandler.logAdminError(prop, rawMsg);
+
+                            if (activeBtn) window.NexAsyncBtn.setError(activeBtn, 'Retry');
+                            if (failure) failure(new Error(friendlyMsg));
                         });
                     })();
                 };
@@ -14219,7 +14774,7 @@ function loadGames() {
         }
     }
 
-    function loadGamesParallelFallback() {
+        function loadGamesParallelFallback() {
         var pending = 2;
         var freshGames = null;
         var freshGenres = {};
@@ -14230,10 +14785,10 @@ function loadGames() {
             if (pending > 0) return;
             if (gamesFailed) {
                 if (!cached) {
-                    allGames = getSampleGames();
-                    genreImages = {};
-                    renderAll();
-                    renderAdminList();
+                    grid.innerHTML = '<div class="nex-friendly-error-card" style="grid-column:1/-1;">' +
+                        '<div><strong><i class="fas fa-wifi" style="color:var(--nex-error);margin-right:6px;"></i>Unable to load products right now.</strong>' +
+                        '<div class="nex-err-ref">Please check your internet connection and retry.</div></div>' +
+                        '<button type="button" class="nex-retry-btn" onclick="window._gasBroken=false;window._gasFailStreak=0;loadGames();"><i class="fas fa-sync-alt"></i> Retry</button></div>';
                 }
                 return;
             }
@@ -14299,6 +14854,7 @@ function loadGames() {
         }
 
         function showDebugLoadButton() {
+            if (typeof IS_ADMIN_MODE === 'undefined' || !IS_ADMIN_MODE) return;
             var existing = document.getElementById('debugLoadBtn');
             if (existing) existing.remove();
             var btn = document.createElement('button');
@@ -14579,17 +15135,19 @@ html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '"
                     html += '<div style="font-size:12px; color:#6a7f9e; margin-bottom:6px;">No reviews yet</div>';
                 }
                 html += '<div class="desc">' + (game.description || '') + '</div>';
-                var preOrderBadge = (game.productType === 'physical')
-                    ? ' <span style="color:#f7d875; font-weight:600;">· Pre-Order (Ships 13th)</span>'
-                    : '';
-                 var lowStockPill = (!isRobuxProduct && !outOfStock && stock >= 1 && stock <= 5)
+                var deliveryBadge = (game.productType === 'physical')
+                    ? '<span class="nex-delivery-pill"><i class="fas fa-calendar-alt"></i> Pre-Order 13th</span>'
+                    : (isRobuxProduct
+                        ? '<span class="nex-delivery-pill in-stock"><i class="fas fa-bolt"></i> 1–2 Hr Delivery</span>'
+                        : '<span class="nex-delivery-pill in-stock"><i class="fas fa-check-circle"></i> ' + (outOfStock ? 'Restocking' : 'In Stock') + '</span>');
+                var lowStockPill = (!isRobuxProduct && !outOfStock && stock >= 1 && stock <= 5)
                     ? ' <span class="low-stock-pill">🔥 Only ' + stock + ' left!</span>'
                     : '';
                  html += '<div class="stock-info ' + (outOfStock ? 'out-of-stock' : '') + '">' +
                     (isRobuxProduct
                         ? 'Central Robux stock · Sold: ' + sold
                         : (outOfStock ? 'Out of Stock' : 'Stock: ' + stock) + ' | Sold: ' + sold) +
-                    lowStockPill + preOrderBadge + '</div>';
+                    deliveryBadge + lowStockPill + '</div>';
                 html += '<div class="card-footer">';
                 html += '<div class="price">' + priceDisplay + '</div>';
 
@@ -15087,49 +15645,41 @@ html += '<img src="' + optimizeDriveImg(item.image || PLACEHOLDER_IMG, 400) + '"
         // 👇👇👇 PASTE FIX D HERE 👇👇👇
         function showBackendError(err) {
             if (document.getElementById('backendErrorBanner')) return;
-
-            var msg = err && err.message ? String(err.message) : 'Unknown error';
-            var isHtml = msg.indexOf('HTML') !== -1;
+            var friendlyMsg = (window.NexErrorHandler && typeof window.NexErrorHandler.toCustomerMessage === 'function')
+                ? window.NexErrorHandler.toCustomerMessage(err, 'storeLoad')
+                : 'Unable to connect. Please check your connection and try again.';
 
             var banner = document.createElement('div');
             banner.id = 'backendErrorBanner';
-            banner.style.cssText =
-                'background:rgba(255,107,107,0.08); border:1px solid rgba(255,107,107,0.35);' +
-                'border-radius:14px; padding:18px 22px; margin:20px 0; color:#ff6b6b;' +
-                'font-family:Inter,sans-serif; font-size:14px;';
-
+            banner.className = 'nex-friendly-error-card';
             banner.innerHTML =
-                '<div style="display:flex;gap:14px;align-items:flex-start;">' +
-                    '<i class="fas fa-exclamation-triangle" style="font-size:22px;margin-top:2px;"></i>' +
-                    '<div style="flex:1;">' +
-                        '<div style="font-weight:800;font-size:16px;margin-bottom:6px;">' +
-                            'Store backend is unreachable' +
+                '<div style="display:flex;gap:14px;align-items:flex-start;flex:1;min-width:220px;">' +
+                    '<i class="fas fa-wifi" style="font-size:22px;color:var(--nex-error);margin-top:2px;"></i>' +
+                    '<div>' +
+                        '<div style="font-weight:800;font-size:15.5px;margin-bottom:4px;color:var(--nex-text-primary);">' +
+                            'Unable to connect right now' +
                         '</div>' +
-                        '<div style="color:#8aa1c0;line-height:1.65;margin-bottom:14px;">' +
-                            (isHtml
-                                ? 'Your Apps Script deployment is set to <strong>"Anyone with Google account"</strong>. Anonymous visitors get redirected to a sign-in page, which the browser blocks — so every API call fails.'
-                                : 'The website can\'t reach the Google Apps Script backend. This is almost always a deployment access setting.') +
-                        '</div>' +
-                        '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:10px;padding:12px 16px;margin-bottom:12px;">' +
-                            '<div style="color:#8aa1c0;font-size:11.5px;font-weight:700;letter-spacing:.5px;margin-bottom:8px;">TO FIX (2 minutes):</div>' +
-                            '<ol style="color:#b0c8e0;font-size:13px;line-height:1.9;margin:0;padding-left:20px;">' +
-                                '<li>Open your <strong>Apps Script</strong> project</li>' +
-                                '<li><strong>Deploy</strong> → <strong>Manage deployments</strong></li>' +
-                                '<li>Click the <strong>pencil (Edit)</strong> on the active deployment</li>' +
-                                '<li>Version → <strong>New version</strong> (not "Save")</li>' +
-                                '<li>Who has access → <strong>Anyone</strong></li>' +
-                                '<li><strong>Deploy</strong>, then hard-refresh this page (Ctrl+Shift+R)</li>' +
-                            '</ol>' +
-                        '</div>' +
-                        '<div style="color:#6a7f9e;font-size:11.5px;">' +
-                            'Error: ' + msg.replace(/[<>&]/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];}) +
+                        '<div style="color:var(--nex-text-secondary);font-size:13.5px;line-height:1.5;">' +
+                            escapeHtml(friendlyMsg) +
                         '</div>' +
                     '</div>' +
-                '</div>';
+                '</div>' +
+                '<button type="button" class="nex-retry-btn" id="nexBackendRetryBtn">' +
+                    '<i class="fas fa-sync-alt"></i> Retry Connection' +
+                '</button>';
 
             var target = document.getElementById('publicView') || grid.parentNode;
             if (target && target.firstChild) {
                 target.insertBefore(banner, target.firstChild);
+                var rb = document.getElementById('nexBackendRetryBtn');
+                if (rb) {
+                    rb.addEventListener('click', function() {
+                        window._gasBroken = false;
+                        window._gasFailStreak = 0;
+                        banner.remove();
+                        loadGames();
+                    });
+                }
             }
         }
         // 👆👆👆 END OF FIX D 👆👆👆
@@ -16301,7 +16851,7 @@ var promoData = appliedPromo ? {
                     .withFailureHandler(function(err) {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
-                        checkoutError.textContent = 'Could not check Robux stock: ' + err.message;
+                        checkoutError.textContent = (window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getRobuxStockForCheckout') : 'Could not verify Robux stock right now. Please try again.');
                     })
                     .getRobuxStockForCheckout(robuxRequiredNow);
             } else {
@@ -16505,7 +17055,7 @@ var promoData = appliedPromo ? {
                 })
                 .withFailureHandler(function(err) {
                     if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerHTML = origHtml; }
-                    showToast('Lookup error: ' + err.message);
+                    showToast(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getOrderForReceiptUpload') : 'Could not look up that order right now.');
                 })
                 .getOrderForReceiptUpload(oid, (customer && customer.email) ? customer.email : '');
         }
@@ -16728,7 +17278,7 @@ var promoData = appliedPromo ? {
                 })
                 .withFailureHandler(function(err) {
                     if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
-                    showToast('Error: ' + err.message);
+                    showToast(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'confirmSociaBuzzPayment') : 'Could not submit payment confirmation.');
                 })
                 .confirmSociaBuzzPayment(currentQROrderId, email, 'Paid via SociaBuzz');
         }
@@ -16836,7 +17386,7 @@ var promoData = appliedPromo ? {
                 .withFailureHandler(function(err) {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
-                    showToast('Upload error: ' + err.message);
+                    showToast(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'uploadReceipt') : 'Could not upload receipt right now.');
                 })
                 .uploadReceipt(currentQROrderId, email, pendingReceiptFileName, pendingReceiptDataUrl);
         }
@@ -16942,91 +17492,21 @@ var promoData = appliedPromo ? {
         })();
 
         // ================================================================
-        // 11. PROFILE DROPDOWN
+        // 11. PROFILE DROPDOWN CORE (Unified in Premium Profile Menu Engine)
         // ================================================================
-        function updateProfileDropdown() {
-            var html = '';
-
-            /* ---------- STORE MODE: customer-only menu ---------- */
-            if (!IS_ADMIN_MODE) {
-                if (customer) {
-                    html += '<button class="dropdown-item" id="dropdownMyAccount"><i class="fas fa-user"></i> My Account</button>';
-                    html += '<button class="dropdown-item" id="dropdownWishlist"><i class="fas fa-heart"></i> Wishlist</button>';
-                    html += '<button class="dropdown-item" id="dropdownLogout"><i class="fas fa-sign-out-alt"></i> Logout</button>';
-                } else {
-                    html += '<button class="dropdown-item" id="dropdownLogin"><i class="fas fa-sign-in-alt"></i> Login</button>';
-                    html += '<button class="dropdown-item" id="dropdownRegister"><i class="fas fa-user-plus"></i> Register</button>';
-                }
-                profileDropdownContent.innerHTML = html;
-
-                var myAcc = document.getElementById('dropdownMyAccount');
-                if (myAcc) myAcc.addEventListener('click', function (e) {
-                    e.preventDefault(); showMyAccount(); closeProfileDropdown();
-                });
-                var wish = document.getElementById('dropdownWishlist');
-                if (wish) wish.addEventListener('click', function (e) {
-                    e.preventDefault(); showWishlist(); closeProfileDropdown();
-                });
-                var logoutCust = document.getElementById('dropdownLogout');
-                if (logoutCust) logoutCust.addEventListener('click', logoutCustomer);
-
-                var dl = document.getElementById('dropdownLogin');
-                if (dl) dl.addEventListener('click', function () {
-                    var sub = loginOverlay.querySelector('.sub');
-                    if (sub) sub.textContent = 'Welcome back! Log in to your account.';
-                    loginOverlay.classList.add('open');
-                    closeProfileDropdown();
-                });
-                var dr = document.getElementById('dropdownRegister');
-                if (dr) dr.addEventListener('click', function () {
-                    registerOverlay.classList.add('open');
-                    closeProfileDropdown();
-                });
-
-                return; // 🚫 never touch admin items in store mode
-            }
-
-            /* ---------- ADMIN MODE: admin-only menu ---------- */
-            if (isAdmin) {
-                html += '<button class="dropdown-item" id="dropdownAdminPanel"><i class="fas fa-user-cog"></i> Admin Panel</button>';
-                html += '<div class="dropdown-divider"></div>';
-                html += '<button class="dropdown-item" id="dropdownLogoutAdmin"><i class="fas fa-sign-out-alt"></i> Logout Admin</button>';
-            } else {
-                html += '<button class="dropdown-item" id="dropdownAdminLogin"><i class="fas fa-user-cog"></i> Admin Login</button>';
-            }
-            profileDropdownContent.innerHTML = html;
-
-            if (isAdmin) {
-                var ap = document.getElementById('dropdownAdminPanel');
-                if (ap) ap.addEventListener('click', function () {
-                    sidebar.classList.add('visible');
-                    showAdminView();
-                    showAdminSection('add-item');
-                    closeProfileDropdown();
-                });
-                var lo = document.getElementById('dropdownLogoutAdmin');
-                if (lo) lo.addEventListener('click', function () {
-                    logoutAdmin(); closeProfileDropdown();
-                });
-            } else {
-                var al = document.getElementById('dropdownAdminLogin');
-                if (al) al.addEventListener('click', function () {
-                    closeProfileDropdown();
-                    adminLoginOverlay.classList.add('open');
-                    adminPassword.value = '';
-                    adminLoginError.textContent = '';
-                });
-            }
-        }
+        function updateProfileDropdown() {}
 
         function closeProfileDropdown() {
-            profileDropdownContent.classList.remove('open');
+            if (profileDropdownContent) profileDropdownContent.classList.remove('open');
         }
 
-        profileToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            profileDropdownContent.classList.toggle('open');
-        });
+        if (profileToggle) {
+            profileToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (profileDropdownContent) profileDropdownContent.classList.toggle('open');
+                if (typeof window._lazyCheckPartnerAgent === 'function') window._lazyCheckPartnerAgent();
+            });
+        }
 
         document.addEventListener('click', function(e) {
             if (!profileDropdown.contains(e.target)) {
@@ -17100,7 +17580,7 @@ if (cart.length > 0) {
                     }
                 })
                 .withFailureHandler(function(err) {
-                    loginError.textContent = 'Error: ' + err.message;
+                    loginError.textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'loginCustomer') : 'Unable to sign in right now. Please try again.';
                 })
                 .loginCustomer(identifier, password);
         });
@@ -17143,7 +17623,7 @@ if (cart.length > 0) {
                     }
                 })
                 .withFailureHandler(function(err) {
-                    adminLoginError.textContent = 'Error: ' + err.message;
+                    adminLoginError.textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'verifyAdminPassword') : 'Unable to verify sign in right now.';
                 })
                 .verifyAdminPassword(password);
         });
@@ -18951,7 +19431,7 @@ function loadOrders() {
                             '</div>';
                     })
                     .withFailureHandler(function(err) {
-                        trackResults.innerHTML = '<p style="color:#ff6b6b;">Error: ' + escapeHtml(err.message) + '</p>';
+                        trackResults.innerHTML = '<p style="color:var(--nex-danger,#E56B70);">' + escapeHtml(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'trackOrderById') : 'Unable to load order status right now.') + '</p>';
                     })
                     .getOrderForReceiptUpload(queryVal, '');
                 return;
@@ -18997,7 +19477,7 @@ function loadOrders() {
                     trackResults.innerHTML = html;
                 })
                 .withFailureHandler(function(err) {
-                    trackResults.innerHTML = '<p style="color:#ff6b6b;">Error: ' + escapeHtml(err.message) + '</p>';
+                    trackResults.innerHTML = '<p style="color:var(--nex-danger,#E56B70);">' + escapeHtml(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getCustomerOrders') : 'Unable to look up orders right now.') + '</p>';
                 })
                 .getCustomerOrders(queryVal);
         });
@@ -19393,7 +19873,7 @@ function renderReviews(reviews) {
                     }
                 })
                 .withFailureHandler(function(err) {
-                    document.getElementById('reviewError').textContent = 'Error: ' + err.message;
+                    document.getElementById('reviewError').textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'addReview') : 'Unable to submit your review right now.';
                     btn.disabled = false;
                     btn.textContent = 'Submit Review';
                 })
@@ -19435,7 +19915,7 @@ function renderReviews(reviews) {
                     }
                 })
                 .withFailureHandler(function(err) {
-                    changePasswordError.textContent = 'Error: ' + err.message;
+                    changePasswordError.textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'changeAdminPassword') : 'Unable to update password right now.';
                 })
                 .changeAdminPassword(current, newPwd);
         });
@@ -19510,7 +19990,7 @@ function renderReviews(reviews) {
                     }
                 })
                 .withFailureHandler(function(err) {
-                    registerError.textContent = 'Error: ' + err.message;
+                    registerError.textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'createAccountWithOtp') : 'Unable to complete registration right now.';
                 })
                 .createAccountWithOtp(email, password, name, phone, referralCodeFromUrl || '', otpCode);
         });
@@ -19549,7 +20029,8 @@ function loadMyOrders() {
     google.script.run
         .withSuccessHandler(function(res) {
             if (!res || !res.success) {
-                myOrdersList.innerHTML = '<p style="color:#ff6b6b; text-align:center; padding:20px;">Error: ' + (res && res.message ? res.message : 'Unknown error') + '</p>';
+                var friendlyOrdErr = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage((res && res.message) || 'Unable to load orders.', 'getMyOrdersData') : 'Unable to load orders right now.';
+                myOrdersList.innerHTML = '<div class="nex-friendly-error-card"><p style="margin:0 0 10px;">' + escapeHtml(friendlyOrdErr) + '</p><button type="button" class="nex-retry-btn" onclick="loadMyOrders()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
                 return;
             }
             myOrdersCache = res.orders || [];
@@ -19582,7 +20063,8 @@ function loadMyOrders() {
             renderOrderList(activeOrderTab);
         })
         .withFailureHandler(function(err) {
-            myOrdersList.innerHTML = '<p style="color:#ff6b6b; text-align:center; padding:20px;">Error loading orders: ' + err.message + '</p>';
+            var friendlyOrdFail = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getMyOrdersData') : 'Unable to load your orders right now.';
+            myOrdersList.innerHTML = '<div class="nex-friendly-error-card"><p style="margin:0 0 10px;">' + escapeHtml(friendlyOrdFail) + '</p><button type="button" class="nex-retry-btn" onclick="loadMyOrders()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
         })
         .getMyOrdersData(customer.email);
 }
@@ -20028,7 +20510,7 @@ function cancelMyOrder(orderId) {
             }
         })
         .withFailureHandler(function(err) {
-            showToast('Error: ' + err.message);
+            showToast(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'cancelCustomerOrder') : 'Could not cancel order right now.');
         })
         .cancelCustomerOrder(orderId, customer.email);
 }
@@ -20124,14 +20606,15 @@ function refreshPendingBadge() {
             .withFailureHandler(function(err) {
                 confirmBtn.disabled = false;
                 confirmBtn.innerHTML = originalText;
-                showToast('Error: ' + err.message);
+                showToast(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'markOrderReceived') : 'Could not confirm receipt right now.');
             })
             .markOrderReceived(oid, customer.email);
     });
 })();
 
-// Light background poll so the badge stays fresh
+// Light background poll so the badge stays fresh (paused when tab hidden)
 setInterval(function() {
+    if (document.hidden) return;
     if (customer && customer.email) refreshPendingBadge();
 }, 120000); // every 2 minutes
 
@@ -20162,7 +20645,7 @@ function openInlineReview(gameId, orderId) {
     html += '</div>';
 
     html += '<div style="text-align:center;margin-bottom:16px;">';
-    html += '<img src="' + ((game && game.image) ? game.image : PLACEHOLDER_IMG) + '" style="width:120px;height:80px;object-fit:contain;border-radius:12px;background:#0b0e14;" />';
+    html += '<img src="' + ((game && game.image) ? game.image : PLACEHOLDER_IMG) + '" loading="lazy" decoding="async" style="width:120px;height:80px;object-fit:contain;border-radius:12px;background:#0b0e14;" />';
     html += '<h3 style="margin-top:8px;">' + (game ? game.title : 'Product') + '</h3>';
     html += '<p style="color:#f7d875;font-weight:600;margin-top:4px;"><i class="fas fa-coins"></i> Earn 5 Wallet Points</p>';
     html += '</div>';
@@ -20246,7 +20729,7 @@ function submitInlineReview() {
             }
         })
         .withFailureHandler(function(err) {
-            errEl.textContent = 'Error: ' + err.message;
+            errEl.textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'addReviewWithReward') : 'Unable to submit review right now.';
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check"></i> Submit Review';
         })
@@ -20346,7 +20829,8 @@ function submitInlineReview() {
                     }
                 })
                 .withFailureHandler(function(err) {
-                    wishlistGrid.innerHTML = '<p style="color:#ff6b6b; grid-column:1/-1; text-align:center; padding:40px 0;">Error loading wishlist: ' + err.message + '</p>';
+                    var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getWishlist') : 'Unable to load your wishlist right now.';
+                    wishlistGrid.innerHTML = '<div class="nex-friendly-error-card" style="grid-column:1/-1;"><p style="margin:0 0 10px;">' + escapeHtml(msg) + '</p><button type="button" class="nex-retry-btn" onclick="loadWishlist()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
                 })
                 .getWishlist(customer.email);
         }
@@ -20407,12 +20891,15 @@ function submitInlineReview() {
             if (pointsDisplay) {
                 pointsDisplay.textContent = numPts + ' Points (= ' + rmVal + ')';
             }
+            if (customer) customer.points = numPts;
             var sbPts = document.getElementById('nex2SidebarPts');
             var sbRm = document.getElementById('nex2SidebarRm');
             var ovPts = document.getElementById('nex2OvPts');
             if (sbPts) sbPts.textContent = numPts.toLocaleString();
             if (sbRm) sbRm.textContent = rmVal;
             if (ovPts) ovPts.textContent = numPts.toLocaleString();
+            if (typeof window.renderNexVipBanner === 'function') window.renderNexVipBanner(numPts);
+            if (typeof updateProfileDropdown === 'function') updateProfileDropdown();
         })
         .getCustomerPoints(customer.email);
         }
@@ -20525,8 +21012,8 @@ function submitInlineReview() {
                     }
                 })
                 .withFailureHandler(function(err) {
-                    profileUpdateMessage.textContent = 'Error: ' + err.message;
-                    profileUpdateMessage.style.color = '#ff6b6b';
+                    profileUpdateMessage.textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'updateCustomerProfile') : 'Could not save profile right now.';
+                    profileUpdateMessage.style.color = '#E56B70';
                 })
                 .updateCustomerProfile(customer.email, name, phone, profileImage);
         });
@@ -20597,16 +21084,16 @@ function submitInlineReview() {
                 google.script.run
                     .withSuccessHandler(onPwdDone)
                     .withFailureHandler(function(err) {
-                        pwdError.textContent = 'Error: ' + err.message;
-                        pwdError.style.color = '#ff6b6b';
+                        pwdError.textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'resetOrChangePasswordWithOtp') : 'Could not update password right now.';
+                        pwdError.style.color = '#E56B70';
                     })
                     .resetOrChangePasswordWithOtp(customer.email, otpCode, newP);
             } else {
                 google.script.run
                     .withSuccessHandler(onPwdDone)
                     .withFailureHandler(function(err) {
-                        pwdError.textContent = 'Error: ' + err.message;
-                        pwdError.style.color = '#ff6b6b';
+                        pwdError.textContent = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'updateCustomerPassword') : 'Could not update password right now.';
+                        pwdError.style.color = '#E56B70';
                     })
                     .updateCustomerPassword(customer.email, current, newP);
             }
@@ -21124,13 +21611,10 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
                 updateProfileDropdown();
             } else if (customer) {
                 updateProfileDropdown();
-                // Defer secondary customer RPCs so catalog loads without contention
+                // Defer lightweight wishlist IDs only; heavy account/orders/referrals load on-demand when My Account opens
                 setTimeout(function () {
-                    loadMyAccount();
-                    loadMyOrders();
-                    loadReferralData();
-                    loadWishlistIds();
-                }, 750);
+                    if (typeof loadWishlistIds === 'function') loadWishlistIds();
+                }, 900);
             }
 
             loadGames();
@@ -22801,7 +23285,7 @@ function resetVariantEditor(ctx) {
         }
 
         function pollChatMessages() {
-            if (!chatIsOpen) return;
+            if (document.hidden || !chatIsOpen) return;
             var identity = chatGetIdentity();
             if (!identity) return;
             google.script.run
@@ -22957,42 +23441,7 @@ function resetVariantEditor(ctx) {
             };
             reader.readAsDataURL(file);
         }
-
-        // ================================================================
-        // 🤖 MASCOT TRACKING SCRIPT
-        // ================================================================
-        document.addEventListener('mousemove', function(e) {
-            var eyes = document.getElementById('mascotEyes');
-            if (!eyes) return;
-
-            // Get the center coordinates of the button
-            var fab = document.getElementById('chatFab');
-            var rect = fab.getBoundingClientRect();
-            var fabX = rect.left + rect.width / 2;
-            var fabY = rect.top + rect.height / 2;
-
-            // Calculate distance and angle from mascot to mouse
-            var deltaX = e.clientX - fabX;
-            var deltaY = e.clientY - fabY;
-            var angle = Math.atan2(deltaY, deltaX);
-            
-            // Limit how far the eyes can move inside the face
-            var maxDistance = 6; // pixels
-            var distance = Math.min(maxDistance, Math.hypot(deltaX, deltaY) / 20);
-
-            // Calculate new eyes position
-            var eyeX = Math.cos(angle) * distance;
-            var eyeY = Math.sin(angle) * distance;
-
-            // Move the eyes container
-            eyes.style.transform = `translate(${eyeX}px, ${eyeY}px)`;
-        });
-
-        // Reset eyes when mouse leaves the window
-        document.addEventListener('mouseleave', function() {
-            var eyes = document.getElementById('mascotEyes');
-            if (eyes) eyes.style.transform = `translate(0px, 0px)`;
-        });
+        // Mascot uses official DaKsTARs465 image asset (mouse eye tracking removed for CPU efficiency)
 
 
         (function setupChatWidget() {
@@ -23026,7 +23475,7 @@ function resetVariantEditor(ctx) {
             });
             update_mascot_smart_bubble(0);
             setInterval(function() {
-                if (!chatIsOpen && customer) {
+                if (!document.hidden && !chatIsOpen && customer) {
                     google.script.run.withSuccessHandler(function(n) { updateChatBadge(n || 0); }).getCustomerUnreadCount(customer.email);
                 }
             }, 60000);
@@ -23149,7 +23598,7 @@ function resetVariantEditor(ctx) {
         }
 
         function loadInboxMessages() {
-            if (!inboxCurrentEmail) return;
+            if (document.hidden || !inboxCurrentEmail) return;
             google.script.run
                 .withSuccessHandler(function(msgs) {
                     var body = document.getElementById('inboxChatBody');
@@ -23308,7 +23757,7 @@ function resetVariantEditor(ctx) {
             });
 
             setInterval(function() {
-                if (isAdmin) refreshAdminUnreadBadge();
+                if (!document.hidden && isAdmin) refreshAdminUnreadBadge();
             }, 60000);
         })();
 
@@ -23716,59 +24165,14 @@ function showAgentDashboard(targetEmail) {
             document.getElementById('agentOrderHistory').innerHTML = html;
         })
         .withFailureHandler(function(err) {
+            var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getSalespersonDashboard') : 'Could not load partner history right now.';
             document.getElementById('agentOrderHistory').innerHTML =
-                '<p style="color:#ff6b6b; text-align:center;">Error: ' + err.message + '</p>';
+                '<p style="color:#E56B70; text-align:center;">' + escapeHtml(msg) + '</p>';
         })
         .getSalespersonDashboard(email);
 }
 
-// 2. Add Agent Dashboard to Profile Dropdown (agent-only + listener re-binding)
-var originalUpdateProfileDropdown = updateProfileDropdown;
-updateProfileDropdown = function() {
-    originalUpdateProfileDropdown();
-
-    if (customer && !IS_ADMIN_MODE) {
-        var customerEmailLower = String(customer.email || '').toLowerCase().trim();
-
-        google.script.run
-            .withSuccessHandler(function(team) {
-                team = team || [];
-                var isAgent = team.some(function(a) {
-                    return a
-                        && String(a.email || '').toLowerCase().trim() === customerEmailLower
-                        && a.status === 'Active';
-                });
-                if (!isAgent) return;
-
-                var html = profileDropdownContent.innerHTML;
-                if (html.indexOf('dropdownWishlist') !== -1 && html.indexOf('dropdownAgentDashboard') === -1) {
-                    html = html.replace(
-                        '<button class="dropdown-item" id="dropdownWishlist">',
-                        '<button class="dropdown-item" id="dropdownAgentDashboard"><i class="fas fa-briefcase"></i> Partner Dashboard</button><button class="dropdown-item" id="dropdownWishlist">'
-                    );
-                    profileDropdownContent.innerHTML = html;
-
-                    var myAcc = document.getElementById('dropdownMyAccount');
-                    if (myAcc) myAcc.addEventListener('click', function(e){ e.preventDefault(); showMyAccount(); closeProfileDropdown(); });
-                    var wish = document.getElementById('dropdownWishlist');
-                    if (wish) wish.addEventListener('click', function(e){ e.preventDefault(); showWishlist(); closeProfileDropdown(); });
-                    var logoutCust = document.getElementById('dropdownLogout');
-                    if (logoutCust) logoutCust.addEventListener('click', function(e){ e.preventDefault(); logoutCustomer(); });
-                    var agentDash = document.getElementById('dropdownAgentDashboard');
-                    if (agentDash) agentDash.addEventListener('click', function(e){ e.preventDefault(); showAgentDashboard(); closeProfileDropdown(); });
-                }
-            })
-            .withFailureHandler(function() { /* silent — not an agent */ })
-            .getSalesTeam();
-    }
-};
-
-// ✅ NEW: The init block ran BEFORE this override was installed.
-// Force one more refresh now that the override is active, so
-// "Partner Dashboard" appears immediately after a page refresh.
-if (customer && !IS_ADMIN_MODE) {
-    setTimeout(updateProfileDropdown, 100);
-}
+// 2. Partner Dashboard back-navigation handler (Dropdown menu unified below)
 
 // Make sure button listeners exist for going back to store
 document.getElementById('backToStoreFromAgentBtn').addEventListener('click', function() {
@@ -25296,19 +25700,75 @@ openEditModal = function (game) {
 };
 
 // ================================================================
-// 👑 PREMIUM CUSTOMER PROFILE DROPDOWN MENU ENGINE (Moved into <script>)
+// 👑 UNIFIED 5-TIER & CUSTOMER PROFILE DROPDOWN ENGINE (Phase 1 Cleanup)
 // ================================================================
 var _cachedDropdownPoints = null;
 var _cachedIsPartnerAgent = null;
 var _cachedPartnerEmail = '';
 
-function getVipTierInfoByPoints(pts) {
+window.NEX_DEFAULT_TIER_THRESHOLDS = [
+    { key: 'starter', label: 'Starter', icon: 'fa-seedling', minXp: 0, color: '#91A0B5' },
+    { key: 'bronze',  label: 'Bronze',  icon: 'fa-shield-alt', minXp: 100, color: '#cd7f32' },
+    { key: 'silver',  label: 'Silver',  icon: 'fa-medal', minXp: 500, color: '#cbd5e1' },
+    { key: 'gold',    label: 'Gold',    icon: 'fa-crown', minXp: 1500, color: '#E8C568' },
+    { key: 'diamond', label: 'Diamond', icon: 'fa-gem', minXp: 3000, color: '#56B9E9' }
+];
+
+window.getNexTierInfo = function(xpOrPts) {
+    var val = Math.max(0, parseInt(xpOrPts, 10) || 0);
+    var tiers = (Array.isArray(window._nexTierThresholds) && window._nexTierThresholds.length === 5)
+        ? window._nexTierThresholds
+        : window.NEX_DEFAULT_TIER_THRESHOLDS;
+    var curIdx = 0;
+    for (var i = 0; i < tiers.length; i++) {
+        if (val >= (parseInt(tiers[i].minXp, 10) || 0)) curIdx = i;
+    }
+    var cur = tiers[curIdx];
+    var next = (curIdx < tiers.length - 1) ? tiers[curIdx + 1] : null;
+    var baseMin = parseInt(cur.minXp, 10) || 0;
+    var nextMin = next ? (parseInt(next.minXp, 10) || baseMin) : Math.max(val, baseMin || 3000);
+    var pct = next
+        ? Math.min(100, Math.max(6, Math.round(((val - baseMin) / Math.max(1, nextMin - baseMin)) * 100)))
+        : 100;
+    return {
+        key: cur.key,
+        label: cur.label,
+        pillLabel: cur.label + ' Tier',
+        icon: cur.icon,
+        color: cur.color || '#E8C568',
+        xp: val,
+        nextMin: nextMin,
+        nextLabel: next ? ('Next: ' + next.label + ' (' + nextMin.toLocaleString() + ' Pts)') : 'Top Tier Unlocked',
+        pct: pct,
+        isMax: !next
+    };
+};
+
+function getVipTierInfoByPoints(pts, totalSpent) {
     var p = parseInt(pts, 10) || 0;
-    if (p >= 1000) return { label: 'Diamond VIP', icon: 'fa-gem' };
-    if (p >= 500)  return { label: 'Gold VIP',    icon: 'fa-crown' };
-    if (p >= 100)  return { label: 'Silver VIP',  icon: 'fa-medal' };
-    return { label: 'Bronze Member', icon: 'fa-shield-alt' };
+    var spent = parseFloat(totalSpent || (customer && customer.totalSpent) || 0) || 0;
+    var xp = Math.max(p, Math.round(spent));
+    var t = window.getNexTierInfo(xp);
+    return { label: t.pillLabel, icon: t.icon, color: t.color };
 }
+
+window._lazyCheckPartnerAgent = function() {
+    if (!customer || !customer.email || IS_ADMIN_MODE) return;
+    var emailLower = String(customer.email).toLowerCase().trim();
+    if (_cachedPartnerEmail === emailLower && _cachedIsPartnerAgent !== null) return;
+    _cachedPartnerEmail = emailLower;
+    google.script.run
+        .withSuccessHandler(function (team) {
+            team = team || [];
+            _cachedIsPartnerAgent = team.some(function (a) {
+                return a && String(a.email || '').toLowerCase().trim() === _cachedPartnerEmail && a.status === 'Active';
+            });
+            var pBtn = document.getElementById('dropdownAgentDashboard');
+            if (pBtn) pBtn.style.display = _cachedIsPartnerAgent ? 'flex' : 'none';
+        })
+        .withFailureHandler(function () { _cachedPartnerEmail = ''; })
+        .getSalesTeam();
+};
 
 function syncHeaderProfileToggleAvatar() {
     if (!profileToggle) return;
@@ -25341,7 +25801,7 @@ function syncHeaderProfileToggleAvatar() {
 updateProfileDropdown = function () {
     syncHeaderProfileToggleAvatar();
 
-    // 1. ADMIN MODE: Preserve existing Admin menu
+    // 1. ADMIN MODE: Preserve Admin menu
     if (IS_ADMIN_MODE) {
         var adminHtml = '';
         if (isAdmin) {
@@ -25389,7 +25849,7 @@ updateProfileDropdown = function () {
         return;
     }
 
-    // 2. GUEST CUSTOMER STATE (Not logged in)
+    // 2. GUEST CUSTOMER STATE
     if (!customer || !customer.email) {
         _cachedDropdownPoints = null;
         _cachedIsPartnerAgent = null;
@@ -25440,10 +25900,11 @@ updateProfileDropdown = function () {
             closeProfileDropdown();
             if (typeof openChatWidget === 'function') openChatWidget();
         });
+        if (typeof refreshHeaderPointsPill === 'function') refreshHeaderPointsPill();
         return;
     }
 
-    // 3. AUTHENTICATED CUSTOMER MENU
+    // 3. AUTHENTICATED CUSTOMER MENU (Deduplicated — single Wallet card + clean pane navigation)
     var displayName = String(customer.name || customer.email.split('@')[0] || 'Customer').trim();
     var usernameHandle = '@' + displayName.toLowerCase().replace(/\s+/g, '');
     var emailStr = String(customer.email || '').trim();
@@ -25451,7 +25912,7 @@ updateProfileDropdown = function () {
     var initial = displayName.charAt(0).toUpperCase();
 
     var pts = (_cachedDropdownPoints !== null) ? _cachedDropdownPoints : (parseInt(customerPointsBalance, 10) || 0);
-    var tierInfo = getVipTierInfoByPoints(pts);
+    var tierInfo = getVipTierInfoByPoints(pts, customer.totalSpent);
 
     var avatarInnerHtml = (avatarUrl && (avatarUrl.indexOf('http') === 0 || avatarUrl.indexOf('data:image') === 0))
         ? '<img src="' + escapeHtml(optimizeDriveImg(avatarUrl, 400)) + '" alt="' + escapeHtml(displayName) + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" />' +
@@ -25473,37 +25934,41 @@ updateProfileDropdown = function () {
                 '<div class="nx-pm-vip-pill" id="nxPmVipPill"><i class="fas ' + tierInfo.icon + '"></i> <span>' + tierInfo.label + '</span></div>' +
             '</div>' +
         '</div>' +
-        '<div class="nx-pm-wallet-box" id="dropdownWalletCard" title="View Wallet &amp; Points">' +
+        '<div class="nx-pm-wallet-box" id="dropdownWalletCard" title="Open Wallet &amp; Vouchers">' +
             '<div class="nx-pm-wallet-left">' +
                 '<div class="nx-pm-wallet-icon"><i class="fas fa-coins"></i></div>' +
                 '<div>' +
-                    '<div class="nx-pm-wallet-label">Wallet Points</div>' +
+                    '<div class="nx-pm-wallet-label">NEX Wallet &amp; Vouchers</div>' +
                     '<div class="nx-pm-wallet-pts">' +
                         '<span id="nxPmPointsVal">' + pts.toLocaleString() + ' Pts</span>' +
                         '<span class="nx-pm-wallet-rm" id="nxPmPointsRm">(= RM ' + (pts * 0.01).toFixed(2) + ')</span>' +
                     '</div>' +
                 '</div>' +
             '</div>' +
-            '<div class="nx-pm-wallet-cta">Details <i class="fas fa-chevron-right"></i></div>' +
+            '<div class="nx-pm-wallet-cta">Open <i class="fas fa-chevron-right"></i></div>' +
         '</div>' +
         '<div class="nx-pm-nav">' +
             '<button class="dropdown-item nx-pm-item" id="dropdownMyOrders">' +
                 '<span class="nx-pm-icon"><i class="fas fa-box-open"></i></span>' +
-                '<span class="nx-pm-text">My Orders<span class="nx-pm-sub">Track status, codes &amp; reviews</span></span>' +
+                '<span class="nx-pm-text">My Orders<span class="nx-pm-sub">Queue status, receipts &amp; reviews</span></span>' +
                 (pendingOrdersCount > 0 ? '<span class="nx-pm-badge">' + pendingOrdersCount + '</span>' : '') +
             '</button>' +
-            '<button class="dropdown-item nx-pm-item" id="dropdownWalletPoints">' +
-                '<span class="nx-pm-icon"><i class="fas fa-wallet"></i></span>' +
-                '<span class="nx-pm-text">Wallet &amp; Points<span class="nx-pm-sub">Points balance &amp; referral rewards</span></span>' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownGamingAccounts">' +
+                '<span class="nx-pm-icon"><i class="fas fa-gamepad"></i></span>' +
+                '<span class="nx-pm-text">Gaming Accounts &amp; IDs<span class="nx-pm-sub">Saved Roblox, MLBB &amp; PUBG IDs</span></span>' +
             '</button>' +
-            '<button class="dropdown-item nx-pm-item" id="dropdownSupportInbox">' +
-                '<span class="nx-pm-icon"><i class="fas fa-comments"></i></span>' +
-                '<span class="nx-pm-text">Customer Support / Inbox<span class="nx-pm-sub">Chat with us in real time</span></span>' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownReferrals">' +
+                '<span class="nx-pm-icon"><i class="fas fa-gift"></i></span>' +
+                '<span class="nx-pm-text">Refer &amp; Earn<span class="nx-pm-sub">Invite friends &amp; collect rewards</span></span>' +
             '</button>' +
             '<button class="dropdown-item nx-pm-item" id="dropdownWishlist">' +
                 '<span class="nx-pm-icon"><i class="fas fa-heart"></i></span>' +
                 '<span class="nx-pm-text">My Wishlist<span class="nx-pm-sub">Saved games &amp; items</span></span>' +
                 (wishCount > 0 ? '<span class="nx-pm-badge">' + wishCount + '</span>' : '') +
+            '</button>' +
+            '<button class="dropdown-item nx-pm-item" id="dropdownSupportInbox">' +
+                '<span class="nx-pm-icon"><i class="fas fa-comments"></i></span>' +
+                '<span class="nx-pm-text">Customer Support / Inbox<span class="nx-pm-sub">Chat with us in real time</span></span>' +
             '</button>' +
             '<button class="dropdown-item nx-pm-item" id="dropdownAgentDashboard" style="display:' + (_cachedIsPartnerAgent ? 'flex' : 'none') + ';">' +
                 '<span class="nx-pm-icon"><i class="fas fa-briefcase"></i></span>' +
@@ -25511,7 +25976,7 @@ updateProfileDropdown = function () {
             '</button>' +
             '<button class="dropdown-item nx-pm-item" id="dropdownMyAccount">' +
                 '<span class="nx-pm-icon"><i class="fas fa-user-cog"></i></span>' +
-                '<span class="nx-pm-text">My Account / Profile Settings<span class="nx-pm-sub">Avatar, phone &amp; password</span></span>' +
+                '<span class="nx-pm-text">Account &amp; Profile Settings<span class="nx-pm-sub">Avatar, frames, password</span></span>' +
             '</button>' +
         '</div>' +
         '<div class="nx-pm-footer">' +
@@ -25523,31 +25988,30 @@ updateProfileDropdown = function () {
 
     profileDropdownContent.innerHTML = html;
 
-    var openAccountAndScroll = function (selector) {
-        showMyAccount();
+    var openAccountPane = function (paneName) {
         closeProfileDropdown();
-        if (selector) {
-            setTimeout(function () {
-                var target = document.querySelector(selector);
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 180);
-        }
+        showMyAccount(paneName || 'orders');
     };
 
     var walletCard = document.getElementById('dropdownWalletCard');
     if (walletCard) walletCard.addEventListener('click', function (e) {
         e.preventDefault();
-        openAccountAndScroll('#nxVipBanner, #profilePoints');
+        openAccountPane('wallet');
     });
     var myOrdersBtn = document.getElementById('dropdownMyOrders');
     if (myOrdersBtn) myOrdersBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        openAccountAndScroll('#orderTabs');
+        openAccountPane('orders');
     });
-    var walletBtn = document.getElementById('dropdownWalletPoints');
-    if (walletBtn) walletBtn.addEventListener('click', function (e) {
+    var gamingBtn = document.getElementById('dropdownGamingAccounts');
+    if (gamingBtn) gamingBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        openAccountAndScroll('#nxVipBanner, #referralLink');
+        openAccountPane('gaming');
+    });
+    var referralsBtn = document.getElementById('dropdownReferrals');
+    if (referralsBtn) referralsBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openAccountPane('referrals');
     });
     var supportBtn = document.getElementById('dropdownSupportInbox');
     if (supportBtn) supportBtn.addEventListener('click', function (e) {
@@ -25570,7 +26034,7 @@ updateProfileDropdown = function () {
     var myAccBtn = document.getElementById('dropdownMyAccount');
     if (myAccBtn) myAccBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        openAccountAndScroll('#myAccountSection .account-container');
+        openAccountPane('settings');
     });
     var logoutBtn = document.getElementById('dropdownLogout');
     if (logoutBtn) logoutBtn.addEventListener('click', function (e) {
@@ -25579,20 +26043,7 @@ updateProfileDropdown = function () {
         logoutCustomer();
     });
 
-    if (_cachedPartnerEmail !== emailStr.toLowerCase()) {
-        _cachedPartnerEmail = emailStr.toLowerCase();
-        google.script.run
-            .withSuccessHandler(function (team) {
-                team = team || [];
-                _cachedIsPartnerAgent = team.some(function (a) {
-                    return a && String(a.email || '').toLowerCase().trim() === _cachedPartnerEmail && a.status === 'Active';
-                });
-                var pBtn = document.getElementById('dropdownAgentDashboard');
-                if (pBtn) pBtn.style.display = _cachedIsPartnerAgent ? 'flex' : 'none';
-            })
-            .withFailureHandler(function () {})
-            .getSalesTeam();
-    }
+    refreshHeaderPointsPill();
 };
 
 var _lastPointsPillFetchAt = 0;
@@ -25611,7 +26062,7 @@ function refreshHeaderPointsPill(force) {
     if (pill) pill.style.display = 'inline-flex';
     var emailKey = String(customer.email).toLowerCase().trim();
     var now = Date.now();
-    if (!force && _lastPointsPillEmail === emailKey && (now - _lastPointsPillFetchAt) < 4000) {
+    if (!force && _lastPointsPillEmail === emailKey && (now - _lastPointsPillFetchAt) < 15000) {
         return;
     }
     _lastPointsPillEmail = emailKey;
@@ -25623,7 +26074,7 @@ function refreshHeaderPointsPill(force) {
             if (typeof customerPointsBalance !== 'undefined') customerPointsBalance = p;
             if (valEl) valEl.textContent = p;
 
-            var tInfo = getVipTierInfoByPoints(p);
+            var tInfo = getVipTierInfoByPoints(p, customer && customer.totalSpent);
             var ptsEl = document.getElementById('nxPmPointsVal');
             var rmEl  = document.getElementById('nxPmPointsRm');
             var vipEl = document.getElementById('nxPmVipPill');
@@ -25636,12 +26087,6 @@ function refreshHeaderPointsPill(force) {
         })
         .getCustomerPoints(customer.email);
 }
-
-var _origUpdateProfileDropdown2 = updateProfileDropdown;
-updateProfileDropdown = function () {
-    _origUpdateProfileDropdown2();
-    refreshHeaderPointsPill();
-};
 
 updateProfileDropdown();
 
@@ -25980,45 +26425,40 @@ renderAll = function () {
     renderRecentlyViewedSection();
 };
 
-// 3. Customer VIP Membership & Points Progress Bar in My Account
-var _preVipLoadMyAccount = loadMyAccount;
-loadMyAccount = function () {
-    _preVipLoadMyAccount();
+// 3. Unified 5-Tier VIP Banner (rendered from loadMyAccount single getCustomerPoints call)
+window.renderNexVipBanner = function (pts) {
     if (!customer || !customer.email) return;
+    var p = parseInt(pts, 10) || 0;
+    var spent = parseFloat(customer.totalSpent || 0) || 0;
+    var tierVal = Math.max(p, Math.round(spent));
+    var tierInfo = (typeof window.getNexTierInfo === 'function')
+        ? window.getNexTierInfo(tierVal)
+        : { label: 'Starter', nextLabel: 'Next: Bronze (100 Pts)', nextMin: 100, pct: Math.min(100, Math.round((tierVal / 100) * 100)), isMax: false };
 
-    google.script.run
-        .withSuccessHandler(function (pts) {
-            var p = parseInt(pts, 10) || 0;
-            var tier = 'Bronze Member';
-            var nextTier = 'Silver';
-            var nextTarget = 100;
-            if (p >= 1000) { tier = '💎 Diamond VIP'; nextTier = 'Max Tier Reached'; nextTarget = 1000; }
-            else if (p >= 500) { tier = '👑 Gold VIP'; nextTier = 'Diamond VIP'; nextTarget = 1000; }
-            else if (p >= 100) { tier = '🥈 Silver VIP'; nextTier = 'Gold VIP'; nextTarget = 500; }
+    var bannerEl = document.getElementById('nxVipBanner');
+    var detailsEl = document.querySelector('#myAccountSection .profile-details');
+    if (!detailsEl) return;
 
-            var pct = Math.min(100, Math.round((p / nextTarget) * 100));
-            var bannerEl = document.getElementById('nxVipBanner');
-            var detailsEl = document.querySelector('#myAccountSection .profile-details');
-            if (!detailsEl) return;
+    if (!bannerEl) {
+        bannerEl = document.createElement('div');
+        bannerEl.id = 'nxVipBanner';
+        bannerEl.className = 'nx-vip-banner';
+        detailsEl.parentNode.insertBefore(bannerEl, detailsEl.nextSibling);
+    }
 
-            if (!bannerEl) {
-                bannerEl = document.createElement('div');
-                bannerEl.id = 'nxVipBanner';
-                bannerEl.className = 'nx-vip-banner';
-                detailsEl.parentNode.insertBefore(bannerEl, detailsEl.nextSibling);
-            }
+    var progressTxt = tierInfo.isMax
+        ? 'Top Tier Unlocked'
+        : tierInfo.nextLabel;
 
-            bannerEl.innerHTML =
-                '<div class="nx-vip-tier-badge"><i class="fas fa-crown"></i> ' + tier + '</div>' +
-                '<div class="nx-vip-progress-wrap">' +
-                '<div class="nx-vip-progress-labels">' +
-                '<span>Wallet Balance: <strong style="color:#f7d875;">' + p + ' Pts</strong> (= RM ' + (p * 0.01).toFixed(2) + ')</span>' +
-                '<span>' + (p >= 1000 ? 'Top VIP Tier Unlocked' : (nextTarget - p) + ' pts to ' + nextTier) + '</span>' +
-                '</div>' +
-                '<div class="nx-vip-progress-bar"><div class="nx-vip-progress-fill" style="width:' + pct + '%;"></div></div>' +
-                '</div>';
-        })
-        .getCustomerPoints(customer.email);
+    bannerEl.innerHTML =
+        '<div class="nx-vip-tier-badge"><i class="fas fa-crown"></i> ' + escapeHtml(tierInfo.label) + ' Member</div>' +
+        '<div class="nx-vip-progress-wrap">' +
+        '<div class="nx-vip-progress-labels">' +
+        '<span>Wallet Balance: <strong style="color:var(--nex-gold,#E8C568);">' + p + ' Pts</strong> (= RM ' + (p * 0.01).toFixed(2) + ')</span>' +
+        '<span>' + escapeHtml(progressTxt) + '</span>' +
+        '</div>' +
+        '<div class="nx-vip-progress-bar"><div class="nx-vip-progress-fill" style="width:' + (tierInfo.pct || 0) + '%;"></div></div>' +
+        '</div>';
 };
 
 // ================================================================
@@ -26125,11 +26565,11 @@ loadMyAccount = function () {
             avatarUrl = optimizeDriveImg(avatarUrl, Math.max(120, size * 2));
         }
         var coreHtml = (avatarUrl && (avatarUrl.indexOf('http') === 0 || avatarUrl.indexOf('data:image') === 0))
-            ? '<img src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(name) + '" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + initial + '\';" />'
+            ? '<img src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(name) + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + initial + '\';" />'
             : initial;
         return '<div class="nex2-framed-avatar" style="width:' + size + 'px;height:' + size + 'px;">' +
             '<div class="nex2-avatar-core" style="font-size:' + Math.max(12, Math.round(size * 0.28)) + 'px;">' + coreHtml + '</div>' +
-            '<img class="nex2-frame-overlay" src="' + escapeHtml(frameDef.assetUrl) + '" alt="' + escapeHtml(frameDef.name) + '" onerror="window._nexFrameSvgFallback(this,\'' + escapeHtml(frameDef.id) + '\')" />' +
+            '<img class="nex2-frame-overlay" src="' + escapeHtml(frameDef.assetUrl) + '" alt="' + escapeHtml(frameDef.name) + '" loading="lazy" decoding="async" onerror="window._nexFrameSvgFallback(this,\'' + escapeHtml(frameDef.id) + '\')" />' +
             '</div>';
     }
 
@@ -26208,7 +26648,7 @@ loadMyAccount = function () {
         el.innerHTML = coins.map(function(c) {
             var coinSrc = NEX2_INLINE_COIN_MAP[c.id] || c.assetUrl;
             return '<div class="nex2-coin-card">' +
-                '<img src="' + escapeHtml(coinSrc) + '" alt="' + escapeHtml(c.name) + '" onerror="window._nexCoinSvgFallback(this,\'' + escapeHtml(c.id) + '\')" />' +
+                '<img src="' + escapeHtml(coinSrc) + '" alt="' + escapeHtml(c.name) + '" loading="lazy" decoding="async" onerror="window._nexCoinSvgFallback(this,\'' + escapeHtml(c.id) + '\')" />' +
                 '<strong style="font-size:12px;color:#fff;">' + escapeHtml(c.name) + '</strong>' +
                 '<span style="font-size:10.5px;color:#8aa1c0;">' + escapeHtml(c.usage) + '</span>' +
                 '</div>';
@@ -26313,7 +26753,7 @@ loadMyAccount = function () {
                         '</div>' +
                         '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #1e2a3a;">' +
                         '<div style="display:flex;align-items:center;gap:8px;">' +
-                        '<img src="' + escapeHtml(coinAsset) + '" alt="Reward Coin" style="width:28px;height:28px;" onerror="window._nexCoinSvgFallback(this,\'' + escapeHtml(c.rewardCoinVariant || 'event') + '\')" />' +
+                        '<img src="' + escapeHtml(coinAsset) + '" alt="Reward Coin" loading="lazy" decoding="async" style="width:28px;height:28px;" onerror="window._nexCoinSvgFallback(this,\'' + escapeHtml(c.rewardCoinVariant || 'event') + '\')" />' +
                         '<span style="font-weight:800;font-size:13px;color:#f7d875;">' + escapeHtml(rewardLabel) + ' + Event Frame</span>' +
                         '</div>' +
                         '<button type="button" class="nex2-top-promo-btn" data-pick-camp="' + escapeHtml(c.campaignId) + '">Select</button>' +
@@ -26738,7 +27178,7 @@ loadMyAccount = function () {
         }
         if (sbRbxWrap) {
             sbRbxWrap.innerHTML = (rbxAv && rbxAv.indexOf('http') === 0)
-                ? '<img src="' + escapeHtml(rbxAv) + '" alt="Roblox" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<i class=\\\'fas fa-cubes\\\'></i>\';" />'
+                ? '<img src="' + escapeHtml(rbxAv) + '" alt="Roblox" loading="lazy" decoding="async" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<i class=\\\'fas fa-cubes\\\'></i>\';" />'
                 : '<i class="fas fa-cubes"></i>';
         }
         if (sbGameTxt) {
@@ -26748,22 +27188,21 @@ loadMyAccount = function () {
             sbGameTxt.style.color = (mlStr || pbStr) ? '#fff' : '#facc15';
         }
 
-        // Tier & XP card computed from verified frames + points
+        // Unified 5-Tier progression synchronized across Dropdown, VIP Banner & Sidebar
         var ptsNum = parseInt(customer.points, 10) || 0;
         var spentApprox = parseFloat(customer.totalSpent || 0) || 0;
-        var xpVal = Math.max(ptsNum, Math.round(spentApprox * 2));
-        var tierName = 'Starter';
-        var tierNext = 500;
-        if (xpVal >= 2000 || spentApprox >= 500) { tierName = 'VIP Mythic'; tierNext = Math.max(xpVal, 2500); }
-        else if (xpVal >= 500 || spentApprox >= 100) { tierName = 'Pro Gamer'; tierNext = 2000; }
+        var xpVal = Math.max(ptsNum, Math.round(spentApprox));
+        var tierInfo = (typeof window.getNexTierInfo === 'function')
+            ? window.getNexTierInfo(xpVal)
+            : { label: 'Starter', nextLabel: 'Next: Bronze (100 Pts)', nextMin: 100, pct: 0, isMax: false };
         var tierPill = document.getElementById('nex2SidebarTierPill');
         var xpText = document.getElementById('nex2SidebarXpText');
         var xpBar = document.getElementById('nex2SidebarXpBar');
         var tierGoal = document.getElementById('nex2SidebarTierGoal');
-        if (tierPill) tierPill.innerHTML = '<i class="fas fa-crown"></i> ' + escapeHtml(tierName);
-        if (xpText) xpText.textContent = xpVal + ' XP / ' + tierNext + ' XP';
-        if (xpBar) xpBar.style.width = Math.min(100, Math.max(8, Math.round((xpVal / tierNext) * 100))) + '%';
-        if (tierGoal) tierGoal.textContent = tierName === 'VIP Mythic' ? 'Top Tier Unlocked' : 'Next Tier';
+        if (tierPill) tierPill.innerHTML = '<i class="fas fa-crown"></i> ' + escapeHtml(tierInfo.label);
+        if (xpText) xpText.textContent = xpVal + ' Pts / ' + tierInfo.nextMin + ' Pts';
+        if (xpBar) xpBar.style.width = Math.max(8, tierInfo.pct || 0) + '%';
+        if (tierGoal) tierGoal.textContent = tierInfo.isMax ? 'Top Tier Unlocked' : tierInfo.nextLabel;
 
         // Overview stats
         var sbPts = document.getElementById('nex2SidebarPts');
