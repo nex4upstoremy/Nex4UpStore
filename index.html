@@ -16048,6 +16048,7 @@ window.NexAsyncBtn = (function() {
                 SB_PUB_KEY: SB_PUB_KEY,
                 GUEST_ID_KEY: GUEST_ID_KEY,
                 cleanEmail: cleanEmail,
+                getCachedToken: getCachedToken,
                 saveCachedToken: saveCachedToken,
                 sbRpc: sbRpc,
                 loadRealtimeSdk: loadRealtimeSdk,
@@ -16450,7 +16451,13 @@ window.NexAsyncBtn = (function() {
                     return Promise.resolve({ ok: false, error: 'no_session' });
                 }
                 var em = window.NexSbChat.cleanEmail(customer.email);
-                return ensureStage3Seeded(!!forceRefresh).then(function(tr) {
+                var cachedTok = (!forceRefresh && window.NexSbChat && typeof window.NexSbChat.getCachedToken === 'function')
+                    ? window.NexSbChat.getCachedToken(em)
+                    : '';
+                var tokPromise = cachedTok
+                    ? Promise.resolve({ ok: true, chatToken: cachedTok })
+                    : ensureStage3Seeded(!!forceRefresh);
+                return tokPromise.then(function(tr) {
                     if (!tr || !tr.ok || !tr.chatToken) return { ok: false, error: 'no_token' };
                     if (tr.justSeeded && tr.myData) {
                         return { ok: true, found: true, myData: tr.myData };
@@ -16460,6 +16467,7 @@ window.NexAsyncBtn = (function() {
                         p_stream_token: tr.chatToken
                     }).then(function(res) {
                         if (res && res.ok && res.found && res.myData) {
+                            markSeeded(em);
                             if (typeof window.nex2ApplyMySocialState === 'function') {
                                 window.nex2ApplyMySocialState(res.myData);
                             }
@@ -31189,7 +31197,8 @@ window.renderNexVipBanner = function (pts) {
             return;
         }
         var playerCard = e.target.closest('[data-player-email]');
-        if (playerCard && !e.target.closest('button')) {
+        var hitBtn = e.target.closest('button');
+        if (playerCard && (!hitBtn || hitBtn === playerCard)) {
             var pe = playerCard.getAttribute('data-player-email');
             if (pe) open_player_modal(pe);
             return;
