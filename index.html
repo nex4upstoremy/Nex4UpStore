@@ -15641,6 +15641,689 @@ window.NexAsyncBtn = (function() {
         //   anything else                  → storefront
         // ================================================================
         var IS_ADMIN_MODE = /(?:[?&]admin=1|#admin\b)/.test(window.location.href);
+
+        // ================================================================
+        // ⚡ HOISTED SUPABASE HYBRID MODULES (Stage 1 Live Chat + Stage 2 Instant Storefront/Orders/Notifications)
+        // Defined before loadGames() & startup init() so storefront boots directly from nex4up_storefront_cache.
+        // ================================================================
+        var chatIsOpen = false;
+        var chatPollTimer = null;
+        var chatPendingImage = null;
+        window._nexbotLocalLog = [];
+        window._chatUnreadCount = 0;
+        window._nexChatMsgKeys = new Set();
+        window._nexLastLoadedMsgs = [];
+        window._nexChatAuthNotice = false;
+        window._nexSbChatRealtimeReady = false;
+
+        window.NexSbChat = (function() {
+            var SB_URL = 'https://sgmyphflffpeqjmivfwq.supabase.co';
+            var SB_PUB_KEY = 'sb_publishable_IF7E5B5fefHYa2lIKpazoA_E0hEnfQ_';
+            var TOKEN_MAP_KEY = 'nex4up_sb_chat_tokens_v1';
+            var GUEST_ID_KEY = 'nex4up_chat_guest_v1';
+
+            var _sdkPromise = null;
+            var _sbClient = null;
+            var _activeChannel = null;
+            var _activeEmail = '';
+            var _activeToken = '';
+            var _tokenInflight = {};
+
+            function cleanEmail(em) {
+                return String(em || '').trim().toLowerCase();
+            }
+
+            function getTokenMap() {
+                try {
+                    return JSON.parse(localStorage.getItem(TOKEN_MAP_KEY) || '{}') || {};
+                } catch (_) { return {}; }
+            }
+
+            function getCachedToken(email) {
+                var em = cleanEmail(email);
+                if (!em) return '';
+                var map = getTokenMap();
+                var entry = map[em];
+                if (typeof entry === 'string') return entry;
+                if (entry && entry.token) return String(entry.token);
+                return '';
+            }
+
+            function saveCachedToken(email, token) {
+                var em = cleanEmail(email);
+                var tok = String(token || '').trim();
+                if (!em || !tok) return;
+                try {
+                    var map = getTokenMap();
+                    map[em] = { token: tok, savedAt: Date.now() };
+                    localStorage.setItem(TOKEN_MAP_KEY, JSON.stringify(map));
+                } catch (_) {}
+            }
+
+            function clearCachedToken(email) {
+                var em = cleanEmail(email);
+                if (!em) return;
+                try {
+                    var map = getTokenMap();
+                    delete map[em];
+                    localStorage.setItem(TOKEN_MAP_KEY, JSON.stringify(map));
+                } catch (_) {}
+            }
+
+            function sbRpc(rpcName, params) {
+                var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                var tid = controller ? setTimeout(function() { controller.abort(); }, 8000) : null;
+                return fetch(SB_URL + '/rest/v1/rpc/' + encodeURIComponent(rpcName), {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SB_PUB_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(params || {}),
+                    signal: controller ? controller.signal : undefined
+                }).then(function(res) {
+                    if (tid) clearTimeout(tid);
+                    return res.json().catch(function() { return { ok: false, error: 'bad_json' }; });
+                }).catch(function(err) {
+                    if (tid) clearTimeout(tid);
+                    return { ok: false, error: (err && err.message) || 'network_error' };
+                });
+            }
+
+            function loadRealtimeSdk() {
+                if (_sbClient) return Promise.resolve(_sbClient);
+                if (window.supabase && typeof window.supabase.createClient === 'function') {
+                    _sbClient = window.supabase.createClient(SB_URL, SB_PUB_KEY, {
+                        auth: { persistSession: false, autoRefreshToken: false }
+                    });
+                    return Promise.resolve(_sbClient);
+                }
+                if (_sdkPromise) return _sdkPromise;
+                _sdkPromise = new Promise(function(resolve) {
+                    var s = document.createElement('script');
+                    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+                    s.async = true;
+                    s.onload = function() {
+                        try {
+                            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                                _sbClient = window.supabase.createClient(SB_URL, SB_PUB_KEY, {
+                                    auth: { persistSession: false, autoRefreshToken: false }
+                                });
+                            }
+                        } catch (_) {}
+                        resolve(_sbClient);
+                    };
+                    s.onerror = function() { resolve(null); };
+                    document.head.appendChild(s);
+                });
+                return _sdkPromise;
+            }
+
+            function resolveToken(identity, forceRefresh) {
+                var em = cleanEmail(identity && identity.email);
+                if (!em) return Promise.resolve({ ok: false, error: 'missing_email' });
+
+                var cached = !forceRefresh ? getCachedToken(em) : '';
+                if (cached) {
+                    return Promise.resolve({ ok: true, chatToken: cached, fromCache: true });
+                }
+
+                if (_tokenInflight[em]) return _tokenInflight[em];
+
+                var isLoggedCust = !!(typeof customer !== 'undefined' && customer && customer.email &&
+                    cleanEmail(customer.email) === em && customer.sessionToken);
+
+                var p;
+                if (isLoggedCust) {
+                    p = new Promise(function(resolve) {
+                        if (typeof google === 'undefined' || !google.script || !google.script.run) {
+                            resolve({ ok: false, error: 'no_gas' });
+                            return;
+                        }
+                        google.script.run
+                            .withSuccessHandler(function(r) {
+                                if (r && r.success && r.chatToken) {
+                                    saveCachedToken(em, r.chatToken);
+                                    resolve({ ok: true, chatToken: r.chatToken });
+                                } else {
+                                    resolve({ ok: false, requiresAuth: !!(r && r.message && /session/i.test(r.message)), error: (r && r.message) || 'bootstrap_failed' });
+                                }
+                            })
+                            .withFailureHandler(function(err) {
+                                resolve({ ok: false, error: (err && err.message) || 'bootstrap_error' });
+                            })
+                            .getCustomerChatBootstrap(em, customer.sessionToken);
+                    });
+                } else if (typeof customer !== 'undefined' && customer && customer.email && cleanEmail(customer.email) === em && !customer.sessionToken) {
+                    p = Promise.resolve({ ok: false, requiresAuth: true });
+                } else {
+                    p = sbRpc('nex4up_chat_guest_init', {
+                        p_email: em,
+                        p_name: (identity && identity.name) || ''
+                    }).then(function(r) {
+                        if (r && r.ok && r.chat_token) {
+                            saveCachedToken(em, r.chat_token);
+                            return { ok: true, chatToken: r.chat_token };
+                        }
+                        if (r && r.requires_auth) {
+                            return { ok: false, requiresAuth: true };
+                        }
+                        return { ok: false, error: (r && r.error) || 'guest_init_failed' };
+                    });
+                }
+
+                _tokenInflight[em] = p.then(function(out) {
+                    delete _tokenInflight[em];
+                    return out;
+                });
+                return _tokenInflight[em];
+            }
+
+            function formatChatTime(val) {
+                if (!val) return '';
+                var s = String(val).trim();
+                if (/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/.test(s)) {
+                    return s.split(/\s+/)[1].substring(0, 5);
+                }
+                var d = new Date(s);
+                if (!isNaN(d.getTime())) {
+                    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+                return '';
+            }
+
+            function appendIncomingMessage(rawMsg) {
+                if (!rawMsg || typeof rawMsg !== 'object') return;
+                var sender = String(rawMsg.sender || '').toLowerCase() === 'customer' ? 'customer' : 'admin';
+                var idKey = rawMsg.id ? ('id:' + rawMsg.id) : '';
+                var cid = rawMsg.client_msg_id || rawMsg.messageId || '';
+                var cidKey = cid ? ('cid:' + cid) : '';
+
+                if ((idKey && window._nexChatMsgKeys.has(idKey)) || (cidKey && window._nexChatMsgKeys.has(cidKey))) {
+                    return;
+                }
+                if (idKey) window._nexChatMsgKeys.add(idKey);
+                if (cidKey) window._nexChatMsgKeys.add(cidKey);
+
+                var normalized = {
+                    id: rawMsg.id || null,
+                    client_msg_id: cid || null,
+                    sender: sender,
+                    message: String(rawMsg.message || ''),
+                    imageUrl: String(rawMsg.imageUrl || rawMsg.image_url || ''),
+                    createdAt: rawMsg.createdAt || rawMsg.created_at || new Date().toISOString()
+                };
+                window._nexLastLoadedMsgs.push(normalized);
+
+                if (chatIsOpen) {
+                    var container = document.getElementById('chatMessages');
+                    if (container) {
+                        var emptyEl = container.querySelector('.chat-empty');
+                        if (emptyEl) emptyEl.remove();
+                        var wasAtBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) < 90;
+
+                        var bubble = document.createElement('div');
+                        bubble.className = 'chat-bubble ' + (sender === 'customer' ? 'mine' : 'theirs');
+                        if (cid) bubble.setAttribute('data-client-msg-id', cid);
+                        var inner = '';
+                        if (normalized.message) inner += '<div>' + escapeChatHtml(normalized.message) + '</div>';
+                        if (normalized.imageUrl) {
+                            inner += '<img src="' + escapeChatHtml(optimizeDriveImg(normalized.imageUrl, 400)) + '" alt="image" loading="lazy" decoding="async" onclick="window.open(this.src, \'_blank\')" />';
+                        }
+                        inner += '<span class="chat-time">' + escapeChatHtml(formatChatTime(normalized.createdAt)) + '</span>';
+                        bubble.innerHTML = inner;
+                        container.appendChild(bubble);
+                        if (wasAtBottom) container.scrollTop = container.scrollHeight;
+                    }
+                    if (sender === 'admin' && _activeEmail && _activeToken) {
+                        sbRpc('nex4up_chat_mark_read', { p_email: _activeEmail, p_chat_token: _activeToken });
+                        window._chatUnreadCount = 0;
+                        updateChatBadge(0);
+                    }
+                } else if (sender === 'admin') {
+                    window._chatUnreadCount = (window._chatUnreadCount || 0) + 1;
+                    updateChatBadge(window._chatUnreadCount);
+                    if (typeof showToast === 'function') showToast('💬 New reply from NEX4UP Support!');
+                }
+            }
+
+            function restartPollForState() {
+                if (chatPollTimer) { clearInterval(chatPollTimer); chatPollTimer = null; }
+                if (!chatIsOpen) return;
+                var intervalMs = window._nexSbChatRealtimeReady ? 45000 : 10000;
+                chatPollTimer = setInterval(pollChatMessages, intervalMs);
+            }
+
+            function connectRealtime(email, chatToken) {
+                var em = cleanEmail(email);
+                var tok = String(chatToken || '').trim();
+                if (!em || !tok) return Promise.resolve(false);
+                if (_activeChannel && _activeEmail === em && _activeToken === tok && window._nexSbChatRealtimeReady) {
+                    return Promise.resolve(true);
+                }
+
+                disconnectRealtime();
+                _activeEmail = em;
+                _activeToken = tok;
+
+                return loadRealtimeSdk().then(function(client) {
+                    if (!client) return false;
+                    if (_activeEmail !== em || _activeToken !== tok) return false;
+
+                    var channelName = 'nex4up_chat_' + tok;
+                    var ch = client.channel(channelName, {
+                        config: { private: false, broadcast: { self: false } }
+                    });
+
+                    ch.on('broadcast', { event: 'new_message' }, function(evt) {
+                        var payload = (evt && evt.payload) ? evt.payload : evt;
+                        appendIncomingMessage(payload);
+                    });
+                    ch.on('broadcast', { event: 'order_updated' }, function(evt) {
+                        var payload = (evt && evt.payload) ? evt.payload : evt;
+                        if (window.NexSbStage2 && typeof window.NexSbStage2.handleLiveOrderEvent === 'function') {
+                            window.NexSbStage2.handleLiveOrderEvent(payload);
+                        }
+                    });
+                    ch.on('broadcast', { event: 'new_notification' }, function(evt) {
+                        var payload = (evt && evt.payload) ? evt.payload : evt;
+                        if (window.NexSbStage2 && typeof window.NexSbStage2.handleLiveNotifEvent === 'function') {
+                            window.NexSbStage2.handleLiveNotifEvent(payload);
+                        }
+                    });
+
+                    ch.subscribe(function(status) {
+                        if (status === 'SUBSCRIBED') {
+                            window._nexSbChatRealtimeReady = true;
+                            update_chat_online_status_pill();
+                            restartPollForState();
+                        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                            window._nexSbChatRealtimeReady = false;
+                            update_chat_online_status_pill();
+                            restartPollForState();
+                        }
+                    });
+                    _activeChannel = ch;
+                    return true;
+                });
+            }
+
+            function disconnectRealtime() {
+                window._nexSbChatRealtimeReady = false;
+                if (_activeChannel && _sbClient) {
+                    try { _sbClient.removeChannel(_activeChannel); } catch (_) {}
+                }
+                _activeChannel = null;
+                _activeEmail = '';
+                _activeToken = '';
+                update_chat_online_status_pill();
+            }
+
+            function broadcastLocal(msgObj) {
+                if (!_activeChannel || !window._nexSbChatRealtimeReady || !msgObj) return;
+                try {
+                    _activeChannel.send({
+                        type: 'broadcast',
+                        event: 'new_message',
+                        payload: msgObj
+                    });
+                } catch (_) {}
+            }
+
+            function openLoginForChat() {
+                var ident = chatGetIdentity();
+                closeChatWidget();
+                var emInput = document.getElementById('loginEmail');
+                if (emInput && ident && ident.email) emInput.value = ident.email;
+                var ov = document.getElementById('loginOverlay');
+                if (ov) ov.classList.add('open');
+            }
+
+            function resetGuestIdentity() {
+                try { sessionStorage.removeItem('nex4up_chat_guest'); } catch (_) {}
+                try { localStorage.removeItem(GUEST_ID_KEY); } catch (_) {}
+                window._nexChatAuthNotice = false;
+                window._nexLastLoadedMsgs = [];
+                window._nexChatMsgKeys = new Set();
+                disconnectRealtime();
+                renderChatIdentity();
+                renderChatMessages([]);
+            }
+
+            function checkUnreadFast(identity) {
+                if (!identity || !identity.email) return Promise.resolve();
+                return resolveToken(identity).then(function(tr) {
+                    if (!tr || !tr.ok || !tr.chatToken) return;
+                    connectRealtime(identity.email, tr.chatToken);
+                    if (typeof customer !== 'undefined' && customer && customer.email && cleanEmail(customer.email) === cleanEmail(identity.email) && customer.sessionToken && window.NexSbStage2) {
+                        window.NexSbStage2.fetchNotificationsFast();
+                    }
+                    return sbRpc('nex4up_chat_unread_count', {
+                        p_email: cleanEmail(identity.email),
+                        p_chat_token: tr.chatToken
+                    }).then(function(uRes) {
+                        if (uRes && uRes.ok) {
+                            var n = parseInt(uRes.unread, 10) || 0;
+                            window._chatUnreadCount = n;
+                            updateChatBadge(n);
+                        }
+                    });
+                });
+            }
+
+            function primeLoggedInSession() {
+                window._nexChatAuthNotice = false;
+                if (typeof customer === 'undefined' || !customer || !customer.email) return;
+                var ident = { email: cleanEmail(customer.email), name: customer.name || '' };
+                renderChatIdentity();
+                if (chatIsOpen) {
+                    loadChatMessages();
+                } else {
+                    checkUnreadFast(ident);
+                }
+            }
+
+            function onLogout() {
+                window._nexChatMsgKeys = new Set();
+                window._nexLastLoadedMsgs = [];
+                window._nexChatAuthNotice = false;
+                window._chatUnreadCount = 0;
+                updateChatBadge(0);
+                disconnectRealtime();
+                renderChatIdentity();
+                if (window.NexSbStage2 && typeof window.NexSbChat !== 'undefined') {
+                    window.NexSbStage2.onLogout();
+                }
+                var container = document.getElementById('chatMessages');
+                if (container) {
+                    container.innerHTML = '<div class="chat-empty">🤖 Hi! Tap a quick action above for instant help, or send us a message below.</div>';
+                }
+            }
+
+            return {
+                SB_URL: SB_URL,
+                SB_PUB_KEY: SB_PUB_KEY,
+                GUEST_ID_KEY: GUEST_ID_KEY,
+                cleanEmail: cleanEmail,
+                saveCachedToken: saveCachedToken,
+                sbRpc: sbRpc,
+                clearCachedToken: clearCachedToken,
+                resolveToken: resolveToken,
+                formatChatTime: formatChatTime,
+                connectRealtime: connectRealtime,
+                disconnectRealtime: disconnectRealtime,
+                broadcastLocal: broadcastLocal,
+                restartPollForState: restartPollForState,
+                openLoginForChat: openLoginForChat,
+                resetGuestIdentity: resetGuestIdentity,
+                checkUnreadFast: checkUnreadFast,
+                primeLoggedInSession: primeLoggedInSession,
+                onLogout: onLogout
+            };
+        })();
+
+        // ================================================================
+        // ⚡ STAGE 2: INSTANT STOREFRONT, LIVE ORDERS & LIVE NOTIFICATION BELL
+        // ================================================================
+        window.NexSbStage2 = (function() {
+            var SEED_MAP_KEY = 'nex4up_sb_s2_seeded_v1';
+            var _seedInflight = {};
+            var _seenOrderToasts = {};
+            var _seenNotifIds = new Set();
+            var _liveNotifsActive = false;
+
+            function getSeedMap() {
+                try { return JSON.parse(localStorage.getItem(SEED_MAP_KEY) || '{}') || {}; } catch (_) { return {}; }
+            }
+
+            function isSeeded(email) {
+                var em = window.NexSbChat.cleanEmail(email);
+                var map = getSeedMap();
+                return !!(em && map[em] && map[em].seededAt);
+            }
+
+            function markSeeded(email) {
+                var em = window.NexSbChat.cleanEmail(email);
+                if (!em) return;
+                try {
+                    var map = getSeedMap();
+                    map[em] = { seededAt: Date.now() };
+                    localStorage.setItem(SEED_MAP_KEY, JSON.stringify(map));
+                } catch (_) {}
+            }
+
+            function clearSeeded(email) {
+                var em = window.NexSbChat.cleanEmail(email);
+                if (!em) return;
+                try {
+                    var map = getSeedMap();
+                    delete map[em];
+                    localStorage.setItem(SEED_MAP_KEY, JSON.stringify(map));
+                } catch (_) {}
+            }
+
+            function fetchStorefrontCache() {
+                var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                var tid = controller ? setTimeout(function() { controller.abort(); }, 4500) : null;
+                var url = window.NexSbChat.SB_URL + '/rest/v1/nex4up_storefront_cache?cache_key=eq.store_bootstrap_v1&select=payload,updated_at';
+                return fetch(url, {
+                    method: 'GET',
+                    headers: { 'apikey': window.NexSbChat.SB_PUB_KEY },
+                    signal: controller ? controller.signal : undefined
+                }).then(function(res) {
+                    if (tid) clearTimeout(tid);
+                    if (!res.ok) return { ok: false };
+                    return res.json().then(function(rows) {
+                        var row = Array.isArray(rows) && rows[0] ? rows[0] : null;
+                        if (row && row.payload && Array.isArray(row.payload.games) && row.payload.games.length > 0) {
+                            return { ok: true, payload: row.payload, updated_at: row.updated_at };
+                        }
+                        return { ok: false };
+                    }).catch(function() { return { ok: false }; });
+                }).catch(function() {
+                    if (tid) clearTimeout(tid);
+                    return { ok: false };
+                });
+            }
+
+            function ensureStage2Seeded(forceRefresh) {
+                if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false, error: 'no_session' });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                if (!forceRefresh && isSeeded(em)) {
+                    return window.NexSbChat.resolveToken({ email: em, name: customer.name || '' });
+                }
+                if (_seedInflight[em]) return _seedInflight[em];
+
+                var p = new Promise(function(resolve) {
+                    if (typeof google === 'undefined' || !google.script || !google.script.run) {
+                        resolve({ ok: false, error: 'no_gas' });
+                        return;
+                    }
+                    google.script.run
+                        .withSuccessHandler(function(r) {
+                            if (r && r.success && r.chatToken) {
+                                window.NexSbChat.saveCachedToken(em, r.chatToken);
+                                markSeeded(em);
+                                resolve({ ok: true, chatToken: r.chatToken });
+                            } else {
+                                resolve({ ok: false, error: (r && r.message) || 'seed_failed' });
+                            }
+                        })
+                        .withFailureHandler(function(err) {
+                            resolve({ ok: false, error: (err && err.message) || 'seed_error' });
+                        })
+                        .getCustomerStage2Bootstrap(em, customer.sessionToken);
+                });
+
+                _seedInflight[em] = p.then(function(out) {
+                    delete _seedInflight[em];
+                    return out;
+                });
+                return _seedInflight[em];
+            }
+
+            function trackOrderByIdFast(orderId) {
+                var cleanOid = String(orderId || '').trim().toUpperCase();
+                if (!cleanOid) return Promise.resolve({ ok: false, found: false });
+                return window.NexSbChat.sbRpc('nex4up_s2_track_order_by_id', {
+                    p_order_id: cleanOid
+                }).then(function(r) {
+                    if (r && r.ok && r.found) {
+                        return Object.assign({ ok: true, found: true, success: true }, r);
+                    }
+                    return { ok: !!(r && r.ok), found: false };
+                });
+            }
+
+            function callRegisteredRpcWithRetry(rpcName, buildParams) {
+                var em = (typeof customer !== 'undefined' && customer && customer.email) ? window.NexSbChat.cleanEmail(customer.email) : '';
+                if (!em || !customer.sessionToken) return Promise.resolve({ ok: false, error: 'no_session' });
+                return ensureStage2Seeded(false).then(function(tr) {
+                    if (!tr || !tr.ok || !tr.chatToken) return { ok: false, error: 'no_token' };
+                    return window.NexSbChat.sbRpc(rpcName, buildParams(em, tr.chatToken)).then(function(res) {
+                        if (res && res.ok) {
+                            window.NexSbChat.connectRealtime(em, tr.chatToken);
+                            return res;
+                        }
+                        if (res && res.error === 'invalid_token') {
+                            window.NexSbChat.clearCachedToken(em);
+                            clearSeeded(em);
+                            return ensureStage2Seeded(true).then(function(tr2) {
+                                if (!tr2 || !tr2.ok || !tr2.chatToken) return { ok: false };
+                                return window.NexSbChat.sbRpc(rpcName, buildParams(em, tr2.chatToken));
+                            });
+                        }
+                        return res || { ok: false };
+                    });
+                });
+            }
+
+            function fetchMyOrdersFast() {
+                return callRegisteredRpcWithRetry('nex4up_s2_get_my_orders', function(em, tok) {
+                    return { p_email: em, p_stream_token: tok, p_limit: 100 };
+                });
+            }
+
+            function fetchNotificationsFast() {
+                return callRegisteredRpcWithRetry('nex4up_s2_get_notifications', function(em, tok) {
+                    return { p_email: em, p_stream_token: tok, p_limit: 50 };
+                }).then(function(res) {
+                    if (res && res.ok && Array.isArray(res.notifications)) {
+                        _liveNotifsActive = true;
+                        res.notifications.forEach(function(n) {
+                            var nid = String((n && (n.id || n.notifId)) || '');
+                            if (nid) _seenNotifIds.add(nid);
+                        });
+                        if (typeof window.nex2ApplyLiveNotifications === 'function') {
+                            window.nex2ApplyLiveNotifications(res.notifications);
+                        }
+                    }
+                    return res;
+                });
+            }
+
+            function markNotificationsReadFast() {
+                if (typeof window.nex2MarkNotificationsReadLocal === 'function') {
+                    window.nex2MarkNotificationsReadLocal();
+                }
+                if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                var tokKeep = customer.sessionToken;
+                callRegisteredRpcWithRetry('nex4up_s2_mark_notifications_read', function(e, t) {
+                    return { p_email: e, p_stream_token: t };
+                });
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    google.script.run.withFailureHandler(function() {}).markNotificationsRead(em, tokKeep);
+                }
+                return Promise.resolve({ ok: true });
+            }
+
+            function handleLiveOrderEvent(payload) {
+                if (!payload || typeof payload !== 'object') return;
+                var oid = String(payload.order_id || (payload.order_payload && payload.order_payload['Order ID']) || '').trim();
+                if (!oid) return;
+                var stText = String(payload.customer_status || payload.fulfilment_status || payload.payment_status || 'Updated').trim();
+
+                if (payload.order_payload && typeof payload.order_payload === 'object' && typeof myOrdersCache !== 'undefined' && Array.isArray(myOrdersCache)) {
+                    var replaced = false;
+                    for (var i = 0; i < myOrdersCache.length; i++) {
+                        if (String(myOrdersCache[i]['Order ID'] || '').trim().toUpperCase() === oid.toUpperCase()) {
+                            myOrdersCache[i] = payload.order_payload;
+                            replaced = true;
+                            break;
+                        }
+                    }
+                    if (!replaced) myOrdersCache.unshift(payload.order_payload);
+                    if (typeof window.applyMyOrdersList === 'function') {
+                        window.applyMyOrdersList(myOrdersCache);
+                    }
+                }
+
+                if (window._nexActiveTrackedOrderId && String(window._nexActiveTrackedOrderId).toUpperCase() === oid.toUpperCase() && typeof window.renderTrackedOrderCard === 'function') {
+                    var op = payload.order_payload || {};
+                    window.renderTrackedOrderCard({
+                        success: true,
+                        orderId: oid,
+                        amount: op['Total (RM)'] || 0,
+                        paymentMethod: op['Payment Method'] || 'MAE',
+                        methodKey: 'mae',
+                        status: stText,
+                        paymentStatus: payload.payment_status || op['Payment Status'] || '',
+                        fulfilmentStatus: payload.fulfilment_status || op['Fulfilment Status'] || '',
+                        items: op['Items'] || '',
+                        hasReceipt: !!(op['Receipt Number']),
+                        trackingNumber: payload.tracking_number || op['Tracking Number'] || '',
+                        trackingUrl: payload.tracking_url || op['Tracking URL'] || ''
+                    });
+                }
+
+                var toastKey = oid + '|' + stText + '|' + String(payload.tracking_number || '');
+                if (!_seenOrderToasts[toastKey]) {
+                    _seenOrderToasts[toastKey] = true;
+                    if (typeof showToast === 'function') {
+                        showToast('📦 Order ' + oid + ': ' + stText);
+                    }
+                }
+            }
+
+            function handleLiveNotifEvent(payload) {
+                if (!payload || typeof payload !== 'object') return;
+                var nid = String(payload.id || payload.notifId || '');
+                if (nid && _seenNotifIds.has(nid)) return;
+                if (nid) _seenNotifIds.add(nid);
+                _liveNotifsActive = true;
+                if (typeof window.nex2PrependLiveNotification === 'function') {
+                    window.nex2PrependLiveNotification(payload);
+                }
+                if (typeof showToast === 'function') {
+                    showToast('🔔 ' + (payload.title || 'New notification'));
+                }
+            }
+
+            function onLogout() {
+                window._nexActiveTrackedOrderId = '';
+                _liveNotifsActive = false;
+                _seenNotifIds = new Set();
+                _seenOrderToasts = {};
+            }
+
+            return {
+                fetchStorefrontCache: fetchStorefrontCache,
+                ensureStage2Seeded: ensureStage2Seeded,
+                trackOrderByIdFast: trackOrderByIdFast,
+                fetchMyOrdersFast: fetchMyOrdersFast,
+                fetchNotificationsFast: fetchNotificationsFast,
+                markNotificationsReadFast: markNotificationsReadFast,
+                handleLiveOrderEvent: handleLiveOrderEvent,
+                handleLiveNotifEvent: handleLiveNotifEvent,
+                hasLiveNotifs: function() { return _liveNotifsActive; },
+                onLogout: onLogout
+            };
+        })();
                 // ================================================================
         // 🛡 HARD GUARD: admin login overlay can only open in ADMIN mode
         // ================================================================
@@ -24623,686 +25306,9 @@ function resetVariantEditor(ctx) {
         }
 
         // ================================================================
-        // 💬 CUSTOMER CHAT WIDGET, SUPABASE LIVE STREAM & NEXBOT ASSISTANT
+        // 💬 CUSTOMER CHAT WIDGET & NEXBOT ASSISTANT DOM HANDLERS
+        // (window.NexSbChat & window.NexSbStage2 hoisted above loadGames())
         // ================================================================
-        var chatIsOpen = false;
-        var chatPollTimer = null;
-        var chatPendingImage = null;
-        window._nexbotLocalLog = [];
-        window._chatUnreadCount = 0;
-        window._nexChatMsgKeys = new Set();
-        window._nexLastLoadedMsgs = [];
-        window._nexChatAuthNotice = false;
-        window._nexSbChatRealtimeReady = false;
-
-        window.NexSbChat = (function() {
-            var SB_URL = 'https://sgmyphflffpeqjmivfwq.supabase.co';
-            var SB_PUB_KEY = 'sb_publishable_IF7E5B5fefHYa2lIKpazoA_E0hEnfQ_';
-            var TOKEN_MAP_KEY = 'nex4up_sb_chat_tokens_v1';
-            var GUEST_ID_KEY = 'nex4up_chat_guest_v1';
-
-            var _sdkPromise = null;
-            var _sbClient = null;
-            var _activeChannel = null;
-            var _activeEmail = '';
-            var _activeToken = '';
-            var _tokenInflight = {};
-
-            function cleanEmail(em) {
-                return String(em || '').trim().toLowerCase();
-            }
-
-            function getTokenMap() {
-                try {
-                    return JSON.parse(localStorage.getItem(TOKEN_MAP_KEY) || '{}') || {};
-                } catch (_) { return {}; }
-            }
-
-            function getCachedToken(email) {
-                var em = cleanEmail(email);
-                if (!em) return '';
-                var map = getTokenMap();
-                var entry = map[em];
-                if (typeof entry === 'string') return entry;
-                if (entry && entry.token) return String(entry.token);
-                return '';
-            }
-
-            function saveCachedToken(email, token) {
-                var em = cleanEmail(email);
-                var tok = String(token || '').trim();
-                if (!em || !tok) return;
-                try {
-                    var map = getTokenMap();
-                    map[em] = { token: tok, savedAt: Date.now() };
-                    localStorage.setItem(TOKEN_MAP_KEY, JSON.stringify(map));
-                } catch (_) {}
-            }
-
-            function clearCachedToken(email) {
-                var em = cleanEmail(email);
-                if (!em) return;
-                try {
-                    var map = getTokenMap();
-                    delete map[em];
-                    localStorage.setItem(TOKEN_MAP_KEY, JSON.stringify(map));
-                } catch (_) {}
-            }
-
-            function sbRpc(rpcName, params) {
-                var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-                var tid = controller ? setTimeout(function() { controller.abort(); }, 8000) : null;
-                return fetch(SB_URL + '/rest/v1/rpc/' + encodeURIComponent(rpcName), {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SB_PUB_KEY,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(params || {}),
-                    signal: controller ? controller.signal : undefined
-                }).then(function(res) {
-                    if (tid) clearTimeout(tid);
-                    return res.json().catch(function() { return { ok: false, error: 'bad_json' }; });
-                }).catch(function(err) {
-                    if (tid) clearTimeout(tid);
-                    return { ok: false, error: (err && err.message) || 'network_error' };
-                });
-            }
-
-            function loadRealtimeSdk() {
-                if (_sbClient) return Promise.resolve(_sbClient);
-                if (window.supabase && typeof window.supabase.createClient === 'function') {
-                    _sbClient = window.supabase.createClient(SB_URL, SB_PUB_KEY, {
-                        auth: { persistSession: false, autoRefreshToken: false }
-                    });
-                    return Promise.resolve(_sbClient);
-                }
-                if (_sdkPromise) return _sdkPromise;
-                _sdkPromise = new Promise(function(resolve) {
-                    var s = document.createElement('script');
-                    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-                    s.async = true;
-                    s.onload = function() {
-                        try {
-                            if (window.supabase && typeof window.supabase.createClient === 'function') {
-                                _sbClient = window.supabase.createClient(SB_URL, SB_PUB_KEY, {
-                                    auth: { persistSession: false, autoRefreshToken: false }
-                                });
-                            }
-                        } catch (_) {}
-                        resolve(_sbClient);
-                    };
-                    s.onerror = function() { resolve(null); };
-                    document.head.appendChild(s);
-                });
-                return _sdkPromise;
-            }
-
-            function resolveToken(identity, forceRefresh) {
-                var em = cleanEmail(identity && identity.email);
-                if (!em) return Promise.resolve({ ok: false, error: 'missing_email' });
-
-                var cached = !forceRefresh ? getCachedToken(em) : '';
-                if (cached) {
-                    return Promise.resolve({ ok: true, chatToken: cached, fromCache: true });
-                }
-
-                if (_tokenInflight[em]) return _tokenInflight[em];
-
-                var isLoggedCust = !!(typeof customer !== 'undefined' && customer && customer.email &&
-                    cleanEmail(customer.email) === em && customer.sessionToken);
-
-                var p;
-                if (isLoggedCust) {
-                    p = new Promise(function(resolve) {
-                        if (typeof google === 'undefined' || !google.script || !google.script.run) {
-                            resolve({ ok: false, error: 'no_gas' });
-                            return;
-                        }
-                        google.script.run
-                            .withSuccessHandler(function(r) {
-                                if (r && r.success && r.chatToken) {
-                                    saveCachedToken(em, r.chatToken);
-                                    resolve({ ok: true, chatToken: r.chatToken });
-                                } else {
-                                    resolve({ ok: false, requiresAuth: !!(r && r.message && /session/i.test(r.message)), error: (r && r.message) || 'bootstrap_failed' });
-                                }
-                            })
-                            .withFailureHandler(function(err) {
-                                resolve({ ok: false, error: (err && err.message) || 'bootstrap_error' });
-                            })
-                            .getCustomerChatBootstrap(em, customer.sessionToken);
-                    });
-                } else if (typeof customer !== 'undefined' && customer && customer.email && cleanEmail(customer.email) === em && !customer.sessionToken) {
-                    p = Promise.resolve({ ok: false, requiresAuth: true });
-                } else {
-                    p = sbRpc('nex4up_chat_guest_init', {
-                        p_email: em,
-                        p_name: (identity && identity.name) || ''
-                    }).then(function(r) {
-                        if (r && r.ok && r.chat_token) {
-                            saveCachedToken(em, r.chat_token);
-                            return { ok: true, chatToken: r.chat_token };
-                        }
-                        if (r && r.requires_auth) {
-                            return { ok: false, requiresAuth: true };
-                        }
-                        return { ok: false, error: (r && r.error) || 'guest_init_failed' };
-                    });
-                }
-
-                _tokenInflight[em] = p.then(function(out) {
-                    delete _tokenInflight[em];
-                    return out;
-                });
-                return _tokenInflight[em];
-            }
-
-            function formatChatTime(val) {
-                if (!val) return '';
-                var s = String(val).trim();
-                if (/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/.test(s)) {
-                    return s.split(/\s+/)[1].substring(0, 5);
-                }
-                var d = new Date(s);
-                if (!isNaN(d.getTime())) {
-                    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
-                return '';
-            }
-
-            function appendIncomingMessage(rawMsg) {
-                if (!rawMsg || typeof rawMsg !== 'object') return;
-                var sender = String(rawMsg.sender || '').toLowerCase() === 'customer' ? 'customer' : 'admin';
-                var idKey = rawMsg.id ? ('id:' + rawMsg.id) : '';
-                var cid = rawMsg.client_msg_id || rawMsg.messageId || '';
-                var cidKey = cid ? ('cid:' + cid) : '';
-
-                if ((idKey && window._nexChatMsgKeys.has(idKey)) || (cidKey && window._nexChatMsgKeys.has(cidKey))) {
-                    return;
-                }
-                if (idKey) window._nexChatMsgKeys.add(idKey);
-                if (cidKey) window._nexChatMsgKeys.add(cidKey);
-
-                var normalized = {
-                    id: rawMsg.id || null,
-                    client_msg_id: cid || null,
-                    sender: sender,
-                    message: String(rawMsg.message || ''),
-                    imageUrl: String(rawMsg.imageUrl || rawMsg.image_url || ''),
-                    createdAt: rawMsg.createdAt || rawMsg.created_at || new Date().toISOString()
-                };
-                window._nexLastLoadedMsgs.push(normalized);
-
-                if (chatIsOpen) {
-                    var container = document.getElementById('chatMessages');
-                    if (container) {
-                        var emptyEl = container.querySelector('.chat-empty');
-                        if (emptyEl) emptyEl.remove();
-                        var wasAtBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) < 90;
-
-                        var bubble = document.createElement('div');
-                        bubble.className = 'chat-bubble ' + (sender === 'customer' ? 'mine' : 'theirs');
-                        if (cid) bubble.setAttribute('data-client-msg-id', cid);
-                        var inner = '';
-                        if (normalized.message) inner += '<div>' + escapeChatHtml(normalized.message) + '</div>';
-                        if (normalized.imageUrl) {
-                            inner += '<img src="' + escapeChatHtml(optimizeDriveImg(normalized.imageUrl, 400)) + '" alt="image" loading="lazy" decoding="async" onclick="window.open(this.src, \'_blank\')" />';
-                        }
-                        inner += '<span class="chat-time">' + escapeChatHtml(formatChatTime(normalized.createdAt)) + '</span>';
-                        bubble.innerHTML = inner;
-                        container.appendChild(bubble);
-                        if (wasAtBottom) container.scrollTop = container.scrollHeight;
-                    }
-                    if (sender === 'admin' && _activeEmail && _activeToken) {
-                        sbRpc('nex4up_chat_mark_read', { p_email: _activeEmail, p_chat_token: _activeToken });
-                        window._chatUnreadCount = 0;
-                        updateChatBadge(0);
-                    }
-                } else if (sender === 'admin') {
-                    window._chatUnreadCount = (window._chatUnreadCount || 0) + 1;
-                    updateChatBadge(window._chatUnreadCount);
-                    if (typeof showToast === 'function') showToast('💬 New reply from NEX4UP Support!');
-                }
-            }
-
-            function restartPollForState() {
-                if (chatPollTimer) { clearInterval(chatPollTimer); chatPollTimer = null; }
-                if (!chatIsOpen) return;
-                var intervalMs = window._nexSbChatRealtimeReady ? 45000 : 10000;
-                chatPollTimer = setInterval(pollChatMessages, intervalMs);
-            }
-
-            function connectRealtime(email, chatToken) {
-                var em = cleanEmail(email);
-                var tok = String(chatToken || '').trim();
-                if (!em || !tok) return Promise.resolve(false);
-                if (_activeChannel && _activeEmail === em && _activeToken === tok && window._nexSbChatRealtimeReady) {
-                    return Promise.resolve(true);
-                }
-
-                disconnectRealtime();
-                _activeEmail = em;
-                _activeToken = tok;
-
-                return loadRealtimeSdk().then(function(client) {
-                    if (!client) return false;
-                    if (_activeEmail !== em || _activeToken !== tok) return false;
-
-                    var channelName = 'nex4up_chat_' + tok;
-                    var ch = client.channel(channelName, {
-                        config: { private: false, broadcast: { self: false } }
-                    });
-
-                    ch.on('broadcast', { event: 'new_message' }, function(evt) {
-                        var payload = (evt && evt.payload) ? evt.payload : evt;
-                        appendIncomingMessage(payload);
-                    });
-                    ch.on('broadcast', { event: 'order_updated' }, function(evt) {
-                        var payload = (evt && evt.payload) ? evt.payload : evt;
-                        if (window.NexSbStage2 && typeof window.NexSbStage2.handleLiveOrderEvent === 'function') {
-                            window.NexSbStage2.handleLiveOrderEvent(payload);
-                        }
-                    });
-                    ch.on('broadcast', { event: 'new_notification' }, function(evt) {
-                        var payload = (evt && evt.payload) ? evt.payload : evt;
-                        if (window.NexSbStage2 && typeof window.NexSbStage2.handleLiveNotifEvent === 'function') {
-                            window.NexSbStage2.handleLiveNotifEvent(payload);
-                        }
-                    });
-
-                    ch.subscribe(function(status) {
-                        if (status === 'SUBSCRIBED') {
-                            window._nexSbChatRealtimeReady = true;
-                            update_chat_online_status_pill();
-                            restartPollForState();
-                        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-                            window._nexSbChatRealtimeReady = false;
-                            update_chat_online_status_pill();
-                            restartPollForState();
-                        }
-                    });
-                    _activeChannel = ch;
-                    return true;
-                });
-            }
-
-            function disconnectRealtime() {
-                window._nexSbChatRealtimeReady = false;
-                if (_activeChannel && _sbClient) {
-                    try { _sbClient.removeChannel(_activeChannel); } catch (_) {}
-                }
-                _activeChannel = null;
-                _activeEmail = '';
-                _activeToken = '';
-                update_chat_online_status_pill();
-            }
-
-            function broadcastLocal(msgObj) {
-                if (!_activeChannel || !window._nexSbChatRealtimeReady || !msgObj) return;
-                try {
-                    _activeChannel.send({
-                        type: 'broadcast',
-                        event: 'new_message',
-                        payload: msgObj
-                    });
-                } catch (_) {}
-            }
-
-            function openLoginForChat() {
-                var ident = chatGetIdentity();
-                closeChatWidget();
-                var emInput = document.getElementById('loginEmail');
-                if (emInput && ident && ident.email) emInput.value = ident.email;
-                var ov = document.getElementById('loginOverlay');
-                if (ov) ov.classList.add('open');
-            }
-
-            function resetGuestIdentity() {
-                try { sessionStorage.removeItem('nex4up_chat_guest'); } catch (_) {}
-                try { localStorage.removeItem(GUEST_ID_KEY); } catch (_) {}
-                window._nexChatAuthNotice = false;
-                window._nexLastLoadedMsgs = [];
-                window._nexChatMsgKeys = new Set();
-                disconnectRealtime();
-                renderChatIdentity();
-                renderChatMessages([]);
-            }
-
-            function checkUnreadFast(identity) {
-                if (!identity || !identity.email) return Promise.resolve();
-                return resolveToken(identity).then(function(tr) {
-                    if (!tr || !tr.ok || !tr.chatToken) return;
-                    connectRealtime(identity.email, tr.chatToken);
-                    if (typeof customer !== 'undefined' && customer && customer.email && cleanEmail(customer.email) === cleanEmail(identity.email) && customer.sessionToken && window.NexSbStage2) {
-                        window.NexSbStage2.fetchNotificationsFast();
-                    }
-                    return sbRpc('nex4up_chat_unread_count', {
-                        p_email: cleanEmail(identity.email),
-                        p_chat_token: tr.chatToken
-                    }).then(function(uRes) {
-                        if (uRes && uRes.ok) {
-                            var n = parseInt(uRes.unread, 10) || 0;
-                            window._chatUnreadCount = n;
-                            updateChatBadge(n);
-                        }
-                    });
-                });
-            }
-
-            function primeLoggedInSession() {
-                window._nexChatAuthNotice = false;
-                if (typeof customer === 'undefined' || !customer || !customer.email) return;
-                var ident = { email: cleanEmail(customer.email), name: customer.name || '' };
-                renderChatIdentity();
-                if (chatIsOpen) {
-                    loadChatMessages();
-                } else {
-                    checkUnreadFast(ident);
-                }
-            }
-
-            function onLogout() {
-                window._nexChatMsgKeys = new Set();
-                window._nexLastLoadedMsgs = [];
-                window._nexChatAuthNotice = false;
-                window._chatUnreadCount = 0;
-                updateChatBadge(0);
-                disconnectRealtime();
-                renderChatIdentity();
-                if (window.NexSbStage2 && typeof window.NexSbChat !== 'undefined') {
-                    window.NexSbStage2.onLogout();
-                }
-                var container = document.getElementById('chatMessages');
-                if (container) {
-                    container.innerHTML = '<div class="chat-empty">🤖 Hi! Tap a quick action above for instant help, or send us a message below.</div>';
-                }
-            }
-
-            return {
-                SB_URL: SB_URL,
-                SB_PUB_KEY: SB_PUB_KEY,
-                GUEST_ID_KEY: GUEST_ID_KEY,
-                cleanEmail: cleanEmail,
-                saveCachedToken: saveCachedToken,
-                sbRpc: sbRpc,
-                clearCachedToken: clearCachedToken,
-                resolveToken: resolveToken,
-                formatChatTime: formatChatTime,
-                connectRealtime: connectRealtime,
-                disconnectRealtime: disconnectRealtime,
-                broadcastLocal: broadcastLocal,
-                restartPollForState: restartPollForState,
-                openLoginForChat: openLoginForChat,
-                resetGuestIdentity: resetGuestIdentity,
-                checkUnreadFast: checkUnreadFast,
-                primeLoggedInSession: primeLoggedInSession,
-                onLogout: onLogout
-            };
-        })();
-
-        // ================================================================
-        // ⚡ STAGE 2: INSTANT STOREFRONT, LIVE ORDERS & LIVE NOTIFICATION BELL
-        // ================================================================
-        window.NexSbStage2 = (function() {
-            var SEED_MAP_KEY = 'nex4up_sb_s2_seeded_v1';
-            var _seedInflight = {};
-            var _seenOrderToasts = {};
-            var _seenNotifIds = new Set();
-            var _liveNotifsActive = false;
-
-            function getSeedMap() {
-                try { return JSON.parse(localStorage.getItem(SEED_MAP_KEY) || '{}') || {}; } catch (_) { return {}; }
-            }
-
-            function isSeeded(email) {
-                var em = window.NexSbChat.cleanEmail(email);
-                var map = getSeedMap();
-                return !!(em && map[em] && map[em].seededAt);
-            }
-
-            function markSeeded(email) {
-                var em = window.NexSbChat.cleanEmail(email);
-                if (!em) return;
-                try {
-                    var map = getSeedMap();
-                    map[em] = { seededAt: Date.now() };
-                    localStorage.setItem(SEED_MAP_KEY, JSON.stringify(map));
-                } catch (_) {}
-            }
-
-            function clearSeeded(email) {
-                var em = window.NexSbChat.cleanEmail(email);
-                if (!em) return;
-                try {
-                    var map = getSeedMap();
-                    delete map[em];
-                    localStorage.setItem(SEED_MAP_KEY, JSON.stringify(map));
-                } catch (_) {}
-            }
-
-            function fetchStorefrontCache() {
-                var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-                var tid = controller ? setTimeout(function() { controller.abort(); }, 4500) : null;
-                var url = window.NexSbChat.SB_URL + '/rest/v1/nex4up_storefront_cache?cache_key=eq.store_bootstrap_v1&select=payload,updated_at';
-                return fetch(url, {
-                    method: 'GET',
-                    headers: { 'apikey': window.NexSbChat.SB_PUB_KEY },
-                    signal: controller ? controller.signal : undefined
-                }).then(function(res) {
-                    if (tid) clearTimeout(tid);
-                    if (!res.ok) return { ok: false };
-                    return res.json().then(function(rows) {
-                        var row = Array.isArray(rows) && rows[0] ? rows[0] : null;
-                        if (row && row.payload && Array.isArray(row.payload.games) && row.payload.games.length > 0) {
-                            return { ok: true, payload: row.payload, updated_at: row.updated_at };
-                        }
-                        return { ok: false };
-                    }).catch(function() { return { ok: false }; });
-                }).catch(function() {
-                    if (tid) clearTimeout(tid);
-                    return { ok: false };
-                });
-            }
-
-            function ensureStage2Seeded(forceRefresh) {
-                if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
-                    return Promise.resolve({ ok: false, error: 'no_session' });
-                }
-                var em = window.NexSbChat.cleanEmail(customer.email);
-                if (!forceRefresh && isSeeded(em)) {
-                    return window.NexSbChat.resolveToken({ email: em, name: customer.name || '' });
-                }
-                if (_seedInflight[em]) return _seedInflight[em];
-
-                var p = new Promise(function(resolve) {
-                    if (typeof google === 'undefined' || !google.script || !google.script.run) {
-                        resolve({ ok: false, error: 'no_gas' });
-                        return;
-                    }
-                    google.script.run
-                        .withSuccessHandler(function(r) {
-                            if (r && r.success && r.chatToken) {
-                                window.NexSbChat.saveCachedToken(em, r.chatToken);
-                                markSeeded(em);
-                                resolve({ ok: true, chatToken: r.chatToken });
-                            } else {
-                                resolve({ ok: false, error: (r && r.message) || 'seed_failed' });
-                            }
-                        })
-                        .withFailureHandler(function(err) {
-                            resolve({ ok: false, error: (err && err.message) || 'seed_error' });
-                        })
-                        .getCustomerStage2Bootstrap(em, customer.sessionToken);
-                });
-
-                _seedInflight[em] = p.then(function(out) {
-                    delete _seedInflight[em];
-                    return out;
-                });
-                return _seedInflight[em];
-            }
-
-            function trackOrderByIdFast(orderId) {
-                var cleanOid = String(orderId || '').trim().toUpperCase();
-                if (!cleanOid) return Promise.resolve({ ok: false, found: false });
-                return window.NexSbChat.sbRpc('nex4up_s2_track_order_by_id', {
-                    p_order_id: cleanOid
-                }).then(function(r) {
-                    if (r && r.ok && r.found) {
-                        return Object.assign({ ok: true, found: true, success: true }, r);
-                    }
-                    return { ok: !!(r && r.ok), found: false };
-                });
-            }
-
-            function callRegisteredRpcWithRetry(rpcName, buildParams) {
-                var em = (typeof customer !== 'undefined' && customer && customer.email) ? window.NexSbChat.cleanEmail(customer.email) : '';
-                if (!em || !customer.sessionToken) return Promise.resolve({ ok: false, error: 'no_session' });
-                return ensureStage2Seeded(false).then(function(tr) {
-                    if (!tr || !tr.ok || !tr.chatToken) return { ok: false, error: 'no_token' };
-                    return window.NexSbChat.sbRpc(rpcName, buildParams(em, tr.chatToken)).then(function(res) {
-                        if (res && res.ok) {
-                            window.NexSbChat.connectRealtime(em, tr.chatToken);
-                            return res;
-                        }
-                        if (res && res.error === 'invalid_token') {
-                            window.NexSbChat.clearCachedToken(em);
-                            clearSeeded(em);
-                            return ensureStage2Seeded(true).then(function(tr2) {
-                                if (!tr2 || !tr2.ok || !tr2.chatToken) return { ok: false };
-                                return window.NexSbChat.sbRpc(rpcName, buildParams(em, tr2.chatToken));
-                            });
-                        }
-                        return res || { ok: false };
-                    });
-                });
-            }
-
-            function fetchMyOrdersFast() {
-                return callRegisteredRpcWithRetry('nex4up_s2_get_my_orders', function(em, tok) {
-                    return { p_email: em, p_stream_token: tok, p_limit: 100 };
-                });
-            }
-
-            function fetchNotificationsFast() {
-                return callRegisteredRpcWithRetry('nex4up_s2_get_notifications', function(em, tok) {
-                    return { p_email: em, p_stream_token: tok, p_limit: 50 };
-                }).then(function(res) {
-                    if (res && res.ok && Array.isArray(res.notifications)) {
-                        _liveNotifsActive = true;
-                        res.notifications.forEach(function(n) {
-                            var nid = String((n && (n.id || n.notifId)) || '');
-                            if (nid) _seenNotifIds.add(nid);
-                        });
-                        if (typeof window.nex2ApplyLiveNotifications === 'function') {
-                            window.nex2ApplyLiveNotifications(res.notifications);
-                        }
-                    }
-                    return res;
-                });
-            }
-
-            function markNotificationsReadFast() {
-                if (typeof window.nex2MarkNotificationsReadLocal === 'function') {
-                    window.nex2MarkNotificationsReadLocal();
-                }
-                if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
-                    return Promise.resolve({ ok: false });
-                }
-                var em = window.NexSbChat.cleanEmail(customer.email);
-                var tokKeep = customer.sessionToken;
-                callRegisteredRpcWithRetry('nex4up_s2_mark_notifications_read', function(e, t) {
-                    return { p_email: e, p_stream_token: t };
-                });
-                if (typeof google !== 'undefined' && google.script && google.script.run) {
-                    google.script.run.withFailureHandler(function() {}).markNotificationsRead(em, tokKeep);
-                }
-                return Promise.resolve({ ok: true });
-            }
-
-            function handleLiveOrderEvent(payload) {
-                if (!payload || typeof payload !== 'object') return;
-                var oid = String(payload.order_id || (payload.order_payload && payload.order_payload['Order ID']) || '').trim();
-                if (!oid) return;
-                var stText = String(payload.customer_status || payload.fulfilment_status || payload.payment_status || 'Updated').trim();
-
-                if (payload.order_payload && typeof payload.order_payload === 'object' && typeof myOrdersCache !== 'undefined' && Array.isArray(myOrdersCache)) {
-                    var replaced = false;
-                    for (var i = 0; i < myOrdersCache.length; i++) {
-                        if (String(myOrdersCache[i]['Order ID'] || '').trim().toUpperCase() === oid.toUpperCase()) {
-                            myOrdersCache[i] = payload.order_payload;
-                            replaced = true;
-                            break;
-                        }
-                    }
-                    if (!replaced) myOrdersCache.unshift(payload.order_payload);
-                    if (typeof window.applyMyOrdersList === 'function') {
-                        window.applyMyOrdersList(myOrdersCache);
-                    }
-                }
-
-                if (window._nexActiveTrackedOrderId && String(window._nexActiveTrackedOrderId).toUpperCase() === oid.toUpperCase() && typeof window.renderTrackedOrderCard === 'function') {
-                    var op = payload.order_payload || {};
-                    window.renderTrackedOrderCard({
-                        success: true,
-                        orderId: oid,
-                        amount: op['Total (RM)'] || 0,
-                        paymentMethod: op['Payment Method'] || 'MAE',
-                        methodKey: 'mae',
-                        status: stText,
-                        paymentStatus: payload.payment_status || op['Payment Status'] || '',
-                        fulfilmentStatus: payload.fulfilment_status || op['Fulfilment Status'] || '',
-                        items: op['Items'] || '',
-                        hasReceipt: !!(op['Receipt Number']),
-                        trackingNumber: payload.tracking_number || op['Tracking Number'] || '',
-                        trackingUrl: payload.tracking_url || op['Tracking URL'] || ''
-                    });
-                }
-
-                var toastKey = oid + '|' + stText + '|' + String(payload.tracking_number || '');
-                if (!_seenOrderToasts[toastKey]) {
-                    _seenOrderToasts[toastKey] = true;
-                    if (typeof showToast === 'function') {
-                        showToast('📦 Order ' + oid + ': ' + stText);
-                    }
-                }
-            }
-
-            function handleLiveNotifEvent(payload) {
-                if (!payload || typeof payload !== 'object') return;
-                var nid = String(payload.id || payload.notifId || '');
-                if (nid && _seenNotifIds.has(nid)) return;
-                if (nid) _seenNotifIds.add(nid);
-                _liveNotifsActive = true;
-                if (typeof window.nex2PrependLiveNotification === 'function') {
-                    window.nex2PrependLiveNotification(payload);
-                }
-                if (typeof showToast === 'function') {
-                    showToast('🔔 ' + (payload.title || 'New notification'));
-                }
-            }
-
-            function onLogout() {
-                window._nexActiveTrackedOrderId = '';
-                _liveNotifsActive = false;
-                _seenNotifIds = new Set();
-                _seenOrderToasts = {};
-            }
-
-            return {
-                fetchStorefrontCache: fetchStorefrontCache,
-                ensureStage2Seeded: ensureStage2Seeded,
-                trackOrderByIdFast: trackOrderByIdFast,
-                fetchMyOrdersFast: fetchMyOrdersFast,
-                fetchNotificationsFast: fetchNotificationsFast,
-                markNotificationsReadFast: markNotificationsReadFast,
-                handleLiveOrderEvent: handleLiveOrderEvent,
-                handleLiveNotifEvent: handleLiveNotifEvent,
-                hasLiveNotifs: function() { return _liveNotifsActive; },
-                onLogout: onLogout
-            };
-        })();
 
         function chatGetIdentity() {
             if (customer && customer.email) {
