@@ -16034,6 +16034,9 @@ window.NexAsyncBtn = (function() {
                 if (window.NexSbStage2 && typeof window.NexSbChat !== 'undefined') {
                     window.NexSbStage2.onLogout();
                 }
+                if (window.NexSbStage3 && typeof window.NexSbStage3.onLogout === 'function') {
+                    window.NexSbStage3.onLogout();
+                }
                 var container = document.getElementById('chatMessages');
                 if (container) {
                     container.innerHTML = '<div class="chat-empty">🤖 Hi! Tap a quick action above for instant help, or send us a message below.</div>';
@@ -16047,6 +16050,7 @@ window.NexAsyncBtn = (function() {
                 cleanEmail: cleanEmail,
                 saveCachedToken: saveCachedToken,
                 sbRpc: sbRpc,
+                loadRealtimeSdk: loadRealtimeSdk,
                 clearCachedToken: clearCachedToken,
                 resolveToken: resolveToken,
                 formatChatTime: formatChatTime,
@@ -16321,6 +16325,539 @@ window.NexAsyncBtn = (function() {
                 handleLiveOrderEvent: handleLiveOrderEvent,
                 handleLiveNotifEvent: handleLiveNotifEvent,
                 hasLiveNotifs: function() { return _liveNotifsActive; },
+                onLogout: onLogout
+            };
+        })();
+
+        // ================================================================
+        // ⚡ STAGE 3: INSTANT COMMUNITY, RANKINGS, 0ms SOCIAL & LIVE FEED
+        // ================================================================
+        window.NexSbStage3 = (function() {
+            var SEED_MAP_KEY = 'nex4up_sb_s3_seeded_v1';
+            var PUBLIC_TOPIC = 'nex4up_community_live';
+            var MAX_CACHE_AGE_MS = 12 * 60 * 60 * 1000;
+            var _seedInflight = {};
+            var _commChannel = null;
+            var _commRealtimeReady = false;
+            var _refreshTimer = null;
+
+            function getSeedMap() {
+                try { return JSON.parse(localStorage.getItem(SEED_MAP_KEY) || '{}') || {}; } catch (_) { return {}; }
+            }
+
+            function isSeeded(email) {
+                var em = window.NexSbChat.cleanEmail(email);
+                var map = getSeedMap();
+                return !!(em && map[em] && map[em].seededAt);
+            }
+
+            function markSeeded(email) {
+                var em = window.NexSbChat.cleanEmail(email);
+                if (!em) return;
+                try {
+                    var map = getSeedMap();
+                    map[em] = { seededAt: Date.now() };
+                    localStorage.setItem(SEED_MAP_KEY, JSON.stringify(map));
+                } catch (_) {}
+            }
+
+            function invalidateSocialSeed(email) {
+                var em = window.NexSbChat.cleanEmail(email || (typeof customer !== 'undefined' && customer && customer.email) || '');
+                if (!em) return;
+                try {
+                    var map = getSeedMap();
+                    delete map[em];
+                    localStorage.setItem(SEED_MAP_KEY, JSON.stringify(map));
+                } catch (_) {}
+            }
+
+            function fetchCommunityPublicCache() {
+                var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                var tid = controller ? setTimeout(function() { controller.abort(); }, 4500) : null;
+                var url = window.NexSbChat.SB_URL + '/rest/v1/nex4up_storefront_cache?cache_key=eq.community_public_v1&select=payload,updated_at';
+                return fetch(url, {
+                    method: 'GET',
+                    headers: { 'apikey': window.NexSbChat.SB_PUB_KEY },
+                    signal: controller ? controller.signal : undefined
+                }).then(function(res) {
+                    if (tid) clearTimeout(tid);
+                    if (!res.ok) return { ok: false };
+                    return res.json().then(function(rows) {
+                        var row = Array.isArray(rows) && rows[0] ? rows[0] : null;
+                        if (!row || !row.payload || !row.payload.frameCatalog || !Array.isArray(row.payload.posts)) {
+                            return { ok: false };
+                        }
+                        if (row.updated_at) {
+                            var ageMs = Date.now() - Date.parse(row.updated_at);
+                            if (!isNaN(ageMs) && ageMs > MAX_CACHE_AGE_MS) {
+                                return { ok: false, stale: true };
+                            }
+                        }
+                        return { ok: true, payload: row.payload, updated_at: row.updated_at };
+                    }).catch(function() { return { ok: false }; });
+                }).catch(function() {
+                    if (tid) clearTimeout(tid);
+                    return { ok: false };
+                });
+            }
+
+            function ensureStage3Seeded(forceRefresh) {
+                if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false, error: 'no_session' });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                if (!forceRefresh && isSeeded(em)) {
+                    return window.NexSbChat.resolveToken({ email: em, name: customer.name || '' });
+                }
+                if (_seedInflight[em]) return _seedInflight[em];
+
+                var settled = false;
+                var p = new Promise(function(resolve) {
+                    if (typeof google === 'undefined' || !google.script || !google.script.run) {
+                        resolve({ ok: false, error: 'no_gas' });
+                        return;
+                    }
+                    google.script.run
+                        .withSuccessHandler(function(r) {
+                            if (r && r.success && r.chatToken) {
+                                window.NexSbChat.saveCachedToken(em, r.chatToken);
+                                markSeeded(em);
+                                if (r.myData && typeof window.nex2ApplyMySocialState === 'function') {
+                                    window.nex2ApplyMySocialState(r.myData);
+                                }
+                                resolve({ ok: true, chatToken: r.chatToken, myData: r.myData || null, justSeeded: true });
+                            } else {
+                                resolve({ ok: false, error: (r && r.message) || 'seed_failed' });
+                            }
+                        })
+                        .withFailureHandler(function(err) {
+                            resolve({ ok: false, error: (err && err.message) || 'seed_error' });
+                        })
+                        .getCustomerStage3Bootstrap(em, customer.sessionToken);
+                });
+
+                var tracked = p.then(function(out) {
+                    settled = true;
+                    if (_seedInflight[em] === tracked) delete _seedInflight[em];
+                    return out;
+                });
+                if (!settled) _seedInflight[em] = tracked;
+                return tracked;
+            }
+
+            function fetchMySocialStateFast(forceRefresh) {
+                if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false, error: 'no_session' });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                return ensureStage3Seeded(!!forceRefresh).then(function(tr) {
+                    if (!tr || !tr.ok || !tr.chatToken) return { ok: false, error: 'no_token' };
+                    if (tr.justSeeded && tr.myData) {
+                        return { ok: true, found: true, myData: tr.myData };
+                    }
+                    return window.NexSbChat.sbRpc('nex4up_s3_get_my_social_state', {
+                        p_email: em,
+                        p_stream_token: tr.chatToken
+                    }).then(function(res) {
+                        if (res && res.ok && res.found && res.myData) {
+                            if (typeof window.nex2ApplyMySocialState === 'function') {
+                                window.nex2ApplyMySocialState(res.myData);
+                            }
+                            return res;
+                        }
+                        if (res && (res.error === 'invalid_token' || res.found === false)) {
+                            if (res.error === 'invalid_token') window.NexSbChat.clearCachedToken(em);
+                            invalidateSocialSeed(em);
+                            return ensureStage3Seeded(true).then(function(tr2) {
+                                return (tr2 && tr2.ok)
+                                    ? { ok: true, found: true, myData: tr2.myData || null }
+                                    : { ok: false };
+                            });
+                        }
+                        return res || { ok: false };
+                    });
+                });
+            }
+
+            function handleCommunityLiveEvent(payload) {
+                if (!payload || typeof payload !== 'object') return;
+                var data = (typeof window.nex2GetStateData === 'function') ? window.nex2GetStateData() : null;
+                var kind = String(payload.kind || 'refresh');
+
+                if (kind === 'like' && payload.postId && data && Array.isArray(data.posts)) {
+                    var foundLike = false;
+                    for (var i = 0; i < data.posts.length; i++) {
+                        if (data.posts[i].postId === payload.postId) {
+                            if (typeof payload.likesCount === 'number') {
+                                data.posts[i].likesCount = Math.max(0, payload.likesCount);
+                            }
+                            foundLike = true;
+                            break;
+                        }
+                    }
+                    if (foundLike && typeof window.nex2RerenderCommunityPreservingDrawers === 'function') {
+                        window.nex2RerenderCommunityPreservingDrawers();
+                    }
+                    return;
+                }
+
+                if (kind === 'comment' && payload.postId && payload.comment && data && Array.isArray(data.posts)) {
+                    var foundCmt = false;
+                    for (var j = 0; j < data.posts.length; j++) {
+                        if (data.posts[j].postId === payload.postId) {
+                            var cmList = Array.isArray(data.posts[j].comments) ? data.posts[j].comments : [];
+                            var dup = cmList.some(function(c) {
+                                return c && c.content === payload.comment.content &&
+                                    c.createdAt === payload.comment.createdAt &&
+                                    c.authorName === payload.comment.authorName;
+                            });
+                            if (!dup) cmList.push(payload.comment);
+                            data.posts[j].comments = cmList;
+                            if (typeof payload.commentsCount === 'number') {
+                                data.posts[j].commentsCount = Math.max(cmList.length, payload.commentsCount);
+                            } else {
+                                data.posts[j].commentsCount = cmList.length;
+                            }
+                            foundCmt = true;
+                            break;
+                        }
+                    }
+                    if (foundCmt && typeof window.nex2RerenderCommunityPreservingDrawers === 'function') {
+                        window.nex2RerenderCommunityPreservingDrawers();
+                    }
+                    return;
+                }
+
+                if (_refreshTimer) clearTimeout(_refreshTimer);
+                _refreshTimer = setTimeout(function() {
+                    _refreshTimer = null;
+                    fetchCommunityPublicCache().then(function(sbRes) {
+                        if (sbRes && sbRes.ok && typeof window.nex2ApplyPublicCommunityPayload === 'function') {
+                            window.nex2ApplyPublicCommunityPayload(sbRes.payload);
+                        }
+                    });
+                }, 1500);
+            }
+
+            function connectCommunityLive() {
+                if (typeof IS_ADMIN_MODE !== 'undefined' && IS_ADMIN_MODE) return Promise.resolve(false);
+                if (_commChannel && _commRealtimeReady) return Promise.resolve(true);
+                if (_commChannel) return Promise.resolve(true);
+                if (!window.NexSbChat || typeof window.NexSbChat.loadRealtimeSdk !== 'function') {
+                    return Promise.resolve(false);
+                }
+                return window.NexSbChat.loadRealtimeSdk().then(function(client) {
+                    if (!client || _commChannel) return false;
+                    var ch = client.channel(PUBLIC_TOPIC, {
+                        config: { private: false, broadcast: { self: false } }
+                    });
+                    ch.on('broadcast', { event: 'community_updated' }, function(evt) {
+                        var payload = (evt && evt.payload) ? evt.payload : evt;
+                        handleCommunityLiveEvent(payload);
+                    });
+                    ch.subscribe(function(status) {
+                        if (status === 'SUBSCRIBED') {
+                            _commRealtimeReady = true;
+                        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                            _commRealtimeReady = false;
+                        }
+                    });
+                    _commChannel = ch;
+                    return true;
+                });
+            }
+
+            function disconnectCommunityLive() {
+                _commRealtimeReady = false;
+                if (_refreshTimer) { clearTimeout(_refreshTimer); _refreshTimer = null; }
+                if (_commChannel && typeof _commChannel.unsubscribe === 'function') {
+                    try { _commChannel.unsubscribe(); } catch (_) {}
+                }
+                _commChannel = null;
+            }
+
+            function broadcastCommunityEvent(payloadObj) {
+                if (!_commChannel || !_commRealtimeReady || typeof _commChannel.send !== 'function') return;
+                try {
+                    _commChannel.send({ type: 'broadcast', event: 'community_updated', payload: payloadObj });
+                } catch (_) {}
+            }
+
+            function callAuthSocialRpcWithRetry(rpcName, buildParams) {
+                var em = (typeof customer !== 'undefined' && customer && customer.email) ? window.NexSbChat.cleanEmail(customer.email) : '';
+                if (!em || !customer.sessionToken) return Promise.resolve({ ok: false, error: 'no_session' });
+                return ensureStage3Seeded(false).then(function(tr) {
+                    if (!tr || !tr.ok || !tr.chatToken) return { ok: false, error: 'no_token' };
+                    return window.NexSbChat.sbRpc(rpcName, buildParams(em, tr.chatToken)).then(function(res) {
+                        if (res && res.ok) return res;
+                        if (res && res.error === 'invalid_token') {
+                            window.NexSbChat.clearCachedToken(em);
+                            invalidateSocialSeed(em);
+                            return ensureStage3Seeded(true).then(function(tr2) {
+                                if (!tr2 || !tr2.ok || !tr2.chatToken) return { ok: false };
+                                return window.NexSbChat.sbRpc(rpcName, buildParams(em, tr2.chatToken));
+                            });
+                        }
+                        return res || { ok: false };
+                    });
+                });
+            }
+
+            function toggleLikeFast(postId) {
+                var pid = String(postId || '').trim();
+                if (!pid || typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                var tokKeep = customer.sessionToken;
+                var data = (typeof window.nex2GetStateData === 'function') ? window.nex2GetStateData() : null;
+
+                if (data) {
+                    data.myData = data.myData || { likedPostIds: [], followingEmails: [], blockedEmails: [] };
+                    var likesArr = Array.isArray(data.myData.likedPostIds) ? data.myData.likedPostIds.slice() : [];
+                    var idx = likesArr.indexOf(pid);
+                    var delta = idx !== -1 ? -1 : 1;
+                    if (idx !== -1) likesArr.splice(idx, 1);
+                    else likesArr.push(pid);
+                    data.myData.likedPostIds = likesArr;
+
+                    if (Array.isArray(data.posts)) {
+                        for (var i = 0; i < data.posts.length; i++) {
+                            if (data.posts[i].postId === pid) {
+                                data.posts[i].likesCount = Math.max(0, (parseInt(data.posts[i].likesCount, 10) || 0) + delta);
+                                break;
+                            }
+                        }
+                    }
+                    if (typeof window.nex2RerenderCommunityPreservingDrawers === 'function') {
+                        window.nex2RerenderCommunityPreservingDrawers();
+                    }
+                }
+
+                return callAuthSocialRpcWithRetry('nex4up_s3_toggle_like_fast', function(e, t) {
+                    return { p_email: e, p_stream_token: t, p_post_id: pid };
+                }).then(function(res) {
+                    if (res && res.ok) {
+                        var dNow = (typeof window.nex2GetStateData === 'function') ? window.nex2GetStateData() : null;
+                        if (dNow) {
+                            dNow.myData = dNow.myData || {};
+                            if (Array.isArray(res.likedPostIds)) dNow.myData.likedPostIds = res.likedPostIds;
+                            if (typeof res.likesCount === 'number' && Array.isArray(dNow.posts)) {
+                                for (var k = 0; k < dNow.posts.length; k++) {
+                                    if (dNow.posts[k].postId === pid) {
+                                        dNow.posts[k].likesCount = Math.max(0, res.likesCount);
+                                        break;
+                                    }
+                                }
+                            }
+                            if (typeof window.nex2RerenderCommunityPreservingDrawers === 'function') {
+                                window.nex2RerenderCommunityPreservingDrawers();
+                            }
+                        }
+                        if (typeof res.likesCount === 'number') {
+                            broadcastCommunityEvent({ kind: 'like', postId: pid, likesCount: res.likesCount });
+                        }
+                        if (typeof google !== 'undefined' && google.script && google.script.run) {
+                            google.script.run.withFailureHandler(function() {}).togglePostLike(em, pid, tokKeep);
+                        }
+                        return res;
+                    }
+                    if (typeof google !== 'undefined' && google.script && google.script.run) {
+                        google.script.run.withSuccessHandler(function() {
+                            if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap({ forceGas: true });
+                        }).togglePostLike(em, pid, tokKeep);
+                    }
+                    return { ok: false };
+                });
+            }
+
+            function syncFollowButtonsInModal(targetEm, isFollowing) {
+                var btns = document.querySelectorAll('#nex2PlayerModalOverlay [data-follow-email]');
+                for (var i = 0; i < btns.length; i++) {
+                    var attrEm = String(btns[i].getAttribute('data-follow-email') || '').trim().toLowerCase();
+                    if (attrEm === targetEm) {
+                        btns[i].textContent = isFollowing ? '✓ Following' : '+ Follow Gamer';
+                    }
+                }
+            }
+
+            function toggleFollowFast(targetEmail) {
+                var targetEm = window.NexSbChat.cleanEmail(targetEmail);
+                if (!targetEm || typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                if (targetEm === em) return Promise.resolve({ ok: false, error: 'self_follow' });
+                var tokKeep = customer.sessionToken;
+                var data = (typeof window.nex2GetStateData === 'function') ? window.nex2GetStateData() : null;
+                var optimisticFollowing = true;
+
+                if (data) {
+                    data.myData = data.myData || { likedPostIds: [], followingEmails: [], blockedEmails: [] };
+                    var flwArr = Array.isArray(data.myData.followingEmails) ? data.myData.followingEmails.slice() : [];
+                    var idx = flwArr.indexOf(targetEm);
+                    if (idx !== -1) {
+                        flwArr.splice(idx, 1);
+                        optimisticFollowing = false;
+                    } else {
+                        flwArr.push(targetEm);
+                        optimisticFollowing = true;
+                    }
+                    data.myData.followingEmails = flwArr;
+                    syncFollowButtonsInModal(targetEm, optimisticFollowing);
+                    if (typeof showToast === 'function') {
+                        showToast(optimisticFollowing ? 'Following gamer!' : 'Unfollowed.');
+                    }
+                    if (typeof window.nex2RerenderCommunityPreservingDrawers === 'function') {
+                        window.nex2RerenderCommunityPreservingDrawers();
+                    }
+                }
+
+                return callAuthSocialRpcWithRetry('nex4up_s3_toggle_follow_fast', function(e, t) {
+                    return { p_email: e, p_stream_token: t, p_target_email: targetEm };
+                }).then(function(res) {
+                    if (res && res.ok) {
+                        var dNow = (typeof window.nex2GetStateData === 'function') ? window.nex2GetStateData() : null;
+                        if (dNow && Array.isArray(res.followingEmails)) {
+                            dNow.myData = dNow.myData || {};
+                            dNow.myData.followingEmails = res.followingEmails;
+                            syncFollowButtonsInModal(targetEm, !!res.following);
+                            if (typeof window.nex2RerenderCommunityPreservingDrawers === 'function') {
+                                window.nex2RerenderCommunityPreservingDrawers();
+                            }
+                        }
+                        if (typeof google !== 'undefined' && google.script && google.script.run) {
+                            google.script.run.withFailureHandler(function() {}).toggleFollowPlayer(em, targetEm, tokKeep);
+                        }
+                        return res;
+                    }
+                    if (typeof google !== 'undefined' && google.script && google.script.run) {
+                        google.script.run.withSuccessHandler(function(r) {
+                            if (r && r.success) {
+                                if (typeof showToast === 'function') showToast(r.following ? 'Following gamer!' : 'Unfollowed.');
+                                if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap({ forceGas: true });
+                            } else if (typeof showToast === 'function') {
+                                showToast((r && r.message) || 'Failed.');
+                            }
+                        }).toggleFollowPlayer(em, targetEm, tokKeep);
+                    }
+                    return { ok: false };
+                });
+            }
+
+            function addCommentFast(postId, text, inputEl) {
+                var pid = String(postId || '').trim();
+                var txt = String(text || '').trim().slice(0, 600);
+                if (!pid || !txt || typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                var tokKeep = customer.sessionToken;
+                var authorName = String(customer.name || em.split('@')[0] || 'Gamer').slice(0, 80);
+                var frameId = String(customer.equippedFrameId || 'frame_default').slice(0, 60);
+                var effAvatar = (customer.avatarMode === 'roblox' && customer.robloxAvatarUrl)
+                    ? customer.robloxAvatarUrl
+                    : (customer.profileImage || customer.robloxAvatarUrl || '');
+                effAvatar = String(effAvatar || '').slice(0, 500);
+
+                if (inputEl) inputEl.value = '';
+
+                var optComment = {
+                    authorEmail: em,
+                    authorName: authorName,
+                    avatarUrl: effAvatar,
+                    equippedFrameId: frameId,
+                    content: txt,
+                    createdAt: 'Just now',
+                    _optimistic: true
+                };
+
+                var data = (typeof window.nex2GetStateData === 'function') ? window.nex2GetStateData() : null;
+                if (data && Array.isArray(data.posts)) {
+                    for (var i = 0; i < data.posts.length; i++) {
+                        if (data.posts[i].postId === pid) {
+                            data.posts[i].comments = Array.isArray(data.posts[i].comments) ? data.posts[i].comments.slice() : [];
+                            data.posts[i].comments.push(optComment);
+                            data.posts[i].commentsCount = Math.max(data.posts[i].comments.length, (parseInt(data.posts[i].commentsCount, 10) || 0) + 1);
+                            break;
+                        }
+                    }
+                    if (typeof window.nex2RerenderCommunityPreservingDrawers === 'function') {
+                        window.nex2RerenderCommunityPreservingDrawers(pid);
+                    }
+                }
+
+                return callAuthSocialRpcWithRetry('nex4up_s3_add_comment_fast', function(e, t) {
+                    return {
+                        p_email: e,
+                        p_stream_token: t,
+                        p_post_id: pid,
+                        p_content: txt,
+                        p_author_name: authorName,
+                        p_avatar_url: effAvatar,
+                        p_frame_id: frameId
+                    };
+                }).then(function(res) {
+                    if (res && res.ok && res.comment) {
+                        var dNow = (typeof window.nex2GetStateData === 'function') ? window.nex2GetStateData() : null;
+                        if (dNow && Array.isArray(dNow.posts)) {
+                            for (var j = 0; j < dNow.posts.length; j++) {
+                                if (dNow.posts[j].postId === pid && Array.isArray(dNow.posts[j].comments)) {
+                                    var oIdx = dNow.posts[j].comments.indexOf(optComment);
+                                    if (oIdx !== -1) dNow.posts[j].comments[oIdx] = res.comment;
+                                    else dNow.posts[j].comments.push(res.comment);
+                                    if (typeof res.commentsCount === 'number') {
+                                        dNow.posts[j].commentsCount = Math.max(dNow.posts[j].comments.length, res.commentsCount);
+                                    }
+                                    break;
+                                }
+                            }
+                            if (typeof window.nex2RerenderCommunityPreservingDrawers === 'function') {
+                                window.nex2RerenderCommunityPreservingDrawers(pid);
+                            }
+                        }
+                        broadcastCommunityEvent({
+                            kind: 'comment',
+                            postId: pid,
+                            comment: res.comment,
+                            commentsCount: res.commentsCount
+                        });
+                        if (typeof google !== 'undefined' && google.script && google.script.run) {
+                            google.script.run.withFailureHandler(function() {}).addPostComment(em, pid, txt, tokKeep);
+                        }
+                        return res;
+                    }
+                    if (typeof google !== 'undefined' && google.script && google.script.run) {
+                        google.script.run.withSuccessHandler(function(r) {
+                            if (r && r.success) {
+                                if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap({ forceGas: true });
+                            } else if (typeof showToast === 'function') {
+                                showToast((r && r.message) || 'Failed.');
+                            }
+                        }).addPostComment(em, pid, txt, tokKeep);
+                    }
+                    return { ok: false };
+                });
+            }
+
+            function onLogout() {
+                disconnectCommunityLive();
+                if (typeof window.nex2ClearMySocialState === 'function') {
+                    window.nex2ClearMySocialState();
+                }
+            }
+
+            return {
+                fetchCommunityPublicCache: fetchCommunityPublicCache,
+                ensureStage3Seeded: ensureStage3Seeded,
+                invalidateSocialSeed: invalidateSocialSeed,
+                fetchMySocialStateFast: fetchMySocialStateFast,
+                connectCommunityLive: connectCommunityLive,
+                disconnectCommunityLive: disconnectCommunityLive,
+                handleCommunityLiveEvent: handleCommunityLiveEvent,
+                toggleLikeFast: toggleLikeFast,
+                toggleFollowFast: toggleFollowFast,
+                addCommentFast: addCommentFast,
                 onLogout: onLogout
             };
         })();
@@ -29165,10 +29702,16 @@ window.renderNexVipBanner = function (pts) {
 
     function switch_nex2_tab(tabName) {
         if (tabName === 'store' || !tabName) {
+            if (window.NexSbStage3 && typeof window.NexSbStage3.disconnectCommunityLive === 'function') {
+                window.NexSbStage3.disconnectCommunityLive();
+            }
             showStoreView();
             return;
         }
         if (tabName === 'profile') {
+            if (window.NexSbStage3 && typeof window.NexSbStage3.disconnectCommunityLive === 'function') {
+                window.NexSbStage3.disconnectCommunityLive();
+            }
             if (customer && customer.email) {
                 showMyAccount();
             } else if (typeof loginOverlay !== 'undefined' && loginOverlay) {
@@ -29204,6 +29747,13 @@ window.renderNexVipBanner = function (pts) {
             sec.classList.add('active');
             window._setNex2ActiveNav(tabName);
             if (tabName === 'faq') render_nex2_faqs();
+            if (window.NexSbStage3) {
+                if (tabName === 'community' || tabName === 'rankings') {
+                    window.NexSbStage3.connectCommunityLive();
+                } else {
+                    window.NexSbStage3.disconnectCommunityLive();
+                }
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         if (typeof window.syncChatFabVisibility === 'function') window.syncChatFabVisibility();
@@ -29713,7 +30263,8 @@ window.renderNexVipBanner = function (pts) {
                     res.customer.sessionToken = customer.sessionToken;
                     customer = Object.assign({}, customer, res.customer);
                     try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
-                    loadNex4Up2Bootstrap();
+                    if (window.NexSbStage3) window.NexSbStage3.invalidateSocialSeed(customer.email);
+                    loadNex4Up2Bootstrap({ refreshSocial: true });
                 }
                 if (doneCb) doneCb();
             })
@@ -30021,9 +30572,100 @@ window.renderNexVipBanner = function (pts) {
         render_nex2_notifications();
     };
 
-    window.loadNex4Up2Bootstrap = function() {
+    window.nex2GetStateData = function() {
+        return _nex2State.data;
+    };
+
+    function _captureOpenCommentState(extraOpenPostId) {
+        var openIds = [];
+        var drafts = {};
+        if (extraOpenPostId) openIds.push(String(extraOpenPostId));
+        var list = document.getElementById('nex2PostsFeedList');
+        if (list) {
+            list.querySelectorAll('[id^="nex2CommentsWrap_"]').forEach(function(w) {
+                var pid = w.id.replace('nex2CommentsWrap_', '');
+                if (w.style && w.style.display && w.style.display !== 'none' && openIds.indexOf(pid) === -1) {
+                    openIds.push(pid);
+                }
+            });
+            list.querySelectorAll('[id^="nex2CmtInput_"]').forEach(function(inp) {
+                var pid = inp.id.replace('nex2CmtInput_', '');
+                if (inp.value && (!extraOpenPostId || pid !== String(extraOpenPostId))) {
+                    drafts[pid] = inp.value;
+                }
+            });
+        }
+        return { openIds: openIds, drafts: drafts };
+    }
+
+    function _restoreOpenCommentState(st) {
+        if (!st) return;
+        (st.openIds || []).forEach(function(pid) {
+            var w = document.getElementById('nex2CommentsWrap_' + pid);
+            if (w) w.style.display = 'block';
+        });
+        Object.keys(st.drafts || {}).forEach(function(pid) {
+            var inp = document.getElementById('nex2CmtInput_' + pid);
+            if (inp) inp.value = st.drafts[pid];
+        });
+    }
+
+    window.nex2RerenderCommunityPreservingDrawers = function(extraOpenPostId) {
+        var cState = _captureOpenCommentState(extraOpenPostId);
+        render_nex2_community_hub();
+        if (window.NexCommunityPhase6) window.NexCommunityPhase6.enhanceFindPlayersDom();
+        _restoreOpenCommentState(cState);
+    };
+
+    window.nex2ApplyPublicCommunityPayload = function(pubPayload) {
+        if (!pubPayload || typeof pubPayload !== 'object') return;
+        var existingMyData = (_nex2State.data && _nex2State.data.myData) ? _nex2State.data.myData : null;
+        var cleanPub = Object.assign({}, pubPayload, { success: true });
+        delete cleanPub.myData;
+        _nex2State.data = existingMyData
+            ? Object.assign({}, cleanPub, { myData: existingMyData })
+            : cleanPub;
+        try {
+            localStorage.setItem('nex4up2_public_cache_v2', JSON.stringify(cleanPub));
+        } catch (err) {}
+        var cState = _captureOpenCommentState();
+        render_nex2_all_sections();
+        _restoreOpenCommentState(cState);
+    };
+
+    window.nex2ApplyMySocialState = function(myDataObj) {
+        if (!myDataObj || typeof myDataObj !== 'object') return;
+        _nex2State.data = _nex2State.data || {};
+        var prevNotifs = (_nex2State.data.myData && Array.isArray(_nex2State.data.myData.notifications))
+            ? _nex2State.data.myData.notifications
+            : [];
+        _nex2State.data.myData = Object.assign({}, myDataObj, {
+            authenticated: true,
+            notifications: Array.isArray(myDataObj.notifications) ? myDataObj.notifications : prevNotifs
+        });
+        if (myDataObj.profile && typeof customer !== 'undefined' && customer) {
+            var tokKeep = customer.sessionToken;
+            customer = Object.assign({}, customer, myDataObj.profile);
+            if (tokKeep) customer.sessionToken = tokKeep;
+            try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
+        }
+        var cState = _captureOpenCommentState();
+        render_nex2_all_sections();
+        _restoreOpenCommentState(cState);
+    };
+
+    window.nex2ClearMySocialState = function() {
+        if (_nex2State.data && _nex2State.data.myData) {
+            delete _nex2State.data.myData;
+            render_nex2_all_sections();
+        }
+    };
+
+    window.loadNex4Up2Bootstrap = function(opts) {
         var em = (customer && customer.email) || '';
         var tok = (customer && customer.sessionToken) || '';
+        var forceGas = !!(opts && opts.forceGas);
+        var refreshSocial = !!(opts && opts.refreshSocial);
         try {
             var cachedRaw = localStorage.getItem('nex4up2_public_cache_v2');
             if (cachedRaw && !_nex2State.data) {
@@ -30035,39 +30677,60 @@ window.renderNexVipBanner = function (pts) {
             }
         } catch (err) {}
 
-        google.script.run
-            .withSuccessHandler(function(res) {
-                if (!res || res.success === false) return;
-                var prevLiveNotifs = (_nex2State.data && _nex2State.data.myData && Array.isArray(_nex2State.data.myData.notifications) &&
-                    window.NexSbStage2 && window.NexSbStage2.hasLiveNotifs())
-                    ? _nex2State.data.myData.notifications.slice()
-                    : null;
-                _nex2State.data = res;
-                if (prevLiveNotifs && _nex2State.data.myData) {
-                    _nex2State.data.myData.notifications = prevLiveNotifs;
+        function loadFromGas() {
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (!res || res.success === false) return;
+                    var prevLiveNotifs = (_nex2State.data && _nex2State.data.myData && Array.isArray(_nex2State.data.myData.notifications) &&
+                        window.NexSbStage2 && window.NexSbStage2.hasLiveNotifs())
+                        ? _nex2State.data.myData.notifications.slice()
+                        : null;
+                    _nex2State.data = res;
+                    if (prevLiveNotifs && _nex2State.data.myData) {
+                        _nex2State.data.myData.notifications = prevLiveNotifs;
+                    }
+                    try {
+                        var publicCopy = Object.assign({}, res);
+                        delete publicCopy.myData;
+                        localStorage.setItem('nex4up2_public_cache_v2', JSON.stringify(publicCopy));
+                    } catch (err) {}
+                    if (res.myData && res.myData.profile && customer) {
+                        var tokKeep = customer.sessionToken;
+                        customer = Object.assign({}, customer, res.myData.profile);
+                        if (tokKeep) customer.sessionToken = tokKeep;
+                        try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
+                    }
+                    render_nex2_all_sections();
+                    if (customer && customer.email && customer.sessionToken && window.NexSbStage2 && !window.NexSbStage2.hasLiveNotifs()) {
+                        window.NexSbStage2.fetchNotificationsFast();
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    console.warn('NEX4UP 2.0 bootstrap pending deploy or offline:', err && err.message);
+                    render_coins_grid_into('nex2MyAccountCoinsRow');
+                    render_coins_grid_into('nex2CreatorsCoinsRow');
+                })
+                .getNex4Up2Bootstrap(em, tok);
+        }
+
+        if (!(typeof IS_ADMIN_MODE !== 'undefined' && IS_ADMIN_MODE) && !(typeof isAdmin !== 'undefined' && isAdmin) && !forceGas && window.NexSbStage3 && typeof window.NexSbStage3.fetchCommunityPublicCache === 'function') {
+            window.NexSbStage3.fetchCommunityPublicCache().then(function(sbRes) {
+                if (sbRes && sbRes.ok && sbRes.payload) {
+                    window.nex2ApplyPublicCommunityPayload(sbRes.payload);
+                    if (customer && customer.email && customer.sessionToken) {
+                        window.NexSbStage3.fetchMySocialStateFast(refreshSocial);
+                        if (window.NexSbStage2 && !window.NexSbStage2.hasLiveNotifs()) {
+                            window.NexSbStage2.fetchNotificationsFast();
+                        }
+                    }
+                    return;
                 }
-                try {
-                    var publicCopy = Object.assign({}, res);
-                    delete publicCopy.myData;
-                    localStorage.setItem('nex4up2_public_cache_v2', JSON.stringify(publicCopy));
-                } catch (err) {}
-                if (res.myData && res.myData.profile && customer) {
-                    var tokKeep = customer.sessionToken;
-                    customer = Object.assign({}, customer, res.myData.profile);
-                    if (tokKeep) customer.sessionToken = tokKeep;
-                    try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
-                }
-                render_nex2_all_sections();
-                if (customer && customer.email && customer.sessionToken && window.NexSbStage2 && !window.NexSbStage2.hasLiveNotifs()) {
-                    window.NexSbStage2.fetchNotificationsFast();
-                }
-            })
-            .withFailureHandler(function(err) {
-                console.warn('NEX4UP 2.0 bootstrap pending deploy or offline:', err && err.message);
-                render_coins_grid_into('nex2MyAccountCoinsRow');
-                render_coins_grid_into('nex2CreatorsCoinsRow');
-            })
-            .getNex4Up2Bootstrap(em, tok);
+                loadFromGas();
+            });
+            return;
+        }
+
+        loadFromGas();
     };
 
     // Hook My Account loading so framed avatar, sidebar & studio update seamlessly
@@ -30461,7 +31124,12 @@ window.renderNexVipBanner = function (pts) {
         var likeBtn = e.target.closest('[data-like-post]');
         if (likeBtn) {
             if (!customer || !customer.email || !customer.sessionToken) { showToast('Please log in with your password to like posts.'); return; }
-            google.script.run.withSuccessHandler(function() { loadNex4Up2Bootstrap(); }).togglePostLike(customer.email, likeBtn.getAttribute('data-like-post'), customer.sessionToken);
+            var likePid = likeBtn.getAttribute('data-like-post');
+            if (window.NexSbStage3 && typeof window.NexSbStage3.toggleLikeFast === 'function') {
+                window.NexSbStage3.toggleLikeFast(likePid);
+            } else {
+                google.script.run.withSuccessHandler(function() { loadNex4Up2Bootstrap(); }).togglePostLike(customer.email, likePid, customer.sessionToken);
+            }
             return;
         }
         var tCmtBtn = e.target.closest('[data-toggle-comments]');
@@ -30477,19 +31145,28 @@ window.renderNexVipBanner = function (pts) {
             var inp = document.getElementById('nex2CmtInput_' + postId);
             var txt = inp ? inp.value.trim() : '';
             if (!txt) return;
-            google.script.run.withSuccessHandler(function(r) {
-                if (r && r.success) { if (inp) inp.value = ''; loadNex4Up2Bootstrap(); }
-                else showToast((r && r.message) || 'Failed.');
-            }).addPostComment(customer.email, postId, txt, customer.sessionToken);
+            if (window.NexSbStage3 && typeof window.NexSbStage3.addCommentFast === 'function') {
+                window.NexSbStage3.addCommentFast(postId, txt, inp);
+            } else {
+                google.script.run.withSuccessHandler(function(r) {
+                    if (r && r.success) { if (inp) inp.value = ''; loadNex4Up2Bootstrap(); }
+                    else showToast((r && r.message) || 'Failed.');
+                }).addPostComment(customer.email, postId, txt, customer.sessionToken);
+            }
             return;
         }
         var flwBtn = e.target.closest('[data-follow-email]');
         if (flwBtn) {
             if (!customer || !customer.email || !customer.sessionToken) { showToast('Please log in with your password to follow players.'); return; }
-            google.script.run.withSuccessHandler(function(r) {
-                if (r && r.success) { showToast(r.following ? 'Following gamer!' : 'Unfollowed.'); loadNex4Up2Bootstrap(); }
-                else showToast((r && r.message) || 'Failed.');
-            }).toggleFollowPlayer(customer.email, flwBtn.getAttribute('data-follow-email'), customer.sessionToken);
+            var flwEmail = flwBtn.getAttribute('data-follow-email');
+            if (window.NexSbStage3 && typeof window.NexSbStage3.toggleFollowFast === 'function') {
+                window.NexSbStage3.toggleFollowFast(flwEmail);
+            } else {
+                google.script.run.withSuccessHandler(function(r) {
+                    if (r && r.success) { showToast(r.following ? 'Following gamer!' : 'Unfollowed.'); loadNex4Up2Bootstrap(); }
+                    else showToast((r && r.message) || 'Failed.');
+                }).toggleFollowPlayer(customer.email, flwEmail, customer.sessionToken);
+            }
             return;
         }
         var repBtn = e.target.closest('[data-report-post]');
@@ -30506,7 +31183,8 @@ window.renderNexVipBanner = function (pts) {
             google.script.run.withSuccessHandler(function(r) {
                 showToast((r && r.message) || 'User blocked.');
                 var m = document.getElementById('nex2PlayerModalOverlay'); if (m) m.classList.remove('open');
-                loadNex4Up2Bootstrap();
+                if (window.NexSbStage3) window.NexSbStage3.invalidateSocialSeed(customer.email);
+                loadNex4Up2Bootstrap({ refreshSocial: true });
             }).reportCommunityContent(customer.email, 'BLOCK', blkBtn.getAttribute('data-block-email'), 'User blocked player', customer.sessionToken);
             return;
         }
@@ -30557,7 +31235,8 @@ window.renderNexVipBanner = function (pts) {
                         customer = Object.assign({}, customer, res.customer);
                         try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
                         render_nex2_frame_studio();
-                        loadNex4Up2Bootstrap();
+                        if (window.NexSbStage3) window.NexSbStage3.invalidateSocialSeed(customer.email);
+                        loadNex4Up2Bootstrap({ refreshSocial: true });
                         showToast(res.message);
                     } else showToast((res && res.message) || 'Could not equip frame.');
                 }).equipProfileFrame(customer.email, fid, customer.sessionToken);
@@ -30569,7 +31248,8 @@ window.renderNexVipBanner = function (pts) {
                         customer = Object.assign({}, customer, res.customer);
                         try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (err) {}
                         loadMyAccount();
-                        loadNex4Up2Bootstrap();
+                        if (window.NexSbStage3) window.NexSbStage3.invalidateSocialSeed(customer.email);
+                        loadNex4Up2Bootstrap({ refreshSocial: true });
                         showToast(res.message);
                     } else showToast((res && res.message) || 'Redemption failed.');
                 }).redeemProfileFrame(customer.email, fid, customer.sessionToken);
@@ -31015,7 +31695,8 @@ window.renderNexVipBanner = function (pts) {
                 if (r && r.success) {
                     campForm.reset();
                     showToast(r.message);
-                    loadNex4Up2Bootstrap();
+                    if (window.NexSbStage3) window.NexSbStage3.invalidateSocialSeed(customer.email);
+                    loadNex4Up2Bootstrap({ refreshSocial: true });
                 } else showToast((r && r.message) || 'Submission error.');
             }).submitCreatorCampaign(customer.email, payload, customer.sessionToken);
         });
@@ -31067,7 +31748,8 @@ window.renderNexVipBanner = function (pts) {
                     _nex2State.pendingPostImgDataUrl = '';
                     var st = document.getElementById('nex2PostImgStatus'); if (st) st.textContent = '';
                     showToast(r.message);
-                    loadNex4Up2Bootstrap();
+                    if (window.NexSbStage3) window.NexSbStage3.invalidateSocialSeed(customer.email);
+                    loadNex4Up2Bootstrap({ refreshSocial: true });
                 } else showToast((r && r.message) || 'Post failed.');
             }).createCommunityPost(customer.email, payload, customer.sessionToken);
         });
@@ -31358,7 +32040,8 @@ window.renderNexVipBanner = function (pts) {
                         if (typeof sync_account_sidebar_and_gaming_panel === 'function') sync_account_sidebar_and_gaming_panel();
                         if (stEl) { stEl.textContent = 'Saved!'; stEl.style.color = '#4ade80'; }
                         if (typeof showToast === 'function') showToast(res.message || 'Privacy settings updated.');
-                        if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap();
+                        if (window.NexSbStage3) window.NexSbStage3.invalidateSocialSeed(customer.email);
+                        if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap({ refreshSocial: true });
                     } else {
                         var errM = (res && res.message) || 'Could not update privacy settings.';
                         if (stEl) { stEl.textContent = errM; stEl.style.color = '#E56B70'; }
