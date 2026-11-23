@@ -15931,6 +15931,12 @@ window.NexAsyncBtn = (function() {
                             window.NexSbStage2.handleLiveNotifEvent(payload);
                         }
                     });
+                    ch.on('broadcast', { event: 'customer_state_updated' }, function(evt) {
+                        var payload = (evt && evt.payload) ? evt.payload : evt;
+                        if (window.NexSbStage5 && typeof window.NexSbStage5.handleLiveCustomerStateEvent === 'function') {
+                            window.NexSbStage5.handleLiveCustomerStateEvent(payload);
+                        }
+                    });
 
                     ch.subscribe(function(status) {
                         if (status === 'SUBSCRIBED') {
@@ -16881,6 +16887,8 @@ window.NexAsyncBtn = (function() {
             var _seenInboxMsgKeys = new Set();
             var _convChatTokens = {};
             var _maxDashAgeMs = 10 * 60 * 1000;
+            var _adminTabMemCache = {};
+            var _adminTabMemTtlMs = 90 * 1000;
 
             function cleanEmail(em) {
                 return String(em || '').trim().toLowerCase();
@@ -17079,6 +17087,10 @@ window.NexAsyncBtn = (function() {
                     ch.on('broadcast', { event: 'admin_dashboard_updated' }, function(evt) {
                         handleLiveDashboardUpdated((evt && evt.payload) ? evt.payload : evt);
                     });
+                    ch.on('broadcast', { event: 'admin_cache_updated' }, function(evt) {
+                        var p = (evt && evt.payload) ? evt.payload : evt;
+                        if (p && p.cacheKey) invalidateLocalTabCache(p.cacheKey);
+                    });
                     ch.subscribe(function(status) {
                         if (status === 'SUBSCRIBED') {
                             _adminRealtimeReady = true;
@@ -17275,12 +17287,53 @@ window.NexAsyncBtn = (function() {
                 };
             }
 
+            function invalidateLocalTabCache(cacheKey) {
+                var key = String(cacheKey || '').trim();
+                if (!key) {
+                    _adminTabMemCache = {};
+                    return;
+                }
+                if (key.slice(-1) === '%') {
+                    var prefix = key.slice(0, -1);
+                    Object.keys(_adminTabMemCache).forEach(function(k) {
+                        if (k.indexOf(prefix) === 0) delete _adminTabMemCache[k];
+                    });
+                } else {
+                    delete _adminTabMemCache[key];
+                }
+            }
+
+            function fetchAdminCacheFast(cacheKey, maxAgeMsOpt) {
+                var key = String(cacheKey || '').trim();
+                if (!key || !isReady()) return Promise.resolve({ ok: false });
+                var mem = _adminTabMemCache[key];
+                if (mem && (Date.now() - mem.fetchedAt) <= _adminTabMemTtlMs) {
+                    return Promise.resolve({ ok: true, payload: mem.payload, updatedAt: mem.updatedAt, fromMemory: true });
+                }
+                var maxAge = (typeof maxAgeMsOpt === 'number' && maxAgeMsOpt > 0) ? maxAgeMsOpt : _maxDashAgeMs;
+                return callAdminRpc('nex4up_s4_admin_get_cache', { p_cache_key: key }).then(function(res) {
+                    if (res && res.ok && res.found && res.payload !== undefined && res.payload !== null) {
+                        var ageMs = res.updatedAt ? (Date.now() - Date.parse(res.updatedAt)) : 0;
+                        if (!isNaN(ageMs) && ageMs <= maxAge) {
+                            _adminTabMemCache[key] = {
+                                payload: res.payload,
+                                updatedAt: res.updatedAt,
+                                fetchedAt: Date.now()
+                            };
+                            return { ok: true, payload: res.payload, updatedAt: res.updatedAt };
+                        }
+                    }
+                    return { ok: false };
+                });
+            }
+
             function onLogout() {
                 var tokKeep = _adminToken;
                 _adminToken = '';
                 _channelKey = '';
                 _seenInboxMsgKeys = new Set();
                 _convChatTokens = {};
+                _adminTabMemCache = {};
                 disconnectAdminRealtime();
                 if (tokKeep && window.NexSbChat && typeof window.NexSbChat.sbRpc === 'function') {
                     window.NexSbChat.sbRpc('nex4up_s4_admin_logout', { p_admin_token: tokKeep });
@@ -17295,6 +17348,8 @@ window.NexAsyncBtn = (function() {
                 disconnectAdminRealtime: disconnectAdminRealtime,
                 fetchOrdersFast: fetchOrdersFast,
                 fetchDashboardFast: fetchDashboardFast,
+                fetchAdminCacheFast: fetchAdminCacheFast,
+                invalidateLocalTabCache: invalidateLocalTabCache,
                 fetchConversationsFast: fetchConversationsFast,
                 fetchMessagesFast: fetchMessagesFast,
                 markThreadReadFast: markThreadReadFast,
@@ -17305,6 +17360,210 @@ window.NexAsyncBtn = (function() {
                 handleLiveOrderUpdated: handleLiveOrderUpdated,
                 handleLiveDashboardUpdated: handleLiveDashboardUpdated,
                 onLogout: onLogout
+            };
+        })();
+
+        // ================================================================
+        // ⚡ STAGE 5: FULL HYBRID PARITY (QRs, REVIEWS, CUSTOMER STATE)
+        // ================================================================
+        window.NexSbStage5 = (function() {
+            var _custStateCache = null;
+            var _custStateInflight = null;
+            var _custStateTtlMs = 3 * 60 * 1000;
+            var _bootstrappedEmails = {};
+
+            function cleanEm(em) {
+                return (window.NexSbChat && typeof window.NexSbChat.cleanEmail === 'function')
+                    ? window.NexSbChat.cleanEmail(em)
+                    : String(em || '').trim().toLowerCase();
+            }
+
+            function isCustomerReady() {
+                if (typeof customer === 'undefined' || !customer || !customer.email || !window.NexSbChat) return false;
+                return !!window.NexSbChat.getCachedToken(customer.email);
+            }
+
+            function invalidateCustomerState() {
+                _custStateCache = null;
+                _custStateInflight = null;
+            }
+
+            function fetchPaymentQRsFast() {
+                if (!window.NexSbChat) return Promise.resolve({ ok: false });
+                var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                var tid = controller ? setTimeout(function() { controller.abort(); }, 3500) : null;
+                var url = window.NexSbChat.SB_URL + '/rest/v1/nex4up_storefront_cache?cache_key=eq.payment_qrs_v1&select=payload,updated_at';
+                return fetch(url, {
+                    method: 'GET',
+                    headers: { 'apikey': window.NexSbChat.SB_PUB_KEY },
+                    signal: controller ? controller.signal : undefined
+                }).then(function(res) {
+                    if (tid) clearTimeout(tid);
+                    if (!res.ok) return { ok: false };
+                    return res.json().then(function(rows) {
+                        var row = Array.isArray(rows) && rows[0] ? rows[0] : null;
+                        if (row && row.payload && typeof row.payload === 'object' && Object.keys(row.payload).length > 0) {
+                            return { ok: true, qrs: row.payload, updatedAt: row.updated_at };
+                        }
+                        return { ok: false };
+                    }).catch(function() { return { ok: false }; });
+                }).catch(function() {
+                    if (tid) clearTimeout(tid);
+                    return { ok: false };
+                });
+            }
+
+            function fetchReviewsFast(gameId) {
+                var gid = String(gameId || '').trim();
+                if (!gid || !window.NexSbChat || typeof window.NexSbChat.sbRpc !== 'function') {
+                    return Promise.resolve({ ok: false });
+                }
+                return window.NexSbChat.sbRpc('nex4up_s5_get_reviews', { p_game_id: gid, p_limit: 100 });
+            }
+
+            function fetchMyReviewFast(gameId) {
+                var gid = String(gameId || '').trim();
+                if (!gid || !isCustomerReady() || !window.NexSbChat) {
+                    return Promise.resolve({ ok: false });
+                }
+                var em = cleanEm(customer.email);
+                var tok = window.NexSbChat.getCachedToken(em);
+                if (!tok) return Promise.resolve({ ok: false });
+                return window.NexSbChat.sbRpc('nex4up_s5_get_my_review', {
+                    p_email: em,
+                    p_chat_token: tok,
+                    p_game_id: gid
+                });
+            }
+
+            function triggerBackgroundBootstrap(em, tokSession) {
+                if (!em || !tokSession || _bootstrappedEmails[em]) return;
+                if (typeof google === 'undefined' || !google.script || !google.script.run || typeof google.script.run.getCustomerStage5Bootstrap !== 'function') return;
+                _bootstrappedEmails[em] = true;
+                google.script.run
+                    .withSuccessHandler(function(bRes) {
+                        if (bRes && bRes.success && bRes.state) {
+                            _custStateCache = {
+                                email: em,
+                                state: Object.assign({ ok: true, found: true }, bRes.state),
+                                fetchedAt: Date.now()
+                            };
+                            if (bRes.chatToken && window.NexSbChat && typeof window.NexSbChat.saveCachedToken === 'function') {
+                                window.NexSbChat.saveCachedToken(em, bRes.chatToken);
+                            }
+                        }
+                    })
+                    .withFailureHandler(function() {})
+                    .getCustomerStage5Bootstrap(em, tokSession);
+            }
+
+            function resolveCustomerChatToken(em) {
+                var tok = window.NexSbChat ? window.NexSbChat.getCachedToken(em) : '';
+                if (tok) return Promise.resolve(tok);
+                if (typeof customer !== 'undefined' && customer && customer.sessionToken && window.NexSbChat && typeof window.NexSbChat.resolveToken === 'function') {
+                    return window.NexSbChat.resolveToken({ email: em, name: customer.name || '' }).then(function(tr) {
+                        return (tr && tr.ok && tr.chatToken) ? String(tr.chatToken) : '';
+                    });
+                }
+                return Promise.resolve('');
+            }
+
+            function fetchCustomerStateFast(forceOpt) {
+                if (typeof customer === 'undefined' || !customer || !customer.email || !window.NexSbChat) {
+                    return Promise.resolve({ ok: false });
+                }
+                var em = cleanEm(customer.email);
+                var force = (forceOpt === true);
+                if (!force && _custStateCache && _custStateCache.email === em && (Date.now() - _custStateCache.fetchedAt) <= _custStateTtlMs) {
+                    return Promise.resolve({ ok: true, state: _custStateCache.state, fromMemory: true });
+                }
+                if (!force && _custStateInflight && _custStateInflight.email === em) {
+                    return _custStateInflight.promise;
+                }
+
+                var p = resolveCustomerChatToken(em).then(function(tok) {
+                    if (!tok) return { ok: false, error: 'no_token' };
+                    return window.NexSbChat.sbRpc('nex4up_s5_get_customer_state', {
+                        p_email: em,
+                        p_chat_token: tok
+                    }).then(function(res) {
+                        if (res && res.ok && res.found) {
+                            _custStateCache = { email: em, state: res, fetchedAt: Date.now() };
+                            return { ok: true, state: res };
+                        }
+                        if (res && res.ok && !res.found && customer && customer.sessionToken) {
+                            triggerBackgroundBootstrap(em, customer.sessionToken);
+                        } else if (res && res.error === 'invalid_token' && window.NexSbChat.clearCachedToken) {
+                            window.NexSbChat.clearCachedToken(em);
+                        }
+                        return { ok: false };
+                    });
+                }).then(function(out) {
+                    if (_custStateInflight && _custStateInflight.email === em) _custStateInflight = null;
+                    return out;
+                });
+
+                _custStateInflight = { email: em, promise: p };
+                return p;
+            }
+
+            function toggleWishlistFast(gameId) {
+                var gid = String(gameId || '').trim();
+                if (!gid || !isCustomerReady() || !window.NexSbChat) {
+                    return Promise.resolve({ ok: false });
+                }
+                var em = cleanEm(customer.email);
+                var tok = window.NexSbChat.getCachedToken(em);
+                if (!tok) return Promise.resolve({ ok: false });
+                return window.NexSbChat.sbRpc('nex4up_s5_toggle_wishlist_fast', {
+                    p_email: em,
+                    p_chat_token: tok,
+                    p_game_id: gid
+                }).then(function(res) {
+                    if (res && res.ok) {
+                        if (_custStateCache && _custStateCache.email === em && _custStateCache.state) {
+                            _custStateCache.state.wishlistIds = res.wishlistIds;
+                            _custStateCache.fetchedAt = Date.now();
+                        }
+                        return { ok: true, added: !!res.added, wishlistIds: res.wishlistIds || [] };
+                    }
+                    return { ok: false };
+                });
+            }
+
+            function handleLiveCustomerStateEvent(payload) {
+                if (typeof customer === 'undefined' || !customer || !customer.email) return;
+                var em = cleanEm(customer.email);
+                if (payload && payload.email && cleanEm(payload.email) !== em) return;
+                invalidateCustomerState();
+                fetchCustomerStateFast(true).then(function(res) {
+                    if (!res || !res.ok || !res.state) return;
+                    var st = res.state;
+                    if (typeof st.pointsBalance === 'number') {
+                        customer.points = st.pointsBalance;
+                        if (typeof applyCustomerPointsBalance === 'function') {
+                            applyCustomerPointsBalance(st.pointsBalance);
+                        }
+                        ['nex2SidebarPts', 'nex2OvPts'].forEach(function(id) {
+                            var el = document.getElementById(id);
+                            if (el) el.textContent = st.pointsBalance.toLocaleString();
+                        });
+                    }
+                    if (Array.isArray(st.wishlistIds) && typeof applyWishlistIds === 'function') {
+                        applyWishlistIds(st.wishlistIds);
+                    }
+                });
+            }
+
+            return {
+                isCustomerReady: isCustomerReady,
+                fetchPaymentQRsFast: fetchPaymentQRsFast,
+                fetchReviewsFast: fetchReviewsFast,
+                fetchMyReviewFast: fetchMyReviewFast,
+                fetchCustomerStateFast: fetchCustomerStateFast,
+                toggleWishlistFast: toggleWishlistFast,
+                invalidateCustomerState: invalidateCustomerState,
+                handleLiveCustomerStateEvent: handleLiveCustomerStateEvent
             };
         })();
                 // ================================================================
@@ -18998,30 +19257,53 @@ var customerPointsBalance = 0;
 var pointsToRedeem = 0;
 var POINT_VALUE = 0.01; // 1 point = RM0.01
 
+function applyCustomerPointsBalance(points) {
+    customerPointsBalance = parseInt(points, 10) || 0;
+    var sec = document.getElementById('pointsRedemptionSection');
+    if (customerPointsBalance > 0) {
+        if (sec) sec.style.display = 'block';
+        var disp = document.getElementById('availablePointsDisplay');
+        var valEl = document.getElementById('availablePointsValue');
+        var inp = document.getElementById('pointsToUseInput');
+        var fb = document.getElementById('pointsFeedback');
+        if (disp) disp.textContent = customerPointsBalance;
+        if (valEl) valEl.textContent = (customerPointsBalance * POINT_VALUE).toFixed(2);
+        if (inp) { inp.max = customerPointsBalance; inp.value = 0; }
+        if (fb) fb.textContent = '';
+        pointsToRedeem = 0;
+    } else {
+        if (sec) sec.style.display = 'none';
+    }
+}
+window.applyCustomerPointsBalance = applyCustomerPointsBalance;
+
 function loadCustomerPoints() {
     if (!customer || !customer.email) {
-        document.getElementById('pointsRedemptionSection').style.display = 'none';
+        var sec = document.getElementById('pointsRedemptionSection');
+        if (sec) sec.style.display = 'none';
         return;
     }
-    google.script.run
-        .withSuccessHandler(function(points) {
-            customerPointsBalance = parseInt(points) || 0;
-            if (customerPointsBalance > 0) {
-                document.getElementById('pointsRedemptionSection').style.display = 'block';
-                document.getElementById('availablePointsDisplay').textContent = customerPointsBalance;
-                document.getElementById('availablePointsValue').textContent = (customerPointsBalance * POINT_VALUE).toFixed(2);
-                document.getElementById('pointsToUseInput').max = customerPointsBalance;
-                document.getElementById('pointsToUseInput').value = 0;
-                document.getElementById('pointsFeedback').textContent = '';
-                pointsToRedeem = 0;
-            } else {
-                document.getElementById('pointsRedemptionSection').style.display = 'none';
+    function loadPointsFromGas() {
+        google.script.run
+            .withSuccessHandler(function(points) {
+                applyCustomerPointsBalance(points);
+            })
+            .withFailureHandler(function(err) {
+                console.log('Points load error:', err);
+            })
+            .getCustomerPoints(customer.email);
+    }
+    if (window.NexSbStage5 && typeof window.NexSbStage5.fetchCustomerStateFast === 'function') {
+        window.NexSbStage5.fetchCustomerStateFast().then(function(sbRes) {
+            if (sbRes && sbRes.ok && sbRes.state && typeof sbRes.state.pointsBalance === 'number') {
+                applyCustomerPointsBalance(sbRes.state.pointsBalance);
+                return;
             }
-        })
-        .withFailureHandler(function(err) {
-            console.log('Points load error:', err);
-        })
-        .getCustomerPoints(customer.email);
+            loadPointsFromGas();
+        });
+        return;
+    }
+    loadPointsFromGas();
 }
 
 function updatePointsPreview() {
@@ -20366,20 +20648,36 @@ var promoData = appliedPromo ? {
                 return;
             }
 
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run
-                    .withSuccessHandler(function(qrs) {
-                        paymentQRsCache = qrs || {};
-                        renderFn(paymentQRsCache);
-                    })
-                    .withFailureHandler(function(err) {
-                        display.innerHTML = '<div class="qr-loading" style="color:#ff6b6b;">' +
-                            '<i class="fas fa-exclamation-triangle"></i><br />Could not load QR.<br />' + (err && err.message ? err.message : '') + '</div>';
-                    })
-                    .getPaymentQRs();
-            } else {
-                display.innerHTML = '<div class="qr-loading" style="color:#ff6b6b;">QR system not available.</div>';
+            function loadQRsFromGas() {
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    google.script.run
+                        .withSuccessHandler(function(qrs) {
+                            paymentQRsCache = qrs || {};
+                            renderFn(paymentQRsCache);
+                        })
+                        .withFailureHandler(function(err) {
+                            display.innerHTML = '<div class="qr-loading" style="color:#ff6b6b;">' +
+                                '<i class="fas fa-exclamation-triangle"></i><br />Could not load QR.<br />' + (err && err.message ? err.message : '') + '</div>';
+                        })
+                        .getPaymentQRs();
+                } else {
+                    display.innerHTML = '<div class="qr-loading" style="color:#ff6b6b;">QR system not available.</div>';
+                }
             }
+
+            if (window.NexSbStage5 && typeof window.NexSbStage5.fetchPaymentQRsFast === 'function') {
+                window.NexSbStage5.fetchPaymentQRsFast().then(function(sbRes) {
+                    if (sbRes && sbRes.ok && sbRes.qrs) {
+                        paymentQRsCache = sbRes.qrs;
+                        renderFn(paymentQRsCache);
+                        return;
+                    }
+                    loadQRsFromGas();
+                });
+                return;
+            }
+
+            loadQRsFromGas();
         }
 
         function confirmSociaBuzzPaymentClient() {
@@ -22989,29 +23287,66 @@ function loadOrders() {
             }
             currentReviewGameId = gameId;
 
-            google.script.run
-                .withSuccessHandler(function(reviews) {
-                    if (!reviews || !Array.isArray(reviews)) reviews = [];
-                    renderReviews(reviews);
-
-                    if (customer) {
-                        google.script.run
-                            .withSuccessHandler(function(existingReview) {
-                                renderReviewForm(existingReview);
-                            })
-                            .withFailureHandler(function(err) {
-                                renderReviewForm(null);
-                            })
-                            .getCustomerReview(gameId, customer.email);
-                    } else {
+            function loadCustomerReviewFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(existingReview) {
+                        renderReviewForm(existingReview);
+                    })
+                    .withFailureHandler(function() {
                         renderReviewForm(null);
-                    }
-                })
-                .withFailureHandler(function(err) {
-                    reviewListEl.innerHTML = '<p style="color:#ff6b6b;">Error loading reviews.</p>';
+                    })
+                    .getCustomerReview(gameId, customer.email);
+            }
+
+            function loadMyReviewFastOrGas() {
+                if (!customer) {
                     renderReviewForm(null);
-                })
-                .getReviews(gameId);
+                    return;
+                }
+                if (window.NexSbStage5 && typeof window.NexSbStage5.isCustomerReady === 'function' && window.NexSbStage5.isCustomerReady()) {
+                    window.NexSbStage5.fetchMyReviewFast(gameId).then(function(myRes) {
+                        if (myRes && myRes.ok) {
+                            renderReviewForm(myRes.found ? myRes.review : null);
+                            return;
+                        }
+                        loadCustomerReviewFromGas();
+                    });
+                    return;
+                }
+                loadCustomerReviewFromGas();
+            }
+
+            function loadReviewsFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(reviews) {
+                        if (!reviews || !Array.isArray(reviews)) reviews = [];
+                        renderReviews(reviews);
+                        if (customer) {
+                            loadCustomerReviewFromGas();
+                        } else {
+                            renderReviewForm(null);
+                        }
+                    })
+                    .withFailureHandler(function(err) {
+                        reviewListEl.innerHTML = '<p style="color:#ff6b6b;">Error loading reviews.</p>';
+                        renderReviewForm(null);
+                    })
+                    .getReviews(gameId);
+            }
+
+            if (window.NexSbStage5 && typeof window.NexSbStage5.fetchReviewsFast === 'function') {
+                window.NexSbStage5.fetchReviewsFast(gameId).then(function(sbRes) {
+                    if (sbRes && sbRes.ok && Array.isArray(sbRes.reviews) && sbRes.reviews.length > 0) {
+                        renderReviews(sbRes.reviews);
+                        loadMyReviewFastOrGas();
+                        return;
+                    }
+                    loadReviewsFromGas();
+                });
+                return;
+            }
+
+            loadReviewsFromGas();
         }
 
 function renderReviews(reviews) {
@@ -23246,6 +23581,9 @@ function renderReviews(reviews) {
             updateProfileDropdown();
             if (typeof loadNex4Up2Bootstrap === 'function') loadNex4Up2Bootstrap();
             if (window.NexSbChat) window.NexSbChat.onLogout();
+            if (window.NexSbStage5 && typeof window.NexSbStage5.invalidateCustomerState === 'function') {
+                window.NexSbStage5.invalidateCustomerState();
+            }
             showToast('Logged out successfully.');
             showStoreView();
             renderPaginatedGrid();
@@ -24081,19 +24419,42 @@ function submitInlineReview() {
         // ================================================================
         // 29. WISHLIST FUNCTIONS
         // ================================================================
+        function applyWishlistIds(ids) {
+            var normalized = (ids || []).map(function(x) {
+                var n = parseInt(x, 10);
+                return isNaN(n) ? x : n;
+            });
+            wishlistIds = new Set(normalized);
+            var wishBtns = document.querySelectorAll('.wishlist-btn');
+            for (var i = 0; i < wishBtns.length; i++) {
+                var id = parseInt(wishBtns[i].dataset.id, 10);
+                var isAct = wishlistIds.has(id) || wishlistIds.has(String(wishBtns[i].dataset.id || ''));
+                wishBtns[i].classList.toggle('active', isAct);
+            }
+        }
+        window.applyWishlistIds = applyWishlistIds;
+
         function loadWishlistIds() {
             if (!customer) return;
-            google.script.run
-                .withSuccessHandler(function(ids) {
-                    wishlistIds = new Set(ids);
-                    var wishBtns = document.querySelectorAll('.wishlist-btn');
-                    for (var i = 0; i < wishBtns.length; i++) {
-                        var id = parseInt(wishBtns[i].dataset.id);
-                        wishBtns[i].classList.toggle('active', wishlistIds.has(id));
+            function loadWishlistIdsFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(ids) {
+                        applyWishlistIds(ids);
+                    })
+                    .withFailureHandler(function(err) { })
+                    .getWishlistIds(customer.email);
+            }
+            if (window.NexSbStage5 && typeof window.NexSbStage5.fetchCustomerStateFast === 'function') {
+                window.NexSbStage5.fetchCustomerStateFast().then(function(sbRes) {
+                    if (sbRes && sbRes.ok && sbRes.state && Array.isArray(sbRes.state.wishlistIds)) {
+                        applyWishlistIds(sbRes.state.wishlistIds);
+                        return;
                     }
-                })
-                .withFailureHandler(function(err) { })
-                .getWishlistIds(customer.email);
+                    loadWishlistIdsFromGas();
+                });
+                return;
+            }
+            loadWishlistIdsFromGas();
         }
 
         function toggleWishlist(gameId) {
@@ -24102,79 +24463,137 @@ function submitInlineReview() {
                 loginOverlay.classList.add('open');
                 return;
             }
+            var gidNum = parseInt(gameId, 10);
+            var keyId = isNaN(gidNum) ? gameId : gidNum;
             var btn = document.querySelector('.wishlist-btn[data-id="' + gameId + '"]');
-            if (btn) btn.disabled = true;
-            google.script.run
-                .withSuccessHandler(function(result) {
-                    if (result.added) {
-                        wishlistIds.add(gameId);
-                        if (btn) btn.classList.add('active');
-                        showToast('Added to wishlist!');
-                    } else {
-                        wishlistIds.delete(gameId);
-                        if (btn) btn.classList.remove('active');
-                        showToast('Removed from wishlist.');
+
+            function toggleViaGas() {
+                if (btn) btn.disabled = true;
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result && result.added) {
+                            wishlistIds.add(keyId);
+                            if (btn) btn.classList.add('active');
+                            showToast('Added to wishlist!');
+                        } else {
+                            wishlistIds.delete(keyId);
+                            wishlistIds.delete(String(keyId));
+                            if (btn) btn.classList.remove('active');
+                            showToast('Removed from wishlist.');
+                        }
+                        if (btn) btn.disabled = false;
+                    })
+                    .withFailureHandler(function() {
+                        showToast('Error updating wishlist.');
+                        if (btn) btn.disabled = false;
+                    })
+                    .toggleWishlist(customer.email, keyId);
+            }
+
+            if (window.NexSbStage5 && typeof window.NexSbStage5.isCustomerReady === 'function' && window.NexSbStage5.isCustomerReady()) {
+                var wasInWishlist = wishlistIds.has(keyId) || wishlistIds.has(String(keyId));
+                var nextAdded = !wasInWishlist;
+                if (nextAdded) {
+                    wishlistIds.add(keyId);
+                } else {
+                    wishlistIds.delete(keyId);
+                    wishlistIds.delete(String(keyId));
+                }
+                if (btn) btn.classList.toggle('active', nextAdded);
+                showToast(nextAdded ? 'Added to wishlist!' : 'Removed from wishlist.');
+
+                window.NexSbStage5.toggleWishlistFast(keyId).then(function(sbRes) {
+                    if (sbRes && sbRes.ok) {
+                        if (typeof google !== 'undefined' && google.script && google.script.run) {
+                            google.script.run.withFailureHandler(function() {}).toggleWishlist(customer.email, keyId);
+                        }
+                        return;
                     }
-                    if (btn) btn.disabled = false;
-                })
-                .withFailureHandler(function(err) {
-                    showToast('Error updating wishlist.');
-                    if (btn) btn.disabled = false;
-                })
-                .toggleWishlist(customer.email, gameId);
+                    if (wasInWishlist) wishlistIds.add(keyId);
+                    else { wishlistIds.delete(keyId); wishlistIds.delete(String(keyId)); }
+                    if (btn) btn.classList.toggle('active', wasInWishlist);
+                    toggleViaGas();
+                });
+                return;
+            }
+
+            toggleViaGas();
+        }
+
+        function renderWishlistGames(games) {
+            if (!games || games.length === 0) {
+                wishlistGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px 0; color:#6a7f9e;"><i class="fas fa-heart fa-3x" style="color:#2a3a52; margin-bottom:16px;"></i><p>Your wishlist is empty. Start adding games!</p></div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < games.length; i++) {
+                var game = games[i];
+                var priceDisplay = game.discount && game.discount > 0 ?
+                    CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2) + ' <span class="original">' + CURRENCY + ' ' + game.price.toFixed(2) + '</span>' :
+                    CURRENCY + ' ' + game.price.toFixed(2);
+                html += '<div class="game-card" data-id="' + game.id + '">';
+                html += '<div class="img-wrap"><img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;"/>';
+                if (game.badge) html += '<span class="badge-top">' + game.badge + '</span>';
+                html += '</div><div class="card-body">';
+                html += '<h3>' + game.title + '</h3>';
+                html += '<div class="category">' + (game.category || 'General') + '</div>';
+                html += '<div class="desc">' + (game.description || '') + '</div>';
+                html += '<div class="stock-info ' + (game.quantity <= 0 ? 'out-of-stock' : '') + '">' + (game.quantity <= 0 ? 'Out of Stock' : 'Stock: ' + game.quantity) + '</div>';
+                var isVarProd = game.hasVariants && game.variantOptions && game.variantOptions.length > 0;
+                html += '<div class="card-footer"><div class="price">' + priceDisplay + '</div>';
+                if (isVarProd) {
+                    html += '<button class="select-options-btn" onclick="openGameById(' + game.id + ')"><i class="fas fa-hand-pointer"></i> Select</button>';
+                } else {
+                    html += '<button class="add-btn" onclick="addToCartById(' + game.id + ')"><i class="fas fa-plus"></i> Add</button>';
+                }
+                html += '</div></div></div>';
+            }
+            wishlistGrid.innerHTML = html;
+            var cards = wishlistGrid.querySelectorAll('.game-card');
+            for (var c = 0; c < cards.length; c++) {
+                cards[c].addEventListener('click', function(e) {
+                    if (e.target.closest('.add-btn')) return;
+                    var id = parseInt(this.dataset.id);
+                    var game = null;
+                    for (var g = 0; g < allGames.length; g++) {
+                        if (allGames[g].id === id) { game = allGames[g]; break; }
+                    }
+                    if (game) openProductModal(game);
+                });
+            }
         }
 
         function loadWishlist() {
             if (!customer) return;
             wishlistGrid.innerHTML = createSkeletonCards(4);
-            google.script.run
-                .withSuccessHandler(function(games) {
-                    if (!games || games.length === 0) {
-                        wishlistGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:60px 0; color:#6a7f9e;"><i class="fas fa-heart fa-3x" style="color:#2a3a52; margin-bottom:16px;"></i><p>Your wishlist is empty. Start adding games!</p></div>';
+
+            function loadWishlistFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(games) {
+                        renderWishlistGames(games);
+                    })
+                    .withFailureHandler(function(err) {
+                        var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getWishlist') : 'Unable to load your wishlist right now.';
+                        wishlistGrid.innerHTML = '<div class="nex-friendly-error-card" style="grid-column:1/-1;"><p style="margin:0 0 10px;">' + escapeHtml(msg) + '</p><button type="button" class="nex-retry-btn" onclick="loadWishlist()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
+                    })
+                    .getWishlist(customer.email);
+            }
+
+            if (window.NexSbStage5 && typeof window.NexSbStage5.fetchCustomerStateFast === 'function') {
+                window.NexSbStage5.fetchCustomerStateFast().then(function(sbRes) {
+                    if (sbRes && sbRes.ok && sbRes.state && Array.isArray(sbRes.state.wishlistIds) && Array.isArray(allGames) && allGames.length > 0) {
+                        var want = new Set(sbRes.state.wishlistIds.map(function(x) { return String(x); }));
+                        applyWishlistIds(sbRes.state.wishlistIds);
+                        var matchedGames = allGames.filter(function(g) { return g && want.has(String(g.id)); });
+                        renderWishlistGames(matchedGames);
                         return;
                     }
-                    var html = '';
-                    for (var i = 0; i < games.length; i++) {
-                        var game = games[i];
-                        var priceDisplay = game.discount && game.discount > 0 ?
-                            CURRENCY + ' ' + (game.price * (1 - game.discount / 100)).toFixed(2) + ' <span class="original">' + CURRENCY + ' ' + game.price.toFixed(2) + '</span>' :
-                            CURRENCY + ' ' + game.price.toFixed(2);
-                        html += '<div class="game-card" data-id="' + game.id + '">';
-                        html += '<div class="img-wrap"><img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '" alt="' + game.title + '" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;"/>';
-                        if (game.badge) html += '<span class="badge-top">' + game.badge + '</span>';
-                        html += '</div><div class="card-body">';
-                        html += '<h3>' + game.title + '</h3>';
-                        html += '<div class="category">' + (game.category || 'General') + '</div>';
-                        html += '<div class="desc">' + (game.description || '') + '</div>';
-                        html += '<div class="stock-info ' + (game.quantity <= 0 ? 'out-of-stock' : '') + '">' + (game.quantity <= 0 ? 'Out of Stock' : 'Stock: ' + game.quantity) + '</div>';
-                        var isVarProd = game.hasVariants && game.variantOptions && game.variantOptions.length > 0;
-                        html += '<div class="card-footer"><div class="price">' + priceDisplay + '</div>';
-                        if (isVarProd) {
-                            html += '<button class="select-options-btn" onclick="openGameById(' + game.id + ')"><i class="fas fa-hand-pointer"></i> Select</button>';
-                        } else {
-                            html += '<button class="add-btn" onclick="addToCartById(' + game.id + ')"><i class="fas fa-plus"></i> Add</button>';
-                        }
-                        html += '</div></div></div>';
-                    }
-                    wishlistGrid.innerHTML = html;
-                    var cards = wishlistGrid.querySelectorAll('.game-card');
-                    for (var c = 0; c < cards.length; c++) {
-                        cards[c].addEventListener('click', function(e) {
-                            if (e.target.closest('.add-btn')) return;
-                            var id = parseInt(this.dataset.id);
-                            var game = null;
-                            for (var g = 0; g < allGames.length; g++) {
-                                if (allGames[g].id === id) { game = allGames[g]; break; }
-                            }
-                            if (game) openProductModal(game);
-                        });
-                    }
-                })
-                .withFailureHandler(function(err) {
-                    var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getWishlist') : 'Unable to load your wishlist right now.';
-                    wishlistGrid.innerHTML = '<div class="nex-friendly-error-card" style="grid-column:1/-1;"><p style="margin:0 0 10px;">' + escapeHtml(msg) + '</p><button type="button" class="nex-retry-btn" onclick="loadWishlist()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
-                })
-                .getWishlist(customer.email);
+                    loadWishlistFromGas();
+                });
+                return;
+            }
+
+            loadWishlistFromGas();
         }
 
           function openGameById(gameId) {
@@ -24498,21 +24917,39 @@ function submitInlineReview() {
         // ================================================================
         // 36. GENRE IMAGE MANAGEMENT
         // ================================================================
-        function loadGenreImages() {
+        function renderGenreImagesData(images) {
+            genreImages = images || {};
+            renderGenreManager();
+            renderGenreBanner();
+            renderGenreCards();
+            setupCarouselArrows();
+        }
+
+        function loadGenreImages(forceRefreshOpt) {
             if (!isAdmin) return;
+            var forceRefresh = (forceRefreshOpt === true);
             genreList.innerHTML = '<p style="color:#6a7f9e;">Loading genre images...</p>';
-            google.script.run
-                .withSuccessHandler(function(images) {
-                    genreImages = images || {};
-                    renderGenreManager();
-                    renderGenreBanner();
-                    renderGenreCards();
-                    setupCarouselArrows();
-                })
-                .withFailureHandler(function(err) {
-                    genreList.innerHTML = '<p style="color:#ff6b6b;">Error loading genre images: ' + err.message + '</p>';
-                })
-                .getGenreImages();
+            function loadGenreImagesFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(images) {
+                        renderGenreImagesData(images);
+                    })
+                    .withFailureHandler(function(err) {
+                        genreList.innerHTML = '<p style="color:#ff6b6b;">Error loading genre images: ' + err.message + '</p>';
+                    })
+                    .getGenreImages();
+            }
+            if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+                window.NexSbAdmin.fetchAdminCacheFast('admin_genres').then(function(sbRes) {
+                    if (sbRes && sbRes.ok && sbRes.payload && typeof sbRes.payload === 'object') {
+                        renderGenreImagesData(sbRes.payload);
+                        return;
+                    }
+                    loadGenreImagesFromGas();
+                });
+                return;
+            }
+            loadGenreImagesFromGas();
         }
 
         function renderGenreManager() {
@@ -24630,6 +25067,35 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
         // ================================================================
         // 37. REFERRAL – LOAD CUSTOMER DATA
         // ================================================================
+        function renderReferralDataPayload(data) {
+            if (data && data.referralLink) {
+                referralLink.value = data.referralLink;
+            } else {
+                referralLink.value = 'No referral code available.';
+            }
+
+            referralCompletedCount.textContent = (data && data.completedCount) ? data.completedCount : 0;
+            referralNextReward.textContent = (data && data.nextReward) ? data.nextReward : 'No reward yet. Keep referring!';
+
+            var historyHtml = '';
+            if (data && data.referrals && data.referrals.length > 0) {
+                for (var i = 0; i < data.referrals.length; i++) {
+                    var r = data.referrals[i];
+                    historyHtml += '<div style="display:flex; justify-content:space-between; padding:6px 12px; border-bottom:1px solid #1a2538; font-size:14px;">';
+                    historyHtml += '<span>' + (r.friendEmail || 'Unknown') + '</span>';
+                    historyHtml += '<span><span class="status-badge status-' + (r.status === 'Completed' ? 'paid' : 'pending') + '">' + r.status + '</span></span>';
+                    historyHtml += '<span style="color:#6a7f9e; font-size:13px;">' + (r.referredAt ? new Date(r.referredAt).toLocaleDateString() : '') + '</span>';
+                    historyHtml += '</div>';
+                }
+            } else {
+                historyHtml = '<p style="color:#6a7f9e; text-align:center; padding:12px;">You haven\'t referred anyone yet.</p>';
+            }
+            referralHistory.innerHTML = historyHtml;
+
+            referralStatus.textContent = '✅ Referral data loaded.';
+            referralStatus.style.color = '#4caf50';
+        }
+
         function loadReferralData() {
             if (!customer) {
                 referralLink.value = '';
@@ -24639,42 +25105,31 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
                 return;
             }
 
-            google.script.run
-                .withSuccessHandler(function(data) {
-    // ✅ Safely check if data exists before accessing it
-    if (data && data.referralLink) {
-        referralLink.value = data.referralLink;
-    } else {
-        referralLink.value = 'No referral code available.';
-    }
+            function loadReferralFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(data) {
+                        renderReferralDataPayload(data);
+                    })
+                    .withFailureHandler(function(err) {
+                        referralStatus.textContent = 'Error loading referral data.';
+                        referralStatus.style.color = '#ff6b6b';
+                        console.error(err);
+                    })
+                    .getCustomerReferralData(customer.email);
+            }
 
-    referralCompletedCount.textContent = (data && data.completedCount) ? data.completedCount : 0;
-    referralNextReward.textContent = (data && data.nextReward) ? data.nextReward : 'No reward yet. Keep referring!';
+            if (window.NexSbStage5 && typeof window.NexSbStage5.fetchCustomerStateFast === 'function') {
+                window.NexSbStage5.fetchCustomerStateFast().then(function(sbRes) {
+                    if (sbRes && sbRes.ok && sbRes.state && sbRes.state.referral && typeof sbRes.state.referral === 'object') {
+                        renderReferralDataPayload(sbRes.state.referral);
+                        return;
+                    }
+                    loadReferralFromGas();
+                });
+                return;
+            }
 
-    var historyHtml = '';
-    if (data && data.referrals && data.referrals.length > 0) {
-        for (var i = 0; i < data.referrals.length; i++) {
-            var r = data.referrals[i];
-            historyHtml += '<div style="display:flex; justify-content:space-between; padding:6px 12px; border-bottom:1px solid #1a2538; font-size:14px;">';
-            historyHtml += '<span>' + (r.friendEmail || 'Unknown') + '</span>';
-            historyHtml += '<span><span class="status-badge status-' + (r.status === 'Completed' ? 'paid' : 'pending') + '">' + r.status + '</span></span>';
-            historyHtml += '<span style="color:#6a7f9e; font-size:13px;">' + (r.referredAt ? new Date(r.referredAt).toLocaleDateString() : '') + '</span>';
-            historyHtml += '</div>';
-        }
-    } else {
-        historyHtml = '<p style="color:#6a7f9e; text-align:center; padding:12px;">You haven\'t referred anyone yet.</p>';
-    }
-    referralHistory.innerHTML = historyHtml;
-
-    referralStatus.textContent = '✅ Referral data loaded.';
-    referralStatus.style.color = '#4caf50';
-})
-                .withFailureHandler(function(err) {
-                    referralStatus.textContent = 'Error loading referral data.';
-                    referralStatus.style.color = '#ff6b6b';
-                    console.error(err);
-                })
-                .getCustomerReferralData(customer.email);
+            loadReferralFromGas();
         }
 
         // ================================================================
@@ -24730,57 +25185,77 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
         // ================================================================
         // 39. ADMIN – REFERRAL CONFIG
         // ================================================================
-        function loadReferralConfig() {
+        function renderReferralConfigForm(config) {
+            var container = document.getElementById('referralConfigContainer');
+            if (!container) return;
+            if (!config || Object.keys(config).length === 0) {
+                container.innerHTML = '<p style="color:#ff6b6b;">No config found. Please run setup.</p>';
+                return;
+            }
+            var html = '<form class="referral-config-form" id="referralConfigForm">';
+            var keys = [
+                'Friend Coupon Code', 'Friend Discount Type', 'Friend Discount Value', 'Min Order for Friend',
+                'Tier 1 Referrals', 'Tier 1 Discount Type', 'Tier 1 Discount Value',
+                'Tier 2 Referrals', 'Tier 2 Discount Type', 'Tier 2 Discount Value',
+                'Tier 3 Referrals', 'Tier 3 Discount Type', 'Tier 3 Discount Value',
+                'Tier 4 Referrals', 'Tier 4 Discount Type', 'Tier 4 Discount Value',
+                'Tier 5+ Discount Type', 'Tier 5+ Discount Value',
+                'Max Per Customer'
+            ];
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                var value = config[key] || '';
+                var hint = '';
+                if (key.includes('Discount Type')) hint = 'percentage or fixed';
+                else if (key.includes('Discount Value')) hint = 'number';
+                else if (key.includes('Referrals')) hint = 'number of referrals';
+                else if (key.includes('Min Order') || key.includes('Max Per')) hint = 'amount';
+                html += '<div class="field">';
+                html += '<label for="cfg_' + key + '">' + key + '</label>';
+                html += '<input type="text" id="cfg_' + key + '" value="' + value + '" placeholder="' + key + '" />';
+                if (hint) html += '<span class="hint">' + hint + '</span>';
+                html += '</div>';
+            }
+            html += '<div class="actions">';
+            html += '<button type="submit" class="save-btn"><i class="fas fa-save"></i> Save Settings</button>';
+            html += '</div>';
+            html += '<div id="referralConfigStatus" class="referral-config-status"></div>';
+            html += '</form>';
+            container.innerHTML = html;
+
+            document.getElementById('referralConfigForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveReferralConfig();
+            });
+        }
+
+        function loadReferralConfig(forceRefreshOpt) {
             if (!isAdmin) return;
+            var forceRefresh = (forceRefreshOpt === true);
             if (window.NexRewardsUi && typeof window.NexRewardsUi.loadAdminTiers === 'function') { window.NexRewardsUi.loadAdminTiers(); }
             var container = document.getElementById('referralConfigContainer');
             container.innerHTML = '<p style="color:#6a7f9e;">Loading settings...</p>';
-            google.script.run
-                .withSuccessHandler(function(config) {
-                    if (!config || Object.keys(config).length === 0) {
-                        container.innerHTML = '<p style="color:#ff6b6b;">No config found. Please run setup.</p>';
+            function loadRefCfgFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(config) {
+                        renderReferralConfigForm(config);
+                    })
+                    .withFailureHandler(function(err) {
+                        container.innerHTML = '<p style="color:#ff6b6b;">Error loading config: ' + err.message + '</p>';
+                    })
+                    .getReferralConfig();
+            }
+            if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+                window.NexSbAdmin.fetchAdminCacheFast('admin_referral_config').then(function(sbRes) {
+                    if (sbRes && sbRes.ok && sbRes.payload && typeof sbRes.payload === 'object' && Object.keys(sbRes.payload).length > 0) {
+                        renderReferralConfigForm(sbRes.payload);
                         return;
                     }
-                    var html = '<form class="referral-config-form" id="referralConfigForm">';
-                    var keys = [
-                        'Friend Coupon Code', 'Friend Discount Type', 'Friend Discount Value', 'Min Order for Friend',
-                        'Tier 1 Referrals', 'Tier 1 Discount Type', 'Tier 1 Discount Value',
-                        'Tier 2 Referrals', 'Tier 2 Discount Type', 'Tier 2 Discount Value',
-                        'Tier 3 Referrals', 'Tier 3 Discount Type', 'Tier 3 Discount Value',
-                        'Tier 4 Referrals', 'Tier 4 Discount Type', 'Tier 4 Discount Value',
-                        'Tier 5+ Discount Type', 'Tier 5+ Discount Value',
-                        'Max Per Customer'
-                    ];
-                    for (var i = 0; i < keys.length; i++) {
-                        var key = keys[i];
-                        var value = config[key] || '';
-                        var hint = '';
-                        if (key.includes('Discount Type')) hint = 'percentage or fixed';
-                        else if (key.includes('Discount Value')) hint = 'number';
-                        else if (key.includes('Referrals')) hint = 'number of referrals';
-                        else if (key.includes('Min Order') || key.includes('Max Per')) hint = 'amount';
-                        html += '<div class="field">';
-                        html += '<label for="cfg_' + key + '">' + key + '</label>';
-                        html += '<input type="text" id="cfg_' + key + '" value="' + value + '" placeholder="' + key + '" />';
-                        if (hint) html += '<span class="hint">' + hint + '</span>';
-                        html += '</div>';
-                    }
-                    html += '<div class="actions">';
-                    html += '<button type="submit" class="save-btn"><i class="fas fa-save"></i> Save Settings</button>';
-                    html += '</div>';
-                    html += '<div id="referralConfigStatus" class="referral-config-status"></div>';
-                    html += '</form>';
-                    container.innerHTML = html;
-
-                    document.getElementById('referralConfigForm').addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        saveReferralConfig();
-                    });
-                })
-                .withFailureHandler(function(err) {
-                    container.innerHTML = '<p style="color:#ff6b6b;">Error loading config: ' + err.message + '</p>';
-                })
-                .getReferralConfig();
+                    loadRefCfgFromGas();
+                });
+                return;
+            }
+            loadRefCfgFromGas();
         }
 
         function saveReferralConfig() {
@@ -24970,52 +25445,77 @@ html += '<span class="genre-label"><i class="fas ' + icon + '"></i> ' + safeGenr
                 // ================================================================
         // 40. BACKUP & RESTORE
         // ================================================================
-        function loadBackupHistory() {
+        function renderBackupHistoryList(backupsStr) {
+            var container = document.getElementById('backupList');
+            if (!container) return;
+            var backups = [];
+            if (Array.isArray(backupsStr)) {
+                backups = backupsStr;
+            } else {
+                try {
+                    backups = JSON.parse(backupsStr || '[]');
+                } catch (e) {
+                    console.error('Failed to parse backups:', backupsStr);
+                    backups = [];
+                }
+            }
+            if (!backups || backups.length === 0) {
+                container.innerHTML = '<div class="empty-msg">No backups yet. Click "Create Backup Now" to make your first backup.</div>';
+                return;
+            }
+
+            var html = '<table><thead><tr><th>Backup ID</th><th>Date</th><th>Games</th><th>Type</th><th>Actions</th></tr></thead><tbody>';
+            for (var i = 0; i < backups.length; i++) {
+                var b = backups[i];
+                html += '<tr>';
+                html += '<td style="font-family:monospace; font-size:12px; color:#f7d875;">' + b.backupId + '</td>';
+                html += '<td>' + b.date + '</td>';
+                html += '<td>' + b.gameCount + '</td>';
+                html += '<td><span class="status-badge ' + (b.type === 'Auto' ? 'status-paid' : 'status-pending') + '">' + b.type + '</span></td>';
+                html += '<td><button class="approve-btn restore-backup-btn" data-backupid="' + b.backupId + '"><i class="fas fa-undo"></i> Restore</button></td>';
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html;
+
+            var restoreBtns = container.querySelectorAll('.restore-backup-btn');
+            for (var j = 0; j < restoreBtns.length; j++) {
+                restoreBtns[j].addEventListener('click', function() {
+                    var backupId = this.dataset.backupid;
+                    confirmRestoreBackup(backupId);
+                });
+            }
+        }
+
+        function loadBackupHistory(forceRefreshOpt) {
             if (!isAdmin) return;
+            var forceRefresh = (forceRefreshOpt === true);
             var container = document.getElementById('backupList');
             container.innerHTML = '<p style="color:#6a7f9e; text-align:center; padding:20px 0;">Loading backups...</p>';
-            
-            google.script.run
+
+            function loadBackupsFromGas() {
+                google.script.run
                     .withSuccessHandler(function(backupsStr) {
-                    // ✅ Parse the JSON string that came back
-                    var backups = [];
-                    try {
-                        backups = JSON.parse(backupsStr || '[]');
-                    } catch (e) {
-                        console.error('Failed to parse backups:', backupsStr);
-                        backups = [];
-                    }
-                    if (!backups || backups.length === 0) {
-                        container.innerHTML = '<div class="empty-msg">No backups yet. Click "Create Backup Now" to make your first backup.</div>';
+                        renderBackupHistoryList(backupsStr);
+                    })
+                    .withFailureHandler(function(err) {
+                        container.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading backups: ' + err.message + '</p>';
+                    })
+                    .getBackupHistory();
+            }
+
+            if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+                window.NexSbAdmin.fetchAdminCacheFast('admin_backup_history').then(function(sbRes) {
+                    if (sbRes && sbRes.ok && sbRes.payload !== undefined && sbRes.payload !== null) {
+                        renderBackupHistoryList(sbRes.payload.raw !== undefined ? sbRes.payload.raw : sbRes.payload);
                         return;
                     }
-                    
-                    var html = '<table><thead><tr><th>Backup ID</th><th>Date</th><th>Games</th><th>Type</th><th>Actions</th></tr></thead><tbody>';
-                    for (var i = 0; i < backups.length; i++) {
-                        var b = backups[i];
-                        html += '<tr>';
-                        html += '<td style="font-family:monospace; font-size:12px; color:#f7d875;">' + b.backupId + '</td>';
-                        html += '<td>' + b.date + '</td>';
-                        html += '<td>' + b.gameCount + '</td>';
-                        html += '<td><span class="status-badge ' + (b.type === 'Auto' ? 'status-paid' : 'status-pending') + '">' + b.type + '</span></td>';
-                        html += '<td><button class="approve-btn restore-backup-btn" data-backupid="' + b.backupId + '"><i class="fas fa-undo"></i> Restore</button></td>';
-                        html += '</tr>';
-                    }
-                    html += '</tbody></table>';
-                    container.innerHTML = html;
-                    
-                    var restoreBtns = container.querySelectorAll('.restore-backup-btn');
-                    for (var j = 0; j < restoreBtns.length; j++) {
-                        restoreBtns[j].addEventListener('click', function() {
-                            var backupId = this.dataset.backupid;
-                            confirmRestoreBackup(backupId);
-                        });
-                    }
-                })
-                .withFailureHandler(function(err) {
-                    container.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading backups: ' + err.message + '</p>';
-                })
-                .getBackupHistory();
+                    loadBackupsFromGas();
+                });
+                return;
+            }
+
+            loadBackupsFromGas();
         }
 
         function confirmRestoreBackup(backupId) {
@@ -27745,6 +28245,79 @@ function resetVariantEditor(ctx) {
 
 // 1. Agent Dashboard View — works for both the agent themselves
 //    AND for admin viewing any agent (pass targetEmail)
+function renderSalespersonPayload(data) {
+    data = data || {};
+    var salesVal = parseFloat(data.totalSales) || 0;
+    var unpaidVal = parseFloat(data.unpaidCommission) || 0;
+    var paidOutVal = parseFloat(data.paidOutCommission) || 0;
+    var pendingVal = parseFloat(data.pendingCommission) || 0;
+    var minPayout = parseFloat(data.minPayout) || 50;
+
+    document.getElementById('agentTotalSales').textContent = 'RM ' + salesVal.toFixed(2);
+    document.getElementById('agentTotalCommission').textContent = 'RM ' + (parseFloat(data.totalCommission) || 0).toFixed(2);
+    if (document.getElementById('agentUnpaidCommission')) document.getElementById('agentUnpaidCommission').textContent = 'RM ' + unpaidVal.toFixed(2);
+    if (document.getElementById('agentPaidOutCommission')) document.getElementById('agentPaidOutCommission').textContent = 'RM ' + paidOutVal.toFixed(2);
+
+    var progBox = document.getElementById('agentPayoutProgressBox');
+    if (progBox) {
+        var pct = minPayout > 0 ? Math.min(100, Math.round((unpaidVal / minPayout) * 100)) : 100;
+        var remaining = Math.max(0, minPayout - unpaidVal);
+        progBox.style.display = 'block';
+        progBox.innerHTML =
+            '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;">' +
+                (unpaidVal >= minPayout
+                    ? '<strong style="color:#4caf50;"><i class="fas fa-check-circle"></i> Payout Target Reached! Eligible for RM ' + unpaidVal.toFixed(2) + ' payout</strong>'
+                    : '<span style="color:#b0c8e0;"><i class="fas fa-bullseye" style="color:#f7d875;"></i> Progress to RM ' + minPayout.toFixed(2) + ' Payout: <strong style="color:#f7d875;">Earn RM ' + remaining.toFixed(2) + ' more</strong></span>') +
+                '<span style="color:#8aa1c0;font-size:12px;">Pending Verification: RM ' + pendingVal.toFixed(2) + '</span>' +
+            '</div>' +
+            '<div class="comm-progress-bar" style="height:10px;margin-top:8px;"><div class="comm-progress-fill" style="width:' + pct + '%;"></div></div>' +
+            (data.payoutInfo ? '<div style="margin-top:8px;font-size:11.5px;color:#8aa1c0;"><i class="fas fa-university"></i> Payout Account: <strong style="color:#e8edf5;">' + escapeHtml(data.payoutInfo) + '</strong></div>' : '');
+    }
+
+    var copyLinkBtn = document.getElementById('copyAgentLinkBtn');
+    if (copyLinkBtn) {
+        if (data.agentCode) {
+            copyLinkBtn.style.display = 'inline-flex';
+            copyLinkBtn.onclick = function() {
+                var link = 'https://nex4upstoremy.github.io/Nex4UpStore/?agent=' + encodeURIComponent(data.agentCode);
+                _copyQuickText(link, '🔗 Agent link copied: ' + link);
+            };
+        } else {
+            copyLinkBtn.style.display = 'none';
+        }
+    }
+
+    var html = '';
+    if (!data.history || data.history.length === 0) {
+        html = '<p style="text-align:center; color:#6a7f9e; padding:20px;">No sales generated yet.</p>';
+    } else {
+        html = '<table><thead><tr>' +
+            '<th>Order ID</th><th>Date</th><th>Net Revenue</th><th>Net Profit</th>' +
+            '<th>Rate</th><th>Commission</th><th>Status</th>' +
+            '</tr></thead><tbody>';
+        data.history.forEach(function(o) {
+            var stStr = String(o.status || 'Pending');
+            var isPaidOut = stStr.indexOf('Paid Out') === 0;
+            var statusColor = isPaidOut ? '#38bdf8'
+                            : stStr === 'Approved' ? '#4caf50'
+                            : stStr === 'Reversed' ? '#ff6b6b'
+                            : '#f7d875';
+            var displaySt = isPaidOut ? ('✅ ' + stStr) : (stStr === 'Approved' ? 'Approved (Unpaid)' : stStr);
+            html += '<tr>' +
+                '<td>' + escapeHtml(o.orderId) + '</td>' +
+                '<td>' + (o.date ? String(o.date).split(' ')[0] : '') + '</td>' +
+                '<td>RM ' + (parseFloat(o.netRevenue) || 0).toFixed(2) + '</td>' +
+                '<td>RM ' + (parseFloat(o.netProfit) || 0).toFixed(2) + '</td>' +
+                '<td>' + o.rate + '%</td>' +
+                '<td style="color:#4caf50; font-weight:700;">RM ' + (parseFloat(o.commission) || 0).toFixed(2) + '</td>' +
+                '<td><span style="color:' + statusColor + '; font-weight:600;">' + escapeHtml(displaySt) + '</span></td>' +
+            '</tr>';
+        });
+        html += '</tbody></table>';
+    }
+    document.getElementById('agentOrderHistory').innerHTML = html;
+}
+
 function showAgentDashboard(targetEmail) {
     var email = (targetEmail || (customer && customer.email) || '').trim();
     if (!email) {
@@ -27781,85 +28354,32 @@ function showAgentDashboard(targetEmail) {
     if (document.getElementById('agentPaidOutCommission')) document.getElementById('agentPaidOutCommission').textContent = 'Loading...';
     document.getElementById('agentOrderHistory').innerHTML = '<p style="text-align:center; color:#6a7f9e; padding:20px;">Loading...</p>';
 
-    google.script.run
-        .withSuccessHandler(function(data) {
-            data = data || {};
-            var salesVal = parseFloat(data.totalSales) || 0;
-            var unpaidVal = parseFloat(data.unpaidCommission) || 0;
-            var paidOutVal = parseFloat(data.paidOutCommission) || 0;
-            var pendingVal = parseFloat(data.pendingCommission) || 0;
-            var minPayout = parseFloat(data.minPayout) || 50;
+    function loadPartnerFromGas() {
+        google.script.run
+            .withSuccessHandler(function(data) {
+                renderSalespersonPayload(data);
+            })
+            .withFailureHandler(function(err) {
+                var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getSalespersonDashboard') : 'Could not load partner history right now.';
+                document.getElementById('agentOrderHistory').innerHTML =
+                    '<p style="color:#E56B70; text-align:center;">' + escapeHtml(msg) + '</p>';
+            })
+            .getSalespersonDashboard(email);
+    }
 
-            document.getElementById('agentTotalSales').textContent = 'RM ' + salesVal.toFixed(2);
-            document.getElementById('agentTotalCommission').textContent = 'RM ' + (parseFloat(data.totalCommission) || 0).toFixed(2);
-            if (document.getElementById('agentUnpaidCommission')) document.getElementById('agentUnpaidCommission').textContent = 'RM ' + unpaidVal.toFixed(2);
-            if (document.getElementById('agentPaidOutCommission')) document.getElementById('agentPaidOutCommission').textContent = 'RM ' + paidOutVal.toFixed(2);
-
-            var progBox = document.getElementById('agentPayoutProgressBox');
-            if (progBox) {
-                var pct = minPayout > 0 ? Math.min(100, Math.round((unpaidVal / minPayout) * 100)) : 100;
-                var remaining = Math.max(0, minPayout - unpaidVal);
-                progBox.style.display = 'block';
-                progBox.innerHTML =
-                    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;">' +
-                        (unpaidVal >= minPayout
-                            ? '<strong style="color:#4caf50;"><i class="fas fa-check-circle"></i> Payout Target Reached! Eligible for RM ' + unpaidVal.toFixed(2) + ' payout</strong>'
-                            : '<span style="color:#b0c8e0;"><i class="fas fa-bullseye" style="color:#f7d875;"></i> Progress to RM ' + minPayout.toFixed(2) + ' Payout: <strong style="color:#f7d875;">Earn RM ' + remaining.toFixed(2) + ' more</strong></span>') +
-                        '<span style="color:#8aa1c0;font-size:12px;">Pending Verification: RM ' + pendingVal.toFixed(2) + '</span>' +
-                    '</div>' +
-                    '<div class="comm-progress-bar" style="height:10px;margin-top:8px;"><div class="comm-progress-fill" style="width:' + pct + '%;"></div></div>' +
-                    (data.payoutInfo ? '<div style="margin-top:8px;font-size:11.5px;color:#8aa1c0;"><i class="fas fa-university"></i> Payout Account: <strong style="color:#e8edf5;">' + escapeHtml(data.payoutInfo) + '</strong></div>' : '');
+    var isSelfPartner = !!(customer && customer.email && customer.email.trim().toLowerCase() === email.toLowerCase() && !window._agentDashboardOpenedByAdmin);
+    if (isSelfPartner && window.NexSbStage5 && typeof window.NexSbStage5.fetchCustomerStateFast === 'function') {
+        window.NexSbStage5.fetchCustomerStateFast().then(function(sbRes) {
+            if (sbRes && sbRes.ok && sbRes.state && sbRes.state.partner && sbRes.state.partner.success) {
+                renderSalespersonPayload(sbRes.state.partner);
+                return;
             }
+            loadPartnerFromGas();
+        });
+        return;
+    }
 
-            var copyLinkBtn = document.getElementById('copyAgentLinkBtn');
-            if (copyLinkBtn) {
-                if (data.agentCode) {
-                    copyLinkBtn.style.display = 'inline-flex';
-                    copyLinkBtn.onclick = function() {
-                        var link = 'https://nex4upstoremy.github.io/Nex4UpStore/?agent=' + encodeURIComponent(data.agentCode);
-                        _copyQuickText(link, '🔗 Agent link copied: ' + link);
-                    };
-                } else {
-                    copyLinkBtn.style.display = 'none';
-                }
-            }
-
-            var html = '';
-            if (!data.history || data.history.length === 0) {
-                html = '<p style="text-align:center; color:#6a7f9e; padding:20px;">No sales generated yet.</p>';
-            } else {
-                html = '<table><thead><tr>' +
-                    '<th>Order ID</th><th>Date</th><th>Net Revenue</th><th>Net Profit</th>' +
-                    '<th>Rate</th><th>Commission</th><th>Status</th>' +
-                    '</tr></thead><tbody>';
-                data.history.forEach(function(o) {
-                    var stStr = String(o.status || 'Pending');
-                    var isPaidOut = stStr.indexOf('Paid Out') === 0;
-                    var statusColor = isPaidOut ? '#38bdf8'
-                                    : stStr === 'Approved' ? '#4caf50'
-                                    : stStr === 'Reversed' ? '#ff6b6b'
-                                    : '#f7d875';
-                    var displaySt = isPaidOut ? ('✅ ' + stStr) : (stStr === 'Approved' ? 'Approved (Unpaid)' : stStr);
-                    html += '<tr>' +
-                        '<td>' + escapeHtml(o.orderId) + '</td>' +
-                        '<td>' + (o.date ? String(o.date).split(' ')[0] : '') + '</td>' +
-                        '<td>RM ' + (parseFloat(o.netRevenue) || 0).toFixed(2) + '</td>' +
-                        '<td>RM ' + (parseFloat(o.netProfit) || 0).toFixed(2) + '</td>' +
-                        '<td>' + o.rate + '%</td>' +
-                        '<td style="color:#4caf50; font-weight:700;">RM ' + (parseFloat(o.commission) || 0).toFixed(2) + '</td>' +
-                        '<td><span style="color:' + statusColor + '; font-weight:600;">' + escapeHtml(displaySt) + '</span></td>' +
-                    '</tr>';
-                });
-                html += '</tbody></table>';
-            }
-            document.getElementById('agentOrderHistory').innerHTML = html;
-        })
-        .withFailureHandler(function(err) {
-            var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getSalespersonDashboard') : 'Could not load partner history right now.';
-            document.getElementById('agentOrderHistory').innerHTML =
-                '<p style="color:#E56B70; text-align:center;">' + escapeHtml(msg) + '</p>';
-        })
-        .getSalespersonDashboard(email);
+    loadPartnerFromGas();
 }
 
 // 2. Partner Dashboard back-navigation handler (Dropdown menu unified below)
@@ -27992,53 +28512,90 @@ function markAgentPaidOutClient(email, name, unpaidStr, payoutInfo) {
     }
 })();
 
-function loadAdminSalesTeam() {
-    if (!isAdmin) return;
-
-    // Load Settings
-    google.script.run.withSuccessHandler(function(settings) {
-        settings = settings || {};
-        if (document.getElementById('cfgDefaultComm')) {
-            document.getElementById('cfgDefaultComm').value = settings['Default Commission Rate'] !== undefined ? settings['Default Commission Rate'] : 20;
-            if (document.getElementById('cfgMinCommissionPayout')) {
-                document.getElementById('cfgMinCommissionPayout').value = settings['Minimum Commission Payout (RM)'] !== undefined ? settings['Minimum Commission Payout (RM)'] : 50;
-            }
-            document.getElementById('cfgGwFee').value = settings['Payment Gateway Fee (%)'] !== undefined ? settings['Payment Gateway Fee (%)'] : 2;
-            document.getElementById('cfgPlatformFee').value = settings['Platform Fee (RM)'] !== undefined ? settings['Platform Fee (RM)'] : 0.50;
-            if (document.getElementById('cfgSociaBuzzFee')) {
-                document.getElementById('cfgSociaBuzzFee').value = settings['SociaBuzz Fee (%)'] !== undefined ? settings['SociaBuzz Fee (%)'] : 5;
-            }
-            if (document.getElementById('cfgSociaBuzzWithdrawalFee')) {
-                document.getElementById('cfgSociaBuzzWithdrawalFee').value = settings['SociaBuzz Withdrawal Fee (RM)'] !== undefined ? settings['SociaBuzz Withdrawal Fee (RM)'] : 1.50;
-            }
-            if (document.getElementById('cfgSociaBuzzWithdrawalsCount')) {
-                document.getElementById('cfgSociaBuzzWithdrawalsCount').value = settings['SociaBuzz Withdrawals Count'] !== undefined ? settings['SociaBuzz Withdrawals Count'] : 1;
-            }
+function applyCostSettingsToForm(settings) {
+    settings = settings || {};
+    if (document.getElementById('cfgDefaultComm')) {
+        document.getElementById('cfgDefaultComm').value = settings['Default Commission Rate'] !== undefined ? settings['Default Commission Rate'] : 20;
+        if (document.getElementById('cfgMinCommissionPayout')) {
+            document.getElementById('cfgMinCommissionPayout').value = settings['Minimum Commission Payout (RM)'] !== undefined ? settings['Minimum Commission Payout (RM)'] : 50;
         }
-    }).getCostSettings();
+        document.getElementById('cfgGwFee').value = settings['Payment Gateway Fee (%)'] !== undefined ? settings['Payment Gateway Fee (%)'] : 2;
+        document.getElementById('cfgPlatformFee').value = settings['Platform Fee (RM)'] !== undefined ? settings['Platform Fee (RM)'] : 0.50;
+        if (document.getElementById('cfgSociaBuzzFee')) {
+            document.getElementById('cfgSociaBuzzFee').value = settings['SociaBuzz Fee (%)'] !== undefined ? settings['SociaBuzz Fee (%)'] : 5;
+        }
+        if (document.getElementById('cfgSociaBuzzWithdrawalFee')) {
+            document.getElementById('cfgSociaBuzzWithdrawalFee').value = settings['SociaBuzz Withdrawal Fee (RM)'] !== undefined ? settings['SociaBuzz Withdrawal Fee (RM)'] : 1.50;
+        }
+        if (document.getElementById('cfgSociaBuzzWithdrawalsCount')) {
+            document.getElementById('cfgSociaBuzzWithdrawalsCount').value = settings['SociaBuzz Withdrawals Count'] !== undefined ? settings['SociaBuzz Withdrawals Count'] : 1;
+        }
+    }
+}
 
-    // Load Team Commission Summary Leaderboard
-    var listEl = document.getElementById('salesTeamList');
-    if (listEl) listEl.innerHTML = '<p style="text-align:center;padding:20px;color:#6a7f9e;"><i class="fas fa-spinner fa-spin"></i> Loading commission summary...</p>';
-    google.script.run
-        .withSuccessHandler(function(res) {
-            if (!res || !res.success) {
-                if (listEl) listEl.innerHTML = '<p style="color:#ff6b6b;padding:16px;">Could not load commission summary.</p>';
+function applySalesSummaryPayload(res, listEl) {
+    if (!res || !res.success) {
+        if (listEl) listEl.innerHTML = '<p style="color:#ff6b6b;padding:16px;">Could not load commission summary.</p>';
+        return;
+    }
+    window._salesSummaryCache = res;
+    var readyEl = document.getElementById('commReadyAgentsCount');
+    var unpaidEl = document.getElementById('commTotalUnpaid');
+    var paidEl = document.getElementById('commTotalPaidOut');
+    if (readyEl) readyEl.textContent = res.readyAgentsCount || 0;
+    if (unpaidEl) unpaidEl.textContent = 'RM ' + (parseFloat(res.totalUnpaidCommission) || 0).toFixed(2);
+    if (paidEl) paidEl.textContent = 'RM ' + (parseFloat(res.totalPaidOutCommission) || 0).toFixed(2);
+    renderAdminSalesTeamLeaderboard();
+}
+
+function loadAdminSalesTeam(forceRefreshOpt) {
+    if (!isAdmin) return;
+    var forceRefresh = (forceRefreshOpt === true);
+    var sbReady = !!(window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function');
+
+    function loadCostSettingsFromGas() {
+        google.script.run.withSuccessHandler(function(settings) {
+            applyCostSettingsToForm(settings);
+        }).getCostSettings();
+    }
+
+    if (!forceRefresh && sbReady) {
+        window.NexSbAdmin.fetchAdminCacheFast('admin_cost_settings').then(function(sbRes) {
+            if (sbRes && sbRes.ok && sbRes.payload && typeof sbRes.payload === 'object') {
+                applyCostSettingsToForm(sbRes.payload);
                 return;
             }
-            window._salesSummaryCache = res;
-            var readyEl = document.getElementById('commReadyAgentsCount');
-            var unpaidEl = document.getElementById('commTotalUnpaid');
-            var paidEl = document.getElementById('commTotalPaidOut');
-            if (readyEl) readyEl.textContent = res.readyAgentsCount || 0;
-            if (unpaidEl) unpaidEl.textContent = 'RM ' + (parseFloat(res.totalUnpaidCommission) || 0).toFixed(2);
-            if (paidEl) paidEl.textContent = 'RM ' + (parseFloat(res.totalPaidOutCommission) || 0).toFixed(2);
-            renderAdminSalesTeamLeaderboard();
-        })
-        .withFailureHandler(function(err) {
-            if (listEl) listEl.innerHTML = '<p style="color:#ff6b6b;padding:16px;">Error: ' + err.message + '</p>';
-        })
-        .getSalesTeamSummary();
+            loadCostSettingsFromGas();
+        });
+    } else {
+        loadCostSettingsFromGas();
+    }
+
+    var listEl = document.getElementById('salesTeamList');
+    if (listEl) listEl.innerHTML = '<p style="text-align:center;padding:20px;color:#6a7f9e;"><i class="fas fa-spinner fa-spin"></i> Loading commission summary...</p>';
+    function loadSalesSummaryFromGas() {
+        google.script.run
+            .withSuccessHandler(function(res) {
+                applySalesSummaryPayload(res, listEl);
+            })
+            .withFailureHandler(function(err) {
+                if (listEl) listEl.innerHTML = '<p style="color:#ff6b6b;padding:16px;">Error: ' + err.message + '</p>';
+            })
+            .getSalesTeamSummary();
+    }
+
+    if (!forceRefresh && sbReady) {
+        window.NexSbAdmin.fetchAdminCacheFast('admin_sales_team').then(function(sbRes) {
+            if (sbRes && sbRes.ok && sbRes.payload && sbRes.payload.success) {
+                applySalesSummaryPayload(sbRes.payload, listEl);
+                return;
+            }
+            loadSalesSummaryFromGas();
+        });
+        return;
+    }
+
+    loadSalesSummaryFromGas();
 }
 
 // Admin: Save Settings Button
@@ -28099,111 +28656,131 @@ document.getElementById('addAgentBtn')?.addEventListener('click', function() {
 
 window._adminPromoCache = [];
 
-function loadAdminPromoCodes() {
+function renderAdminPromoCodesPayload(res) {
+    var container = document.getElementById('adminPromoList');
+    if (!container) return;
+    var promos = Array.isArray(res) ? res : ((res && Array.isArray(res.promos)) ? res.promos : []);
+    window._adminPromoCache = promos;
+    if (promos.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#6a7f9e;padding:16px;">No promo codes yet.</p>';
+        return;
+    }
+    var html = '<table><thead><tr><th>Code</th><th>Discount</th><th>Audience</th><th>Limits</th><th>Expiry</th><th>Actions</th></tr></thead><tbody>';
+    promos.forEach(function(p) {
+        var discText = p.discountType === 'percentage' ? (p.discountValue + '%') : ('RM ' + (parseFloat(p.discountValue) || 0).toFixed(2));
+        var isOff = parseInt(p.usageLimit, 10) === 0;
+        var isSpec = (p.audienceType === 'specific_users');
+        var audHtml = isSpec
+            ? '<span class="nex-audience-pill specific"><i class="fas fa-lock"></i> ' + escapeHtmlForAdmin(p.allowedUsers || 'Restricted') + '</span>'
+            : '<span class="nex-audience-pill everyone"><i class="fas fa-globe"></i> Everyone</span>';
+        var maxPerStr = (parseInt(p.maxPerCustomer, 10) > 0) ? (p.maxPerCustomer + 'x/user') : 'Unlim/user';
+        var minStr = (parseFloat(p.minOrder) > 0) ? (' · Min RM ' + parseFloat(p.minOrder).toFixed(2)) : '';
+        html += '<tr>' +
+            '<td style="font-family:monospace;color:#f7d875;font-weight:700;">' + escapeHtmlForAdmin(p.code) + (isOff ? ' <span style="color:#E56B70;font-size:10px;">(Disabled)</span>' : '') + '</td>' +
+            '<td>' + discText + '<div style="font-size:10.5px;color:#91A0B5;">' + escapeHtmlForAdmin(p.description || '') + '</div></td>' +
+            '<td>' + audHtml + '</td>' +
+            '<td>' + (p.usedCount || 0) + ' / ' + p.usageLimit + '<div style="font-size:10.5px;color:#91A0B5;">' + escapeHtmlForAdmin(maxPerStr + minStr) + '</div></td>' +
+            '<td>' + escapeHtmlForAdmin(p.expiryDate || '-') + '</td>' +
+            '<td><div style="display:flex;gap:5px;flex-wrap:wrap;">' +
+                '<button type="button" class="edit-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:#1B2737;color:#E8C568;border:1px solid #2e425f;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Edit</button>' +
+                '<button type="button" class="log-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:#1B2737;color:#56B9E9;border:1px solid #2e425f;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Log</button>' +
+                '<button type="button" class="toggle-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" data-next="' + (isOff ? 100 : 0) + '" style="background:#1e2a3a;color:' + (isOff ? '#54B86A' : '#E9B94E') + ';border:1px solid #2a3a52;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">' + (isOff ? 'Enable' : 'Disable') + '</button>' +
+                '<button type="button" class="del-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:rgba(229,107,112,0.14);color:#E56B70;border:1px solid rgba(229,107,112,0.35);border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Delete</button>' +
+            '</div></td>' +
+        '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+
+    container.querySelectorAll('.edit-promo-btn').forEach(function(b) {
+        b.addEventListener('click', function() {
+            var item = (window._adminPromoCache || []).find(function(x) { return x.code === b.dataset.code; });
+            if (!item) return;
+            document.getElementById('promoMgrCode').value = item.code || '';
+            document.getElementById('promoMgrType').value = item.discountType || 'percentage';
+            document.getElementById('promoMgrValue').value = item.discountValue || '';
+            document.getElementById('promoMgrMinOrder').value = item.minOrder || 0;
+            if (document.getElementById('promoMgrMaxPerUser')) document.getElementById('promoMgrMaxPerUser').value = (item.maxPerCustomer !== undefined ? item.maxPerCustomer : 1);
+            document.getElementById('promoMgrLimit').value = (item.usageLimit !== undefined ? item.usageLimit : 100);
+            document.getElementById('promoMgrExpiry').value = item.expiryDate || '';
+            var audEl = document.getElementById('promoMgrAudience');
+            var allowWrap = document.getElementById('promoMgrAllowedWrap');
+            if (audEl) audEl.value = item.audienceType || 'everyone';
+            if (allowWrap) allowWrap.style.display = (audEl && audEl.value === 'specific_users') ? 'block' : 'none';
+            if (document.getElementById('promoMgrAllowedUsers')) document.getElementById('promoMgrAllowedUsers').value = item.allowedUsers || '';
+            if (document.getElementById('promoMgrDescription')) document.getElementById('promoMgrDescription').value = item.description || '';
+            document.getElementById('promoMgrCode').focus();
+        });
+    });
+
+    container.querySelectorAll('.log-promo-btn').forEach(function(b) {
+        b.addEventListener('click', function() {
+            var box = document.getElementById('adminCouponHistoryBox');
+            if (!box) return;
+            box.style.display = 'block';
+            box.innerHTML = '<div style="color:#91A0B5;font-size:12.5px;"><i class="fas fa-spinner fa-spin"></i> Loading redemption audit for ' + escapeHtmlForAdmin(b.dataset.code) + '...</div>';
+            google.script.run.withSuccessHandler(function(r) {
+                var rows = (r && r.redemptions) || [];
+                if (rows.length === 0) {
+                    box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;"><strong style="color:#E8C568;">Redemption History: ' + escapeHtmlForAdmin(b.dataset.code) + '</strong><button type="button" onclick="this.closest(\'#adminCouponHistoryBox\').style.display=\'none\'" style="background:none;border:none;color:#91A0B5;cursor:pointer;">Close</button></div><p style="color:#91A0B5;font-size:12.5px;margin:8px 0 0;">No redemptions recorded yet.</p>';
+                    return;
+                }
+                box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong style="color:#E8C568;">Redemption History: ' + escapeHtmlForAdmin(b.dataset.code) + ' (' + rows.length + ')</strong><button type="button" onclick="this.closest(\'#adminCouponHistoryBox\').style.display=\'none\'" style="background:none;border:none;color:#91A0B5;cursor:pointer;">Close</button></div>' +
+                    '<table><thead><tr><th>Email</th><th>Order ID</th><th>Discount</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
+                    rows.map(function(row) {
+                        return '<tr><td>' + escapeHtmlForAdmin(row.email) + '</td><td>' + escapeHtmlForAdmin(row.orderId) + '</td><td>RM ' + (parseFloat(row.discountAmount) || 0).toFixed(2) + '</td><td>' + escapeHtmlForAdmin(row.status) + '</td><td>' + escapeHtmlForAdmin(row.usedAt) + '</td></tr>';
+                    }).join('') + '</tbody></table>';
+            }).getCouponRedemptionHistory(b.dataset.code, window._nexAdminPwdSession || '');
+        });
+    });
+
+    container.querySelectorAll('.toggle-promo-btn').forEach(function(b) {
+        b.addEventListener('click', function() {
+            var item = (window._adminPromoCache || []).find(function(x) { return x.code === b.dataset.code; });
+            if (!item) return;
+            var upd = Object.assign({}, item, { usageLimit: parseInt(b.dataset.next, 10) });
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Updated coupon');
+                loadAdminPromoCodes(true);
+            }).saveAdminPromoCodeV2(upd, window._nexAdminPwdSession || '');
+        });
+    });
+
+    container.querySelectorAll('.del-promo-btn').forEach(function(b) {
+        b.addEventListener('click', function() {
+            if (!confirm('Delete promo code "' + b.dataset.code + '"?')) return;
+            google.script.run.withSuccessHandler(function(r) {
+                showToast((r && r.message) || 'Deleted');
+                loadAdminPromoCodes(true);
+            }).deleteAdminPromoCode(b.dataset.code, window._nexAdminPwdSession || '');
+        });
+    });
+}
+
+function loadAdminPromoCodes(forceRefreshOpt) {
     if (!isAdmin) return;
+    var forceRefresh = (forceRefreshOpt === true);
     var container = document.getElementById('adminPromoList');
     if (!container) return;
     container.innerHTML = '<p style="text-align:center;color:#6a7f9e;padding:12px;">Loading coupons...</p>';
-    google.script.run
-        .withSuccessHandler(function(res) {
-            var promos = Array.isArray(res) ? res : ((res && Array.isArray(res.promos)) ? res.promos : []);
-            window._adminPromoCache = promos;
-            if (promos.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#6a7f9e;padding:16px;">No promo codes yet.</p>';
+    function loadPromosFromGas() {
+        google.script.run
+            .withSuccessHandler(function(res) {
+                renderAdminPromoCodesPayload(res);
+            })
+            .getAdminPromoCodesV2(window._nexAdminPwdSession || '');
+    }
+    if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+        window.NexSbAdmin.fetchAdminCacheFast('admin_promos').then(function(sbRes) {
+            if (sbRes && sbRes.ok && sbRes.payload && (Array.isArray(sbRes.payload) || sbRes.payload.success)) {
+                renderAdminPromoCodesPayload(sbRes.payload);
                 return;
             }
-            var html = '<table><thead><tr><th>Code</th><th>Discount</th><th>Audience</th><th>Limits</th><th>Expiry</th><th>Actions</th></tr></thead><tbody>';
-            promos.forEach(function(p) {
-                var discText = p.discountType === 'percentage' ? (p.discountValue + '%') : ('RM ' + (parseFloat(p.discountValue) || 0).toFixed(2));
-                var isOff = parseInt(p.usageLimit, 10) === 0;
-                var isSpec = (p.audienceType === 'specific_users');
-                var audHtml = isSpec
-                    ? '<span class="nex-audience-pill specific"><i class="fas fa-lock"></i> ' + escapeHtmlForAdmin(p.allowedUsers || 'Restricted') + '</span>'
-                    : '<span class="nex-audience-pill everyone"><i class="fas fa-globe"></i> Everyone</span>';
-                var maxPerStr = (parseInt(p.maxPerCustomer, 10) > 0) ? (p.maxPerCustomer + 'x/user') : 'Unlim/user';
-                var minStr = (parseFloat(p.minOrder) > 0) ? (' · Min RM ' + parseFloat(p.minOrder).toFixed(2)) : '';
-                html += '<tr>' +
-                    '<td style="font-family:monospace;color:#f7d875;font-weight:700;">' + escapeHtmlForAdmin(p.code) + (isOff ? ' <span style="color:#E56B70;font-size:10px;">(Disabled)</span>' : '') + '</td>' +
-                    '<td>' + discText + '<div style="font-size:10.5px;color:#91A0B5;">' + escapeHtmlForAdmin(p.description || '') + '</div></td>' +
-                    '<td>' + audHtml + '</td>' +
-                    '<td>' + (p.usedCount || 0) + ' / ' + p.usageLimit + '<div style="font-size:10.5px;color:#91A0B5;">' + escapeHtmlForAdmin(maxPerStr + minStr) + '</div></td>' +
-                    '<td>' + escapeHtmlForAdmin(p.expiryDate || '-') + '</td>' +
-                    '<td><div style="display:flex;gap:5px;flex-wrap:wrap;">' +
-                        '<button type="button" class="edit-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:#1B2737;color:#E8C568;border:1px solid #2e425f;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Edit</button>' +
-                        '<button type="button" class="log-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:#1B2737;color:#56B9E9;border:1px solid #2e425f;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Log</button>' +
-                        '<button type="button" class="toggle-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" data-next="' + (isOff ? 100 : 0) + '" style="background:#1e2a3a;color:' + (isOff ? '#54B86A' : '#E9B94E') + ';border:1px solid #2a3a52;border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">' + (isOff ? 'Enable' : 'Disable') + '</button>' +
-                        '<button type="button" class="del-promo-btn" data-code="' + escapeHtmlForAdmin(p.code) + '" style="background:rgba(229,107,112,0.14);color:#E56B70;border:1px solid rgba(229,107,112,0.35);border-radius:12px;padding:4px 9px;font-size:11px;cursor:pointer;font-weight:700;">Delete</button>' +
-                    '</div></td>' +
-                '</tr>';
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
-
-            container.querySelectorAll('.edit-promo-btn').forEach(function(b) {
-                b.addEventListener('click', function() {
-                    var item = (window._adminPromoCache || []).find(function(x) { return x.code === b.dataset.code; });
-                    if (!item) return;
-                    document.getElementById('promoMgrCode').value = item.code || '';
-                    document.getElementById('promoMgrType').value = item.discountType || 'percentage';
-                    document.getElementById('promoMgrValue').value = item.discountValue || '';
-                    document.getElementById('promoMgrMinOrder').value = item.minOrder || 0;
-                    if (document.getElementById('promoMgrMaxPerUser')) document.getElementById('promoMgrMaxPerUser').value = (item.maxPerCustomer !== undefined ? item.maxPerCustomer : 1);
-                    document.getElementById('promoMgrLimit').value = (item.usageLimit !== undefined ? item.usageLimit : 100);
-                    document.getElementById('promoMgrExpiry').value = item.expiryDate || '';
-                    var audEl = document.getElementById('promoMgrAudience');
-                    var allowWrap = document.getElementById('promoMgrAllowedWrap');
-                    if (audEl) audEl.value = item.audienceType || 'everyone';
-                    if (allowWrap) allowWrap.style.display = (audEl && audEl.value === 'specific_users') ? 'block' : 'none';
-                    if (document.getElementById('promoMgrAllowedUsers')) document.getElementById('promoMgrAllowedUsers').value = item.allowedUsers || '';
-                    if (document.getElementById('promoMgrDescription')) document.getElementById('promoMgrDescription').value = item.description || '';
-                    document.getElementById('promoMgrCode').focus();
-                });
-            });
-
-            container.querySelectorAll('.log-promo-btn').forEach(function(b) {
-                b.addEventListener('click', function() {
-                    var box = document.getElementById('adminCouponHistoryBox');
-                    if (!box) return;
-                    box.style.display = 'block';
-                    box.innerHTML = '<div style="color:#91A0B5;font-size:12.5px;"><i class="fas fa-spinner fa-spin"></i> Loading redemption audit for ' + escapeHtmlForAdmin(b.dataset.code) + '...</div>';
-                    google.script.run.withSuccessHandler(function(r) {
-                        var rows = (r && r.redemptions) || [];
-                        if (rows.length === 0) {
-                            box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;"><strong style="color:#E8C568;">Redemption History: ' + escapeHtmlForAdmin(b.dataset.code) + '</strong><button type="button" onclick="this.closest(\'#adminCouponHistoryBox\').style.display=\'none\'" style="background:none;border:none;color:#91A0B5;cursor:pointer;">Close</button></div><p style="color:#91A0B5;font-size:12.5px;margin:8px 0 0;">No redemptions recorded yet.</p>';
-                            return;
-                        }
-                        box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong style="color:#E8C568;">Redemption History: ' + escapeHtmlForAdmin(b.dataset.code) + ' (' + rows.length + ')</strong><button type="button" onclick="this.closest(\'#adminCouponHistoryBox\').style.display=\'none\'" style="background:none;border:none;color:#91A0B5;cursor:pointer;">Close</button></div>' +
-                            '<table><thead><tr><th>Email</th><th>Order ID</th><th>Discount</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
-                            rows.map(function(row) {
-                                return '<tr><td>' + escapeHtmlForAdmin(row.email) + '</td><td>' + escapeHtmlForAdmin(row.orderId) + '</td><td>RM ' + (parseFloat(row.discountAmount) || 0).toFixed(2) + '</td><td>' + escapeHtmlForAdmin(row.status) + '</td><td>' + escapeHtmlForAdmin(row.usedAt) + '</td></tr>';
-                            }).join('') + '</tbody></table>';
-                    }).getCouponRedemptionHistory(b.dataset.code, window._nexAdminPwdSession || '');
-                });
-            });
-
-            container.querySelectorAll('.toggle-promo-btn').forEach(function(b) {
-                b.addEventListener('click', function() {
-                    var item = (window._adminPromoCache || []).find(function(x) { return x.code === b.dataset.code; });
-                    if (!item) return;
-                    var upd = Object.assign({}, item, { usageLimit: parseInt(b.dataset.next, 10) });
-                    google.script.run.withSuccessHandler(function(r) {
-                        showToast((r && r.message) || 'Updated coupon');
-                        loadAdminPromoCodes();
-                    }).saveAdminPromoCodeV2(upd, window._nexAdminPwdSession || '');
-                });
-            });
-
-            container.querySelectorAll('.del-promo-btn').forEach(function(b) {
-                b.addEventListener('click', function() {
-                    if (!confirm('Delete promo code "' + b.dataset.code + '"?')) return;
-                    google.script.run.withSuccessHandler(function(r) {
-                        showToast((r && r.message) || 'Deleted');
-                        loadAdminPromoCodes();
-                    }).deleteAdminPromoCode(b.dataset.code, window._nexAdminPwdSession || '');
-                });
-            });
-        })
-        .getAdminPromoCodesV2(window._nexAdminPwdSession || '');
+            loadPromosFromGas();
+        });
+        return;
+    }
+    loadPromosFromGas();
 }
 
 document.getElementById('adminPromoForm')?.addEventListener('submit', function(e) {
@@ -28261,8 +28838,9 @@ function getCartRobuxRequired() {
     return total;
 }
 
-function loadRobuxInventory() {
+function loadRobuxInventory(forceRefreshOpt) {
     if (!isAdmin) return;
+    var forceRefresh = (forceRefreshOpt === true);
     
     // Ensure the month options exist
     setupRobuxTimeFilter();
@@ -28273,16 +28851,32 @@ function loadRobuxInventory() {
     ['rbStatPurchased','rbStatStock','rbStatReserved','rbStatAvailable','rbStatSold','rbStatRevenue','rbStatProfit','rbStatAvg','rbStatValue']
         .forEach(function (id) { var el = document.getElementById(id); if (el) el.textContent = '…'; });
 
-    google.script.run
-        .withSuccessHandler(function (res) {
-            if (!res || !res.success) { showToast('Failed to load Robux inventory.'); return; }
-            robuxDashboardCache = res;
-            renderRobuxDashboard(res, range);
-        })
-        .withFailureHandler(function (err) {
-            showToast('Robux inventory error: ' + err.message);
-        })
-        .getRobuxInventoryDashboard(range);
+    function loadRobuxFromGas() {
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (!res || !res.success) { showToast('Failed to load Robux inventory.'); return; }
+                robuxDashboardCache = res;
+                renderRobuxDashboard(res, range);
+            })
+            .withFailureHandler(function (err) {
+                showToast('Robux inventory error: ' + err.message);
+            })
+            .getRobuxInventoryDashboard(range);
+    }
+
+    if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+        window.NexSbAdmin.fetchAdminCacheFast('robux_inventory_' + range).then(function(sbRes) {
+            if (sbRes && sbRes.ok && sbRes.payload && sbRes.payload.success) {
+                robuxDashboardCache = sbRes.payload;
+                renderRobuxDashboard(sbRes.payload, range);
+                return;
+            }
+            loadRobuxFromGas();
+        });
+        return;
+    }
+
+    loadRobuxFromGas();
 }
 
 function renderRobuxDashboard(res, range) {
@@ -31096,52 +31690,70 @@ window.renderNexVipBanner = function (pts) {
         }
     }
 
-    function load_wallet_and_vouchers() {
-        if (!customer || !customer.email) return;
+    function renderWalletPayload(res) {
+        if (!res || !res.success) return;
         var vEl = document.getElementById('nex2WalletVouchersList');
         var lEl = document.getElementById('nex2WalletLedgerList');
         var sbV = document.getElementById('nex2SidebarVouchers');
+        var pts = parseInt(res.pointsBalance, 10) || 0;
+        customer.points = pts;
+        var rmVal = 'RM ' + (pts * 0.01).toFixed(2);
+        ['nex2SidebarPts', 'nex2OvPts'].forEach(function(id) { var el = document.getElementById(id); if (el) el.textContent = pts.toLocaleString(); });
+        var sbRm = document.getElementById('nex2SidebarRm');
+        if (sbRm) sbRm.textContent = rmVal;
+        var vouchers = res.vouchers || [];
+        if (sbV) sbV.textContent = vouchers.length;
+        if (vEl) {
+            vEl.innerHTML = vouchers.length ? vouchers.map(function(v) {
+                var valTxt = v.discountType === 'percent' ? (v.discountValue + '% OFF') : ('RM ' + parseFloat(v.discountValue || 0).toFixed(2) + ' OFF');
+                return '<div class="nex2-voucher-card">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">' +
+                    '<span class="nex2-rarity-pill" style="background:rgba(247,216,117,0.16);color:#f7d875;">' + escapeHtml(v.tag || 'PROMO') + '</span>' +
+                    '<span style="font-size:11px;color:#8aa1c0;">' + (v.expiryDate ? 'Exp: ' + escapeHtml(v.expiryDate) : 'Active') + '</span></div>' +
+                    '<div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;">' + escapeHtml(valTxt) + '</div>' +
+                    (v.minOrder > 0 ? '<div style="font-size:11.5px;color:#8aa1c0;margin-bottom:8px;">Min. spend RM ' + parseFloat(v.minOrder).toFixed(2) + '</div>' : '<div style="font-size:11.5px;color:#8aa1c0;margin-bottom:8px;">No minimum spend</div>') +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;background:#0b0e14;padding:6px 10px;border-radius:8px;border:1px solid #1e2a3a;">' +
+                    '<code style="color:#4ade80;font-weight:800;">' + escapeHtml(v.code) + '</code>' +
+                    '<button type="button" class="nex2-top-promo-btn" onclick="copyToClipboard(\'' + escapeHtml(v.code) + '\')">Copy</button></div></div>';
+            }).join('') : '<div style="grid-column:1/-1;color:#6a7f9e;font-size:13px;padding:12px;">No active store vouchers available right now. Refer friends or submit creator videos to unlock vouchers!</div>';
+        }
+        if (window.NexRewardsUi && typeof window.NexRewardsUi.setLedgerAndRender === 'function') {
+            window.NexRewardsUi.setLedgerAndRender(res.ledger || [], pts);
+        } else if (lEl) {
+            var ledger = res.ledger || [];
+            lEl.innerHTML = ledger.length ? ledger.map(function(item) {
+                var chg = parseInt(item.pointsChange, 10) || 0;
+                return '<div class="nex2-ledger-row">' +
+                    '<div><div style="font-weight:700;color:#fff;">' + escapeHtml(item.reason || 'Points Update') + '</div>' +
+                    '<div style="font-size:11px;color:#6a7f9e;">' + escapeHtml(item.date || '') + (item.orderId ? ' • ' + escapeHtml(item.orderId) : '') + '</div></div>' +
+                    '<strong style="color:' + (chg >= 0 ? '#4ade80' : '#ff6b6b') + ';">' + (chg >= 0 ? '+' : '') + chg + ' Pts</strong></div>';
+            }).join('') : '<p style="color:#6a7f9e;font-size:13px;padding:12px;">No Wallet Points transactions yet — complete orders or leave product reviews to earn points!</p>';
+        }
+    }
+
+    function load_wallet_and_vouchers() {
+        if (!customer || !customer.email) return;
+        var vEl = document.getElementById('nex2WalletVouchersList');
         if (!customer.sessionToken) {
             if (vEl) vEl.innerHTML = '<div style="grid-column:1/-1;color:#8aa1c0;font-size:13px;">Sign in with email/Google to load active vouchers &amp; activity.</div>';
             return;
         }
-        google.script.run.withSuccessHandler(function(res) {
-            if (!res || !res.success) return;
-            var pts = parseInt(res.pointsBalance, 10) || 0;
-            customer.points = pts;
-            var rmVal = 'RM ' + (pts * 0.01).toFixed(2);
-            ['nex2SidebarPts', 'nex2OvPts'].forEach(function(id) { var el = document.getElementById(id); if (el) el.textContent = pts.toLocaleString(); });
-            var sbRm = document.getElementById('nex2SidebarRm');
-            if (sbRm) sbRm.textContent = rmVal;
-            var vouchers = res.vouchers || [];
-            if (sbV) sbV.textContent = vouchers.length;
-            if (vEl) {
-                vEl.innerHTML = vouchers.length ? vouchers.map(function(v) {
-                    var valTxt = v.discountType === 'percent' ? (v.discountValue + '% OFF') : ('RM ' + parseFloat(v.discountValue || 0).toFixed(2) + ' OFF');
-                    return '<div class="nex2-voucher-card">' +
-                        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">' +
-                        '<span class="nex2-rarity-pill" style="background:rgba(247,216,117,0.16);color:#f7d875;">' + escapeHtml(v.tag || 'PROMO') + '</span>' +
-                        '<span style="font-size:11px;color:#8aa1c0;">' + (v.expiryDate ? 'Exp: ' + escapeHtml(v.expiryDate) : 'Active') + '</span></div>' +
-                        '<div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;">' + escapeHtml(valTxt) + '</div>' +
-                        (v.minOrder > 0 ? '<div style="font-size:11.5px;color:#8aa1c0;margin-bottom:8px;">Min. spend RM ' + parseFloat(v.minOrder).toFixed(2) + '</div>' : '<div style="font-size:11.5px;color:#8aa1c0;margin-bottom:8px;">No minimum spend</div>') +
-                        '<div style="display:flex;justify-content:space-between;align-items:center;background:#0b0e14;padding:6px 10px;border-radius:8px;border:1px solid #1e2a3a;">' +
-                        '<code style="color:#4ade80;font-weight:800;">' + escapeHtml(v.code) + '</code>' +
-                        '<button type="button" class="nex2-top-promo-btn" onclick="copyToClipboard(\'' + escapeHtml(v.code) + '\')">Copy</button></div></div>';
-                }).join('') : '<div style="grid-column:1/-1;color:#6a7f9e;font-size:13px;padding:12px;">No active store vouchers available right now. Refer friends or submit creator videos to unlock vouchers!</div>';
-            }
-            if (window.NexRewardsUi && typeof window.NexRewardsUi.setLedgerAndRender === 'function') {
-                window.NexRewardsUi.setLedgerAndRender(res.ledger || [], pts);
-            } else if (lEl) {
-                var ledger = res.ledger || [];
-                lEl.innerHTML = ledger.length ? ledger.map(function(item) {
-                    var chg = parseInt(item.pointsChange, 10) || 0;
-                    return '<div class="nex2-ledger-row">' +
-                        '<div><div style="font-weight:700;color:#fff;">' + escapeHtml(item.reason || 'Points Update') + '</div>' +
-                        '<div style="font-size:11px;color:#6a7f9e;">' + escapeHtml(item.date || '') + (item.orderId ? ' • ' + escapeHtml(item.orderId) : '') + '</div></div>' +
-                        '<strong style="color:' + (chg >= 0 ? '#4ade80' : '#ff6b6b') + ';">' + (chg >= 0 ? '+' : '') + chg + ' Pts</strong></div>';
-                }).join('') : '<p style="color:#6a7f9e;font-size:13px;padding:12px;">No Wallet Points transactions yet — complete orders or leave product reviews to earn points!</p>';
-            }
-        }).getCustomerWalletAndVouchers(customer.email, customer.sessionToken);
+        function loadWalletFromGas() {
+            google.script.run.withSuccessHandler(function(res) {
+                renderWalletPayload(res);
+            }).getCustomerWalletAndVouchers(customer.email, customer.sessionToken);
+        }
+        if (window.NexSbStage5 && typeof window.NexSbStage5.fetchCustomerStateFast === 'function') {
+            window.NexSbStage5.fetchCustomerStateFast().then(function(sbRes) {
+                if (sbRes && sbRes.ok && sbRes.state && sbRes.state.wallet && sbRes.state.wallet.success) {
+                    renderWalletPayload(sbRes.state.wallet);
+                    return;
+                }
+                loadWalletFromGas();
+            });
+        } else {
+            loadWalletFromGas();
+        }
         if (window.NexRewardsUi && typeof window.NexRewardsUi.loadCustomerLoyalty === 'function') {
             window.NexRewardsUi.loadCustomerLoyalty();
         }
@@ -31459,121 +32071,139 @@ window.renderNexVipBanner = function (pts) {
         modal.classList.add('open');
     }
 
+    function renderNex4Up2AdminDashboardPayload(res) {
+        if (!res || !res.success) return;
+        // 1. Campaigns List
+        var cList = document.getElementById('nex2AdminCampaignsList');
+        if (cList) {
+            cList.innerHTML = (res.campaigns || []).map(function(c) {
+                return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                    '<div><strong style="color:#fff;">' + escapeHtml(String(c[1])) + '</strong> <span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">' + escapeHtml(String(c[10])) + '</span>' +
+                    '<div style="font-size:12px;color:#8aa1c0;">' + escapeHtml(String(c[2])) + ' • Reward: ' + escapeHtml(String(c[5]) + ' ' + String(c[6])) + ' • Ends: ' + escapeHtml(String(c[9])) + '</div></div>' +
+                    '<button type="button" class="nex2-top-promo-btn" data-edit-camp="' + escapeHtml(String(c[0])) + '">Edit</button>' +
+                    '</div>';
+            }).join('') || '<p style="color:#6a7f9e;padding:12px;">No campaigns.</p>';
+            window._nex2AdminCampsCache = res.campaigns || [];
+        }
+
+        // 2. Submissions Queue
+        var sList = document.getElementById('nex2AdminSubmissionsList');
+        if (sList) {
+            sList.innerHTML = (res.submissions || []).map(function(s) {
+                var sid = String(s[0]);
+                var st = String(s[8] || 'Pending');
+                var stCol = st === 'Approved' ? '#4ade80' : (st === 'Rejected' ? '#ff6b6b' : '#f7d875');
+                return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                    '<div><strong style="color:#fff;">' + escapeHtml(sid) + '</strong> — ' + escapeHtml(String(s[3] || s[2])) + ' (' + escapeHtml(String(s[4])) + ') ' +
+                    '<span class="nex2-rarity-pill" style="background:rgba(255,255,255,0.07);color:' + stCol + ';">' + escapeHtml(st) + '</span>' +
+                    '<div style="font-size:12px;margin-top:3px;"><a href="' + escapeHtml(String(s[5])) + '" target="_blank" style="color:#38bdf8;">🔗 Open Video</a> • Reward: ' + escapeHtml(String(s[9]) + ' ' + String(s[10])) + '</div></div>' +
+                    (st === 'Pending' ? '<div style="display:flex;gap:8px;"><button type="button" class="submit-btn" style="padding:7px 12px;font-size:12px;" data-review-sub="' + escapeHtml(sid) + '" data-decision="Approved">✅ Approve &amp; Reward</button><button type="button" class="cancel-btn" style="padding:7px 12px;font-size:12px;border-radius:10px;" data-review-sub="' + escapeHtml(sid) + '" data-decision="Rejected">❌ Reject</button></div>' : '<span style="font-size:11.5px;color:#8aa1c0;">Ref: ' + escapeHtml(String(s[11] || '-')) + '</span>') +
+                    '</div>';
+            }).join('') || '<p style="color:#6a7f9e;padding:12px;">No creator submissions yet.</p>';
+        }
+
+        // 3. Reports Queue
+        var rList = document.getElementById('nex2AdminReportsList');
+        if (rList) {
+            rList.innerHTML = (res.interactions || []).map(function(rep) {
+                return '<div style="background:#0b0e14;border:1px solid #3f1d28;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+                    '<div><strong style="color:#ff6b6b;">Report ' + escapeHtml(String(rep[0])) + '</strong> on <code>' + escapeHtml(String(rep[2])) + '</code> by ' + escapeHtml(String(rep[3])) + '<div style="font-size:12px;color:#cbd5e1;">' + escapeHtml(String(rep[5])) + '</div></div>' +
+                    '<button type="button" class="nex2-comm-action-btn" data-mod-action="dismissReport" data-mod-target="' + escapeHtml(String(rep[0])) + '">Dismiss</button>' +
+                    '</div>';
+            }).join('') || '<p style="color:#6a7f9e;padding:12px;">No open reports.</p>';
+        }
+
+        // 4. Community Posts
+        var pList = document.getElementById('nex2AdminPostsList');
+        if (pList) {
+            pList.innerHTML = (res.posts || []).map(function(p) {
+                var pid = String(p[0]);
+                return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;">' +
+                    '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+                    '<strong style="color:#fff;">' + escapeHtml(String(p[2])) + ' (' + escapeHtml(String(p[3])) + ')</strong>' +
+                    '<span style="font-size:11.5px;color:#8aa1c0;">' + escapeHtml(String(p[8])) + ' • Pinned: ' + escapeHtml(String(p[9])) + '</span>' +
+                    '</div>' +
+                    '<p style="font-size:12.5px;color:#cbd5e1;margin:6px 0;">' + escapeHtml(String(p[4])) + '</p>' +
+                    '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+                    '<button type="button" class="nex2-comm-action-btn" data-mod-action="' + (String(p[9]) === 'Yes' ? 'unpin' : 'pin') + '" data-mod-target="' + escapeHtml(pid) + '">' + (String(p[9]) === 'Yes' ? 'Unpin' : '📌 Pin') + '</button>' +
+                    '<button type="button" class="nex2-comm-action-btn" data-mod-action="' + (String(p[8]) === 'Hidden' ? 'approve' : 'hide') + '" data-mod-target="' + escapeHtml(pid) + '">' + (String(p[8]) === 'Hidden' ? 'Show' : 'Hide') + '</button>' +
+                    '<button type="button" class="nex2-comm-action-btn" data-mod-action="delete" data-mod-target="' + escapeHtml(pid) + '" style="color:#ff6b6b;">Delete</button>' +
+                    '</div></div>';
+            }).join('') || '<p style="color:#6a7f9e;padding:12px;">No posts.</p>';
+        }
+
+        // 5. Dev Team Admin List
+        var dList = document.getElementById('nex2AdminDevList');
+        if (dList) {
+            dList.innerHTML = (res.devTeam || []).map(function(d) {
+                var avImg = String(d[7] || '').trim();
+                return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                    '<div style="display:flex;align-items:center;gap:12px;">' +
+                    render_framed_avatar_html({ size: 46, frameId: 'frame_esports', avatarUrl: avImg, name: String(d[1] || 'D') }) +
+                    '<div><strong style="color:#fff;font-size:14px;">' + escapeHtml(String(d[1])) + '</strong> <span class="nex2-rarity-pill" style="background:rgba(192,132,252,0.16);color:#c084fc;">' + escapeHtml(String(d[6] || 'DEV')) + '</span>' +
+                    '<div style="font-size:12px;color:#38bdf8;">Roblox: @' + escapeHtml(String(d[2])) + ' • ' + escapeHtml(String(d[3])) + ' <span style="color:#6a7f9e;">(Order #' + escapeHtml(String(d[8] || 1)) + ')</span></div>' +
+                    '</div></div>' +
+                    '<div style="display:flex;gap:6px;"><button type="button" class="nex2-comm-action-btn" data-edit-dev="' + escapeHtml(String(d[0])) + '">✏️ Edit</button><button type="button" class="nex2-comm-action-btn" style="color:#ff6b6b;" data-del-dev="' + escapeHtml(String(d[0])) + '">🗑️ Remove</button></div></div>';
+            }).join('') || '<p style="color:#6a7f9e;padding:12px;">No developer cards yet. Click "+ Add New Developer" above to add your first teammate!</p>';
+            window._nex2AdminDevsCache = res.devTeam || [];
+        }
+
+        // 6. Supabase Status
+        var sbBadge = document.getElementById('nex2SupabaseStatusBadge');
+        if (sbBadge && res.supabase) {
+            sbBadge.textContent = res.supabase.hasSecretKey ? '✅ Secret Key Configured in GAS' : '⚠️ Secret Key Not Set Yet';
+            sbBadge.style.color = res.supabase.hasSecretKey ? '#4ade80' : '#f7d875';
+        }
+
+        // 7. Audit Log
+        var aList = document.getElementById('nex2AdminAuditList');
+        if (aList) {
+            aList.innerHTML = (res.auditLogs || []).map(function(l) {
+                return '<div style="padding:7px 10px;border-bottom:1px solid #1e2a3a;font-size:12px;color:#cbd5e1;">' +
+                    '<span style="color:#6a7f9e;">[' + escapeHtml(String(l[1])) + ']</span> <strong style="color:#f7d875;">' + escapeHtml(String(l[3])) + '</strong> → ' + escapeHtml(String(l[4])) + ' <span style="color:#8aa1c0;">' + escapeHtml(String(l[5])) + '</span></div>';
+            }).join('') || '<p style="color:#6a7f9e;padding:12px;">No audit events recorded yet.</p>';
+        }
+
+        // 8. Admin FAQs List
+        var fList = document.getElementById('nex2AdminFaqsList');
+        if (fList) {
+            window._nex2AdminFaqsCache = res.faqs || [];
+            fList.innerHTML = window._nex2AdminFaqsCache.map(function(f) {
+                var pubSt = String(f[5] || 'Yes');
+                return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+                    '<div style="flex:1;min-width:220px;"><strong style="color:#fff;">' + escapeHtml(String(f[2])) + '</strong> ' +
+                    '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">' + escapeHtml(String(f[1])) + '</span> ' +
+                    '<span class="nex2-rarity-pill" style="background:rgba(255,255,255,0.06);color:' + (pubSt === 'Yes' ? '#4ade80' : '#f7d875') + ';">' + escapeHtml(pubSt === 'Yes' ? 'Published' : 'Draft') + '</span>' +
+                    '<div style="font-size:12px;color:#8aa1c0;margin-top:4px;">' + escapeHtml(String(f[3]).slice(0, 120)) + (String(f[3]).length > 120 ? '...' : '') + '</div></div>' +
+                    '<div style="display:flex;gap:6px;"><button type="button" class="nex2-comm-action-btn" data-edit-faq="' + escapeHtml(String(f[0])) + '">✏️ Edit</button>' +
+                    '<button type="button" class="nex2-comm-action-btn" style="color:#ff6b6b;" data-del-faq="' + escapeHtml(String(f[0])) + '">🗑️ Delete</button></div></div>';
+            }).join('') || '<p style="color:#6a7f9e;padding:12px;">No FAQ entries found.</p>';
+        }
+    }
+
     // ---------- Admin Panel Loader for NEX4UP 2.0 ----------
-    window.loadNex4Up2AdminDashboard = function() {
+    window.loadNex4Up2AdminDashboard = function(forceRefreshOpt) {
         var pwd = window._nexAdminPwdSession || '';
         if (!pwd) return;
-        google.script.run
-            .withSuccessHandler(function(res) {
-                if (!res || !res.success) return;
-                // 1. Campaigns List
-                var cList = document.getElementById('nex2AdminCampaignsList');
-                if (cList) {
-                    cList.innerHTML = (res.campaigns || []).map(function(c) {
-                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
-                            '<div><strong style="color:#fff;">' + escapeHtml(String(c[1])) + '</strong> <span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">' + escapeHtml(String(c[10])) + '</span>' +
-                            '<div style="font-size:12px;color:#8aa1c0;">' + escapeHtml(String(c[2])) + ' • Reward: ' + escapeHtml(String(c[5]) + ' ' + String(c[6])) + ' • Ends: ' + escapeHtml(String(c[9])) + '</div></div>' +
-                            '<button type="button" class="nex2-top-promo-btn" data-edit-camp="' + escapeHtml(String(c[0])) + '">Edit</button>' +
-                            '</div>';
-                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No campaigns.</p>';
-                    window._nex2AdminCampsCache = res.campaigns || [];
+        var forceRefresh = (forceRefreshOpt === true);
+        function loadCommDashFromGas() {
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    renderNex4Up2AdminDashboardPayload(res);
+                })
+                .adminGetCommunityDashboard(pwd);
+        }
+        if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+            window.NexSbAdmin.fetchAdminCacheFast('admin_community_hub').then(function(sbRes) {
+                if (sbRes && sbRes.ok && sbRes.payload && sbRes.payload.success) {
+                    renderNex4Up2AdminDashboardPayload(sbRes.payload);
+                    return;
                 }
-
-                // 2. Submissions Queue
-                var sList = document.getElementById('nex2AdminSubmissionsList');
-                if (sList) {
-                    sList.innerHTML = (res.submissions || []).map(function(s) {
-                        var sid = String(s[0]);
-                        var st = String(s[8] || 'Pending');
-                        var stCol = st === 'Approved' ? '#4ade80' : (st === 'Rejected' ? '#ff6b6b' : '#f7d875');
-                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
-                            '<div><strong style="color:#fff;">' + escapeHtml(sid) + '</strong> — ' + escapeHtml(String(s[3] || s[2])) + ' (' + escapeHtml(String(s[4])) + ') ' +
-                            '<span class="nex2-rarity-pill" style="background:rgba(255,255,255,0.07);color:' + stCol + ';">' + escapeHtml(st) + '</span>' +
-                            '<div style="font-size:12px;margin-top:3px;"><a href="' + escapeHtml(String(s[5])) + '" target="_blank" style="color:#38bdf8;">🔗 Open Video</a> • Reward: ' + escapeHtml(String(s[9]) + ' ' + String(s[10])) + '</div></div>' +
-                            (st === 'Pending' ? '<div style="display:flex;gap:8px;"><button type="button" class="submit-btn" style="padding:7px 12px;font-size:12px;" data-review-sub="' + escapeHtml(sid) + '" data-decision="Approved">✅ Approve &amp; Reward</button><button type="button" class="cancel-btn" style="padding:7px 12px;font-size:12px;border-radius:10px;" data-review-sub="' + escapeHtml(sid) + '" data-decision="Rejected">❌ Reject</button></div>' : '<span style="font-size:11.5px;color:#8aa1c0;">Ref: ' + escapeHtml(String(s[11] || '-')) + '</span>') +
-                            '</div>';
-                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No creator submissions yet.</p>';
-                }
-
-                // 3. Reports Queue
-                var rList = document.getElementById('nex2AdminReportsList');
-                if (rList) {
-                    rList.innerHTML = (res.interactions || []).map(function(rep) {
-                        return '<div style="background:#0b0e14;border:1px solid #3f1d28;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
-                            '<div><strong style="color:#ff6b6b;">Report ' + escapeHtml(String(rep[0])) + '</strong> on <code>' + escapeHtml(String(rep[2])) + '</code> by ' + escapeHtml(String(rep[3])) + '<div style="font-size:12px;color:#cbd5e1;">' + escapeHtml(String(rep[5])) + '</div></div>' +
-                            '<button type="button" class="nex2-comm-action-btn" data-mod-action="dismissReport" data-mod-target="' + escapeHtml(String(rep[0])) + '">Dismiss</button>' +
-                            '</div>';
-                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No open reports.</p>';
-                }
-
-                // 4. Community Posts
-                var pList = document.getElementById('nex2AdminPostsList');
-                if (pList) {
-                    pList.innerHTML = (res.posts || []).map(function(p) {
-                        var pid = String(p[0]);
-                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;">' +
-                            '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
-                            '<strong style="color:#fff;">' + escapeHtml(String(p[2])) + ' (' + escapeHtml(String(p[3])) + ')</strong>' +
-                            '<span style="font-size:11.5px;color:#8aa1c0;">' + escapeHtml(String(p[8])) + ' • Pinned: ' + escapeHtml(String(p[9])) + '</span>' +
-                            '</div>' +
-                            '<p style="font-size:12.5px;color:#cbd5e1;margin:6px 0;">' + escapeHtml(String(p[4])) + '</p>' +
-                            '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-                            '<button type="button" class="nex2-comm-action-btn" data-mod-action="' + (String(p[9]) === 'Yes' ? 'unpin' : 'pin') + '" data-mod-target="' + escapeHtml(pid) + '">' + (String(p[9]) === 'Yes' ? 'Unpin' : '📌 Pin') + '</button>' +
-                            '<button type="button" class="nex2-comm-action-btn" data-mod-action="' + (String(p[8]) === 'Hidden' ? 'approve' : 'hide') + '" data-mod-target="' + escapeHtml(pid) + '">' + (String(p[8]) === 'Hidden' ? 'Show' : 'Hide') + '</button>' +
-                            '<button type="button" class="nex2-comm-action-btn" data-mod-action="delete" data-mod-target="' + escapeHtml(pid) + '" style="color:#ff6b6b;">Delete</button>' +
-                            '</div></div>';
-                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No posts.</p>';
-                }
-
-                // 5. Dev Team Admin List
-                var dList = document.getElementById('nex2AdminDevList');
-                if (dList) {
-                    dList.innerHTML = (res.devTeam || []).map(function(d) {
-                        var avImg = String(d[7] || '').trim();
-                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
-                            '<div style="display:flex;align-items:center;gap:12px;">' +
-                            render_framed_avatar_html({ size: 46, frameId: 'frame_esports', avatarUrl: avImg, name: String(d[1] || 'D') }) +
-                            '<div><strong style="color:#fff;font-size:14px;">' + escapeHtml(String(d[1])) + '</strong> <span class="nex2-rarity-pill" style="background:rgba(192,132,252,0.16);color:#c084fc;">' + escapeHtml(String(d[6] || 'DEV')) + '</span>' +
-                            '<div style="font-size:12px;color:#38bdf8;">Roblox: @' + escapeHtml(String(d[2])) + ' • ' + escapeHtml(String(d[3])) + ' <span style="color:#6a7f9e;">(Order #' + escapeHtml(String(d[8] || 1)) + ')</span></div>' +
-                            '</div></div>' +
-                            '<div style="display:flex;gap:6px;"><button type="button" class="nex2-comm-action-btn" data-edit-dev="' + escapeHtml(String(d[0])) + '">✏️ Edit</button><button type="button" class="nex2-comm-action-btn" style="color:#ff6b6b;" data-del-dev="' + escapeHtml(String(d[0])) + '">🗑️ Remove</button></div></div>';
-                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No developer cards yet. Click "+ Add New Developer" above to add your first teammate!</p>';
-                    window._nex2AdminDevsCache = res.devTeam || [];
-                }
-
-                // 6. Supabase Status
-                var sbBadge = document.getElementById('nex2SupabaseStatusBadge');
-                if (sbBadge && res.supabase) {
-                    sbBadge.textContent = res.supabase.hasSecretKey ? '✅ Secret Key Configured in GAS' : '⚠️ Secret Key Not Set Yet';
-                    sbBadge.style.color = res.supabase.hasSecretKey ? '#4ade80' : '#f7d875';
-                }
-
-                // 7. Audit Log
-                var aList = document.getElementById('nex2AdminAuditList');
-                if (aList) {
-                    aList.innerHTML = (res.auditLogs || []).map(function(l) {
-                        return '<div style="padding:7px 10px;border-bottom:1px solid #1e2a3a;font-size:12px;color:#cbd5e1;">' +
-                            '<span style="color:#6a7f9e;">[' + escapeHtml(String(l[1])) + ']</span> <strong style="color:#f7d875;">' + escapeHtml(String(l[3])) + '</strong> → ' + escapeHtml(String(l[4])) + ' <span style="color:#8aa1c0;">' + escapeHtml(String(l[5])) + '</span></div>';
-                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No audit events recorded yet.</p>';
-                }
-
-                // 8. Admin FAQs List
-                var fList = document.getElementById('nex2AdminFaqsList');
-                if (fList) {
-                    window._nex2AdminFaqsCache = res.faqs || [];
-                    fList.innerHTML = window._nex2AdminFaqsCache.map(function(f) {
-                        var pubSt = String(f[5] || 'Yes');
-                        return '<div style="background:#0b0e14;border:1px solid #1e2a3a;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
-                            '<div style="flex:1;min-width:220px;"><strong style="color:#fff;">' + escapeHtml(String(f[2])) + '</strong> ' +
-                            '<span class="nex2-rarity-pill" style="background:rgba(56,189,248,0.16);color:#38bdf8;">' + escapeHtml(String(f[1])) + '</span> ' +
-                            '<span class="nex2-rarity-pill" style="background:rgba(255,255,255,0.06);color:' + (pubSt === 'Yes' ? '#4ade80' : '#f7d875') + ';">' + escapeHtml(pubSt === 'Yes' ? 'Published' : 'Draft') + '</span>' +
-                            '<div style="font-size:12px;color:#8aa1c0;margin-top:4px;">' + escapeHtml(String(f[3]).slice(0, 120)) + (String(f[3]).length > 120 ? '...' : '') + '</div></div>' +
-                            '<div style="display:flex;gap:6px;"><button type="button" class="nex2-comm-action-btn" data-edit-faq="' + escapeHtml(String(f[0])) + '">✏️ Edit</button>' +
-                            '<button type="button" class="nex2-comm-action-btn" style="color:#ff6b6b;" data-del-faq="' + escapeHtml(String(f[0])) + '">🗑️ Delete</button></div></div>';
-                    }).join('') || '<p style="color:#6a7f9e;padding:12px;">No FAQ entries found.</p>';
-                }
-            })
-            .adminGetCommunityDashboard(pwd);
+                loadCommDashFromGas();
+            });
+            return;
+        }
+        loadCommDashFromGas();
     };
 
     // ---------- Event Wiring ----------
@@ -34122,21 +34752,39 @@ window.NexBannerCarousel = (function () {
         }
     }
 
-    window.loadAdminCmsManager = function () {
+    function applyAdminCmsPayload(res) {
+        if (!res || !res.success) return;
+        if (Array.isArray(res.banners) && res.banners.length > 0) _adminBanners = res.banners;
+        if (res.announcement) _adminAnnouncement = res.announcement;
+        renderAdminBannerList();
+        if (_adminBanners.length > 0) loadIntoEditor(_adminBanners[0]);
+        populateAnnouncementForm(_adminAnnouncement);
+    }
+
+    window.loadAdminCmsManager = function (forceRefreshOpt) {
+        var forceRefresh = (forceRefreshOpt === true);
         renderAdminBannerList();
         if (_adminBanners.length > 0) loadIntoEditor(_adminBanners[0]);
         populateAnnouncementForm(_adminAnnouncement);
         if (!window._nexAdminPwdSession) return;
-        google.script.run
-            .withSuccessHandler(function (res) {
-                if (!res || !res.success) return;
-                if (Array.isArray(res.banners) && res.banners.length > 0) _adminBanners = res.banners;
-                if (res.announcement) _adminAnnouncement = res.announcement;
-                renderAdminBannerList();
-                if (_adminBanners.length > 0) loadIntoEditor(_adminBanners[0]);
-                populateAnnouncementForm(_adminAnnouncement);
-            })
-            .getAdminCmsContent(window._nexAdminPwdSession);
+        function loadCmsFromGas() {
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    applyAdminCmsPayload(res);
+                })
+                .getAdminCmsContent(window._nexAdminPwdSession);
+        }
+        if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+            window.NexSbAdmin.fetchAdminCacheFast('admin_cms').then(function(sbRes) {
+                if (sbRes && sbRes.ok && sbRes.payload && sbRes.payload.success) {
+                    applyAdminCmsPayload(sbRes.payload);
+                    return;
+                }
+                loadCmsFromGas();
+            });
+            return;
+        }
+        loadCmsFromGas();
     };
 
     function bindAdminCmsEvents() {
@@ -34575,20 +35223,37 @@ window.NexRewardsUi = (function () {
         renderRoadmap(pts, _lifetimeXp);
     }
 
+    function applyLoyaltyStatusPayload(res) {
+        if (!res || !res.success) return;
+        if (Array.isArray(res.tiers) && res.tiers.length === 5) applyPublicConfig({ tiers: res.tiers });
+        _lifetimeXp = parseInt(res.lifetimeEarnedPoints, 10) || 0;
+        customer.points = parseInt(res.pointsBalance, 10) || 0;
+        customer.lifetimePoints = _lifetimeXp;
+        if (Array.isArray(res.unlockedFrames)) customer.unlockedFrames = res.unlockedFrames;
+        renderRoadmap(customer.points, _lifetimeXp);
+        if (typeof window.renderNexVipBanner === 'function') window.renderNexVipBanner(customer.points);
+    }
+
     function loadCustomerLoyalty() {
         if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) return;
-        google.script.run
-            .withSuccessHandler(function (res) {
-                if (!res || !res.success) return;
-                if (Array.isArray(res.tiers) && res.tiers.length === 5) applyPublicConfig({ tiers: res.tiers });
-                _lifetimeXp = parseInt(res.lifetimeEarnedPoints, 10) || 0;
-                customer.points = parseInt(res.pointsBalance, 10) || 0;
-                customer.lifetimePoints = _lifetimeXp;
-                if (Array.isArray(res.unlockedFrames)) customer.unlockedFrames = res.unlockedFrames;
-                renderRoadmap(customer.points, _lifetimeXp);
-                if (typeof window.renderNexVipBanner === 'function') window.renderNexVipBanner(customer.points);
-            })
-            .getCustomerLoyaltyStatus(customer.email, customer.sessionToken);
+        function loadLoyaltyFromGas() {
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    applyLoyaltyStatusPayload(res);
+                })
+                .getCustomerLoyaltyStatus(customer.email, customer.sessionToken);
+        }
+        if (window.NexSbStage5 && typeof window.NexSbStage5.fetchCustomerStateFast === 'function') {
+            window.NexSbStage5.fetchCustomerStateFast().then(function(sbRes) {
+                if (sbRes && sbRes.ok && sbRes.state && sbRes.state.loyalty && sbRes.state.loyalty.success) {
+                    applyLoyaltyStatusPayload(sbRes.state.loyalty);
+                    return;
+                }
+                loadLoyaltyFromGas();
+            });
+            return;
+        }
+        loadLoyaltyFromGas();
     }
 
     function renderAdminTiersTable(tiers) {
@@ -34913,30 +35578,48 @@ window.NexAdminOpsMonitor = (function () {
         }
     }
 
-    function loadDashboard() {
+    function applyOpsDashboardPayload(res, stLbl) {
+        if (!res || !res.success) {
+            if (stLbl) stLbl.textContent = (res && res.message) || 'Could not load cloud telemetry.';
+            return;
+        }
+        _cloudErrors = res.errorLogs || [];
+        _lastMetrics = res.workflowMetrics || null;
+        _lastAuditLogs = res.auditLogs || [];
+        renderErrors();
+        renderAnalytics(_lastMetrics, _lastAuditLogs);
+        if (stLbl) stLbl.textContent = 'Synced: ' + (res.generatedAt || 'Now');
+    }
+
+    function loadDashboard(forceRefreshOpt) {
         renderErrors();
         var pwd = window._nexAdminPwdSession || '';
         if (!pwd) return;
+        var forceRefresh = (forceRefreshOpt === true);
         var stLbl = document.getElementById('nexOpsLastUpdated');
         if (stLbl) stLbl.textContent = 'Refreshing cloud telemetry...';
-        google.script.run
-            .withSuccessHandler(function (res) {
-                if (!res || !res.success) {
-                    if (stLbl) stLbl.textContent = (res && res.message) || 'Could not load cloud telemetry.';
+        function loadOpsFromGas() {
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    applyOpsDashboardPayload(res, stLbl);
+                })
+                .withFailureHandler(function (err) {
+                    var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getAdminOperationalDashboard') : 'Unable to sync ops telemetry.';
+                    if (stLbl) stLbl.textContent = msg;
+                })
+                .getAdminOperationalDashboard(pwd, {});
+        }
+        if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+            window.NexSbAdmin.fetchAdminCacheFast('admin_ops_monitor', 5 * 60 * 1000).then(function(sbRes) {
+                if (sbRes && sbRes.ok && sbRes.payload && sbRes.payload.success) {
+                    applyOpsDashboardPayload(sbRes.payload, stLbl);
                     return;
                 }
-                _cloudErrors = res.errorLogs || [];
-                _lastMetrics = res.workflowMetrics || null;
-                _lastAuditLogs = res.auditLogs || [];
-                renderErrors();
-                renderAnalytics(_lastMetrics, _lastAuditLogs);
-                if (stLbl) stLbl.textContent = 'Synced: ' + (res.generatedAt || 'Now');
-            })
-            .withFailureHandler(function (err) {
-                var msg = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getAdminOperationalDashboard') : 'Unable to sync ops telemetry.';
-                if (stLbl) stLbl.textContent = msg;
-            })
-            .getAdminOperationalDashboard(pwd, {});
+                loadOpsFromGas();
+            });
+            return;
+        }
+        loadOpsFromGas();
     }
 
     function exportErrorsCsv() {
@@ -34969,7 +35652,7 @@ window.NexAdminOpsMonitor = (function () {
         if (sSt) sSt.addEventListener('change', renderErrors);
 
         var refBtn = document.getElementById('nexOpsRefreshBtn');
-        if (refBtn) refBtn.addEventListener('click', loadDashboard);
+        if (refBtn) refBtn.addEventListener('click', function () { loadDashboard(true); });
 
         var expBtn = document.getElementById('nexOpsExportCsvBtn');
         if (expBtn) expBtn.addEventListener('click', exportErrorsCsv);
@@ -35285,19 +35968,37 @@ window.NexMarketingStudio = (function () {
         }
     }
 
-    function loadStudio() {
+    function applyMarketingStudioPayload(res) {
+        if (!res || !res.success) return;
+        if (Array.isArray(res.posts) && res.posts.length) _posts = res.posts;
+        if (res.utmTotals) _utmTotals = res.utmTotals;
+        renderStudio();
+    }
+
+    function loadStudio(forceRefreshOpt) {
         renderStudio();
         var pwd = window._nexAdminPwdSession || '';
         if (!pwd) return;
-        google.script.run
-            .withSuccessHandler(function (res) {
-                if (!res || !res.success) return;
-                if (Array.isArray(res.posts) && res.posts.length) _posts = res.posts;
-                if (res.utmTotals) _utmTotals = res.utmTotals;
-                renderStudio();
-            })
-            .withFailureHandler(function () {})
-            .getAdminMarketingStudio(pwd);
+        var forceRefresh = (forceRefreshOpt === true);
+        function loadStudioFromGas() {
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    applyMarketingStudioPayload(res);
+                })
+                .withFailureHandler(function () {})
+                .getAdminMarketingStudio(pwd);
+        }
+        if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady() && typeof window.NexSbAdmin.fetchAdminCacheFast === 'function') {
+            window.NexSbAdmin.fetchAdminCacheFast('admin_marketing_studio').then(function(sbRes) {
+                if (sbRes && sbRes.ok && sbRes.payload && sbRes.payload.success) {
+                    applyMarketingStudioPayload(sbRes.payload);
+                    return;
+                }
+                loadStudioFromGas();
+            });
+            return;
+        }
+        loadStudioFromGas();
     }
 
     function openGateModal(postId) {
