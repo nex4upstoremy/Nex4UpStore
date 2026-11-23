@@ -16243,19 +16243,38 @@ function loadGames() {
             .getGenreImages();
     }
 
-    google.script.run
-        .withSuccessHandler(function (res) {
-            if (res && Array.isArray(res.games)) {
-                applyFreshData(res.games, res.genreImages || {}, res.cmsContent || null, res.queueSummary || null, res.loyaltyConfig || null);
-            } else {
-                // Backward compatibility if GAS hasn't deployed getStoreBootstrapData yet
-                loadGamesParallelFallback();
+    function fetchStorefrontViaGas(silentBg) {
+        google.script.run
+            .withSuccessHandler(function (res) {
+                if (res && Array.isArray(res.games)) {
+                    applyFreshData(res.games, res.genreImages || {}, res.cmsContent || null, res.queueSummary || null, res.loyaltyConfig || null);
+                } else if (!silentBg) {
+                    loadGamesParallelFallback();
+                }
+            })
+            .withFailureHandler(function () {
+                if (!silentBg) loadGamesParallelFallback();
+            })
+            .getStoreBootstrapData();
+    }
+
+    if (!(typeof IS_ADMIN_MODE !== 'undefined' && IS_ADMIN_MODE) && !(typeof isAdmin !== 'undefined' && isAdmin) && window.NexSbStage2 && typeof window.NexSbStage2.fetchStorefrontCache === 'function') {
+        window.NexSbStage2.fetchStorefrontCache().then(function (sbRes) {
+            if (sbRes && sbRes.ok && sbRes.payload && Array.isArray(sbRes.payload.games) && sbRes.payload.games.length > 0) {
+                var p = sbRes.payload;
+                applyFreshData(p.games, p.genreImages || {}, p.cmsContent || null, p.queueSummary || null, p.loyaltyConfig || null);
+                var updatedMs = sbRes.updated_at ? new Date(sbRes.updated_at).getTime() : 0;
+                if (!updatedMs || (Date.now() - updatedMs) > 12 * 3600 * 1000) {
+                    setTimeout(function () { fetchStorefrontViaGas(true); }, 1800);
+                }
+                return;
             }
-        })
-        .withFailureHandler(function () {
-            loadGamesParallelFallback();
-        })
-        .getStoreBootstrapData();
+            fetchStorefrontViaGas(false);
+        });
+        return;
+    }
+
+    fetchStorefrontViaGas(false);
 }
 
         function loadPublicGenreImages(callback) {
@@ -20845,8 +20864,95 @@ function loadOrders() {
                 setTimeout(function() { trackSubmit.click(); }, 300);
             }
         });
-        trackClose.addEventListener('click', function() { trackOverlay.classList.remove('open'); });
-        trackOverlay.addEventListener('click', function(e) { if (e.target === trackOverlay) trackOverlay.classList.remove('open'); });
+        window.renderTrackedOrderCard = function(res) {
+            if (!trackResults) return;
+            if (!res || !res.success) {
+                window._nexActiveTrackedOrderId = '';
+                trackResults.innerHTML = '<div class="empty-msg">' + escapeHtml((res && res.message) || 'Order ID not found.') + '</div>';
+                return;
+            }
+            window._nexActiveTrackedOrderId = String(res.orderId || '');
+            var st = String(res.status || 'Awaiting Payment');
+            var statusClass = st.toLowerCase().replace(/\s+/g, '-');
+            var curStep = 1;
+            if (st === 'Awaiting Verification' || st === 'Payment Verifying' || res.receiptNumber || res.hasReceipt) curStep = 2;
+            if (st === 'Paid' || st === 'Paid — Awaiting Shipment') curStep = 3;
+            if (st === 'Shipped' || st === 'Delivered') curStep = 4;
+            var stepsHtml = '';
+            if (st !== 'Cancelled' && st !== 'Refunded') {
+                var sLabels = ['Placed', 'Payment Sent', 'Verified', 'Completed'];
+                stepsHtml = '<div class="order-progress-track" style="margin:10px 0 8px;">';
+                for (var sp = 1; sp <= 4; sp++) {
+                    var cls = sp < curStep ? 'done' : (sp === curStep ? 'active' : '');
+                    stepsHtml += '<div class="order-step ' + cls + '"><div class="order-step-dot">' + (sp < curStep ? '<i class="fas fa-check"></i>' : sp) + '</div><div class="order-step-label">' + sLabels[sp - 1] + '</div></div>';
+                }
+                stepsHtml += '</div>';
+            }
+            var actionBtn = '';
+            if (st === 'Awaiting Payment') {
+                var mk = escapeHtml(res.methodKey || 'mae');
+                var oidSafe = escapeHtml(res.orderId);
+                var amtNum = (parseFloat(res.amount) || 0).toFixed(2);
+                actionBtn = '<div style="margin-top:10px;"><button type="button" class="prb-upload-btn" onclick="trackOverlay.classList.remove(\'open\'); openQRModal(\'' + oidSafe + '\', \'' + mk + '\', ' + amtNum + ', true)"><i class="fas fa-upload"></i> Upload Receipt / Pay Now</button></div>';
+            }
+            var trackInfo = res.trackingNumber
+                ? '<div><strong>Tracking:</strong> <code>' + escapeHtml(res.trackingNumber) + '</code>' + (res.trackingUrl ? ' <a href="' + escapeHtml(res.trackingUrl) + '" target="_blank" style="color:#38bdf8;">Track &rarr;</a>' : '') + '</div>'
+                : '';
+            trackResults.innerHTML =
+                '<div class="order-item">' +
+                    '<div class="order-id">' + escapeHtml(res.orderId) + '<span id="nexTrackLiveQueueBadge"></span></div>' +
+                    (res.items ? '<div><strong>Items:</strong> ' + escapeHtml(res.items) + '</div>' : '') +
+                    '<div><strong>Method:</strong> ' + escapeHtml(res.paymentMethod || '-') + ' | <strong>Total:</strong> ' + CURRENCY + ' ' + (parseFloat(res.amount) || 0).toFixed(2) + '</div>' +
+                    '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + escapeHtml(st) + '</span></div>' +
+                    trackInfo + stepsHtml + actionBtn +
+                '</div>';
+            if (window.NexQueueUi && typeof window.NexQueueUi.fetchOrderQueueBadge === 'function') {
+                window.NexQueueUi.fetchOrderQueueBadge(res.orderId, 'nexTrackLiveQueueBadge');
+            }
+        };
+
+        window.renderTrackedOrdersList = function(orders) {
+            if (!trackResults) return;
+            window._nexActiveTrackedOrderId = '';
+            if (!orders || orders.length === 0) {
+                trackResults.innerHTML = '<div class="empty-msg">No orders found for this email.</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < orders.length; i++) {
+                var o = orders[i];
+                var status = o._customerStatus || getStatusValue(o);
+                var statusClass = status.toLowerCase().replace(/\s+/g, '-');
+                var orderId = o['Order ID'] || 'N/A';
+                var items = o['Items'] || 'N/A';
+                var total = parseFloat(o['Total (RM)'] || 0).toFixed(2);
+                var date = o['Date'] || 'N/A';
+                var pmRaw = String(o['Payment Method'] || '').toLowerCase();
+                var mk = pmRaw.indexOf('sociabuzz') !== -1 ? 'sociabuzz' : ((pmRaw.indexOf('tng') !== -1 || pmRaw.indexOf('touch') !== -1) ? 'tng' : (pmRaw.indexOf('shopee') !== -1 ? 'shopee' : 'mae'));
+                var payBtn = (status === 'Awaiting Payment')
+                    ? '<div style="margin-top:8px;"><button type="button" class="prb-upload-btn" onclick="trackOverlay.classList.remove(\'open\'); openQRModal(\'' + escapeHtml(orderId) + '\', \'' + mk + '\', ' + total + ', true)"><i class="fas fa-upload"></i> Upload Receipt / Pay Now</button></div>'
+                    : '';
+                var trackInfo = o['Tracking Number']
+                    ? '<div><strong>Tracking:</strong> <code>' + escapeHtml(o['Tracking Number']) + '</code>' + (o['Tracking URL'] ? ' <a href="' + escapeHtml(o['Tracking URL']) + '" target="_blank" style="color:#38bdf8;">Track &rarr;</a>' : '') + '</div>'
+                    : '';
+                html += '<div class="order-item">';
+                html += '<div class="order-id">' + escapeHtml(orderId) + '</div>';
+                html += '<div><strong>Items:</strong> ' + escapeHtml(items) + '</div>';
+                html += '<div><strong>Total:</strong> ' + CURRENCY + ' ' + total + '</div>';
+                html += '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + escapeHtml(status) + '</span></div>';
+                html += trackInfo;
+                if (typeof renderCustomerOrderRequirementsHtml === 'function' && Array.isArray(o._requirements) && o._requirements.length > 0) {
+                    html += renderCustomerOrderRequirementsHtml(o);
+                }
+                html += '<div><strong>Date:</strong> ' + escapeHtml(date) + '</div>';
+                html += payBtn;
+                html += '</div>';
+            }
+            trackResults.innerHTML = html;
+        };
+
+        trackClose.addEventListener('click', function() { window._nexActiveTrackedOrderId = ''; trackOverlay.classList.remove('open'); });
+        trackOverlay.addEventListener('click', function(e) { if (e.target === trackOverlay) { window._nexActiveTrackedOrderId = ''; trackOverlay.classList.remove('open'); } });
 
         trackSubmit.addEventListener('click', function() {
             var queryVal = trackEmail.value.trim();
@@ -20856,99 +20962,53 @@ function loadOrders() {
             }
             trackResults.innerHTML = '<p style="color:#6a7f9e;"><i class="fas fa-spinner fa-spin"></i> Searching...</p>';
 
-            // 1. Direct Order ID Lookup (Works without logging in!)
-            if (queryVal.toUpperCase().indexOf('ORD-') === 0) {
+            var fallbackTrackOrderIdGas = function(oidQuery) {
                 google.script.run
-                    .withSuccessHandler(function(res) {
-                        if (!res || !res.success) {
-                            trackResults.innerHTML = '<div class="empty-msg">' + escapeHtml((res && res.message) || 'Order ID not found.') + '</div>';
-                            return;
-                        }
-                        var st = String(res.status || 'Awaiting Payment');
-                        var statusClass = st.toLowerCase().replace(/\s+/g, '-');
-                        var curStep = 1;
-                        if (st === 'Awaiting Verification' || res.receiptNumber) curStep = 2;
-                        if (st === 'Paid') curStep = 3;
-                        if (st === 'Shipped' || st === 'Delivered') curStep = 4;
-                        var stepsHtml = '';
-                        if (st !== 'Cancelled' && st !== 'Refunded') {
-                            var sLabels = ['Placed', 'Payment Sent', 'Verified', 'Completed'];
-                            stepsHtml = '<div class="order-progress-track" style="margin:10px 0 8px;">';
-                            for (var sp = 1; sp <= 4; sp++) {
-                                var cls = sp < curStep ? 'done' : (sp === curStep ? 'active' : '');
-                                stepsHtml += '<div class="order-step ' + cls + '"><div class="order-step-dot">' + (sp < curStep ? '<i class="fas fa-check"></i>' : sp) + '</div><div class="order-step-label">' + sLabels[sp - 1] + '</div></div>';
-                            }
-                            stepsHtml += '</div>';
-                        }
-                        var actionBtn = '';
-                        if (st === 'Awaiting Payment') {
-                            var mk = escapeHtml(res.methodKey || 'mae');
-                            var oidSafe = escapeHtml(res.orderId);
-                            var amtNum = (parseFloat(res.amount) || 0).toFixed(2);
-                            actionBtn = '<div style="margin-top:10px;"><button type="button" class="prb-upload-btn" onclick="trackOverlay.classList.remove(\'open\'); openQRModal(\'' + oidSafe + '\', \'' + mk + '\', ' + amtNum + ', true)"><i class="fas fa-upload"></i> Upload Receipt / Pay Now</button></div>';
-                        }
-                        trackResults.innerHTML =
-                            '<div class="order-item">' +
-                                '<div class="order-id">' + escapeHtml(res.orderId) + '<span id="nexTrackLiveQueueBadge"></span></div>' +
-                                (res.items ? '<div><strong>Items:</strong> ' + escapeHtml(res.items) + '</div>' : '') +
-                                '<div><strong>Method:</strong> ' + escapeHtml(res.paymentMethod || '-') + ' | <strong>Total:</strong> ' + CURRENCY + ' ' + (parseFloat(res.amount) || 0).toFixed(2) + '</div>' +
-                                '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + escapeHtml(st) + '</span></div>' +
-                                stepsHtml + actionBtn +
-                            '</div>';
-                        if (window.NexQueueUi && typeof window.NexQueueUi.fetchOrderQueueBadge === 'function') {
-                            window.NexQueueUi.fetchOrderQueueBadge(res.orderId, 'nexTrackLiveQueueBadge');
-                        }
-                    })
+                    .withSuccessHandler(function(res) { window.renderTrackedOrderCard(res); })
                     .withFailureHandler(function(err) {
                         trackResults.innerHTML = '<p style="color:var(--nex-danger,#E56B70);">' + escapeHtml(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'trackOrderById') : 'Unable to load order status right now.') + '</p>';
                     })
-                    .getOrderForReceiptUpload(queryVal, '');
+                    .getOrderForReceiptUpload(oidQuery, '');
+            };
+
+            // 1. Direct Order ID Lookup (Supabase fast non-PII RPC first, seamless GAS fallback)
+            if (queryVal.toUpperCase().indexOf('ORD-') === 0) {
+                if (window.NexSbStage2 && typeof window.NexSbStage2.trackOrderByIdFast === 'function') {
+                    window.NexSbStage2.trackOrderByIdFast(queryVal).then(function(sbRes) {
+                        if (sbRes && sbRes.ok && sbRes.found) {
+                            window.renderTrackedOrderCard(sbRes);
+                            return;
+                        }
+                        fallbackTrackOrderIdGas(queryVal);
+                    });
+                    return;
+                }
+                fallbackTrackOrderIdGas(queryVal);
                 return;
             }
 
-            // 2. Email Order History Lookup
-            google.script.run
-                .withSuccessHandler(function(orders) {
-                    if (!orders || orders.length === 0) {
-                        trackResults.innerHTML = '<div class="empty-msg">No orders found for this email.</div>';
+            // 2. Email Order History Lookup (Use fast Supabase RPC when querying own authenticated session)
+            var fallbackTrackEmailGas = function(emQuery) {
+                google.script.run
+                    .withSuccessHandler(function(orders) { window.renderTrackedOrdersList(orders); })
+                    .withFailureHandler(function(err) {
+                        trackResults.innerHTML = '<p style="color:var(--nex-danger,#E56B70);">' + escapeHtml(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getCustomerOrders') : 'Unable to look up orders right now.') + '</p>';
+                    })
+                    .getCustomerOrders(emQuery);
+            };
+
+            if (customer && customer.email && customer.sessionToken && queryVal.toLowerCase() === String(customer.email).trim().toLowerCase() && window.NexSbStage2) {
+                window.NexSbStage2.fetchMyOrdersFast().then(function(sbOrd) {
+                    if (sbOrd && sbOrd.ok) {
+                        window.renderTrackedOrdersList(sbOrd.orders || []);
                         return;
                     }
-                    var html = '';
-                    for (var i = 0; i < orders.length; i++) {
-                        var o = orders[i];
-                        var status = getStatusValue(o);
-                        var statusClass = status.toLowerCase().replace(/\s+/g, '-');
-                        var orderId = o['Order ID'] || 'N/A';
-                        var items = o['Items'] || 'N/A';
-                        var total = parseFloat(o['Total (RM)'] || 0).toFixed(2);
-                        var date = o['Date'] || 'N/A';
-                        var pmRaw = String(o['Payment Method'] || '').toLowerCase();
-                        var mk = pmRaw.indexOf('sociabuzz') !== -1 ? 'sociabuzz' : ((pmRaw.indexOf('tng') !== -1 || pmRaw.indexOf('touch') !== -1) ? 'tng' : (pmRaw.indexOf('shopee') !== -1 ? 'shopee' : 'mae'));
-                        var payBtn = (status === 'Awaiting Payment')
-                            ? '<div style="margin-top:8px;"><button type="button" class="prb-upload-btn" onclick="trackOverlay.classList.remove(\'open\'); openQRModal(\'' + escapeHtml(orderId) + '\', \'' + mk + '\', ' + total + ', true)"><i class="fas fa-upload"></i> Upload Receipt / Pay Now</button></div>'
-                            : '';
-                        var trackInfo = o['Tracking Number']
-                            ? '<div><strong>Tracking:</strong> <code>' + escapeHtml(o['Tracking Number']) + '</code>' + (o['Tracking URL'] ? ' <a href="' + escapeHtml(o['Tracking URL']) + '" target="_blank" style="color:#38bdf8;">Track &rarr;</a>' : '') + '</div>'
-                            : '';
-                        html += '<div class="order-item">';
-                        html += '<div class="order-id">' + escapeHtml(orderId) + '</div>';
-                        html += '<div><strong>Items:</strong> ' + escapeHtml(items) + '</div>';
-                        html += '<div><strong>Total:</strong> ' + CURRENCY + ' ' + total + '</div>';
-                        html += '<div><strong>Status:</strong> <span class="order-status ' + statusClass + '">' + escapeHtml(status) + '</span></div>';
-                        html += trackInfo;
-                        if (typeof renderCustomerOrderRequirementsHtml === 'function' && Array.isArray(o._requirements) && o._requirements.length > 0) {
-                            html += renderCustomerOrderRequirementsHtml(o);
-                        }
-                        html += '<div><strong>Date:</strong> ' + escapeHtml(date) + '</div>';
-                        html += payBtn;
-                        html += '</div>';
-                    }
-                    trackResults.innerHTML = html;
-                })
-                .withFailureHandler(function(err) {
-                    trackResults.innerHTML = '<p style="color:var(--nex-danger,#E56B70);">' + escapeHtml(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getCustomerOrders') : 'Unable to look up orders right now.') + '</p>';
-                })
-                .getCustomerOrders(queryVal);
+                    fallbackTrackEmailGas(queryVal);
+                });
+                return;
+            }
+
+            fallbackTrackEmailGas(queryVal);
         });
 
         // ================================================================
@@ -21495,54 +21555,74 @@ switchToLogin.addEventListener('click', function(e) {
 var myOrdersCache = [];
 var activeOrderTab = 'All';
 
+window.applyMyOrdersList = function(orders) {
+    myOrdersCache = Array.isArray(orders) ? orders : [];
+    for (var si = 0; si < myOrdersCache.length; si++) {
+        var mo = myOrdersCache[si];
+        var moId = mo['Order ID'] || '';
+        var moPay = String(mo['Payment Status'] || '');
+        var moRec = String(mo['Receipt Number'] || '').trim();
+        var moPmRaw = String(mo['Payment Method'] || '').toLowerCase();
+        var moKey = 'mae';
+        if (moPmRaw.indexOf('sociabuzz') !== -1) moKey = 'sociabuzz';
+        else if (moPmRaw.indexOf('touch') !== -1 || moPmRaw.indexOf('tng') !== -1) moKey = 'tng';
+        else if (moPmRaw.indexOf('shopee') !== -1) moKey = 'shopee';
+        if (moPay === 'Awaiting Payment' && !moRec) {
+            savePendingPaymentSession({
+                orderId: moId,
+                method: moKey,
+                amount: parseFloat(mo['Total (RM)']) || 0,
+                items: String(mo['Items'] || ''),
+                email: (customer && customer.email) || '',
+                createdAt: Date.now()
+            });
+        } else {
+            remove_pending_payment_session(moId);
+        }
+    }
+    render_pending_receipt_banner();
+    renderOrderTabCounts();
+    renderOrderList(activeOrderTab);
+    if (window.NexQueueUi && typeof window.NexQueueUi.fetchCustomerQueueMap === 'function' && customer && customer.email) {
+        window.NexQueueUi.fetchCustomerQueueMap(customer.email);
+    }
+};
+
 function loadMyOrders() {
     if (!customer) return;
-    myOrdersList.innerHTML = '<p style="color:#6a7f9e; text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading orders...</p>';
+    if (!myOrdersCache || myOrdersCache.length === 0) {
+        myOrdersList.innerHTML = '<p style="color:#6a7f9e; text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading orders...</p>';
+    }
 
-    google.script.run
-        .withSuccessHandler(function(res) {
-            if (!res || !res.success) {
-                var friendlyOrdErr = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage((res && res.message) || 'Unable to load orders.', 'getMyOrdersData') : 'Unable to load orders right now.';
-                myOrdersList.innerHTML = '<div class="nex-friendly-error-card"><p style="margin:0 0 10px;">' + escapeHtml(friendlyOrdErr) + '</p><button type="button" class="nex-retry-btn" onclick="loadMyOrders()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
+    var loadMyOrdersGasFallback = function() {
+        google.script.run
+            .withSuccessHandler(function(res) {
+                if (!res || !res.success) {
+                    var friendlyOrdErr = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage((res && res.message) || 'Unable to load orders.', 'getMyOrdersData') : 'Unable to load orders right now.';
+                    myOrdersList.innerHTML = '<div class="nex-friendly-error-card"><p style="margin:0 0 10px;">' + escapeHtml(friendlyOrdErr) + '</p><button type="button" class="nex-retry-btn" onclick="loadMyOrders()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
+                    return;
+                }
+                window.applyMyOrdersList(res.orders || []);
+            })
+            .withFailureHandler(function(err) {
+                var friendlyOrdFail = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getMyOrdersData') : 'Unable to load your orders right now.';
+                myOrdersList.innerHTML = '<div class="nex-friendly-error-card"><p style="margin:0 0 10px;">' + escapeHtml(friendlyOrdFail) + '</p><button type="button" class="nex-retry-btn" onclick="loadMyOrders()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
+            })
+            .getMyOrdersData(customer.email);
+    };
+
+    if (customer.sessionToken && window.NexSbStage2 && typeof window.NexSbStage2.fetchMyOrdersFast === 'function') {
+        window.NexSbStage2.fetchMyOrdersFast().then(function(sbRes) {
+            if (sbRes && sbRes.ok) {
+                window.applyMyOrdersList(sbRes.orders || []);
                 return;
             }
-            myOrdersCache = res.orders || [];
-            // Sync Pending Receipt History across devices / refreshes
-            for (var si = 0; si < myOrdersCache.length; si++) {
-                var mo = myOrdersCache[si];
-                var moId = mo['Order ID'] || '';
-                var moPay = String(mo['Payment Status'] || '');
-                var moRec = String(mo['Receipt Number'] || '').trim();
-                var moPmRaw = String(mo['Payment Method'] || '').toLowerCase();
-                var moKey = 'mae';
-                if (moPmRaw.indexOf('sociabuzz') !== -1) moKey = 'sociabuzz';
-                else if (moPmRaw.indexOf('touch') !== -1 || moPmRaw.indexOf('tng') !== -1) moKey = 'tng';
-                else if (moPmRaw.indexOf('shopee') !== -1) moKey = 'shopee';
-                if (moPay === 'Awaiting Payment' && !moRec) {
-                    savePendingPaymentSession({
-                        orderId: moId,
-                        method: moKey,
-                        amount: parseFloat(mo['Total (RM)']) || 0,
-                        items: String(mo['Items'] || ''),
-                        email: customer.email || '',
-                        createdAt: Date.now()
-                    });
-                } else {
-                    remove_pending_payment_session(moId);
-                }
-            }
-            render_pending_receipt_banner();
-            renderOrderTabCounts();
-            renderOrderList(activeOrderTab);
-            if (window.NexQueueUi && typeof window.NexQueueUi.fetchCustomerQueueMap === 'function' && customer && customer.email) {
-                window.NexQueueUi.fetchCustomerQueueMap(customer.email);
-            }
-        })
-        .withFailureHandler(function(err) {
-            var friendlyOrdFail = window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getMyOrdersData') : 'Unable to load your orders right now.';
-            myOrdersList.innerHTML = '<div class="nex-friendly-error-card"><p style="margin:0 0 10px;">' + escapeHtml(friendlyOrdFail) + '</p><button type="button" class="nex-retry-btn" onclick="loadMyOrders()"><i class="fas fa-rotate-right"></i> Try Again</button></div>';
-        })
-        .getMyOrdersData(customer.email);
+            loadMyOrdersGasFallback();
+        });
+        return;
+    }
+
+    loadMyOrdersGasFallback();
 }
 
 function renderOrderTabCounts() {
@@ -24818,6 +24898,18 @@ function resetVariantEditor(ctx) {
                         var payload = (evt && evt.payload) ? evt.payload : evt;
                         appendIncomingMessage(payload);
                     });
+                    ch.on('broadcast', { event: 'order_updated' }, function(evt) {
+                        var payload = (evt && evt.payload) ? evt.payload : evt;
+                        if (window.NexSbStage2 && typeof window.NexSbStage2.handleLiveOrderEvent === 'function') {
+                            window.NexSbStage2.handleLiveOrderEvent(payload);
+                        }
+                    });
+                    ch.on('broadcast', { event: 'new_notification' }, function(evt) {
+                        var payload = (evt && evt.payload) ? evt.payload : evt;
+                        if (window.NexSbStage2 && typeof window.NexSbStage2.handleLiveNotifEvent === 'function') {
+                            window.NexSbStage2.handleLiveNotifEvent(payload);
+                        }
+                    });
 
                     ch.subscribe(function(status) {
                         if (status === 'SUBSCRIBED') {
@@ -24882,6 +24974,9 @@ function resetVariantEditor(ctx) {
                 return resolveToken(identity).then(function(tr) {
                     if (!tr || !tr.ok || !tr.chatToken) return;
                     connectRealtime(identity.email, tr.chatToken);
+                    if (typeof customer !== 'undefined' && customer && customer.email && cleanEmail(customer.email) === cleanEmail(identity.email) && customer.sessionToken && window.NexSbStage2) {
+                        window.NexSbStage2.fetchNotificationsFast();
+                    }
                     return sbRpc('nex4up_chat_unread_count', {
                         p_email: cleanEmail(identity.email),
                         p_chat_token: tr.chatToken
@@ -24915,6 +25010,9 @@ function resetVariantEditor(ctx) {
                 updateChatBadge(0);
                 disconnectRealtime();
                 renderChatIdentity();
+                if (window.NexSbStage2 && typeof window.NexSbChat !== 'undefined') {
+                    window.NexSbStage2.onLogout();
+                }
                 var container = document.getElementById('chatMessages');
                 if (container) {
                     container.innerHTML = '<div class="chat-empty">🤖 Hi! Tap a quick action above for instant help, or send us a message below.</div>';
@@ -24922,7 +25020,11 @@ function resetVariantEditor(ctx) {
             }
 
             return {
+                SB_URL: SB_URL,
+                SB_PUB_KEY: SB_PUB_KEY,
                 GUEST_ID_KEY: GUEST_ID_KEY,
+                cleanEmail: cleanEmail,
+                saveCachedToken: saveCachedToken,
                 sbRpc: sbRpc,
                 clearCachedToken: clearCachedToken,
                 resolveToken: resolveToken,
@@ -24935,6 +25037,269 @@ function resetVariantEditor(ctx) {
                 resetGuestIdentity: resetGuestIdentity,
                 checkUnreadFast: checkUnreadFast,
                 primeLoggedInSession: primeLoggedInSession,
+                onLogout: onLogout
+            };
+        })();
+
+        // ================================================================
+        // ⚡ STAGE 2: INSTANT STOREFRONT, LIVE ORDERS & LIVE NOTIFICATION BELL
+        // ================================================================
+        window.NexSbStage2 = (function() {
+            var SEED_MAP_KEY = 'nex4up_sb_s2_seeded_v1';
+            var _seedInflight = {};
+            var _seenOrderToasts = {};
+            var _seenNotifIds = new Set();
+            var _liveNotifsActive = false;
+
+            function getSeedMap() {
+                try { return JSON.parse(localStorage.getItem(SEED_MAP_KEY) || '{}') || {}; } catch (_) { return {}; }
+            }
+
+            function isSeeded(email) {
+                var em = window.NexSbChat.cleanEmail(email);
+                var map = getSeedMap();
+                return !!(em && map[em] && map[em].seededAt);
+            }
+
+            function markSeeded(email) {
+                var em = window.NexSbChat.cleanEmail(email);
+                if (!em) return;
+                try {
+                    var map = getSeedMap();
+                    map[em] = { seededAt: Date.now() };
+                    localStorage.setItem(SEED_MAP_KEY, JSON.stringify(map));
+                } catch (_) {}
+            }
+
+            function clearSeeded(email) {
+                var em = window.NexSbChat.cleanEmail(email);
+                if (!em) return;
+                try {
+                    var map = getSeedMap();
+                    delete map[em];
+                    localStorage.setItem(SEED_MAP_KEY, JSON.stringify(map));
+                } catch (_) {}
+            }
+
+            function fetchStorefrontCache() {
+                var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                var tid = controller ? setTimeout(function() { controller.abort(); }, 4500) : null;
+                var url = window.NexSbChat.SB_URL + '/rest/v1/nex4up_storefront_cache?cache_key=eq.store_bootstrap_v1&select=payload,updated_at';
+                return fetch(url, {
+                    method: 'GET',
+                    headers: { 'apikey': window.NexSbChat.SB_PUB_KEY },
+                    signal: controller ? controller.signal : undefined
+                }).then(function(res) {
+                    if (tid) clearTimeout(tid);
+                    if (!res.ok) return { ok: false };
+                    return res.json().then(function(rows) {
+                        var row = Array.isArray(rows) && rows[0] ? rows[0] : null;
+                        if (row && row.payload && Array.isArray(row.payload.games) && row.payload.games.length > 0) {
+                            return { ok: true, payload: row.payload, updated_at: row.updated_at };
+                        }
+                        return { ok: false };
+                    }).catch(function() { return { ok: false }; });
+                }).catch(function() {
+                    if (tid) clearTimeout(tid);
+                    return { ok: false };
+                });
+            }
+
+            function ensureStage2Seeded(forceRefresh) {
+                if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false, error: 'no_session' });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                if (!forceRefresh && isSeeded(em)) {
+                    return window.NexSbChat.resolveToken({ email: em, name: customer.name || '' });
+                }
+                if (_seedInflight[em]) return _seedInflight[em];
+
+                var p = new Promise(function(resolve) {
+                    if (typeof google === 'undefined' || !google.script || !google.script.run) {
+                        resolve({ ok: false, error: 'no_gas' });
+                        return;
+                    }
+                    google.script.run
+                        .withSuccessHandler(function(r) {
+                            if (r && r.success && r.chatToken) {
+                                window.NexSbChat.saveCachedToken(em, r.chatToken);
+                                markSeeded(em);
+                                resolve({ ok: true, chatToken: r.chatToken });
+                            } else {
+                                resolve({ ok: false, error: (r && r.message) || 'seed_failed' });
+                            }
+                        })
+                        .withFailureHandler(function(err) {
+                            resolve({ ok: false, error: (err && err.message) || 'seed_error' });
+                        })
+                        .getCustomerStage2Bootstrap(em, customer.sessionToken);
+                });
+
+                _seedInflight[em] = p.then(function(out) {
+                    delete _seedInflight[em];
+                    return out;
+                });
+                return _seedInflight[em];
+            }
+
+            function trackOrderByIdFast(orderId) {
+                var cleanOid = String(orderId || '').trim().toUpperCase();
+                if (!cleanOid) return Promise.resolve({ ok: false, found: false });
+                return window.NexSbChat.sbRpc('nex4up_s2_track_order_by_id', {
+                    p_order_id: cleanOid
+                }).then(function(r) {
+                    if (r && r.ok && r.found) {
+                        return Object.assign({ ok: true, found: true, success: true }, r);
+                    }
+                    return { ok: !!(r && r.ok), found: false };
+                });
+            }
+
+            function callRegisteredRpcWithRetry(rpcName, buildParams) {
+                var em = (typeof customer !== 'undefined' && customer && customer.email) ? window.NexSbChat.cleanEmail(customer.email) : '';
+                if (!em || !customer.sessionToken) return Promise.resolve({ ok: false, error: 'no_session' });
+                return ensureStage2Seeded(false).then(function(tr) {
+                    if (!tr || !tr.ok || !tr.chatToken) return { ok: false, error: 'no_token' };
+                    return window.NexSbChat.sbRpc(rpcName, buildParams(em, tr.chatToken)).then(function(res) {
+                        if (res && res.ok) {
+                            window.NexSbChat.connectRealtime(em, tr.chatToken);
+                            return res;
+                        }
+                        if (res && res.error === 'invalid_token') {
+                            window.NexSbChat.clearCachedToken(em);
+                            clearSeeded(em);
+                            return ensureStage2Seeded(true).then(function(tr2) {
+                                if (!tr2 || !tr2.ok || !tr2.chatToken) return { ok: false };
+                                return window.NexSbChat.sbRpc(rpcName, buildParams(em, tr2.chatToken));
+                            });
+                        }
+                        return res || { ok: false };
+                    });
+                });
+            }
+
+            function fetchMyOrdersFast() {
+                return callRegisteredRpcWithRetry('nex4up_s2_get_my_orders', function(em, tok) {
+                    return { p_email: em, p_stream_token: tok, p_limit: 100 };
+                });
+            }
+
+            function fetchNotificationsFast() {
+                return callRegisteredRpcWithRetry('nex4up_s2_get_notifications', function(em, tok) {
+                    return { p_email: em, p_stream_token: tok, p_limit: 50 };
+                }).then(function(res) {
+                    if (res && res.ok && Array.isArray(res.notifications)) {
+                        _liveNotifsActive = true;
+                        res.notifications.forEach(function(n) {
+                            var nid = String((n && (n.id || n.notifId)) || '');
+                            if (nid) _seenNotifIds.add(nid);
+                        });
+                        if (typeof window.nex2ApplyLiveNotifications === 'function') {
+                            window.nex2ApplyLiveNotifications(res.notifications);
+                        }
+                    }
+                    return res;
+                });
+            }
+
+            function markNotificationsReadFast() {
+                if (typeof window.nex2MarkNotificationsReadLocal === 'function') {
+                    window.nex2MarkNotificationsReadLocal();
+                }
+                if (typeof customer === 'undefined' || !customer || !customer.email || !customer.sessionToken) {
+                    return Promise.resolve({ ok: false });
+                }
+                var em = window.NexSbChat.cleanEmail(customer.email);
+                var tokKeep = customer.sessionToken;
+                callRegisteredRpcWithRetry('nex4up_s2_mark_notifications_read', function(e, t) {
+                    return { p_email: e, p_stream_token: t };
+                });
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    google.script.run.withFailureHandler(function() {}).markNotificationsRead(em, tokKeep);
+                }
+                return Promise.resolve({ ok: true });
+            }
+
+            function handleLiveOrderEvent(payload) {
+                if (!payload || typeof payload !== 'object') return;
+                var oid = String(payload.order_id || (payload.order_payload && payload.order_payload['Order ID']) || '').trim();
+                if (!oid) return;
+                var stText = String(payload.customer_status || payload.fulfilment_status || payload.payment_status || 'Updated').trim();
+
+                if (payload.order_payload && typeof payload.order_payload === 'object' && typeof myOrdersCache !== 'undefined' && Array.isArray(myOrdersCache)) {
+                    var replaced = false;
+                    for (var i = 0; i < myOrdersCache.length; i++) {
+                        if (String(myOrdersCache[i]['Order ID'] || '').trim().toUpperCase() === oid.toUpperCase()) {
+                            myOrdersCache[i] = payload.order_payload;
+                            replaced = true;
+                            break;
+                        }
+                    }
+                    if (!replaced) myOrdersCache.unshift(payload.order_payload);
+                    if (typeof window.applyMyOrdersList === 'function') {
+                        window.applyMyOrdersList(myOrdersCache);
+                    }
+                }
+
+                if (window._nexActiveTrackedOrderId && String(window._nexActiveTrackedOrderId).toUpperCase() === oid.toUpperCase() && typeof window.renderTrackedOrderCard === 'function') {
+                    var op = payload.order_payload || {};
+                    window.renderTrackedOrderCard({
+                        success: true,
+                        orderId: oid,
+                        amount: op['Total (RM)'] || 0,
+                        paymentMethod: op['Payment Method'] || 'MAE',
+                        methodKey: 'mae',
+                        status: stText,
+                        paymentStatus: payload.payment_status || op['Payment Status'] || '',
+                        fulfilmentStatus: payload.fulfilment_status || op['Fulfilment Status'] || '',
+                        items: op['Items'] || '',
+                        hasReceipt: !!(op['Receipt Number']),
+                        trackingNumber: payload.tracking_number || op['Tracking Number'] || '',
+                        trackingUrl: payload.tracking_url || op['Tracking URL'] || ''
+                    });
+                }
+
+                var toastKey = oid + '|' + stText + '|' + String(payload.tracking_number || '');
+                if (!_seenOrderToasts[toastKey]) {
+                    _seenOrderToasts[toastKey] = true;
+                    if (typeof showToast === 'function') {
+                        showToast('📦 Order ' + oid + ': ' + stText);
+                    }
+                }
+            }
+
+            function handleLiveNotifEvent(payload) {
+                if (!payload || typeof payload !== 'object') return;
+                var nid = String(payload.id || payload.notifId || '');
+                if (nid && _seenNotifIds.has(nid)) return;
+                if (nid) _seenNotifIds.add(nid);
+                _liveNotifsActive = true;
+                if (typeof window.nex2PrependLiveNotification === 'function') {
+                    window.nex2PrependLiveNotification(payload);
+                }
+                if (typeof showToast === 'function') {
+                    showToast('🔔 ' + (payload.title || 'New notification'));
+                }
+            }
+
+            function onLogout() {
+                window._nexActiveTrackedOrderId = '';
+                _liveNotifsActive = false;
+                _seenNotifIds = new Set();
+                _seenOrderToasts = {};
+            }
+
+            return {
+                fetchStorefrontCache: fetchStorefrontCache,
+                ensureStage2Seeded: ensureStage2Seeded,
+                trackOrderByIdFast: trackOrderByIdFast,
+                fetchMyOrdersFast: fetchMyOrdersFast,
+                fetchNotificationsFast: fetchNotificationsFast,
+                markNotificationsReadFast: markNotificationsReadFast,
+                handleLiveOrderEvent: handleLiveOrderEvent,
+                handleLiveNotifEvent: handleLiveNotifEvent,
+                hasLiveNotifs: function() { return _liveNotifsActive; },
                 onLogout: onLogout
             };
         })();
@@ -29604,6 +29969,52 @@ window.renderNexVipBanner = function (pts) {
         if (window.NexCommunityPhase6) window.NexCommunityPhase6.afterRenderAll();
     }
 
+    function _formatNotifDate(val) {
+        var s = String(val || '').trim();
+        if (!s) return '';
+        if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+            var d = new Date(s);
+            if (!isNaN(d.getTime())) {
+                return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+                    d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+        return s;
+    }
+
+    window.nex2ApplyLiveNotifications = function(notifsList) {
+        if (!Array.isArray(notifsList)) return;
+        _nex2State.data = _nex2State.data || {};
+        _nex2State.data.myData = _nex2State.data.myData || {};
+        _nex2State.data.myData.notifications = notifsList.map(function(n) {
+            return Object.assign({}, n, { createdAt: _formatNotifDate(n && n.createdAt) });
+        });
+        render_nex2_notifications();
+    };
+
+    window.nex2PrependLiveNotification = function(notifObj) {
+        if (!notifObj || typeof notifObj !== 'object') return;
+        _nex2State.data = _nex2State.data || {};
+        _nex2State.data.myData = _nex2State.data.myData || {};
+        var arr = Array.isArray(_nex2State.data.myData.notifications) ? _nex2State.data.myData.notifications.slice() : [];
+        var nid = String(notifObj.id || notifObj.notifId || '');
+        if (nid && arr.some(function(x) { return String((x && (x.id || x.notifId)) || '') === nid; })) return;
+        arr.unshift(Object.assign({}, notifObj, { createdAt: _formatNotifDate(notifObj.createdAt) }));
+        _nex2State.data.myData.notifications = arr.slice(0, 60);
+        render_nex2_notifications();
+    };
+
+    window.nex2MarkNotificationsReadLocal = function() {
+        _nex2State.data = _nex2State.data || {};
+        _nex2State.data.myData = _nex2State.data.myData || {};
+        if (Array.isArray(_nex2State.data.myData.notifications)) {
+            _nex2State.data.myData.notifications = _nex2State.data.myData.notifications.map(function(n) {
+                return Object.assign({}, n, { read: true });
+            });
+        }
+        render_nex2_notifications();
+    };
+
     window.loadNex4Up2Bootstrap = function() {
         var em = (customer && customer.email) || '';
         var tok = (customer && customer.sessionToken) || '';
@@ -29621,7 +30032,14 @@ window.renderNexVipBanner = function (pts) {
         google.script.run
             .withSuccessHandler(function(res) {
                 if (!res || res.success === false) return;
+                var prevLiveNotifs = (_nex2State.data && _nex2State.data.myData && Array.isArray(_nex2State.data.myData.notifications) &&
+                    window.NexSbStage2 && window.NexSbStage2.hasLiveNotifs())
+                    ? _nex2State.data.myData.notifications.slice()
+                    : null;
                 _nex2State.data = res;
+                if (prevLiveNotifs && _nex2State.data.myData) {
+                    _nex2State.data.myData.notifications = prevLiveNotifs;
+                }
                 try {
                     var publicCopy = Object.assign({}, res);
                     delete publicCopy.myData;
@@ -29634,6 +30052,9 @@ window.renderNexVipBanner = function (pts) {
                     try { localStorage.setItem('nex4up_customer', JSON.stringify(customer)); } catch (e) {}
                 }
                 render_nex2_all_sections();
+                if (customer && customer.email && customer.sessionToken && window.NexSbStage2 && !window.NexSbStage2.hasLiveNotifs()) {
+                    window.NexSbStage2.fetchNotificationsFast();
+                }
             })
             .withFailureHandler(function(err) {
                 console.warn('NEX4UP 2.0 bootstrap pending deploy or offline:', err && err.message);
@@ -29945,6 +30366,9 @@ window.renderNexVipBanner = function (pts) {
                 } else {
                     dd.style.top = '';
                 }
+                if (willOpen && customer && customer.email && customer.sessionToken && window.NexSbStage2) {
+                    window.NexSbStage2.fetchNotificationsFast();
+                }
             }
             return;
         }
@@ -29956,7 +30380,11 @@ window.renderNexVipBanner = function (pts) {
         }
         if (e.target.closest('#nex2MarkAllReadBtn')) {
             if (!customer || !customer.email || !customer.sessionToken) return;
-            google.script.run.withSuccessHandler(function() { loadNex4Up2Bootstrap(); }).markNotificationsRead(customer.email, customer.sessionToken);
+            if (window.NexSbStage2 && typeof window.NexSbStage2.markNotificationsReadFast === 'function') {
+                window.NexSbStage2.markNotificationsReadFast();
+            } else {
+                google.script.run.withSuccessHandler(function() { loadNex4Up2Bootstrap(); }).markNotificationsRead(customer.email, customer.sessionToken);
+            }
             return;
         }
         var notifItem = e.target.closest('[data-notif-tab]');
