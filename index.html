@@ -16869,6 +16869,444 @@ window.NexAsyncBtn = (function() {
                 onLogout: onLogout
             };
         })();
+
+        // ================================================================
+        // ⚡ STAGE 4: ADMIN PANEL (REAL-TIME INBOX, LIVE ORDERS & DASHBOARD)
+        // ================================================================
+        window.NexSbAdmin = (function() {
+            var _adminToken = '';
+            var _channelKey = '';
+            var _adminChannel = null;
+            var _adminRealtimeReady = false;
+            var _seenInboxMsgKeys = new Set();
+            var _convChatTokens = {};
+            var _maxDashAgeMs = 10 * 60 * 1000;
+
+            function cleanEmail(em) {
+                return String(em || '').trim().toLowerCase();
+            }
+
+            function esc(s) {
+                return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            }
+
+            function isReady() {
+                return !!(typeof isAdmin !== 'undefined' && isAdmin && _adminToken);
+            }
+
+            function isRealtimeReady() {
+                return !!(_adminRealtimeReady && _adminChannel);
+            }
+
+            function msgKey(m) {
+                if (!m || typeof m !== 'object') return '';
+                if (m.client_msg_id) return 'cid:' + String(m.client_msg_id);
+                if (m.id !== undefined && m.id !== null) return 'id:' + String(m.id);
+                return 'fb:' + cleanEmail(m.email) + '|' + String(m.sender || '') + '|' + String(m.message || '') + '|' + String(m.date || m.createdAt || '');
+            }
+
+            function rememberMessages(email, msgs) {
+                if (!Array.isArray(msgs)) return;
+                for (var i = 0; i < msgs.length; i++) {
+                    var k = msgKey(Object.assign({ email: email }, msgs[i]));
+                    if (k) _seenInboxMsgKeys.add(k);
+                }
+            }
+
+            function setAdminBadgeCount(n) {
+                var badge = document.getElementById('adminInboxBadge');
+                if (!badge) return;
+                var num = parseInt(n, 10) || 0;
+                if (num > 0) {
+                    badge.textContent = num > 99 ? '99+' : String(num);
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            function appendLiveBubbleIfCurrentThread(payload) {
+                if (typeof inboxCurrentEmail === 'undefined' || !inboxCurrentEmail) return false;
+                if (cleanEmail(inboxCurrentEmail) !== cleanEmail(payload.email)) return false;
+                var body = document.getElementById('inboxChatBody');
+                if (!body) return false;
+
+                var k = msgKey(payload);
+                if (k && _seenInboxMsgKeys.has(k)) return true;
+                if (k) _seenInboxMsgKeys.add(k);
+
+                var emptyEl = body.querySelector('.chat-empty');
+                if (emptyEl) emptyEl.remove();
+
+                var isMine = String(payload.sender || '') === 'admin';
+                var bubbleClass = isMine ? 'mine' : 'theirs';
+                var timeStr = payload.date ? (String(payload.date).split(' ')[1] || '').substring(0, 5) : '';
+                if (!timeStr && payload.createdAt) {
+                    try {
+                        var d = new Date(payload.createdAt);
+                        if (!isNaN(d.getTime())) timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    } catch (_) {}
+                }
+
+                var bubble = document.createElement('div');
+                bubble.className = 'chat-bubble ' + bubbleClass;
+                var inner = '';
+                if (payload.message) inner += '<div>' + esc(payload.message) + '</div>';
+                if (payload.imageUrl) {
+                    inner += '<img src="' + esc(payload.imageUrl) + '" alt="image" onclick="window.open(this.src, \'_blank\')" />';
+                }
+                inner += '<span class="chat-time">' + esc(timeStr) + '</span>';
+                bubble.innerHTML = inner;
+                body.appendChild(bubble);
+                body.scrollTop = body.scrollHeight;
+                return true;
+            }
+
+            function handleLiveChatMessage(payload) {
+                if (!payload || typeof payload !== 'object' || !payload.email) return;
+                var em = cleanEmail(payload.email);
+                var isSameOpen = (typeof inboxCurrentEmail !== 'undefined' && inboxCurrentEmail && cleanEmail(inboxCurrentEmail) === em);
+                var isCustomerMsg = String(payload.sender || '') === 'customer';
+
+                if (typeof inboxAllConversations !== 'undefined' && Array.isArray(inboxAllConversations)) {
+                    var existingIdx = -1;
+                    for (var i = 0; i < inboxAllConversations.length; i++) {
+                        if (cleanEmail(inboxAllConversations[i].email) === em) {
+                            existingIdx = i;
+                            break;
+                        }
+                    }
+                    var prevConv = existingIdx !== -1 ? inboxAllConversations[existingIdx] : { email: em, name: payload.name || em, unread: 0 };
+                    var nextUnread = (isCustomerMsg && !isSameOpen)
+                        ? (parseInt(prevConv.unread, 10) || 0) + 1
+                        : (isSameOpen ? 0 : (parseInt(prevConv.unread, 10) || 0));
+                    var updatedConv = Object.assign({}, prevConv, {
+                        email: em,
+                        name: (payload.name && payload.name !== 'Admin') ? payload.name : (prevConv.name || em),
+                        lastMessage: payload.message || (payload.imageUrl ? '[Image]' : ''),
+                        lastSender: isCustomerMsg ? 'customer' : 'admin',
+                        lastDate: payload.date || prevConv.lastDate || '',
+                        unread: nextUnread
+                    });
+                    if (existingIdx !== -1) inboxAllConversations.splice(existingIdx, 1);
+                    inboxAllConversations.unshift(updatedConv);
+                    var inboxSec = document.getElementById('section-inbox');
+                    if (inboxSec && inboxSec.classList.contains('active') && typeof filterAndRenderInbox === 'function') {
+                        filterAndRenderInbox();
+                    }
+                }
+
+                if (isSameOpen) {
+                    appendLiveBubbleIfCurrentThread(payload);
+                    if (isCustomerMsg) markThreadReadFast(em);
+                } else if (isCustomerMsg) {
+                    fetchUnreadCountFast();
+                    if (typeof showToast === 'function') {
+                        showToast('💬 ' + (payload.name || em) + ': ' + String(payload.message || '[Image]').slice(0, 42));
+                    }
+                }
+            }
+
+            function handleLiveOrderUpdated(payload) {
+                if (!payload || typeof payload !== 'object' || !payload.order_payload) return;
+                var op = payload.order_payload;
+                var oid = String(op['Order ID'] || payload.order_id || '').trim();
+                if (!oid) return;
+
+                if (Array.isArray(window._adminAllOrdersCache)) {
+                    var idx = -1;
+                    for (var i = 0; i < window._adminAllOrdersCache.length; i++) {
+                        if (String(window._adminAllOrdersCache[i]['Order ID'] || '').trim().toUpperCase() === oid.toUpperCase()) {
+                            idx = i;
+                            break;
+                        }
+                    }
+                    if (idx !== -1) window._adminAllOrdersCache[idx] = op;
+                    else window._adminAllOrdersCache.unshift(op);
+
+                    if (typeof window.renderAdminOrdersTable === 'function') {
+                        window.renderAdminOrdersTable(window._adminAllOrdersCache);
+                    }
+                    if (typeof window.applyOrdersToApprovalQueue === 'function') {
+                        window.applyOrdersToApprovalQueue(window._adminAllOrdersCache);
+                    }
+                }
+                if (typeof showToast === 'function') {
+                    var st = String(payload.fulfilment_status || payload.payment_status || 'Updated');
+                    showToast('🛎️ Live Order ' + oid + ': ' + st);
+                }
+            }
+
+            function handleLiveDashboardUpdated(payload) {
+                if (!payload || !payload.summary) return;
+                var picker = document.getElementById('dashboardTimeFilter');
+                var activeRange = picker ? picker.value : 'month';
+                if (payload.range && payload.range !== activeRange) return;
+                if (typeof window.renderAdvancedDashboardSummary === 'function') {
+                    window.renderAdvancedDashboardSummary(payload.summary);
+                }
+            }
+
+            function connectAdminRealtime() {
+                if (!isReady() || !_channelKey) return Promise.resolve(false);
+                if (_adminChannel && _adminRealtimeReady) return Promise.resolve(true);
+                if (_adminChannel) return Promise.resolve(true);
+                if (!window.NexSbChat || typeof window.NexSbChat.loadRealtimeSdk !== 'function') {
+                    return Promise.resolve(false);
+                }
+
+                return window.NexSbChat.loadRealtimeSdk().then(function(client) {
+                    if (!client || _adminChannel || !isReady()) return false;
+                    var ch = client.channel('nex4up_admin_live_' + _channelKey, {
+                        config: { private: false, broadcast: { self: false } }
+                    });
+                    ch.on('broadcast', { event: 'admin_chat_message' }, function(evt) {
+                        handleLiveChatMessage((evt && evt.payload) ? evt.payload : evt);
+                    });
+                    ch.on('broadcast', { event: 'admin_order_updated' }, function(evt) {
+                        handleLiveOrderUpdated((evt && evt.payload) ? evt.payload : evt);
+                    });
+                    ch.on('broadcast', { event: 'admin_orders_refresh' }, function() {
+                        fetchOrdersFast().then(function(res) {
+                            if (res && res.ok && Array.isArray(res.orders)) {
+                                window._adminAllOrdersCache = res.orders;
+                                if (typeof window.renderAdminOrdersTable === 'function') window.renderAdminOrdersTable(res.orders);
+                                if (typeof window.applyOrdersToApprovalQueue === 'function') window.applyOrdersToApprovalQueue(res.orders);
+                            }
+                        });
+                    });
+                    ch.on('broadcast', { event: 'admin_dashboard_updated' }, function(evt) {
+                        handleLiveDashboardUpdated((evt && evt.payload) ? evt.payload : evt);
+                    });
+                    ch.subscribe(function(status) {
+                        if (status === 'SUBSCRIBED') {
+                            _adminRealtimeReady = true;
+                        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                            _adminRealtimeReady = false;
+                        }
+                    });
+                    _adminChannel = ch;
+                    return true;
+                });
+            }
+
+            function disconnectAdminRealtime() {
+                _adminRealtimeReady = false;
+                if (_adminChannel && typeof _adminChannel.unsubscribe === 'function') {
+                    try { _adminChannel.unsubscribe(); } catch (_) {}
+                }
+                _adminChannel = null;
+            }
+
+            function bootstrapAfterLogin(adminPwd) {
+                if (!adminPwd || typeof google === 'undefined' || !google.script || !google.script.run) {
+                    return Promise.resolve({ ok: false });
+                }
+                return new Promise(function(resolve) {
+                    google.script.run
+                        .withSuccessHandler(function(r) {
+                            if (r && r.success && r.adminToken) {
+                                _adminToken = String(r.adminToken);
+                                _channelKey = String(r.channelKey || '');
+                                connectAdminRealtime();
+                                resolve({ ok: true, data: r });
+                            } else {
+                                resolve({ ok: false });
+                            }
+                        })
+                        .withFailureHandler(function() {
+                            resolve({ ok: false });
+                        })
+                        .getAdminStage4Bootstrap(adminPwd);
+                });
+            }
+
+            function callAdminRpc(rpcName, params) {
+                if (!isReady()) return Promise.resolve({ ok: false, error: 'no_admin_token' });
+                return window.NexSbChat.sbRpc(rpcName, Object.assign({ p_admin_token: _adminToken }, params || {}));
+            }
+
+            function fetchOrdersFast(limitOpt) {
+                return callAdminRpc('nex4up_s4_admin_get_orders', { p_limit: limitOpt || 500 });
+            }
+
+            function fetchDashboardFast(range) {
+                var cleanRange = String(range || 'month').trim() || 'month';
+                return callAdminRpc('nex4up_s4_admin_get_cache', { p_cache_key: 'dashboard_' + cleanRange }).then(function(res) {
+                    if (res && res.ok && res.found && res.payload) {
+                        var ageMs = res.updatedAt ? (Date.now() - Date.parse(res.updatedAt)) : 0;
+                        if (!isNaN(ageMs) && ageMs <= _maxDashAgeMs) {
+                            return { ok: true, summary: res.payload };
+                        }
+                    }
+                    return { ok: false };
+                });
+            }
+
+            function fetchConversationsFast(limitOpt) {
+                return callAdminRpc('nex4up_s4_admin_get_conversations', { p_limit: limitOpt || 120 }).then(function(res) {
+                    if (res && res.ok && Array.isArray(res.conversations)) {
+                        for (var i = 0; i < res.conversations.length; i++) {
+                            var c = res.conversations[i];
+                            if (c && c.email && c.chatToken) _convChatTokens[cleanEmail(c.email)] = c.chatToken;
+                        }
+                        if (typeof res.totalUnread === 'number') setAdminBadgeCount(res.totalUnread);
+                    }
+                    return res;
+                });
+            }
+
+            function fetchMessagesFast(email, limitOpt) {
+                var em = cleanEmail(email);
+                return callAdminRpc('nex4up_s4_admin_get_messages', { p_email: em, p_limit: limitOpt || 150 }).then(function(res) {
+                    if (res && res.ok && Array.isArray(res.messages)) {
+                        if (res.chatToken) _convChatTokens[em] = res.chatToken;
+                        rememberMessages(em, res.messages);
+                    }
+                    return res;
+                });
+            }
+
+            function markThreadReadFast(email) {
+                var em = cleanEmail(email);
+                return callAdminRpc('nex4up_s4_admin_mark_read', { p_email: em }).then(function(res) {
+                    if (res && res.ok && typeof res.totalUnread === 'number') {
+                        setAdminBadgeCount(res.totalUnread);
+                    }
+                    if (typeof inboxAllConversations !== 'undefined' && Array.isArray(inboxAllConversations)) {
+                        for (var i = 0; i < inboxAllConversations.length; i++) {
+                            if (cleanEmail(inboxAllConversations[i].email) === em) {
+                                inboxAllConversations[i].unread = 0;
+                                break;
+                            }
+                        }
+                        if (typeof filterAndRenderInbox === 'function') filterAndRenderInbox();
+                    }
+                    return res;
+                });
+            }
+
+            function fetchUnreadCountFast() {
+                return callAdminRpc('nex4up_s4_admin_unread_count', {}).then(function(res) {
+                    if (res && res.ok && typeof res.unread === 'number') {
+                        setAdminBadgeCount(res.unread);
+                    }
+                    return res;
+                });
+            }
+
+            function broadcastToCustomerChat(chatToken, msgPayload) {
+                var tok = String(chatToken || '').trim();
+                if (!tok || !msgPayload || !window.NexSbChat || typeof window.NexSbChat.loadRealtimeSdk !== 'function') return;
+                window.NexSbChat.loadRealtimeSdk().then(function(client) {
+                    if (!client) return;
+                    try {
+                        var tmpCh = client.channel('nex4up_chat_' + tok, {
+                            config: { private: false, broadcast: { self: false } }
+                        });
+                        tmpCh.send({ type: 'broadcast', event: 'new_message', payload: msgPayload });
+                    } catch (_) {}
+                });
+            }
+
+            function sendAdminReplyFast(email, text, clientMsgId) {
+                var em = cleanEmail(email);
+                var txt = String(text || '').trim();
+                var cid = clientMsgId || ('ADM-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7));
+                if (!em || !txt || !isReady()) return Promise.resolve({ ok: false });
+
+                var nowIso = new Date().toISOString();
+                var optPayload = {
+                    client_msg_id: cid,
+                    email: em,
+                    name: 'Admin',
+                    sender: 'admin',
+                    message: txt,
+                    imageUrl: '',
+                    createdAt: nowIso
+                };
+                appendLiveBubbleIfCurrentThread(optPayload);
+                handleLiveChatMessage(optPayload);
+
+                return callAdminRpc('nex4up_s4_admin_send_message', {
+                    p_email: em,
+                    p_message: txt,
+                    p_image_url: '',
+                    p_client_msg_id: cid
+                }).then(function(res) {
+                    if (res && res.ok && res.message) {
+                        var tok = res.chat_token || _convChatTokens[em] || '';
+                        if (tok) {
+                            _convChatTokens[em] = tok;
+                            broadcastToCustomerChat(tok, res.message);
+                        }
+                        if (typeof google !== 'undefined' && google.script && google.script.run && typeof window._nexAdminPwdSession !== 'undefined' && window._nexAdminPwdSession) {
+                            google.script.run.withFailureHandler(function() {}).mirrorAdminChatToSheet(window._nexAdminPwdSession, em, txt, cid);
+                        }
+                        return { ok: true, message: res.message };
+                    }
+                    return { ok: false, error: (res && res.error) || 'send_failed' };
+                });
+            }
+
+            function applyOptimisticOrderUpdate(orderId, fieldsPatch) {
+                var oid = String(orderId || '').trim().toUpperCase();
+                if (!oid || !Array.isArray(window._adminAllOrdersCache)) return function() {};
+                var idx = -1;
+                for (var i = 0; i < window._adminAllOrdersCache.length; i++) {
+                    if (String(window._adminAllOrdersCache[i]['Order ID'] || '').trim().toUpperCase() === oid) {
+                        idx = i;
+                        break;
+                    }
+                }
+                if (idx === -1) return function() {};
+
+                var prevOrder = JSON.parse(JSON.stringify(window._adminAllOrdersCache[idx]));
+                window._adminAllOrdersCache[idx] = Object.assign({}, prevOrder, fieldsPatch || {});
+                if (typeof window.renderAdminOrdersTable === 'function') window.renderAdminOrdersTable(window._adminAllOrdersCache);
+                if (typeof window.applyOrdersToApprovalQueue === 'function') window.applyOrdersToApprovalQueue(window._adminAllOrdersCache);
+
+                return function rollback() {
+                    if (!Array.isArray(window._adminAllOrdersCache)) return;
+                    window._adminAllOrdersCache[idx] = prevOrder;
+                    if (typeof window.renderAdminOrdersTable === 'function') window.renderAdminOrdersTable(window._adminAllOrdersCache);
+                    if (typeof window.applyOrdersToApprovalQueue === 'function') window.applyOrdersToApprovalQueue(window._adminAllOrdersCache);
+                };
+            }
+
+            function onLogout() {
+                var tokKeep = _adminToken;
+                _adminToken = '';
+                _channelKey = '';
+                _seenInboxMsgKeys = new Set();
+                _convChatTokens = {};
+                disconnectAdminRealtime();
+                if (tokKeep && window.NexSbChat && typeof window.NexSbChat.sbRpc === 'function') {
+                    window.NexSbChat.sbRpc('nex4up_s4_admin_logout', { p_admin_token: tokKeep });
+                }
+            }
+
+            return {
+                isReady: isReady,
+                isRealtimeReady: isRealtimeReady,
+                bootstrapAfterLogin: bootstrapAfterLogin,
+                connectAdminRealtime: connectAdminRealtime,
+                disconnectAdminRealtime: disconnectAdminRealtime,
+                fetchOrdersFast: fetchOrdersFast,
+                fetchDashboardFast: fetchDashboardFast,
+                fetchConversationsFast: fetchConversationsFast,
+                fetchMessagesFast: fetchMessagesFast,
+                markThreadReadFast: markThreadReadFast,
+                fetchUnreadCountFast: fetchUnreadCountFast,
+                sendAdminReplyFast: sendAdminReplyFast,
+                applyOptimisticOrderUpdate: applyOptimisticOrderUpdate,
+                handleLiveChatMessage: handleLiveChatMessage,
+                handleLiveOrderUpdated: handleLiveOrderUpdated,
+                handleLiveDashboardUpdated: handleLiveDashboardUpdated,
+                onLogout: onLogout
+            };
+        })();
                 // ================================================================
         // 🛡 HARD GUARD: admin login overlay can only open in ADMIN mode
         // ================================================================
@@ -20307,10 +20745,6 @@ if (cart.length > 0) {
                         showAdminView();
                         showAdminSection('add-item');
                         renderAdminList();
-                        loadOrders();
-                        loadAdvancedDashboard();
-                        loadPendingOrders();
-                        refreshAdminUnreadBadge();
                         loadPublicGenreImages(function() {
                             renderAll();
                         });
@@ -20319,6 +20753,23 @@ if (cart.length > 0) {
                         adminLoginForm.reset();
                         adminLoginError.textContent = '';
                         showToast('Admin mode activated.');
+                        if (window.NexSbAdmin && typeof window.NexSbAdmin.bootstrapAfterLogin === 'function') {
+                            window.NexSbAdmin.bootstrapAfterLogin(password).then(function(sbRes) {
+                                loadOrders();
+                                loadAdvancedDashboard();
+                                loadPendingOrders();
+                                refreshAdminUnreadBadge();
+                                var inboxSec = document.getElementById('section-inbox');
+                                if (sbRes && sbRes.ok && inboxSec && inboxSec.classList.contains('active')) {
+                                    loadInboxConversations();
+                                }
+                            });
+                        } else {
+                            loadOrders();
+                            loadAdvancedDashboard();
+                            loadPendingOrders();
+                            refreshAdminUnreadBadge();
+                        }
                     } else {
                         adminLoginError.textContent = 'Incorrect admin password.';
                     }
@@ -20353,6 +20804,9 @@ if (cart.length > 0) {
         function logoutAdmin() {
             if (inboxPollTimer) { clearInterval(inboxPollTimer); inboxPollTimer = null; }
             inboxCurrentEmail = null;
+            if (window.NexSbAdmin && typeof window.NexSbAdmin.onLogout === 'function') {
+                window.NexSbAdmin.onLogout();
+            }
             isAdmin = false;
             window._nexAdminPwdSession = '';
             profileToggle.classList.remove('active');
@@ -20404,6 +20858,10 @@ if (cart.length > 0) {
                     showAdminSection(section);
                     if (section === 'payment-approval') {
                         loadPendingOrders();
+                    } else if (section === 'orders') {
+                        if (window.NexSbAdmin && window.NexSbAdmin.isReady()) loadOrders();
+                    } else if (section === 'dashboard') {
+                        if (window.NexSbAdmin && window.NexSbAdmin.isReady()) loadAdvancedDashboard();
                     } else if (section === 'genres') {
                         loadGenreImages();
                     } else if (section === 'cms-banners') {
@@ -21379,10 +21837,7 @@ function exportOrdersAccountingCsv() {
     }
 }
 
-function loadOrders() {
-    ordersList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Payment</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Fulfilment</th></tr></thead><tbody>' + createSkeletonTableRows(5) + '</tbody></table></div>';
-    google.script.run
-        .withSuccessHandler(function(orders) {
+function renderAdminOrdersTable(orders) {
             window._adminAllOrdersCache = orders || [];
             if (window.NexQueueUi && typeof window.NexQueueUi.refreshAdminQueue === 'function') { window.NexQueueUi.refreshAdminQueue(); }
             if (!orders || orders.length === 0) {
@@ -21517,31 +21972,65 @@ function loadOrders() {
                     var oid = this.dataset.orderid;
                     if (!confirm('Mark order ' + oid + ' as Shipped?\n\nThe customer will then see an "Order Received" button.')) return;
                     var btn = this;
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    var rollback = (window.NexSbAdmin && window.NexSbAdmin.isReady())
+                        ? window.NexSbAdmin.applyOptimisticOrderUpdate(oid, { 'Fulfilment Status': 'Shipped', _tab: 'To Receive', _customerStatus: 'Shipped' })
+                        : null;
+                    if (rollback) {
+                        showToast('✅ Order shipped.');
+                    } else {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    }
                     google.script.run
 .withSuccessHandler(function(res) {
     if (res && res.success === false) {
+        if (rollback) rollback();
         showToast('❌ Shipping blocked: ' + (res.message || 'Unknown error'));
-        loadOrders();
+        if (!rollback) loadOrders();
         return;
     }
-    showToast('✅ Order shipped.');
-    loadOrders();
+    if (!rollback) {
+        showToast('✅ Order shipped.');
+        loadOrders();
+    }
 })
                         .withFailureHandler(function(err) {
+                            if (rollback) rollback();
                             showToast('Error: ' + err.message);
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="fas fa-truck"></i> Mark as Shipped';
+                            if (!rollback) {
+                                btn.disabled = false;
+                                btn.innerHTML = '<i class="fas fa-truck"></i> Mark as Shipped';
+                            }
                         })
                         .updateFulfilmentStatus(oid, 'Shipped');
                 });
             }
-        })
-        .withFailureHandler(function(err) {
-            ordersList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading orders: ' + err.message + '</p>';
-        })
-        .getOrdersData();
+}
+window.renderAdminOrdersTable = renderAdminOrdersTable;
+
+function loadOrders() {
+    ordersList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Payment</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Fulfilment</th></tr></thead><tbody>' + createSkeletonTableRows(5) + '</tbody></table></div>';
+    function loadOrdersFromGas() {
+        google.script.run
+            .withSuccessHandler(function(orders) {
+                renderAdminOrdersTable(orders);
+            })
+            .withFailureHandler(function(err) {
+                ordersList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading orders: ' + err.message + '</p>';
+            })
+            .getOrdersData();
+    }
+    if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+        window.NexSbAdmin.fetchOrdersFast().then(function(sbRes) {
+            if (sbRes && sbRes.ok && Array.isArray(sbRes.orders) && sbRes.orders.length > 0) {
+                renderAdminOrdersTable(sbRes.orders);
+                return;
+            }
+            loadOrdersFromGas();
+        });
+        return;
+    }
+    loadOrdersFromGas();
 }
 
         function getStatusValue(order) {
@@ -21572,17 +22061,40 @@ function loadOrders() {
         }
     }
 
+    var sbReady = !!(window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady());
+    var rollback = sbReady
+        ? window.NexSbAdmin.applyOptimisticOrderUpdate(orderId, { 'Payment Status': newStatus })
+        : null;
+    if (sbReady) {
+        showToast('✅ Order ' + orderId + ' → ' + newStatus);
+    }
+
     google.script.run
-        .withSuccessHandler(function (updatedOrders) {
-            try { loadOrders(); } catch (e) { console.warn('loadOrders:', e); }
+        .withSuccessHandler(function (res) {
+            if (res && res.success === false) {
+                if (rollback) rollback();
+                if (targetSelect && document.body.contains(targetSelect)) targetSelect.disabled = false;
+                showToast('❌ ' + (res.message || 'Error updating order status.'));
+                if (!sbReady) {
+                    try { loadOrders(); } catch (e) { console.warn('loadOrders:', e); }
+                }
+                return;
+            }
+            if (targetSelect && document.body.contains(targetSelect)) targetSelect.disabled = false;
+            if (!sbReady || !window.NexSbAdmin.isRealtimeReady()) {
+                try { loadOrders(); } catch (e) { console.warn('loadOrders:', e); }
+                try { loadPendingOrders(); } catch (e) { console.warn('loadPendingOrders:', e); }
+            }
             try { loadAdvancedDashboard(); } catch (e) { console.warn('loadAdvancedDashboard:', e); }
-            try { loadPendingOrders(); } catch (e) { console.warn('loadPendingOrders:', e); }
-            showToast('✅ Order ' + orderId + ' → ' + newStatus);
+            if (!sbReady) {
+                showToast('✅ Order ' + orderId + ' → ' + newStatus);
+            }
         })
         .withFailureHandler(function (err) {
+            if (rollback) rollback();
             showToast('❌ Error updating order status.');
             console.error('updateOrderStatus error:', err);
-            if (targetSelect) targetSelect.disabled = false;
+            if (targetSelect && document.body.contains(targetSelect)) targetSelect.disabled = false;
         })
         .updateOrderStatus(orderId, newStatus);
 }
@@ -21590,6 +22102,39 @@ function loadOrders() {
         // ================================================================
         // PAYMENT APPROVAL — with receipt number search
         // ================================================================
+        function applyOrdersToApprovalQueue(orders) {
+            if (!orders || orders.length === 0) {
+                approvalAllOrders = [];
+                approvalList.innerHTML = '<div class="empty-msg">No orders found.</div>';
+                updateApprovalCount();
+                return;
+            }
+
+            var sampleOrder = orders[0];
+            var allKeys = Object.keys(sampleOrder);
+            var statusKey = null;
+            for (var k = 0; k < allKeys.length; k++) {
+                if (allKeys[k].toLowerCase().indexOf('status') !== -1) { statusKey = allKeys[k]; break; }
+            }
+            if (!statusKey) statusKey = 'Payment Status';
+
+            var pending = [];
+            for (var oi2 = 0; oi2 < orders.length; oi2++) {
+                var o2 = orders[oi2];
+                var st = (o2[statusKey] || '').toString().trim().toLowerCase();
+                if (st === 'awaiting verification' || st === 'pending' || st === 'awaiting payment') {
+                    pending.push(o2);
+                }
+            }
+
+            // ✅ Cache all pending orders for searching
+            approvalAllOrders = pending;
+
+            // ✅ Render with current search filter
+            renderApprovalList();
+        }
+        window.applyOrdersToApprovalQueue = applyOrdersToApprovalQueue;
+
         function loadPendingOrders() {
             var skeletonRow = '<tr>';
             for (var s = 0; s < 8; s++) {
@@ -21599,42 +22144,31 @@ function loadOrders() {
 
             approvalList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Payment</th><th>Total</th><th>Receipt Number</th><th>Receipt Image</th><th>Actions</th></tr></thead><tbody>' + skeletonRow + '</tbody></table></div>';
 
-            google.script.run
-                .withSuccessHandler(function(orders) {
-                    if (!orders || orders.length === 0) {
-                        approvalAllOrders = [];
-                        approvalList.innerHTML = '<div class="empty-msg">No orders found.</div>';
-                        updateApprovalCount();
+            function loadPendingFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(orders) {
+                        if (Array.isArray(orders)) window._adminAllOrdersCache = orders;
+                        applyOrdersToApprovalQueue(orders);
+                    })
+                    .withFailureHandler(function(err) {
+                        approvalList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading pending orders: ' + err.message + '</p>';
+                    })
+                    .getOrdersData();
+            }
+
+            if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+                window.NexSbAdmin.fetchOrdersFast().then(function(sbRes) {
+                    if (sbRes && sbRes.ok && Array.isArray(sbRes.orders) && sbRes.orders.length > 0) {
+                        window._adminAllOrdersCache = sbRes.orders;
+                        applyOrdersToApprovalQueue(sbRes.orders);
                         return;
                     }
+                    loadPendingFromGas();
+                });
+                return;
+            }
 
-                    var sampleOrder = orders[0];
-                    var allKeys = Object.keys(sampleOrder);
-                    var statusKey = null;
-                    for (var k = 0; k < allKeys.length; k++) {
-                        if (allKeys[k].toLowerCase().indexOf('status') !== -1) { statusKey = allKeys[k]; break; }
-                    }
-                    if (!statusKey) statusKey = 'Payment Status';
-
-                    var pending = [];
-                    for (var oi2 = 0; oi2 < orders.length; oi2++) {
-                        var o2 = orders[oi2];
-                        var st = (o2[statusKey] || '').toString().trim().toLowerCase();
-                        if (st === 'awaiting verification' || st === 'pending' || st === 'awaiting payment') {
-                            pending.push(o2);
-                        }
-                    }
-
-                    // ✅ Cache all pending orders for searching
-                    approvalAllOrders = pending;
-
-                    // ✅ Render with current search filter
-                    renderApprovalList();
-                })
-                .withFailureHandler(function(err) {
-                    approvalList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading pending orders: ' + err.message + '</p>';
-                })
-                .getOrdersData();
+            loadPendingFromGas();
         }
 
         function _isSociaBuzzOrder(order) {
@@ -21918,9 +22452,64 @@ function loadOrders() {
         // Alias to prevent crashes from old code
         function loadDashboard() { loadAdvancedDashboard(); }
 
-        function loadAdvancedDashboard() {
+        function renderAdvancedDashboardSummary(summary) {
+            if (!summary) return;
+            document.getElementById('dashTotalOrders').textContent = summary.totalOrders || 0;
+            document.getElementById('dashGrossRev').textContent = 'RM ' + (summary.grossRevenue || 0).toFixed(2);
+            document.getElementById('dashPromoDisc').textContent = '- RM ' + (summary.promoDiscount || 0).toFixed(2);
+            document.getElementById('dashPointsDisc').textContent = '- RM ' + (summary.pointsDiscount || 0).toFixed(2);
+            document.getElementById('dashNetRev').textContent = 'RM ' + (summary.netRevenue || 0).toFixed(2);
+            document.getElementById('dashTotalCost').textContent = 'RM ' + (summary.totalCost || 0).toFixed(2);
+            document.getElementById('dashNetProfit').textContent = 'RM ' + (summary.netProfit || 0).toFixed(2);
+
+            var sbz = summary.sociaBuzzSummary || {};
+            var sbzOrdersEl = document.getElementById('sbzDashOrdersBadge');
+            var sbzGrossEl = document.getElementById('sbzDashGross');
+            var sbzGwEl = document.getElementById('sbzDashGwFee');
+            var sbzCutLabelEl = document.getElementById('sbzDashCutLabel');
+            var sbzCutEl = document.getElementById('sbzDashWithdrawalCut');
+            var sbzNetEl = document.getElementById('sbzDashNet');
+            if (sbzOrdersEl) sbzOrdersEl.textContent = (sbz.orders || 0) + ' Order' + ((sbz.orders || 0) === 1 ? '' : 's');
+            if (sbzGrossEl) sbzGrossEl.textContent = 'RM ' + (sbz.grossRevenue || 0).toFixed(2);
+            if (sbzGwEl) sbzGwEl.textContent = '- RM ' + (sbz.gatewayFees || 0).toFixed(2);
+            if (sbzCutLabelEl) sbzCutLabelEl.textContent = 'Withdrawal Cut (RM ' + (sbz.withdrawalFeePerTx !== undefined ? sbz.withdrawalFeePerTx : 1.5).toFixed(2) + ' × ' + (sbz.withdrawalsCount !== undefined ? sbz.withdrawalsCount : 1) + ')';
+            if (sbzCutEl) sbzCutEl.textContent = '- RM ' + (sbz.totalWithdrawalCut || 0).toFixed(2);
+            if (sbzNetEl) sbzNetEl.textContent = 'RM ' + (sbz.netReceivable || 0).toFixed(2);
+
+            var counts = summary.statusCounts || {};
+            if (statusAwaitingPaymentEl) statusAwaitingPaymentEl.textContent = counts['Awaiting Payment'] || 0;
+            if (statusAwaitingVerificationEl) statusAwaitingVerificationEl.textContent = counts['Awaiting Verification'] || 0;
+            statusPendingEl.textContent = counts.Pending || 0;
+            statusPaidEl.textContent = counts.Paid || 0;
+            statusShippedEl.textContent = counts.Shipped || 0;
+            statusCancelledEl.textContent = counts.Cancelled || 0;
+
+            if (summary.lowStock && summary.lowStock.length > 0) {
+                var lsHtml = '';
+                for (var ls = 0; ls < summary.lowStock.length; ls++) {
+                    lsHtml += '<div class="item low-stock-warning"><span>' + summary.lowStock[ls].title + '</span><span>' + summary.lowStock[ls].quantity + ' left</span></div>';
+                }
+                lowStockList.innerHTML = lsHtml;
+            } else {
+                lowStockList.innerHTML = '<div class="item" style="color:#4caf50;">✅ All products have sufficient stock</div>';
+            }
+
+            if (summary.topSelling && summary.topSelling.length > 0) {
+                var tsHtml = '';
+                for (var ts = 0; ts < summary.topSelling.length; ts++) {
+                    tsHtml += '<div class="item top-sale"><span>' + summary.topSelling[ts].title + '</span><span>' + summary.topSelling[ts].qty + ' sold</span></div>';
+                }
+                topSellingList.innerHTML = tsHtml;
+            } else {
+                topSellingList.innerHTML = '<div class="item" style="color:#6a7f9e;">No sales data for this period.</div>';
+            }
+        }
+        window.renderAdvancedDashboardSummary = renderAdvancedDashboardSummary;
+
+        function loadAdvancedDashboard(forceRefreshOpt) {
             var filterEl = document.getElementById('dashboardTimeFilter');
             var range = filterEl ? filterEl.value : 'month';
+            var forceRefresh = (forceRefreshOpt === true);
             
             // Skeleton loading
             var statNumbers = document.querySelectorAll('#dashboardStats .stat-number');
@@ -21930,62 +22519,29 @@ function loadOrders() {
             lowStockList.innerHTML = '<div class="skeleton skeleton-item"></div><div class="skeleton skeleton-item"></div>';
             topSellingList.innerHTML = '<div class="skeleton skeleton-item"></div><div class="skeleton skeleton-item"></div>';
 
-            google.script.run
-                .withSuccessHandler(function(summary) {
-                    document.getElementById('dashTotalOrders').textContent = summary.totalOrders || 0;
-                    document.getElementById('dashGrossRev').textContent = 'RM ' + (summary.grossRevenue || 0).toFixed(2);
-                    document.getElementById('dashPromoDisc').textContent = '- RM ' + (summary.promoDiscount || 0).toFixed(2);
-                    document.getElementById('dashPointsDisc').textContent = '- RM ' + (summary.pointsDiscount || 0).toFixed(2);
-                    document.getElementById('dashNetRev').textContent = 'RM ' + (summary.netRevenue || 0).toFixed(2);
-                    document.getElementById('dashTotalCost').textContent = 'RM ' + (summary.totalCost || 0).toFixed(2);
-                    document.getElementById('dashNetProfit').textContent = 'RM ' + (summary.netProfit || 0).toFixed(2);
+            function loadDashboardFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(summary) {
+                        renderAdvancedDashboardSummary(summary);
+                    })
+                    .withFailureHandler(function(err) {
+                        document.getElementById('dashboardStats').innerHTML = '<p style="color:#ff6b6b; text-align:center; grid-column:1/-1;">Error loading dashboard data: ' + err.message + '</p>';
+                    })
+                    .getAdvancedSalesSummary(range);
+            }
 
-                    var sbz = summary.sociaBuzzSummary || {};
-                    var sbzOrdersEl = document.getElementById('sbzDashOrdersBadge');
-                    var sbzGrossEl = document.getElementById('sbzDashGross');
-                    var sbzGwEl = document.getElementById('sbzDashGwFee');
-                    var sbzCutLabelEl = document.getElementById('sbzDashCutLabel');
-                    var sbzCutEl = document.getElementById('sbzDashWithdrawalCut');
-                    var sbzNetEl = document.getElementById('sbzDashNet');
-                    if (sbzOrdersEl) sbzOrdersEl.textContent = (sbz.orders || 0) + ' Order' + ((sbz.orders || 0) === 1 ? '' : 's');
-                    if (sbzGrossEl) sbzGrossEl.textContent = 'RM ' + (sbz.grossRevenue || 0).toFixed(2);
-                    if (sbzGwEl) sbzGwEl.textContent = '- RM ' + (sbz.gatewayFees || 0).toFixed(2);
-                    if (sbzCutLabelEl) sbzCutLabelEl.textContent = 'Withdrawal Cut (RM ' + (sbz.withdrawalFeePerTx !== undefined ? sbz.withdrawalFeePerTx : 1.5).toFixed(2) + ' × ' + (sbz.withdrawalsCount !== undefined ? sbz.withdrawalsCount : 1) + ')';
-                    if (sbzCutEl) sbzCutEl.textContent = '- RM ' + (sbz.totalWithdrawalCut || 0).toFixed(2);
-                    if (sbzNetEl) sbzNetEl.textContent = 'RM ' + (sbz.netReceivable || 0).toFixed(2);
-
-                    var counts = summary.statusCounts || {};
-                    if (statusAwaitingPaymentEl) statusAwaitingPaymentEl.textContent = counts['Awaiting Payment'] || 0;
-                    if (statusAwaitingVerificationEl) statusAwaitingVerificationEl.textContent = counts['Awaiting Verification'] || 0;
-                    statusPendingEl.textContent = counts.Pending || 0;
-                    statusPaidEl.textContent = counts.Paid || 0;
-                    statusShippedEl.textContent = counts.Shipped || 0;
-                    statusCancelledEl.textContent = counts.Cancelled || 0;
-
-                    if (summary.lowStock && summary.lowStock.length > 0) {
-                        var lsHtml = '';
-                        for (var ls = 0; ls < summary.lowStock.length; ls++) {
-                            lsHtml += '<div class="item low-stock-warning"><span>' + summary.lowStock[ls].title + '</span><span>' + summary.lowStock[ls].quantity + ' left</span></div>';
-                        }
-                        lowStockList.innerHTML = lsHtml;
-                    } else {
-                        lowStockList.innerHTML = '<div class="item" style="color:#4caf50;">✅ All products have sufficient stock</div>';
+            if (!forceRefresh && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+                window.NexSbAdmin.fetchDashboardFast(range).then(function(sbRes) {
+                    if (sbRes && sbRes.ok && sbRes.summary) {
+                        renderAdvancedDashboardSummary(sbRes.summary);
+                        return;
                     }
+                    loadDashboardFromGas();
+                });
+                return;
+            }
 
-                    if (summary.topSelling && summary.topSelling.length > 0) {
-                        var tsHtml = '';
-                        for (var ts = 0; ts < summary.topSelling.length; ts++) {
-                            tsHtml += '<div class="item top-sale"><span>' + summary.topSelling[ts].title + '</span><span>' + summary.topSelling[ts].qty + ' sold</span></div>';
-                        }
-                        topSellingList.innerHTML = tsHtml;
-                    } else {
-                        topSellingList.innerHTML = '<div class="item" style="color:#6a7f9e;">No sales data for this period.</div>';
-                    }
-                })
-                .withFailureHandler(function(err) {
-                    document.getElementById('dashboardStats').innerHTML = '<p style="color:#ff6b6b; text-align:center; grid-column:1/-1;">Error loading dashboard data: ' + err.message + '</p>';
-                })
-                .getAdvancedSalesSummary(range);
+            loadDashboardFromGas();
         }
 
         // ✅ Generate Dropdown Options & Setup Listener
@@ -22014,7 +22570,7 @@ function loadOrders() {
             picker.addEventListener('change', loadAdvancedDashboard);
             
             var refreshBtn = document.getElementById('refreshDashboardBtn');
-            if (refreshBtn) refreshBtn.addEventListener('click', loadAdvancedDashboard);
+            if (refreshBtn) refreshBtn.addEventListener('click', function() { loadAdvancedDashboard(true); });
         })();
 
         (function setupAdminAutomationTools() {
@@ -26528,15 +27084,31 @@ function resetVariantEditor(ctx) {
             var list = document.getElementById('inboxConversations');
             list.innerHTML = '<div class="inbox-empty">Loading conversations...</div>';
 
-            google.script.run
-                .withSuccessHandler(function(convs) {
-                    inboxAllConversations = convs || [];
-                    filterAndRenderInbox();
-                })
-                .withFailureHandler(function(err) {
-                    list.innerHTML = '<div class="inbox-empty" style="color:#ff6b6b;">Error: ' + err.message + '</div>';
-                })
-                .getAllConversations();
+            function loadConversationsFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(convs) {
+                        inboxAllConversations = convs || [];
+                        filterAndRenderInbox();
+                    })
+                    .withFailureHandler(function(err) {
+                        list.innerHTML = '<div class="inbox-empty" style="color:#ff6b6b;">Error: ' + err.message + '</div>';
+                    })
+                    .getAllConversations();
+            }
+
+            if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+                window.NexSbAdmin.fetchConversationsFast().then(function(sbRes) {
+                    if (sbRes && sbRes.ok && Array.isArray(sbRes.conversations) && sbRes.conversations.length > 0) {
+                        inboxAllConversations = sbRes.conversations;
+                        filterAndRenderInbox();
+                        return;
+                    }
+                    loadConversationsFromGas();
+                });
+                return;
+            }
+
+            loadConversationsFromGas();
         }
 
                 function filterAndRenderInbox() {
@@ -26611,13 +27183,25 @@ function resetVariantEditor(ctx) {
 
         function openInboxConversation(email) {
             inboxCurrentEmail = email;
-            google.script.run.withSuccessHandler(function() {
-                loadInboxConversations();
-                refreshAdminUnreadBadge();
-            }).markMessagesRead(email, 'admin');
+            var sbReady = !!(window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady());
+            if (sbReady) {
+                window.NexSbAdmin.markThreadReadFast(email);
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    google.script.run.withFailureHandler(function() {}).markMessagesRead(email, 'admin');
+                }
+            } else {
+                google.script.run.withSuccessHandler(function() {
+                    loadInboxConversations();
+                    refreshAdminUnreadBadge();
+                }).markMessagesRead(email, 'admin');
+            }
 
             var header = document.getElementById('inboxChatHeader');
-            var conv = inboxConversations.find(function(c) { return c.email === email; });
+            var targetEm = String(email || '').trim().toLowerCase();
+            var convSource = (typeof inboxAllConversations !== 'undefined' && Array.isArray(inboxAllConversations))
+                ? inboxAllConversations
+                : (typeof inboxConversations !== 'undefined' && Array.isArray(inboxConversations) ? inboxConversations : []);
+            var conv = convSource.find(function(c) { return String(c && c.email || '').trim().toLowerCase() === targetEm; });
             var displayName = conv ? (conv.name || conv.email) : email;
             header.innerHTML = '<div><h4>' + escapeChatHtml(displayName) + '</h4><small>' + escapeChatHtml(email) + '</small></div>';
 
@@ -26626,81 +27210,154 @@ function resetVariantEditor(ctx) {
 
             loadInboxMessages();
             if (inboxPollTimer) clearInterval(inboxPollTimer);
-            inboxPollTimer = setInterval(loadInboxMessages, 20000);
+            var pollMs = (window.NexSbAdmin && typeof window.NexSbAdmin.isRealtimeReady === 'function' && window.NexSbAdmin.isRealtimeReady()) ? 60000 : 20000;
+            inboxPollTimer = setInterval(loadInboxMessages, pollMs);
+        }
+
+        function formatInboxMsgTime(m) {
+            var raw = m && (m.date || m.createdAt || m.created_at || '');
+            if (!raw) return '';
+            var s = String(raw);
+            if (s.indexOf('T') !== -1) {
+                var dt = new Date(s);
+                if (!isNaN(dt.getTime())) {
+                    return String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0');
+                }
+            }
+            var parts = s.split(' ');
+            return (parts[1] ? parts[1].substring(0, 5) : s.substring(0, 5)) || '';
+        }
+
+        function renderInboxMessageList(msgs) {
+            var body = document.getElementById('inboxChatBody');
+            if (!body) return;
+            if (!msgs || msgs.length === 0) {
+                body.innerHTML = '<div class="chat-empty">No messages yet.</div>';
+                return;
+            }
+            var html = '';
+            msgs.forEach(function(m) {
+                var isMine = m.sender === 'admin';
+                var bubbleClass = isMine ? 'mine' : 'theirs';
+                var timeStr = formatInboxMsgTime(m);
+                html += '<div class="chat-bubble ' + bubbleClass + '">';
+                if (m.message) html += '<div>' + escapeChatHtml(m.message) + '</div>';
+                if (m.imageUrl) {
+                    html += '<img src="' + escapeChatHtml(m.imageUrl) + '" alt="image" onclick="window.open(this.src, \'_blank\')" />';
+                }
+                html += '<span class="chat-time">' + escapeChatHtml(timeStr) + '</span>';
+                html += '</div>';
+            });
+            body.innerHTML = html;
+            body.scrollTop = body.scrollHeight;
         }
 
         function loadInboxMessages() {
             if (document.hidden || !inboxCurrentEmail) return;
-            google.script.run
-                .withSuccessHandler(function(msgs) {
-                    var body = document.getElementById('inboxChatBody');
-                    if (!msgs || msgs.length === 0) {
-                        body.innerHTML = '<div class="chat-empty">No messages yet.</div>';
+            var reqEmail = inboxCurrentEmail;
+
+            function loadMessagesFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(msgs) {
+                        if (inboxCurrentEmail !== reqEmail) return;
+                        renderInboxMessageList(msgs);
+                    })
+                    .getMessages(reqEmail);
+            }
+
+            if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+                window.NexSbAdmin.fetchMessagesFast(reqEmail).then(function(sbRes) {
+                    if (inboxCurrentEmail !== reqEmail) return;
+                    if (sbRes && sbRes.ok && Array.isArray(sbRes.messages) && sbRes.messages.length > 0) {
+                        renderInboxMessageList(sbRes.messages);
                         return;
                     }
-                    var html = '';
-                    msgs.forEach(function(m) {
-                        var isMine = m.sender === 'admin';
-                        var bubbleClass = isMine ? 'mine' : 'theirs';
-                        var timeStr = m.date ? String(m.date).split(' ')[1]?.substring(0,5) || '' : '';
-                        html += '<div class="chat-bubble ' + bubbleClass + '">';
-                        if (m.message) html += '<div>' + escapeChatHtml(m.message) + '</div>';
-                        if (m.imageUrl) {
-                            html += '<img src="' + escapeChatHtml(m.imageUrl) + '" alt="image" onclick="window.open(this.src, \'_blank\')" />';
-                        }
-                        html += '<span class="chat-time">' + escapeChatHtml(timeStr) + '</span>';
-                        html += '</div>';
-                    });
-                    body.innerHTML = html;
-                    body.scrollTop = body.scrollHeight;
-                })
-                .getMessages(inboxCurrentEmail);
+                    loadMessagesFromGas();
+                });
+                return;
+            }
+
+            loadMessagesFromGas();
         }
 
         function sendInboxReply() {
             if (!inboxCurrentEmail) return;
+            var targetEmail = inboxCurrentEmail;
             var input = document.getElementById('inboxReplyInput');
             var text = input.value.trim();
             var imageData = inboxPendingImage;
             if (!text && !imageData) { showToast('Type a reply or attach an image.'); return; }
 
             var btn = document.getElementById('inboxSendBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            input.value = '';
 
-            google.script.run
-                .withSuccessHandler(function(res) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                    if (res && res.success) {
-                        inboxPendingImage = null;
-                        document.getElementById('inboxPreviewStrip').classList.remove('show');
-                        document.getElementById('inboxPreviewImg').src = '';
-                        loadInboxMessages();
-                        loadInboxConversations();
-                    } else {
-                        showToast((res && res.message) || 'Failed to send reply.');
+            function sendViaGas(useText, useImage) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                google.script.run
+                    .withSuccessHandler(function(res) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                        if (res && res.success) {
+                            if (useImage) {
+                                inboxPendingImage = null;
+                                document.getElementById('inboxPreviewStrip').classList.remove('show');
+                                document.getElementById('inboxPreviewImg').src = '';
+                            }
+                            loadInboxMessages();
+                            loadInboxConversations();
+                        } else {
+                            showToast((res && res.message) || 'Failed to send reply.');
+                        }
+                    })
+                    .withFailureHandler(function(err) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                        showToast('Send error: ' + err.message);
+                    })
+                    .adminSendMessage(targetEmail, useText, useImage);
+            }
+
+            if (!imageData && window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+                input.value = '';
+                window.NexSbAdmin.sendAdminReplyFast(targetEmail, text).then(function(sbRes) {
+                    if (!sbRes || !sbRes.ok) {
+                        sendViaGas(text, null);
                     }
-                })
-                .withFailureHandler(function(err) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                    showToast('Send error: ' + err.message);
-                })
-                .adminSendMessage(inboxCurrentEmail, text, imageData);
+                });
+                return;
+            }
+
+            input.value = '';
+            sendViaGas(text, imageData);
+        }
+
+        function applyAdminUnreadBadge(n) {
+            var badge = document.getElementById('adminInboxBadge');
+            if (!badge) return;
+            if (n > 0) { badge.textContent = n > 99 ? '99+' : n; badge.style.display = 'inline-block'; }
+            else { badge.style.display = 'none'; }
         }
 
         function refreshAdminUnreadBadge() {
             if (!isAdmin) return;
-            google.script.run
-                .withSuccessHandler(function(n) {
-                    var badge = document.getElementById('adminInboxBadge');
-                    if (!badge) return;
-                    if (n > 0) { badge.textContent = n > 99 ? '99+' : n; badge.style.display = 'inline-block'; }
-                    else { badge.style.display = 'none'; }
-                })
-                .getAdminUnreadCount();
+            function refreshBadgeFromGas() {
+                google.script.run
+                    .withSuccessHandler(function(n) {
+                        applyAdminUnreadBadge(n);
+                    })
+                    .getAdminUnreadCount();
+            }
+            if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+                window.NexSbAdmin.fetchUnreadCountFast().then(function(sbRes) {
+                    if (sbRes && sbRes.ok && typeof sbRes.unread === 'number') {
+                        applyAdminUnreadBadge(sbRes.unread);
+                        return;
+                    }
+                    refreshBadgeFromGas();
+                });
+                return;
+            }
+            refreshBadgeFromGas();
         }
 
         (function setupAdminInbox() {
