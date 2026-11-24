@@ -18198,6 +18198,13 @@ function loadGames() {
         window.NexSbStage2.fetchStorefrontCache().then(function (sbRes) {
             if (sbRes && sbRes.ok && sbRes.payload && Array.isArray(sbRes.payload.games) && sbRes.payload.games.length > 0) {
                 var p = sbRes.payload;
+                if (p.productRequirements && typeof p.productRequirements === 'object') {
+                    window._sbProductRequirementsMap = p.productRequirements;
+                }
+                if (p.robuxStock && typeof p.robuxStock === 'object') {
+                    window._sbRobuxStock = p.robuxStock;
+                    window._sbRobuxStockAt = Date.now();
+                }
                 applyFreshData(p.games, p.genreImages || {}, p.cmsContent || null, p.queueSummary || null, p.loyaltyConfig || null);
                 var updatedMs = sbRes.updated_at ? new Date(sbRes.updated_at).getTime() : 0;
                 if (!updatedMs || (Date.now() - updatedMs) > 12 * 3600 * 1000) {
@@ -19386,7 +19393,17 @@ checkoutBtn.addEventListener('click', function() {
     applyBtn.innerHTML = '<i class="fas fa-tag"></i> Apply';
 
     resetPaymentMethodSelector();
+    window._pendingOrderPromise = null;
+    window._pendingOrderCreation = false;
+    window._pendingOrderSavedLater = false;
     window._checkoutSubmissionToken = 'SUB-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    if (!paymentQRsCache && window.NexSbStage5 && typeof window.NexSbStage5.fetchPaymentQRsFast === 'function') {
+        window.NexSbStage5.fetchPaymentQRsFast().then(function(sbQr) {
+            if (sbQr && sbQr.ok && sbQr.qrs && !paymentQRsCache) {
+                paymentQRsCache = sbQr.qrs;
+            }
+        });
+    }
     loadAndBuildCheckoutRequirements();
     loadCustomerPoints();
 
@@ -19796,38 +19813,84 @@ checkoutBtn.addEventListener('click', function() {
             var seq = ++window._checkoutReqsRequestSeq;
             window._checkoutReqsLoaded = false;
             window._checkoutReqsLoading = true;
+
+            function applyReqsFromMap(fullMap) {
+                if (seq !== window._checkoutReqsRequestSeq) return;
+                window._checkoutReqsLoading = false;
+                var subset = {};
+                for (var pi = 0; pi < productIds.length; pi++) {
+                    var pidKey = productIds[pi];
+                    subset[pidKey] = (fullMap && fullMap[pidKey]) || {
+                        productId: pidKey,
+                        requirementEnabled: false,
+                        collectionMode: 'per_order_item',
+                        fields: []
+                    };
+                }
+                window._checkoutReqsMap = subset;
+                window._checkoutReqsLoaded = true;
+                renderDynamicCheckoutFieldsInto(container, cart, window._checkoutReqsMap, { isPreview: false });
+            }
+
+            if (window._sbProductRequirementsMap && typeof window._sbProductRequirementsMap === 'object') {
+                applyReqsFromMap(window._sbProductRequirementsMap);
+                return;
+            }
+
             container.innerHTML = '<div class="dyn-req-loading"><span><i class="fas fa-spinner fa-spin" style="color:#f7d875;margin-right:8px;"></i>Loading required product details...</span></div>';
 
-            google.script.run
-                .withSuccessHandler(function (res) {
-                    if (seq !== window._checkoutReqsRequestSeq) return;
-                    window._checkoutReqsLoading = false;
-                    if (!res || res.success === false) {
+            function fetchReqsFromGas() {
+                google.script.run
+                    .withSuccessHandler(function (res) {
+                        if (seq !== window._checkoutReqsRequestSeq) return;
+                        window._checkoutReqsLoading = false;
+                        if (!res || res.success === false) {
+                            window._checkoutReqsLoaded = false;
+                            container.innerHTML = '<div class="dyn-req-error-box">' +
+                                '<span><i class="fas fa-exclamation-triangle"></i> Could not load product requirements: ' + escapeHtml((res && res.message) || 'Unknown error') + '</span>' +
+                                '<button type="button" class="dyn-req-btn sm" id="retryLoadReqsBtn"><i class="fas fa-sync-alt"></i> Retry</button>' +
+                            '</div>';
+                            var rb = document.getElementById('retryLoadReqsBtn');
+                            if (rb) rb.addEventListener('click', loadAndBuildCheckoutRequirements);
+                            return;
+                        }
+                        window._checkoutReqsMap = res.requirements || {};
+                        window._checkoutReqsLoaded = true;
+                        renderDynamicCheckoutFieldsInto(container, cart, window._checkoutReqsMap, { isPreview: false });
+                    })
+                    .withFailureHandler(function (err) {
+                        if (seq !== window._checkoutReqsRequestSeq) return;
+                        window._checkoutReqsLoading = false;
                         window._checkoutReqsLoaded = false;
                         container.innerHTML = '<div class="dyn-req-error-box">' +
-                            '<span><i class="fas fa-exclamation-triangle"></i> Could not load product requirements: ' + escapeHtml((res && res.message) || 'Unknown error') + '</span>' +
+                            '<span><i class="fas fa-exclamation-triangle"></i> Could not load product requirements: ' + escapeHtml((err && err.message) || 'Network error') + '</span>' +
                             '<button type="button" class="dyn-req-btn sm" id="retryLoadReqsBtn"><i class="fas fa-sync-alt"></i> Retry</button>' +
                         '</div>';
-                        var rb = document.getElementById('retryLoadReqsBtn');
-                        if (rb) rb.addEventListener('click', loadAndBuildCheckoutRequirements);
+                        var rb2 = document.getElementById('retryLoadReqsBtn');
+                        if (rb2) rb2.addEventListener('click', loadAndBuildCheckoutRequirements);
+                    })
+                    .getProductRequirementsBatch(productIds);
+            }
+
+            if (window.NexSbStage2 && typeof window.NexSbStage2.fetchStorefrontCache === 'function') {
+                window.NexSbStage2.fetchStorefrontCache().then(function(sbRes) {
+                    if (seq !== window._checkoutReqsRequestSeq) return;
+                    var pl = sbRes && sbRes.ok && sbRes.payload ? sbRes.payload : null;
+                    if (pl && pl.robuxStock && typeof pl.robuxStock === 'object') {
+                        window._sbRobuxStock = pl.robuxStock;
+                        window._sbRobuxStockAt = Date.now();
+                    }
+                    if (pl && pl.productRequirements && typeof pl.productRequirements === 'object') {
+                        window._sbProductRequirementsMap = pl.productRequirements;
+                        applyReqsFromMap(pl.productRequirements);
                         return;
                     }
-                    window._checkoutReqsMap = res.requirements || {};
-                    window._checkoutReqsLoaded = true;
-                    renderDynamicCheckoutFieldsInto(container, cart, window._checkoutReqsMap, { isPreview: false });
-                })
-                .withFailureHandler(function (err) {
-                    if (seq !== window._checkoutReqsRequestSeq) return;
-                    window._checkoutReqsLoading = false;
-                    window._checkoutReqsLoaded = false;
-                    container.innerHTML = '<div class="dyn-req-error-box">' +
-                        '<span><i class="fas fa-exclamation-triangle"></i> Could not load product requirements: ' + escapeHtml((err && err.message) || 'Network error') + '</span>' +
-                        '<button type="button" class="dyn-req-btn sm" id="retryLoadReqsBtn"><i class="fas fa-sync-alt"></i> Retry</button>' +
-                    '</div>';
-                    var rb2 = document.getElementById('retryLoadReqsBtn');
-                    if (rb2) rb2.addEventListener('click', loadAndBuildCheckoutRequirements);
-                })
-                .getProductRequirementsBatch(productIds);
+                    fetchReqsFromGas();
+                });
+                return;
+            }
+
+            fetchReqsFromGas();
         }
 
         function validateAndCollectDynamicCheckoutFields(container, cartList, reqsMap) {
@@ -20185,30 +20248,56 @@ var promoData = appliedPromo ? {
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing...';
 
+            var robuxRequiredNow = getCartRobuxRequired();
+
             function doPlaceOrder(backorderAccepted) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing...';
+                var paidAmount = finalTotal;
+                var paidMethod = selectedPaymentMethod;
+                var itemsSnapshot = items.slice();
+                var promoSnapshot = appliedPromo;
+                var robuxUsedSnapshot = robuxRequiredNow;
+                var itemsSummary = itemsSnapshot.map(function(it) {
+                    return it.title + (it.variantLabel ? ' (' + it.variantLabel + ')' : '') + ' × ' + it.quantity;
+                }).join(', ');
+
+                saveDynReqValues(submittedRequirements, window._checkoutReqsMap);
+                var contactToSave = { phone: customerData.phone || '', email: customerData.email || '' };
+                if (hasPhysicalItem && shippingData) {
+                    contactToSave.shippingName = shippingData.name || '';
+                    contactToSave.shippingPhone = shippingData.phone || '';
+                    contactToSave.shippingAddress = shippingData.address || '';
+                    contactToSave.shippingCity = shippingData.city || '';
+                    contactToSave.shippingState = shippingData.state || '';
+                    contactToSave.shippingPostcode = shippingData.postcode || '';
+                }
+                saveCheckoutContact(contactToSave);
+
+                window._pendingOrderSavedLater = false;
+                window._pendingOrderCreation = true;
+                var _resolvePendingOrder;
+                window._pendingOrderPromise = new Promise(function(resolve) {
+                    _resolvePendingOrder = resolve;
+                });
+
+                checkoutOverlay.classList.remove('open');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                openQRModal('PENDING', paidMethod, paidAmount);
 
                 google.script.run
                     .withSuccessHandler(function(orderId) {
-                        showToast('✅ Order placed! Order ID: ' + orderId);
-                        var paidAmount = finalTotal;
-                        var paidMethod = selectedPaymentMethod;
-                        var itemsSummary = items.map(function(it) {
-                            return it.title + (it.variantLabel ? ' (' + it.variantLabel + ')' : '') + ' × ' + it.quantity;
-                        }).join(', ');
-                        saveDynReqValues(submittedRequirements, window._checkoutReqsMap);
-                        window._checkoutSubmissionToken = '';
-                        var contactToSave = { phone: customerData.phone || '', email: customerData.email || '' };
-                        if (hasPhysicalItem && shippingData) {
-                            contactToSave.shippingName = shippingData.name || '';
-                            contactToSave.shippingPhone = shippingData.phone || '';
-                            contactToSave.shippingAddress = shippingData.address || '';
-                            contactToSave.shippingCity = shippingData.city || '';
-                            contactToSave.shippingState = shippingData.state || '';
-                            contactToSave.shippingPostcode = shippingData.postcode || '';
+                        window._pendingOrderCreation = false;
+                        if (currentQROrderId === 'PENDING') {
+                            currentQROrderId = orderId;
+                            var idEl = document.getElementById('qrOrderId');
+                            if (idEl) idEl.textContent = orderId;
+                            if (currentQRMethodKey === 'sociabuzz' && document.getElementById('qrOverlay').classList.contains('open')) {
+                                loadQRForMethod('sociabuzz');
+                            }
                         }
-                        saveCheckoutContact(contactToSave);
+                        if (typeof _resolvePendingOrder === 'function') _resolvePendingOrder(orderId);
+                        showToast('✅ Order confirmed! Order ID: ' + orderId);
+                        window._checkoutSubmissionToken = '';
                         savePendingPaymentSession({
                             orderId: orderId,
                             method: paidMethod,
@@ -20224,9 +20313,6 @@ var promoData = appliedPromo ? {
                         appliedPromo = null;
                         renderCart();
                         loadGames();
-                        checkoutOverlay.classList.remove('open');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
                         checkoutForm.reset();
                         document.getElementById('promoFeedback').textContent = '';
                         document.getElementById('gameIdFields').innerHTML = '';
@@ -20236,10 +20322,6 @@ var promoData = appliedPromo ? {
                             if (el) el.value = '';
                         });
                         document.getElementById('shippingFormContainer').style.display = 'none';
-
-                        setTimeout(function() {
-                            openQRModal(orderId, paidMethod, paidAmount);
-                        }, 250);
 
                         if (isAdmin) {
                             loadOrders();
@@ -20251,6 +20333,17 @@ var promoData = appliedPromo ? {
                         }
                     })
                     .withFailureHandler(function(err) {
+                        window._pendingOrderCreation = false;
+                        if (window._sbRobuxStock && robuxUsedSnapshot > 0) {
+                            window._sbRobuxStock.available += robuxUsedSnapshot;
+                        }
+                        if (typeof _resolvePendingOrder === 'function') _resolvePendingOrder(null);
+                        if (currentQROrderId === 'PENDING') {
+                            window._qrAllowLater = true;
+                            closeQRModal();
+                        }
+                        appliedPromo = promoSnapshot;
+                        checkoutOverlay.classList.add('open');
                         var errMsg = (err && err.message) ? err.message : 'Error placing order. Please try again.';
                         var isConnOrTimeout = /unable to connect|timed out|timeout|network/i.test(String(errMsg));
                         if (isConnOrTimeout) {
@@ -20268,31 +20361,48 @@ var promoData = appliedPromo ? {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
                     })
-                    .placeOrder(customerData, items, total2, promoData, gameIds, selectedPaymentMethod, pointsToRedeem, shippingData, hasPhysicalItem, agentCodeFromUrl || '', backorderAccepted, submittedRequirements);
+                    .placeOrder(customerData, items, total2, promoData, gameIds, paidMethod, pointsToRedeem, shippingData, hasPhysicalItem, agentCodeFromUrl || '', backorderAccepted, submittedRequirements);
             }
 
-            var robuxRequiredNow = getCartRobuxRequired();
             if (robuxRequiredNow > 0) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking stock...';
-                google.script.run
-                    .withSuccessHandler(function(stock) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
-                        if (stock && stock.success && stock.available < robuxRequiredNow) {
-                            showRobuxBackorderModal(robuxRequiredNow, stock.available, function(accepted) {
-                                if (accepted) doPlaceOrder(true);
-                            });
-                        } else {
-                            doPlaceOrder(false);
-                        }
-                    })
-                    .withFailureHandler(function(err) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
-                        checkoutError.textContent = (window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getRobuxStockForCheckout') : 'Could not verify Robux stock right now. Please try again.');
-                    })
-                    .getRobuxStockForCheckout(robuxRequiredNow);
+                if (window._sbRobuxStock && window._sbRobuxStock.success && typeof window._sbRobuxStock.available === 'number' && (Date.now() - (window._sbRobuxStockAt || 0)) < 15 * 60 * 1000) {
+                    var sbAvail = window._sbRobuxStock.available;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                    if (sbAvail < robuxRequiredNow) {
+                        showRobuxBackorderModal(robuxRequiredNow, sbAvail, function(accepted) {
+                            if (accepted) doPlaceOrder(true);
+                        });
+                    } else {
+                        window._sbRobuxStock.available = Math.max(0, sbAvail - robuxRequiredNow);
+                        doPlaceOrder(false);
+                    }
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking stock...';
+                    google.script.run
+                        .withSuccessHandler(function(stock) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                            if (stock && stock.success) {
+                                window._sbRobuxStock = stock;
+                                window._sbRobuxStockAt = Date.now();
+                            }
+                            if (stock && stock.success && stock.available < robuxRequiredNow) {
+                                showRobuxBackorderModal(robuxRequiredNow, stock.available, function(accepted) {
+                                    if (accepted) doPlaceOrder(true);
+                                });
+                            } else {
+                                doPlaceOrder(false);
+                            }
+                        })
+                        .withFailureHandler(function(err) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-check"></i> Place Order';
+                            checkoutError.textContent = (window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'getRobuxStockForCheckout') : 'Could not verify Robux stock right now. Please try again.');
+                        })
+                        .getRobuxStockForCheckout(robuxRequiredNow);
+                }
             } else {
                 doPlaceOrder(false);
             }
@@ -20519,7 +20629,7 @@ var promoData = appliedPromo ? {
             var doneBtn = document.getElementById('qrDoneBtn');
             if (doneBtn) doneBtn.style.display = 'none';
 
-            document.getElementById('qrOrderId').textContent = orderId;
+            document.getElementById('qrOrderId').textContent = (orderId === 'PENDING') ? 'Generating Order ID...' : orderId;
             document.getElementById('qrMethod').textContent = currentQRMethodLabel;
             document.getElementById('qrAmount').textContent = CURRENCY + ' ' + currentQRAmount.toFixed(2);
 
@@ -20606,9 +20716,11 @@ var promoData = appliedPromo ? {
             var display = document.getElementById('qrDisplay');
             if (method === 'sociabuzz') {
                 var amtStr = currentQRAmount.toFixed(2);
+                var isPendingOrderId = (!currentQROrderId || currentQROrderId === 'PENDING');
+                var sbzMsgId = isPendingOrderId ? '' : currentQROrderId;
                 var sbzPayUrl = SOCIABUZZ_TRIBE_URL +
                     '?amount=' + encodeURIComponent(amtStr) +
-                    '&message=' + encodeURIComponent(currentQROrderId || '');
+                    (sbzMsgId ? ('&message=' + encodeURIComponent(sbzMsgId)) : '');
                 display.innerHTML =
                     '<div class="sbz-pay-card">' +
                         '<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">' +
@@ -20620,8 +20732,8 @@ var promoData = appliedPromo ? {
                             '<button type="button" class="sbz-copy-btn" id="sbzCopyAmountBtn"><i class="fas fa-copy"></i> Copy Amount</button>' +
                         '</div>' +
                         '<div class="sbz-copy-row">' +
-                            '<div><span style="color:#8aa1c0; font-size:11px; display:block;">Order ID (paste in message)</span><strong style="color:#e8edf5; font-family:monospace;">' + escapeHtml(currentQROrderId || '') + '</strong></div>' +
-                            '<button type="button" class="sbz-copy-btn" id="sbzCopyOrderBtn"><i class="fas fa-copy"></i> Copy ID</button>' +
+                            '<div><span style="color:#8aa1c0; font-size:11px; display:block;">Order ID (paste in message)</span><strong style="color:#e8edf5; font-family:monospace;">' + escapeHtml(isPendingOrderId ? 'Generating Order ID...' : currentQROrderId) + '</strong></div>' +
+                            '<button type="button" class="sbz-copy-btn" id="sbzCopyOrderBtn"' + (isPendingOrderId ? ' disabled' : '') + '><i class="fas fa-copy"></i> Copy ID</button>' +
                         '</div>' +
                         '<a class="sbz-pay-btn" id="sociaBuzzPayLink" href="' + sbzPayUrl + '" target="_blank" rel="noopener noreferrer">' +
                             '<i class="fas fa-external-link-alt"></i> Pay ' + CURRENCY + ' ' + amtStr + ' on SociaBuzz' +
@@ -20703,6 +20815,21 @@ var promoData = appliedPromo ? {
             if (!currentQROrderId) return;
             var btn = document.getElementById('sociaBuzzConfirmBtn');
             var originalHtml = btn ? btn.innerHTML : '';
+            if (currentQROrderId === 'PENDING' && window._pendingOrderPromise) {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming Order ID...';
+                }
+                window._pendingOrderPromise.then(function(resolvedId) {
+                    if (!resolvedId) {
+                        if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
+                        return;
+                    }
+                    currentQROrderId = resolvedId;
+                    confirmSociaBuzzPaymentClient();
+                });
+                return;
+            }
             if (btn) {
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Notifying Admin...';
@@ -20811,6 +20938,20 @@ var promoData = appliedPromo ? {
             if (!pendingReceiptDataUrl || !currentQROrderId) return;
             var btn = document.getElementById('receiptUploadBtn');
             var originalText = btn.innerHTML;
+            if (currentQROrderId === 'PENDING' && window._pendingOrderPromise) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming Order ID...';
+                window._pendingOrderPromise.then(function(resolvedId) {
+                    if (!resolvedId) {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        return;
+                    }
+                    currentQROrderId = resolvedId;
+                    submitReceiptUpload();
+                });
+                return;
+            }
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
@@ -20873,13 +21014,15 @@ var promoData = appliedPromo ? {
 
             if (saveLaterBtn) {
                 saveLaterBtn.addEventListener('click', function() {
-                    if (currentQROrderId) {
+                    if (currentQROrderId && currentQROrderId !== 'PENDING') {
                         savePendingPaymentSession({
                             orderId: currentQROrderId,
                             method: currentQRMethodKey || 'mae',
                             amount: currentQRAmount || 0,
                             createdAt: Date.now()
                         });
+                    } else if (currentQROrderId === 'PENDING') {
+                        window._pendingOrderSavedLater = true;
                     }
                     window._qrAllowLater = true;
                     closeQRModal();
