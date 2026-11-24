@@ -17126,9 +17126,12 @@ window.NexAsyncBtn = (function() {
                 if (!adminPwd || typeof google === 'undefined' || !google.script || !google.script.run) {
                     return Promise.resolve({ ok: false });
                 }
-                return new Promise(function(resolve) {
+                var bpPromise = new Promise(function(resolve) {
                     google.script.run
                         .withSuccessHandler(function(r) {
+                            if (window._nexAdminBootstrapPromise === bpPromise) {
+                                window._nexAdminBootstrapPromise = null;
+                            }
                             if (r && r.success && r.adminToken) {
                                 _adminToken = String(r.adminToken);
                                 _channelKey = String(r.channelKey || '');
@@ -17139,10 +17142,15 @@ window.NexAsyncBtn = (function() {
                             }
                         })
                         .withFailureHandler(function() {
+                            if (window._nexAdminBootstrapPromise === bpPromise) {
+                                window._nexAdminBootstrapPromise = null;
+                            }
                             resolve({ ok: false });
                         })
                         .getAdminStage4Bootstrap(adminPwd);
                 });
+                window._nexAdminBootstrapPromise = bpPromise;
+                return bpPromise;
             }
 
             function callAdminRpc(rpcName, params) {
@@ -20295,17 +20303,22 @@ var promoData = appliedPromo ? {
                                 loadQRForMethod('sociabuzz');
                             }
                         }
+                        var uploadInFlight = !!window._receiptUploadWaitingOrActive;
                         if (typeof _resolvePendingOrder === 'function') _resolvePendingOrder(orderId);
-                        showToast('✅ Order confirmed! Order ID: ' + orderId);
+                        if (!uploadInFlight) {
+                            showToast('✅ Order confirmed! Order ID: ' + orderId);
+                        }
                         window._checkoutSubmissionToken = '';
-                        savePendingPaymentSession({
-                            orderId: orderId,
-                            method: paidMethod,
-                            amount: paidAmount,
-                            items: itemsSummary,
-                            email: customerData.email || '',
-                            createdAt: Date.now()
-                        });
+                        if (!uploadInFlight) {
+                            savePendingPaymentSession({
+                                orderId: orderId,
+                                method: paidMethod,
+                                amount: paidAmount,
+                                items: itemsSummary,
+                                email: customerData.email || '',
+                                createdAt: Date.now()
+                            });
+                        }
                         if (window.NexMarketingStudio && typeof window.NexMarketingStudio.trackConversionIfAttributed === 'function') {
                             window.NexMarketingStudio.trackConversionIfAttributed(orderId, paidAmount);
                         }
@@ -20323,17 +20336,20 @@ var promoData = appliedPromo ? {
                         });
                         document.getElementById('shippingFormContainer').style.display = 'none';
 
-                        if (isAdmin) {
-                            loadOrders();
-                            loadAdvancedDashboard();
-                            loadPendingOrders();
-                        }
-                        if (customer) {
-                            loadMyOrders();
+                        if (!uploadInFlight) {
+                            if (isAdmin) {
+                                loadOrders();
+                                loadAdvancedDashboard();
+                                loadPendingOrders();
+                            }
+                            if (customer) {
+                                loadMyOrders();
+                            }
                         }
                     })
                     .withFailureHandler(function(err) {
                         window._pendingOrderCreation = false;
+                        window._receiptUploadWaitingOrActive = false;
                         if (window._sbRobuxStock && robuxUsedSnapshot > 0) {
                             window._sbRobuxStock.available += robuxUsedSnapshot;
                         }
@@ -20610,6 +20626,7 @@ var promoData = appliedPromo ? {
         }
 
         function openQRModal(orderId, method, amount, allowLater) {
+            window._receiptUploadWaitingOrActive = false;
             currentQROrderId = orderId;
             currentQRMethodKey = method;
             currentQRMethodLabel = getMethodLabel(method);
@@ -20693,6 +20710,10 @@ var promoData = appliedPromo ? {
         }
 
         function closeQRModal() {
+            if (window._receiptUploadWaitingOrActive) {
+                showToast('⏳ Receipt upload in progress — please wait a few seconds...');
+                return;
+            }
             if (currentQROrderId && !window._qrAllowLater) {
                 if (currentQRMethodKey === 'sociabuzz' && !sociaBuzzPaymentConfirmed) {
                     showToast('⚠️ Please click "I Have Completed Payment on SociaBuzz" after paying.');
@@ -20811,10 +20832,57 @@ var promoData = appliedPromo ? {
             loadQRsFromGas();
         }
 
+        function _applyLocalPaymentSubmittedUpdate(orderIdVal, receiptNumberVal, receiptUrlVal) {
+            var oid = String(orderIdVal || '').trim().toUpperCase();
+            if (!oid) return;
+            var rNum = String(receiptNumberVal || '').trim();
+            var rUrl = String(receiptUrlVal || '').trim();
+            if (Array.isArray(myOrdersCache)) {
+                var touchedCust = false;
+                for (var ci = 0; ci < myOrdersCache.length; ci++) {
+                    if (String(myOrdersCache[ci]['Order ID'] || '').trim().toUpperCase() === oid) {
+                        myOrdersCache[ci]['Payment Status'] = 'Awaiting Verification';
+                        if (rNum) myOrdersCache[ci]['Receipt Number'] = rNum;
+                        if (rUrl) myOrdersCache[ci]['Receipt URL'] = rUrl;
+                        myOrdersCache[ci]._customerStatus = 'Payment Verifying';
+                        myOrdersCache[ci]._tab = 'To Ship';
+                        touchedCust = true;
+                        break;
+                    }
+                }
+                if (touchedCust) {
+                    if (typeof renderOrderTabCounts === 'function') renderOrderTabCounts();
+                    if (typeof renderOrderList === 'function') renderOrderList(typeof activeOrderTab !== 'undefined' ? activeOrderTab : 'All');
+                }
+            }
+            var patch = {
+                'Payment Status': 'Awaiting Verification',
+                _customerStatus: 'Payment Verifying',
+                _tab: 'To Ship'
+            };
+            if (rNum) patch['Receipt Number'] = rNum;
+            if (rUrl) patch['Receipt URL'] = rUrl;
+            if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+                window.NexSbAdmin.applyOptimisticOrderUpdate(orderIdVal, patch);
+            } else if (Array.isArray(window._adminAllOrdersCache)) {
+                for (var ai = 0; ai < window._adminAllOrdersCache.length; ai++) {
+                    if (String(window._adminAllOrdersCache[ai]['Order ID'] || '').trim().toUpperCase() === oid) {
+                        window._adminAllOrdersCache[ai] = Object.assign({}, window._adminAllOrdersCache[ai], patch);
+                        if (typeof window.renderAdminOrdersTable === 'function') window.renderAdminOrdersTable(window._adminAllOrdersCache);
+                        if (typeof window.applyOrdersToApprovalQueue === 'function') window.applyOrdersToApprovalQueue(window._adminAllOrdersCache);
+                        break;
+                    }
+                }
+            }
+        }
+
         function confirmSociaBuzzPaymentClient() {
             if (!currentQROrderId) return;
             var btn = document.getElementById('sociaBuzzConfirmBtn');
             var originalHtml = btn ? btn.innerHTML : '';
+            var saveLaterBtnEl = document.getElementById('qrSaveForLaterBtn');
+            window._receiptUploadWaitingOrActive = true;
+            if (saveLaterBtnEl) saveLaterBtnEl.style.display = 'none';
             if (currentQROrderId === 'PENDING' && window._pendingOrderPromise) {
                 if (btn) {
                     btn.disabled = true;
@@ -20822,6 +20890,8 @@ var promoData = appliedPromo ? {
                 }
                 window._pendingOrderPromise.then(function(resolvedId) {
                     if (!resolvedId) {
+                        window._receiptUploadWaitingOrActive = false;
+                        if (saveLaterBtnEl) saveLaterBtnEl.style.display = 'flex';
                         if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
                         return;
                     }
@@ -20838,6 +20908,7 @@ var promoData = appliedPromo ? {
 
             google.script.run
                 .withSuccessHandler(function(result) {
+                    window._receiptUploadWaitingOrActive = false;
                     if (result && result.success) {
                         sociaBuzzPaymentConfirmed = true;
                         remove_pending_payment_session(currentQROrderId);
@@ -20845,20 +20916,25 @@ var promoData = appliedPromo ? {
                         if (sbzActions) sbzActions.style.display = 'none';
                         var saveLaterBtn = document.getElementById('qrSaveForLaterBtn');
                         if (saveLaterBtn) saveLaterBtn.style.display = 'none';
-                        document.getElementById('receiptNumberDisplay').textContent = result.receiptNumber || ('SBZ-' + currentQROrderId);
+                        var resolvedRef = result.receiptNumber || ('SBZ-' + currentQROrderId);
+                        document.getElementById('receiptNumberDisplay').textContent = resolvedRef;
                         document.getElementById('receiptSuccess').style.display = 'block';
                         var doneBtn = document.getElementById('qrDoneBtn');
                         if (doneBtn) doneBtn.style.display = 'flex';
                         showToast('⚡ SociaBuzz payment submitted! Admin notified on Telegram.');
+                        _applyLocalPaymentSubmittedUpdate(currentQROrderId, resolvedRef, result.receiptUrl || ('SOCIABUZZ://confirmed/' + currentQROrderId));
 
                         if (isAdmin) { loadOrders(); loadAdvancedDashboard(); loadPendingOrders(); }
                         if (customer) loadMyOrders();
                     } else {
+                        if (saveLaterBtnEl) saveLaterBtnEl.style.display = 'flex';
                         if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
                         showToast((result && result.message) || 'Could not record SociaBuzz confirmation.');
                     }
                 })
                 .withFailureHandler(function(err) {
+                    window._receiptUploadWaitingOrActive = false;
+                    if (saveLaterBtnEl) saveLaterBtnEl.style.display = 'flex';
                     if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
                     showToast(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'confirmSociaBuzzPayment') : 'Could not submit payment confirmation.');
                 })
@@ -20938,11 +21014,16 @@ var promoData = appliedPromo ? {
             if (!pendingReceiptDataUrl || !currentQROrderId) return;
             var btn = document.getElementById('receiptUploadBtn');
             var originalText = btn.innerHTML;
+            var saveLaterBtnEl = document.getElementById('qrSaveForLaterBtn');
+            window._receiptUploadWaitingOrActive = true;
+            if (saveLaterBtnEl) saveLaterBtnEl.style.display = 'none';
             if (currentQROrderId === 'PENDING' && window._pendingOrderPromise) {
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming Order ID...';
                 window._pendingOrderPromise.then(function(resolvedId) {
                     if (!resolvedId) {
+                        window._receiptUploadWaitingOrActive = false;
+                        if (saveLaterBtnEl) saveLaterBtnEl.style.display = 'flex';
                         btn.disabled = false;
                         btn.innerHTML = originalText;
                         return;
@@ -20959,6 +21040,7 @@ var promoData = appliedPromo ? {
 
             google.script.run
                 .withSuccessHandler(function(result) {
+                    window._receiptUploadWaitingOrActive = false;
                     if (result && result.success) {
                         remove_pending_payment_session(currentQROrderId);
                         document.getElementById('receiptActions').style.display = 'none';
@@ -20970,16 +21052,20 @@ var promoData = appliedPromo ? {
                         var doneBtn = document.getElementById('qrDoneBtn');
                         if (doneBtn) doneBtn.style.display = 'flex'; // ✅ Show the Done button
                         showToast('Receipt uploaded! Ref: ' + result.receiptNumber);
+                        _applyLocalPaymentSubmittedUpdate(currentQROrderId, result.receiptNumber, result.receiptUrl || '');
 
                         if (isAdmin) { loadOrders(); loadAdvancedDashboard(); loadPendingOrders(); }
                         if (customer) loadMyOrders();
                     } else {
+                        if (saveLaterBtnEl) saveLaterBtnEl.style.display = 'flex';
                         btn.disabled = false;
                         btn.innerHTML = originalText;
                         showToast((result && result.message) || 'Upload failed.');
                     }
                 })
                 .withFailureHandler(function(err) {
+                    window._receiptUploadWaitingOrActive = false;
+                    if (saveLaterBtnEl) saveLaterBtnEl.style.display = 'flex';
                     btn.disabled = false;
                     btn.innerHTML = originalText;
                     showToast(window.NexErrorHandler ? window.NexErrorHandler.toCustomerMessage(err, 'uploadReceipt') : 'Could not upload receipt right now.');
@@ -22337,7 +22423,7 @@ function renderAdminOrdersTable(orders) {
                     }
                 });
 
-                var payStatusRaw = String(o['Payment Status'] || 'Awaiting Payment').trim();
+                var payStatusRaw = getStatusValue(o) || 'Awaiting Payment';
                 var fulfilStatusRaw = String(o['Fulfilment Status'] || '').trim();
                 html += '<td><select class="order-status-select" data-orderid="' + oid + '">';
                 var pStatuses = ['Awaiting Payment', 'Awaiting Verification', 'Pending', 'Paid', 'Cancelled'];
@@ -22468,45 +22554,96 @@ function renderAdminOrdersTable(orders) {
 }
 window.renderAdminOrdersTable = renderAdminOrdersTable;
 
-function loadOrders() {
-    ordersList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Payment</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Fulfilment</th></tr></thead><tbody>' + createSkeletonTableRows(5) + '</tbody></table></div>';
-    function loadOrdersFromGas() {
+function _fetchAdminOrdersPreferred(seqKey, onSuccess, onFailure) {
+    window[seqKey] = (window[seqKey] || 0) + 1;
+    var seq = window[seqKey];
+
+    function fromGas() {
         google.script.run
             .withSuccessHandler(function(orders) {
-                renderAdminOrdersTable(orders);
+                if (seq !== window[seqKey]) return;
+                if (Array.isArray(orders)) window._adminAllOrdersCache = orders;
+                onSuccess(orders);
             })
             .withFailureHandler(function(err) {
-                ordersList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading orders: ' + err.message + '</p>';
+                if (seq !== window[seqKey]) return;
+                onFailure(err);
             })
             .getOrdersData();
     }
-    if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
-        window.NexSbAdmin.fetchOrdersFast().then(function(sbRes) {
-            if (sbRes && sbRes.ok && Array.isArray(sbRes.orders) && sbRes.orders.length > 0) {
-                renderAdminOrdersTable(sbRes.orders);
-                return;
-            }
-            loadOrdersFromGas();
+
+    function trySupabaseThenGas() {
+        if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
+            window.NexSbAdmin.fetchOrdersFast().then(function(sbRes) {
+                if (seq !== window[seqKey]) return;
+                if (sbRes && sbRes.ok && Array.isArray(sbRes.orders) && sbRes.orders.length > 0) {
+                    window._adminAllOrdersCache = sbRes.orders;
+                    onSuccess(sbRes.orders);
+                    return;
+                }
+                fromGas();
+            });
+            return true;
+        }
+        return false;
+    }
+
+    if (trySupabaseThenGas()) return;
+
+    if (window._nexAdminBootstrapPromise && typeof window._nexAdminBootstrapPromise.then === 'function') {
+        window._nexAdminBootstrapPromise.then(function() {
+            if (seq !== window[seqKey]) return;
+            if (!trySupabaseThenGas()) fromGas();
         });
         return;
     }
-    loadOrdersFromGas();
+
+    fromGas();
+}
+
+function loadOrders() {
+    ordersList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Phone</th><th>Payment</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Fulfilment</th></tr></thead><tbody>' + createSkeletonTableRows(5) + '</tbody></table></div>';
+    _fetchAdminOrdersPreferred(
+        '_loadOrdersReqSeq',
+        function(orders) {
+            renderAdminOrdersTable(orders);
+        },
+        function(err) {
+            ordersList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading orders: ' + err.message + '</p>';
+        }
+    );
 }
 
         function getStatusValue(order) {
-            var statusKeys = ['Payment Status', 'Status', 'payment status', 'status'];
+            if (!order || typeof order !== 'object') return 'Pending';
+            var resolved = '';
+            var statusKeys = ['Payment Status', 'Status', 'payment status', 'status', 'payment_status'];
             for (var i = 0; i < statusKeys.length; i++) {
-                if (order[statusKeys[i]] !== undefined && order[statusKeys[i]] !== null) {
-                    return String(order[statusKeys[i]]).trim();
+                if (order[statusKeys[i]] !== undefined && order[statusKeys[i]] !== null && String(order[statusKeys[i]]).trim() !== '') {
+                    resolved = String(order[statusKeys[i]]).trim();
+                    break;
                 }
             }
-            for (var key in order) {
-                if (key.toLowerCase().includes('status')) {
-                    return String(order[key]).trim();
+            if (!resolved) {
+                for (var key in order) {
+                    var lowKey = key.toLowerCase();
+                    if (lowKey === 'fulfilment status' || lowKey === 'fulfillment status' || lowKey === 'review status' || lowKey === 'backorder status' || lowKey === '_customerstatus') {
+                        continue;
+                    }
+                    if (lowKey.indexOf('status') !== -1 && order[key] !== undefined && order[key] !== null && String(order[key]).trim() !== '') {
+                        resolved = String(order[key]).trim();
+                        break;
+                    }
                 }
             }
-            return 'Pending';
+            if (!resolved) resolved = 'Pending';
+            var hasRec = !!(String(order['Receipt Number'] || '').trim() || String(order['Receipt URL'] || '').trim() || order.has_receipt === true);
+            if (hasRec && (resolved === 'Awaiting Payment' || resolved === 'Pending')) {
+                return 'Awaiting Verification';
+            }
+            return resolved;
         }
+        window.getStatusValue = getStatusValue;
 
         function updateOrderStatus(orderId, newStatus) {
     var targetSelect = null;
@@ -22570,18 +22707,10 @@ function loadOrders() {
                 return;
             }
 
-            var sampleOrder = orders[0];
-            var allKeys = Object.keys(sampleOrder);
-            var statusKey = null;
-            for (var k = 0; k < allKeys.length; k++) {
-                if (allKeys[k].toLowerCase().indexOf('status') !== -1) { statusKey = allKeys[k]; break; }
-            }
-            if (!statusKey) statusKey = 'Payment Status';
-
             var pending = [];
             for (var oi2 = 0; oi2 < orders.length; oi2++) {
                 var o2 = orders[oi2];
-                var st = (o2[statusKey] || '').toString().trim().toLowerCase();
+                var st = getStatusValue(o2).toLowerCase();
                 if (st === 'awaiting verification' || st === 'pending' || st === 'awaiting payment') {
                     pending.push(o2);
                 }
@@ -22604,31 +22733,15 @@ function loadOrders() {
 
             approvalList.innerHTML = '<div class="orders-container"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Payment</th><th>Total</th><th>Receipt Number</th><th>Receipt Image</th><th>Actions</th></tr></thead><tbody>' + skeletonRow + '</tbody></table></div>';
 
-            function loadPendingFromGas() {
-                google.script.run
-                    .withSuccessHandler(function(orders) {
-                        if (Array.isArray(orders)) window._adminAllOrdersCache = orders;
-                        applyOrdersToApprovalQueue(orders);
-                    })
-                    .withFailureHandler(function(err) {
-                        approvalList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading pending orders: ' + err.message + '</p>';
-                    })
-                    .getOrdersData();
-            }
-
-            if (window.NexSbAdmin && typeof window.NexSbAdmin.isReady === 'function' && window.NexSbAdmin.isReady()) {
-                window.NexSbAdmin.fetchOrdersFast().then(function(sbRes) {
-                    if (sbRes && sbRes.ok && Array.isArray(sbRes.orders) && sbRes.orders.length > 0) {
-                        window._adminAllOrdersCache = sbRes.orders;
-                        applyOrdersToApprovalQueue(sbRes.orders);
-                        return;
-                    }
-                    loadPendingFromGas();
-                });
-                return;
-            }
-
-            loadPendingFromGas();
+            _fetchAdminOrdersPreferred(
+                '_loadPendingOrdersReqSeq',
+                function(orders) {
+                    applyOrdersToApprovalQueue(orders);
+                },
+                function(err) {
+                    approvalList.innerHTML = '<p style="color:#ff6b6b; text-align:center;">Error loading pending orders: ' + err.message + '</p>';
+                }
+            );
         }
 
         function _isSociaBuzzOrder(order) {
@@ -23844,8 +23957,16 @@ window.applyMyOrdersList = function(orders) {
     for (var si = 0; si < myOrdersCache.length; si++) {
         var mo = myOrdersCache[si];
         var moId = mo['Order ID'] || '';
-        var moPay = String(mo['Payment Status'] || '');
-        var moRec = String(mo['Receipt Number'] || '').trim();
+        var moRec = String(mo['Receipt Number'] || '').trim() || String(mo['Receipt URL'] || '').trim();
+        var moPay = (typeof getStatusValue === 'function') ? getStatusValue(mo) : String(mo['Payment Status'] || '');
+        if (moRec && (moPay === 'Awaiting Payment' || moPay === 'Pending' || !moPay)) {
+            moPay = 'Awaiting Verification';
+        }
+        if (moPay === 'Awaiting Verification' && mo['Payment Status'] !== 'Awaiting Verification') {
+            mo['Payment Status'] = 'Awaiting Verification';
+            mo._customerStatus = 'Payment Verifying';
+            mo._tab = 'To Ship';
+        }
         var moPmRaw = String(mo['Payment Method'] || '').toLowerCase();
         var moKey = 'mae';
         if (moPmRaw.indexOf('sociabuzz') !== -1) moKey = 'sociabuzz';
