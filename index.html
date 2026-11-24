@@ -15535,7 +15535,19 @@ window.NexAsyncBtn = (function() {
                     (function doFetch() {
                         attempt++;
                         var controller = new AbortController();
-                        var timeoutId = setTimeout(function () { controller.abort(); }, 25000);
+                        var _slowActionTimeouts = {
+                            placeOrder: 65000,
+                            uploadReceipt: 65000,
+                            confirmSociaBuzzPayment: 65000,
+                            updateOrderStatus: 65000,
+                            bulkUpdateOrderStatuses: 65000,
+                            getAdminStage4Bootstrap: 60000,
+                            getPaymentQRs: 45000,
+                            getCustomerStage5Bootstrap: 45000,
+                            getNex4Up2Bootstrap: 45000
+                        };
+                        var timeoutMs = _slowActionTimeouts[prop] || 30000;
+                        var timeoutId = setTimeout(function () { controller.abort(); }, timeoutMs);
 
                         fetch(GAS_URL, {
                             method: 'POST',
@@ -15597,7 +15609,6 @@ window.NexAsyncBtn = (function() {
                             var friendlyMsg = window.NexErrorHandler
                                 ? window.NexErrorHandler.toCustomerMessage(rawMsg, prop)
                                 : 'Unable to connect. Please try again.';
-                            if (window.NexErrorHandler) window.NexErrorHandler.logAdminError(prop, rawMsg);
 
                             if (activeBtn) window.NexAsyncBtn.setError(activeBtn, 'Retry');
                             if (failure) failure(new Error(friendlyMsg));
@@ -20241,9 +20252,17 @@ var promoData = appliedPromo ? {
                     })
                     .withFailureHandler(function(err) {
                         var errMsg = (err && err.message) ? err.message : 'Error placing order. Please try again.';
-                        checkoutError.textContent = errMsg;
-                        if (String(errMsg).toLowerCase().indexOf('duplicate') === -1) {
-                            window._checkoutSubmissionToken = 'SUB-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+                        var isConnOrTimeout = /unable to connect|timed out|timeout|network/i.test(String(errMsg));
+                        if (isConnOrTimeout) {
+                            checkoutError.textContent = 'Connection timed out while confirming your order. Please check My Orders or Pending Payments before retrying so you do not create a duplicate order.';
+                            if (customer && typeof loadMyOrders === 'function') {
+                                try { loadMyOrders(); } catch (_) {}
+                            }
+                        } else {
+                            checkoutError.textContent = errMsg;
+                            if (String(errMsg).toLowerCase().indexOf('duplicate') === -1) {
+                                window._checkoutSubmissionToken = 'SUB-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+                            }
                         }
                         console.error(err);
                         submitBtn.disabled = false;
@@ -20752,12 +20771,12 @@ var promoData = appliedPromo ? {
             reader.onload = function(ev) {
                 var rawDataUrl = ev.target.result;
                 var isImage = file.type.indexOf('image/') === 0;
-                // Auto-compress large mobile receipt photos/screenshots (>900KB) for faster reliable upload
-                if (isImage && file.size > 900 * 1024) {
+                // Auto-compress mobile receipt photos/screenshots (>450KB) for faster reliable upload
+                if (isImage && file.size > 450 * 1024) {
                     var imgEl = new Image();
                     imgEl.onload = function() {
                         try {
-                            var maxDim = 1600;
+                            var maxDim = 1400;
                             var w = imgEl.naturalWidth || imgEl.width;
                             var h = imgEl.naturalHeight || imgEl.height;
                             if (w > maxDim || h > maxDim) {
@@ -20770,7 +20789,7 @@ var promoData = appliedPromo ? {
                             canvas.height = h;
                             var ctx = canvas.getContext('2d');
                             ctx.drawImage(imgEl, 0, 0, w, h);
-                            var compressed = canvas.toDataURL('image/jpeg', 0.82);
+                            var compressed = canvas.toDataURL('image/jpeg', 0.80);
                             var baseName = String(file.name || 'receipt.jpg').replace(/\.[^.]+$/, '') + '.jpg';
                             applyReceiptPreview(compressed, baseName, true);
                         } catch (cErr) {
