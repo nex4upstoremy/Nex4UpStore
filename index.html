@@ -6616,7 +6616,8 @@
 
             /* Logo stays compact on the left, no wrap */
             .logo {
-                flex-shrink: 0 !important;
+                flex: 0 0 auto !important;
+                min-width: 34px !important;
                 gap: 6px !important;
                 order: 0 !important;
             }
@@ -6624,28 +6625,48 @@
             .logo .mobile-emblem {
                 display: block !important;
                 height: 34px !important;
-                width: auto !important;
+                width: 34px !important;
+                min-width: 34px !important;
                 max-width: 38px !important;
-                object-fit: contain;
+                object-fit: contain !important;
             }
 
-            /* header-controls becomes a normal flex row on the right */
+            /* header-controls wraps gracefully if tight, never overlaps logo */
             .header-controls {
                 display: flex !important;
                 flex-direction: row !important;
-                flex-wrap: nowrap !important;
-                flex: 1 1 auto !important;
+                flex-wrap: wrap !important;
+                flex: 1 1 0% !important;
                 order: 1 !important;
-                gap: 6px !important;
+                gap: 4px !important;
                 align-items: center;
                 justify-content: flex-end;
                 min-width: 0;
             }
+            .nav-cat-btn {
+                padding: 6px 8px !important;
+                gap: 0 !important;
+            }
+            .nav-cat-btn span,
+            .nav-cat-btn .fa-chevron-down {
+                display: none !important;
+            }
+            .nex2-lang-pill {
+                padding: 5px 7px !important;
+                font-size: 11px !important;
+                gap: 3px !important;
+                flex-shrink: 0 !important;
+            }
+            .nex2-notif-btn {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 13px !important;
+            }
 
-            /* ----- Search: shrinks, wraps to icon if needed ----- */
+            /* ----- Search: shrinks, never pushes controls over logo ----- */
             .search-wrapper {
-                flex: 1 1 auto !important;
-                min-width: 80px !important;
+                flex: 1 1 60px !important;
+                min-width: 50px !important;
                 order: 1 !important;
             }
             .search-box {
@@ -6700,11 +6721,6 @@
                 font-size: 15px !important;
                 padding: 0 !important;
             }
-
-            /* ----- Logo sizing on tablet ----- */
-            .logo .logo-icon { height: 36px !important; max-width: 50px !important; }
-            .logo .logo-text { font-size: 20px !important; letter-spacing: -1px !important; }
-            .logo .mobile-emblem { display: none !important; }
         }
 
         /* ===== TINY PHONES: 400px and below ===== */
@@ -6720,7 +6736,8 @@
             .logo .logo-text { display: none !important; }
             .logo .mobile-emblem {
                 display: block !important;
-                height: 30px !important;
+                height: 32px !important;
+                width: 32px !important;
             }
 
             .search-box input { font-size: 11px !important; }
