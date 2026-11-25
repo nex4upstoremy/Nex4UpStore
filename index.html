@@ -770,7 +770,7 @@
             width:100%; height:100%;
             background: rgba(0,0,0,0.7);
             backdrop-filter: blur(4px);
-            z-index: 700;
+            z-index: 1200;
             display: none;
             align-items: center;
             justify-content: center;
@@ -1411,7 +1411,7 @@
             width:100%; height:100%;
             background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px);
-            z-index: 950;
+            z-index: 1140;
             display: none;
             align-items: center;
             justify-content: center;
@@ -2202,7 +2202,7 @@
             width:100%; height:100%;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(6px);
-            z-index: 900;
+            z-index: 1130;
             display: none;
             align-items: center;
             justify-content: center;
@@ -2298,7 +2298,7 @@
             width:100%; height:100%;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(6px);
-            z-index: 850;
+            z-index: 1110;
             display: none;
             align-items: center;
             justify-content: center;
@@ -2647,7 +2647,7 @@
             width:100%; height:100%;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(6px);
-            z-index: 860;
+            z-index: 1120;
             display: none;
             align-items: center;
             justify-content: center;
@@ -2768,7 +2768,7 @@
             width:100%; height:100%;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(6px);
-            z-index: 600;
+            z-index: 1100;
             display: none;
             align-items: center;
             justify-content: center;
@@ -3237,7 +3237,7 @@
             width: 100%; height: 100%;
             background: rgba(0,0,0,0.88);
             backdrop-filter: blur(8px);
-            z-index: 970;
+            z-index: 1160;
             display: none;
             align-items: center;
             justify-content: center;
@@ -4699,7 +4699,7 @@
             font-weight:600; font-size:15px;
             border:1px solid #2a3a52;
             box-shadow:0 12px 40px rgba(0,0,0,0.6);
-            z-index:300;
+            z-index:3500;
             display: none;
             align-items:center;
             gap:12px;
@@ -5538,7 +5538,7 @@
             width:100%; height:100%;
             background: rgba(0,0,0,0.88);
             backdrop-filter: blur(10px);
-            z-index: 960;
+            z-index: 1150;
             display: none;
             align-items: center;
             justify-content: center;
@@ -6045,7 +6045,7 @@
             width: 100%; height: 100%;
             background: rgba(0,0,0,0.88);
             backdrop-filter: blur(8px);
-            z-index: 980;
+            z-index: 1170;
             display: none;
             align-items: center;
             justify-content: center;
@@ -6631,11 +6631,11 @@
                 object-fit: contain !important;
             }
 
-            /* header-controls wraps gracefully if tight, never overlaps logo */
+            /* header-controls stays on one straight horizontal line on mobile */
             .header-controls {
                 display: flex !important;
                 flex-direction: row !important;
-                flex-wrap: wrap !important;
+                flex-wrap: nowrap !important;
                 flex: 1 1 0% !important;
                 order: 1 !important;
                 gap: 4px !important;
@@ -6665,8 +6665,8 @@
 
             /* ----- Search: shrinks, never pushes controls over logo ----- */
             .search-wrapper {
-                flex: 1 1 60px !important;
-                min-width: 50px !important;
+                flex: 1 1 44px !important;
+                min-width: 44px !important;
                 order: 1 !important;
             }
             .search-box {
@@ -6682,16 +6682,9 @@
                 font-size: 11.5px;
             }
 
-            /* ----- Track: icon only ----- */
+            /* ----- Track: hidden on mobile header (available in Profile) ----- */
             .track-btn {
-                order: 2 !important;
-                padding: 7px 9px !important;
-                font-size: 0 !important;   /* hides text, keeps icon */
-                gap: 0 !important;
-                flex-shrink: 0 !important;
-            }
-            .track-btn i {
-                font-size: 14px !important;
+                display: none !important;
             }
 
             /* ----- Cart: icon + badge only ----- */
@@ -6743,7 +6736,8 @@
             .search-box input { font-size: 11px !important; }
             .search-box input::placeholder { font-size: 10.5px; }
 
-            .track-btn, .cart-btn { padding: 6px 7px !important; }
+            .track-btn { display: none !important; }
+            .cart-btn { padding: 0 6px !important; }
 
             .profile-toggle {
                 width: 30px !important;
@@ -11374,6 +11368,207 @@ header,
     border-radius: 18px;
     padding: 20px;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* ============================================================
+   📱 FINAL AUTHORITATIVE MOBILE HEADER — Single Straight Row
+   ============================================================ */
+@media (max-width: 768px) {
+    header {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 4px !important;
+        padding: 6px 8px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .logo {
+        flex: 0 0 auto !important;
+        width: 28px !important;
+        min-width: 28px !important;
+        gap: 0 !important;
+        order: 0 !important;
+    }
+    .logo .logo-icon,
+    .logo .logo-text {
+        display: none !important;
+    }
+    .logo .mobile-emblem {
+        display: block !important;
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        object-fit: contain !important;
+    }
+    .header-controls {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        gap: 4px !important;
+        order: 1 !important;
+    }
+    /* Hide redundant Track Order magnifying-glass button on mobile header (already in Profile / NexBot) */
+    .track-btn {
+        display: none !important;
+    }
+    .nav-cat-dropdown {
+        order: 0 !important;
+        flex-shrink: 0 !important;
+    }
+    .nav-cat-btn {
+        width: 28px !important;
+        height: 28px !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        border-radius: 8px !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+    .nav-cat-btn span,
+    .nav-cat-btn .fa-chevron-down {
+        display: none !important;
+    }
+    .search-wrapper {
+        order: 1 !important;
+        flex: 1 1 0% !important;
+        min-width: 44px !important;
+    }
+    .search-box {
+        height: 28px !important;
+        padding: 0 6px 0 8px !important;
+        width: 100% !important;
+        border-radius: 20px !important;
+        gap: 2px !important;
+        box-sizing: border-box !important;
+    }
+    .search-box input {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: 1 1 0% !important;
+        font-size: 11px !important;
+        padding: 0 !important;
+        line-height: 26px !important;
+    }
+    .search-box input::placeholder {
+        font-size: 10.5px !important;
+    }
+    .search-box button {
+        padding: 0 2px !important;
+        font-size: 12px !important;
+        flex-shrink: 0 !important;
+    }
+    .search-box .clear-search {
+        padding: 0 2px !important;
+        font-size: 11px !important;
+    }
+    #searchDropdown {
+        left: -32px !important;
+        min-width: 0 !important;
+        width: min(320px, calc(100vw - 20px)) !important;
+        max-width: calc(100vw - 20px) !important;
+    }
+    .nex2-lang-pill {
+        order: 2 !important;
+        height: 28px !important;
+        padding: 0 6px !important;
+        font-size: 10.5px !important;
+        gap: 3px !important;
+        border-radius: 8px !important;
+        flex-shrink: 0 !important;
+        box-sizing: border-box !important;
+    }
+    .nex2-notif-wrap {
+        order: 3 !important;
+        flex-shrink: 0 !important;
+    }
+    .nex2-notif-btn {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 12.5px !important;
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
+    }
+    .header-points-pill {
+        order: 4 !important;
+        height: 28px !important;
+        padding: 0 6px !important;
+        font-size: 10.5px !important;
+        gap: 3px !important;
+        border-radius: 20px !important;
+        flex-shrink: 0 !important;
+        max-width: 68px !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+    .header-points-pill i {
+        font-size: 10.5px !important;
+    }
+    .header-points-pill span.pts-label {
+        display: none !important;
+    }
+    .cart-btn {
+        order: 5 !important;
+        height: 28px !important;
+        padding: 0 7px !important;
+        font-size: 0 !important;
+        gap: 3px !important;
+        border-radius: 20px !important;
+        flex-shrink: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        box-sizing: border-box !important;
+    }
+    .cart-btn i {
+        font-size: 12px !important;
+    }
+    .cart-btn span:not(.badge) {
+        display: none !important;
+    }
+    .cart-btn .badge {
+        font-size: 10px !important;
+        padding: 1px 5px !important;
+        min-width: 16px !important;
+        line-height: 1.2 !important;
+    }
+    .profile-dropdown {
+        order: 6 !important;
+        flex-shrink: 0 !important;
+    }
+    .profile-toggle {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 13px !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+    .profile-toggle .nav-user-initial {
+        font-size: 11.5px !important;
+    }
+}
+@media (max-width: 420px) {
+    header,
+    .header-controls {
+        gap: 3px !important;
+    }
+    .nex2-lang-pill {
+        padding: 0 5px !important;
+    }
+    .nex2-lang-pill i {
+        display: none !important;
+    }
+    .header-points-pill {
+        padding: 0 5px !important;
+        max-width: 60px !important;
+    }
+    .cart-btn {
+        padding: 0 6px !important;
+    }
 }
     </style>
 <script>
@@ -19627,6 +19822,7 @@ checkoutBtn.addEventListener('click', function() {
 
     updateCheckoutSummary();
     checkoutError.textContent = '';
+    if (cartOverlay) cartOverlay.classList.remove('open');
     checkoutOverlay.classList.add('open');
 
     // ✅ NEW: Auto-apply the referral welcome coupon for first-time orders
@@ -20815,6 +21011,8 @@ var promoData = appliedPromo ? {
         }
 
         function openQRModal(orderId, method, amount, allowLater) {
+            if (typeof cartOverlay !== 'undefined' && cartOverlay) cartOverlay.classList.remove('open');
+            if (typeof checkoutOverlay !== 'undefined' && checkoutOverlay) checkoutOverlay.classList.remove('open');
             window._receiptUploadWaitingOrActive = false;
             currentQROrderId = orderId;
             currentQRMethodKey = method;
