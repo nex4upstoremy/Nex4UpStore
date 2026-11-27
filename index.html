@@ -6750,7 +6750,7 @@
            ============================================================ */
         .product-toolbar {
             display: grid;
-            grid-template-columns: 1.5fr 1fr 1fr auto;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
             gap: 10px;
             margin-bottom: 16px;
             padding: 14px;
@@ -6840,6 +6840,73 @@
             font-weight: 600;
             white-space: nowrap;
             padding-left: 6px;
+        }
+
+        /* Admin Product Online / Offline Toggle Switch */
+        .admin-online-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 11px 5px 6px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .admin-online-toggle .toggle-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: transform 0.2s ease, background 0.2s ease;
+            flex-shrink: 0;
+        }
+        .admin-online-toggle.is-online {
+            background: rgba(74, 222, 128, 0.14);
+            border-color: rgba(74, 222, 128, 0.45);
+            color: #4ade80;
+        }
+        .admin-online-toggle.is-online .toggle-dot {
+            background: #4ade80;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.7);
+        }
+        .admin-online-toggle.is-online:hover {
+            background: rgba(74, 222, 128, 0.24);
+        }
+        .admin-online-toggle.is-offline {
+            background: rgba(100, 116, 139, 0.16);
+            border-color: rgba(148, 163, 184, 0.35);
+            color: #94a3b8;
+        }
+        .admin-online-toggle.is-offline .toggle-dot {
+            background: #64748b;
+        }
+        .admin-online-toggle.is-offline:hover {
+            background: rgba(148, 163, 184, 0.24);
+            color: #e2e8f0;
+        }
+        .admin-online-toggle:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+        .admin-offline-pill {
+            display: inline-block;
+            background: rgba(100, 116, 139, 0.22);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 7px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        tr.admin-row-offline {
+            opacity: 0.72;
         }
 
         /* Admin product pagination */
@@ -12149,6 +12216,16 @@ header,
         OFF = This product will be excluded.
     </small>
 </div>
+                                <div class="field field-full">
+                                    <label class="check-label">
+                                        <input type="checkbox" id="addProductIsOnline" checked />
+                                        <span><i class="fas fa-eye" style="color:#4ade80;margin-right:6px;"></i>Storefront Visibility: Online (Show in Storefront)</span>
+                                    </label>
+                                    <small style="color:#8aa1c0; display:block; margin-top:6px;">
+                                        ON = Customers can see and purchase this product.
+                                        OFF = Hidden from storefront without deleting it.
+                                    </small>
+                                </div>
                                 <input type="hidden" id="gameType" value="other" />
                             </div>
                         </div>
@@ -12315,6 +12392,12 @@ header,
 
                         <select id="adminProductCategory" class="toolbar-select">
                             <option value="all">All Categories</option>
+                        </select>
+
+                        <select id="adminProductStatusFilter" class="toolbar-select">
+                            <option value="all">All Status (Online &amp; Offline)</option>
+                            <option value="online">🟢 Online Only</option>
+                            <option value="offline">⚪ Offline Only</option>
                         </select>
 
                         <select id="adminProductSort" class="toolbar-select">
@@ -14360,6 +14443,7 @@ header,
                 </div>
 
                 <div class="nex2-card-grid" id="nex2ReviewsWallGrid"></div>
+                <div class="pagination pagination-container" id="nex2ReviewsWallPagination" style="margin-top:24px;"></div>
             </div>
 
             <!-- ===== NEX4UP 2.0: DEVELOPERS & CHANGELOG PAGE ===== -->
@@ -14492,6 +14576,7 @@ header,
                     <span class="review-count" id="reviewCount">(0 reviews)</span>
                 </div>
                 <div class="review-list" id="reviewList"></div>
+                <div class="pagination pagination-container" id="productReviewsPagination" style="margin:12px 0 20px;"></div>
                 <div class="review-form-container" id="reviewFormContainer"></div>
             </div>
         </div>
@@ -14795,6 +14880,16 @@ header,
     <small style="color:#8aa1c0; display:block; margin-top:6px;">
         ON = This product can receive the automatic first-purchase discount.
         OFF = This product will be excluded.
+    </small>
+</div>
+
+<div class="field field-full">
+    <label class="check-label">
+        <input type="checkbox" id="editProductIsOnline" checked />
+        <span><i class="fas fa-eye" style="color:#4ade80;margin-right:6px;"></i>Storefront Visibility: Online (Show in Storefront)</span>
+    </label>
+    <small style="color:#8aa1c0; display:block; margin-top:6px;">
+        ON = Product is live in storefront. OFF = Product is hidden/offline without deleting it.
     </small>
 </div>
 
@@ -15877,6 +15972,16 @@ window.NexAsyncBtn = (function() {
         // 1. STATE
         // ================================================================
         var allGames = [];
+        function isProductOnline(g) {
+            if (!g || typeof g !== 'object') return false;
+            if (g.isOnline === false || g.isOnline === 'false' || g.isOffline === true) return false;
+            if (g.requirementsConfig && (g.requirementsConfig.isOnline === false || g.requirementsConfig.isOnline === 'false')) return false;
+            return true;
+        }
+        function getPublicOnlineGames() {
+            if (!Array.isArray(allGames)) return [];
+            return allGames.filter(isProductOnline);
+        }
         var cart = [];
         var currentFilter = 'all';
         var searchQuery = '';
@@ -18574,15 +18679,16 @@ function loadGames() {
 
         function renderGenreCards() {
             if (!genreCardsContainer) return;
+            var publicGames = getPublicOnlineGames();
             var genres = {};
-            for (var i = 0; i < allGames.length; i++) {
-                var cat = allGames[i].category || 'General';
+            for (var i = 0; i < publicGames.length; i++) {
+                var cat = publicGames[i].category || 'General';
                 genres[cat] = (genres[cat] || 0) + 1;
             }
             var genreKeys = Object.keys(genres).sort();
 
 var html = '';
-var allCount = allGames.length;
+var allCount = publicGames.length;
 var allActive = currentFilter === 'all' ? 'active' : '';
 var allImg = genreImages['All'] || '';
 html += '<div class="genre-card ' + allActive + '" data-filter="all">';
@@ -18594,7 +18700,7 @@ if (allImg) {
 html += '<div class="genre-overlay"><div class="genre-name">All</div><div class="genre-count">' + allCount + ' games</div></div>';
 html += '</div>';
 
-var hotCount = allGames.filter(g => g.sold > 0).length;
+var hotCount = publicGames.filter(g => g.sold > 0).length;
 var hotActive = currentFilter === 'hotselling' ? 'active' : '';
 var hotImg = genreImages['Hot Selling'] || '';
 html += '<div class="genre-card ' + hotActive + '" data-filter="hotselling">';
@@ -18668,8 +18774,9 @@ html += '</div>';
         function renderFilters() {
             var cats = ['all', 'hotselling'];
             var uniqueCats = {};
-            for (var i = 0; i < allGames.length; i++) {
-                var cat = allGames[i].category || 'Other';
+            var publicGames = getPublicOnlineGames();
+            for (var i = 0; i < publicGames.length; i++) {
+                var cat = publicGames[i].category || 'Other';
                 if (!uniqueCats[cat]) uniqueCats[cat] = true;
             }
             for (var key in uniqueCats) {
@@ -18727,8 +18834,9 @@ html += '</div>';
                 return;
             }
             var count = 0;
-            for (var i = 0; i < allGames.length; i++) {
-                if ((allGames[i].category || 'Other') === genre) count++;
+            var publicGames = getPublicOnlineGames();
+            for (var i = 0; i < publicGames.length; i++) {
+                if ((publicGames[i].category || 'Other') === genre) count++;
             }
             var html = '<div class="genre-banner">';
             html += '<img src="' + optimizeDriveImg(url, 900) + '" alt="' + genre + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" />';
@@ -18982,7 +19090,7 @@ html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '"
         }
 
         function getFilteredGames() {
-            var result = allGames.slice(0);
+            var result = getPublicOnlineGames();
             if (currentFilter === 'hotselling') {
                 result = result.filter(function(g) { return g.sold > 0; });
                 result.sort(function(a, b) { return b.sold - a.sold; });
@@ -19007,10 +19115,11 @@ html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '"
                 return;
             }
             var q = query.trim().toLowerCase();
+            var publicGames = getPublicOnlineGames();
             var matches = [];
             var genreMatches = [];
-            for (var i = 0; i < allGames.length; i++) {
-                var game = allGames[i];
+            for (var i = 0; i < publicGames.length; i++) {
+                var game = publicGames[i];
                 if (game.title.toLowerCase().indexOf(q) !== -1 ||
                     (game.description && game.description.toLowerCase().indexOf(q) !== -1)) {
                     matches.push(game);
@@ -19018,8 +19127,8 @@ html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '"
                 }
             }
             var uniqueGenres = {};
-            for (var j = 0; j < allGames.length; j++) {
-                var cat = allGames[j].category || 'General';
+            for (var j = 0; j < publicGames.length; j++) {
+                var cat = publicGames[j].category || 'General';
                 if (cat.toLowerCase().indexOf(q) !== -1 && !uniqueGenres[cat]) {
                     uniqueGenres[cat] = true;
                 }
@@ -19038,8 +19147,8 @@ html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '"
                 for (var g = 0; g < genreMatches.length; g++) {
                     var genre = genreMatches[g];
                     var count = 0;
-                    for (var k = 0; k < allGames.length; k++) {
-                        if ((allGames[k].category || 'General') === genre) count++;
+                    for (var k = 0; k < publicGames.length; k++) {
+                        if ((publicGames[k].category || 'General') === genre) count++;
                     }
                     html += '<div class="genre-suggestion" data-filter="' + genre + '">' +
                         '<i class="fas fa-tag"></i> ' + genre + ' (' + count + ' games)' +
@@ -19143,10 +19252,11 @@ html += '<img src="' + optimizeDriveImg(game.image || PLACEHOLDER_IMG, 400) + '"
         }
 
         function updateStats() {
-            totalGamesEl.textContent = allGames.length;
+            var publicGames = getPublicOnlineGames();
+            totalGamesEl.textContent = publicGames.length;
             var cats = {};
-            for (var i = 0; i < allGames.length; i++) {
-                var cat = allGames[i].category || 'Other';
+            for (var i = 0; i < publicGames.length; i++) {
+                var cat = publicGames[i].category || 'Other';
                 cats[cat] = true;
             }
             totalCategoriesEl.textContent = Object.keys(cats).length;
@@ -19755,6 +19865,29 @@ function saveCheckoutContact(info) {
 
 checkoutBtn.addEventListener('click', function() {
     if (cart.length === 0) return;
+
+    var offlineRemovedCount = 0;
+    if (Array.isArray(allGames) && allGames.length > 0) {
+        var keptCart = [];
+        for (var ci = 0; ci < cart.length; ci++) {
+            var cItem = cart[ci];
+            var foundProd = null;
+            for (var gi = 0; gi < allGames.length; gi++) {
+                if (allGames[gi].id === cItem.id) { foundProd = allGames[gi]; break; }
+            }
+            if (foundProd && !isProductOnline(foundProd)) {
+                offlineRemovedCount++;
+            } else {
+                keptCart.push(cItem);
+            }
+        }
+        if (offlineRemovedCount > 0) {
+            cart = keptCart;
+            renderCart();
+            showToast('⚠️ Offline product(s) were removed from your cart.');
+            if (cart.length === 0) return;
+        }
+    }
 
     // ✅ NEW: Require login before checkout
     if (!customer) {
@@ -21836,6 +21969,7 @@ if (cart.length > 0) {
         // ================================================================
         var adminProductSearch = '';
         var adminProductCategory = 'all';
+        var adminProductStatus = 'all';
         var adminProductSort = 'id-desc';
         var adminProductPage = 1;
         var adminProductsPerPage = 20;
@@ -21849,6 +21983,13 @@ if (cart.length > 0) {
                 list = list.filter(function(g) {
                     return (g.category || 'General') === adminProductCategory;
                 });
+            }
+
+            // 1b. Status filter (Online / Offline)
+            if (adminProductStatus === 'online') {
+                list = list.filter(isProductOnline);
+            } else if (adminProductStatus === 'offline') {
+                list = list.filter(function(g) { return !isProductOnline(g); });
             }
 
             // 2. Search filter (title, ID, or category)
@@ -22013,9 +22154,15 @@ if (cart.length > 0) {
             // Update count badge
             var countEl2 = document.getElementById('adminProductCount');
             if (countEl2) {
-                var label = totalItems + ' item' + (totalItems !== 1 ? 's' : '');
-                if (adminProductSearch.trim() || adminProductCategory !== 'all') {
-                    label += ' (filtered)';
+                var onlineCount = 0;
+                for (var oc = 0; oc < allGames.length; oc++) {
+                    if (isProductOnline(allGames[oc])) onlineCount++;
+                }
+                var offlineCount = allGames.length - onlineCount;
+                var label = totalItems + ' item' + (totalItems !== 1 ? 's' : '') +
+                    ' (' + onlineCount + ' online, ' + offlineCount + ' offline)';
+                if (adminProductSearch.trim() || adminProductCategory !== 'all' || adminProductStatus !== 'all') {
+                    label += ' [filtered]';
                 }
                 countEl2.textContent = label;
             }
@@ -22040,23 +22187,25 @@ if (cart.length > 0) {
 
             var html = '<table><thead><tr>' +
                 '<th>ID</th><th>Image</th><th>Title</th><th>Category</th>' +
-                '<th>Price</th><th>Disc.</th><th>Qty</th><th>Type</th><th>Actions</th>' +
+                '<th>Price</th><th>Disc.</th><th>Qty</th><th>Type</th><th>Status</th><th>Actions</th>' +
                 '</tr></thead><tbody>';
 
             for (var i = 0; i < pageItems.length; i++) {
                 var g = pageItems[i];
+                var isOnline = isProductOnline(g);
                 var typeLabel = (g.productType === 'physical') ? '📦 Physical' : (g.productType === 'gift_code' ? '🎁 Gift Code' : '💾 Digital');
                 var variantIcon = (g.hasVariants) ? ' <i class="fas fa-layer-group" style="color:#f7d875;font-size:11px;" title="Has variants"></i>' : '';
+                var offlineBadge = isOnline ? '' : ' <span class="admin-offline-pill">OFFLINE</span>';
                 var reqCfg = g.requirementsConfig;
                 var reqFieldCnt = (reqCfg && reqCfg.requirementEnabled && Array.isArray(reqCfg.fields)) ? reqCfg.fields.length : 0;
                 var reqPill = reqFieldCnt > 0
                     ? '<br><span class="dyn-req-badge-pill"><i class="fas fa-id-card"></i> ' + reqFieldCnt + ' field' + (reqFieldCnt !== 1 ? 's' : '') + '</span>'
                     : '<br><span class="dyn-req-badge-pill none">No ID req</span>';
 
-                html += '<tr>';
+                html += '<tr class="' + (isOnline ? '' : 'admin-row-offline') + '">';
                 html += '<td>' + highlightText(g.id, query) + '</td>';
                 html += '<td><img src="' + (g.image || PLACEHOLDER_IMG) + '" class="admin-thumb" alt="" onerror="this.onerror=null; this.src=PLACEHOLDER_IMG;" /></td>';
-                html += '<td>' + highlightText(g.title, query) + variantIcon + '</td>';
+                html += '<td>' + highlightText(g.title, query) + variantIcon + offlineBadge + '</td>';
                 html += '<td>' + highlightText(g.category || 'General', query) + '</td>';
                 var priceCell;
                 if (g.hasVariants && g.variants && g.variants.length > 0) {
@@ -22084,6 +22233,10 @@ if (cart.length > 0) {
                 html += '<td style="' + qtyColor + '">' + (g.quantity || 0) + '</td>';
                 html += '<td style="font-size:11px;">' + typeLabel + reqPill + '</td>';
                 html += '<td>' +
+                    '<button type="button" class="admin-online-toggle ' + (isOnline ? 'is-online' : 'is-offline') + '" data-id="' + g.id + '" title="Click to toggle Online / Offline in storefront">' +
+                    '<span class="toggle-dot"></span><span>' + (isOnline ? 'Online' : 'Offline') + '</span></button>' +
+                    '</td>';
+                html += '<td>' +
                     '<button class="action-btn edit-btn" data-id="' + g.id + '" title="Edit"><i class="fas fa-edit"></i></button> ' +
                     '<button class="action-btn delete-btn" data-id="' + g.id + '" title="Delete"><i class="fas fa-trash-alt"></i></button>' +
                     '</td>';
@@ -22091,6 +22244,15 @@ if (cart.length > 0) {
             }
             html += '</tbody></table>';
             adminGameList.innerHTML = html;
+
+            // Bind Online / Offline toggle buttons
+            var statusToggleBtns = adminGameList.querySelectorAll('.admin-online-toggle');
+            for (var st = 0; st < statusToggleBtns.length; st++) {
+                statusToggleBtns[st].addEventListener('click', function() {
+                    var id = parseInt(this.dataset.id, 10);
+                    toggleAdminProductOnlineStatus(id, this);
+                });
+            }
 
             // Bind edit buttons
             var editBtns = adminGameList.querySelectorAll('.edit-btn');
@@ -22119,11 +22281,61 @@ if (cart.length > 0) {
             render_admin_product_pagination(totalPages, totalItems);
         }
 
+        function toggleAdminProductOnlineStatus(gameId, btnEl) {
+            if (!isAdmin) { showToast('You need to be in admin mode.'); return; }
+            var game = null;
+            for (var i = 0; i < allGames.length; i++) {
+                if (allGames[i].id === gameId) { game = allGames[i]; break; }
+            }
+            if (!game) return;
+            var prevOnline = isProductOnline(game);
+            var nextOnline = !prevOnline;
+
+            function applyLocalStatus(flag) {
+                game.isOnline = flag;
+                if (!game.requirementsConfig || typeof game.requirementsConfig !== 'object') {
+                    game.requirementsConfig = { productId: String(game.id), requirementEnabled: false, collectionMode: 'per_order_item', fields: [] };
+                }
+                game.requirementsConfig.isOnline = flag;
+                if (typeof _saveStoreLocalCache === 'function') _saveStoreLocalCache(allGames, genreImages);
+                renderAdminList();
+                renderAll();
+            }
+
+            applyLocalStatus(nextOnline);
+            if (btnEl) btnEl.disabled = true;
+
+            if (typeof google === 'undefined' || !google.script || !google.script.run) {
+                showToast(nextOnline ? ('🟢 "' + game.title + '" is now ONLINE in storefront.') : ('⚪ "' + game.title + '" is now OFFLINE (hidden from storefront).'));
+                return;
+            }
+
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res && res.success === false) {
+                        applyLocalStatus(prevOnline);
+                        showToast('❌ ' + (res.message || 'Could not update product status.'));
+                        return;
+                    }
+                    var serverOnline = (res && res.isOnline !== undefined) ? !!res.isOnline : nextOnline;
+                    applyLocalStatus(serverOnline);
+                    showToast(serverOnline
+                        ? ('🟢 "' + game.title + '" is now ONLINE in storefront.')
+                        : ('⚪ "' + game.title + '" is now OFFLINE (hidden from storefront).'));
+                })
+                .withFailureHandler(function(err) {
+                    applyLocalStatus(prevOnline);
+                    showToast('❌ Error updating status: ' + ((err && err.message) || 'Network error'));
+                })
+                .saveProductRequirements(game.id, { _statusToggleOnly: true, isOnline: nextOnline }, window._nexAdminPwdSession || '');
+        }
+
         // ===== Event listeners for the admin product toolbar =====
         (function setupAdminProductToolbar() {
             var searchInput = document.getElementById('adminProductSearch');
             var clearBtn = document.getElementById('adminProductClearSearch');
             var categorySelect = document.getElementById('adminProductCategory');
+            var statusSelect = document.getElementById('adminProductStatusFilter');
             var sortSelect = document.getElementById('adminProductSort');
 
             if (searchInput) {
@@ -22159,6 +22371,14 @@ if (cart.length > 0) {
             if (categorySelect) {
                 categorySelect.addEventListener('change', function() {
                     adminProductCategory = this.value;
+                    adminProductPage = 1;
+                    renderAdminList();
+                });
+            }
+
+            if (statusSelect) {
+                statusSelect.addEventListener('change', function() {
+                    adminProductStatus = this.value || 'all';
                     adminProductPage = 1;
                     renderAdminList();
                 });
@@ -22246,6 +22466,10 @@ if (firstPurchaseCheckbox) {
     // Old products with no setting default to ON.
     firstPurchaseCheckbox.checked =
         game.firstPurchaseDiscountEligible !== false;
+}
+var editOnlineCheckbox = document.getElementById('editProductIsOnline');
+if (editOnlineCheckbox) {
+    editOnlineCheckbox.checked = isProductOnline(game);
 }
 
 // Open the edit modal.
@@ -22426,7 +22650,8 @@ var data = {
 
     // NEW: Save the checkbox setting
     firstPurchaseDiscountEligible:
-        document.getElementById('editFirstPurchaseDiscountEligible').checked
+        document.getElementById('editFirstPurchaseDiscountEligible').checked,
+    isOnline: (document.getElementById('editProductIsOnline') ? document.getElementById('editProductIsOnline').checked : true)
 };
 
             var errorEl = document.getElementById('editFormError');
@@ -22441,6 +22666,9 @@ var data = {
                 } else {
                     data.requirementsConfig = editReqCheck.config;
                 }
+            }
+            if (!errors.length) {
+                data.requirementsConfig = Object.assign({ requirementEnabled: false, collectionMode: 'per_order_item', fields: [] }, data.requirementsConfig || {}, { isOnline: data.isOnline });
             }
 
             if (errors.length > 0) {
@@ -22464,6 +22692,7 @@ var data = {
 
                     if (Array.isArray(result)) {
                         allGames = result;
+                        if (typeof _saveStoreLocalCache === 'function') _saveStoreLocalCache(allGames, genreImages);
                         renderAll();
                         renderAdminList();
                         closeEditModal();
@@ -22593,7 +22822,8 @@ var data = {
 
     // NEW: Save the checkbox setting
     firstPurchaseDiscountEligible:
-        document.getElementById('addFirstPurchaseDiscountEligible').checked
+        document.getElementById('addFirstPurchaseDiscountEligible').checked,
+    isOnline: (document.getElementById('addProductIsOnline') ? document.getElementById('addProductIsOnline').checked : true)
 };
 
 var errors = [];
@@ -22609,6 +22839,9 @@ if (window.ProductReqAdminEditor) {
     } else {
         data.requirementsConfig = addReqCheck.config;
     }
+}
+if (!errors.length) {
+    data.requirementsConfig = Object.assign({ requirementEnabled: false, collectionMode: 'per_order_item', fields: [] }, data.requirementsConfig || {}, { isOnline: data.isOnline });
 }
 
             if (errors.length > 0) {
@@ -22630,11 +22863,14 @@ if (window.ProductReqAdminEditor) {
                         return;
                     }
                     allGames = Array.isArray(updatedData) ? updatedData : allGames;
+                    if (typeof _saveStoreLocalCache === 'function') _saveStoreLocalCache(allGames, genreImages);
                     renderAll();
                     renderAdminList();
                     resetVariantEditor('add');
                     if (window.ProductReqAdminEditor) window.ProductReqAdminEditor.reset('add');
                     addGameForm.reset();
+                    var addOnlineCb = document.getElementById('addProductIsOnline');
+                    if (addOnlineCb) addOnlineCb.checked = true;
                     var gtEl = document.getElementById('gameType');
                     if (gtEl) gtEl.value = 'other';
                     document.getElementById('quantity').value = 0;
@@ -23756,6 +23992,11 @@ function loadOrders() {
         // 24. PRODUCT DETAIL MODAL
         // ================================================================
         function openProductModal(game) {
+            if (!game) return;
+            if (!isProductOnline(game) && !isAdmin) {
+                showToast('⚠️ This product is currently offline.');
+                return;
+            }
             currentModalGameId = game.id;
 
             var allImages = [game.image];
@@ -24009,7 +24250,15 @@ function loadOrders() {
         }
 
 function renderReviews(reviews) {
+    var pageOpt = arguments.length > 1 ? arguments[1] : undefined;
     if (!reviews || !Array.isArray(reviews)) reviews = [];
+    window._modalReviewsCache = reviews;
+    var modalReviewsPerPage = 15;
+    var revTotalPages = Math.ceil(reviews.length / modalReviewsPerPage) || 1;
+    var curRevPage = (pageOpt !== undefined) ? (parseInt(pageOpt, 10) || 1) : 1;
+    if (curRevPage < 1) curRevPage = 1;
+    if (curRevPage > revTotalPages) curRevPage = revTotalPages;
+    window._modalReviewsPage = curRevPage;
 
     var avg = 0;
     if (reviews.length > 0) {
@@ -24029,12 +24278,16 @@ function renderReviews(reviews) {
     }
     avgStarsEl.innerHTML = starHtml;
 
+    var startIdx = (curRevPage - 1) * modalReviewsPerPage;
+    var endIdx = startIdx + modalReviewsPerPage;
+    var pageReviews = reviews.slice(startIdx, endIdx);
+
     var listHtml = '';
     if (reviews.length === 0) {
         listHtml = '<p style="color:#6a7f9e; text-align:center; padding:20px 0;">No reviews yet. Be the first to review!</p>';
     } else {
-        for (var j = 0; j < reviews.length; j++) {
-            var r = reviews[j];
+        for (var j = 0; j < pageReviews.length; j++) {
+            var r = pageReviews[j];
 
             // ✅ Build avatar + name row
             var displayName = r.customerName || 'Anonymous';
@@ -24072,6 +24325,36 @@ function renderReviews(reviews) {
         }
     }
     reviewListEl.innerHTML = listHtml;
+
+    var modalPagEl = document.getElementById('productReviewsPagination');
+    if (modalPagEl) {
+        if (reviews.length <= modalReviewsPerPage || revTotalPages <= 1) {
+            modalPagEl.innerHTML = '';
+        } else {
+            var mpHtml = '<button type="button" class="page-btn" data-mrev-page="prev" ' + (curRevPage <= 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+            for (var mp = 1; mp <= revTotalPages; mp++) {
+                mpHtml += '<button type="button" class="page-btn ' + (mp === curRevPage ? 'active' : '') + '" data-mrev-page="' + mp + '">' + mp + '</button>';
+            }
+            mpHtml += '<button type="button" class="page-btn" data-mrev-page="next" ' + (curRevPage >= revTotalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
+            mpHtml += '<span class="page-info">' + (startIdx + 1) + '-' + Math.min(endIdx, reviews.length) + ' of ' + reviews.length + ' reviews</span>';
+            modalPagEl.innerHTML = mpHtml;
+
+            modalPagEl.querySelectorAll('.page-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var target = this.getAttribute('data-mrev-page');
+                    var nextPage = curRevPage;
+                    if (target === 'prev') nextPage = curRevPage - 1;
+                    else if (target === 'next') nextPage = curRevPage + 1;
+                    else nextPage = parseInt(target, 10) || 1;
+                    if (nextPage >= 1 && nextPage <= revTotalPages && nextPage !== curRevPage) {
+                        renderReviews(window._modalReviewsCache || reviews, nextPage);
+                        var sec = document.getElementById('productReviews');
+                        if (sec && typeof sec.scrollIntoView === 'function') sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+    }
 }
 
         function renderReviewForm(existingReview) {
@@ -30014,9 +30297,10 @@ function getProductHierarchy(game) {
 function buildMarketplaceCatalog() {
     var categoriesMap = {};
     var allGenresList = [];
+    var onlineGames = getPublicOnlineGames();
 
-    for (var i = 0; i < allGames.length; i++) {
-        var g = allGames[i];
+    for (var i = 0; i < onlineGames.length; i++) {
+        var g = onlineGames[i];
         var h = getProductHierarchy(g);
         g._mainCategory = h.mainCategory;
         g._subGenre = h.subGenre;
@@ -30141,7 +30425,7 @@ function renderMarketplaceHeaderMenu(catalog) {
     var html = '<div class="nav-cat-group">' +
         '<div class="nav-cat-parent" data-cat="" style="color:#e8edf5;">' +
         '<span><i class="fas fa-home" style="color:#f7d875; width:20px;"></i> All Categories (Home)</span>' +
-        '<span style="font-size:11px; color:#6a7f9e;">' + allGames.length + ' items</span>' +
+        '<span style="font-size:11px; color:#6a7f9e;">' + getPublicOnlineGames().length + ' items</span>' +
         '</div></div>';
 
     catalog.categoriesList.forEach(function (cat) {
@@ -30373,7 +30657,7 @@ function renderMarketplaceCategoriesAndGenres(catalog) {
 // Override getFilteredGames() to support 3-Level Hierarchy + Package/Price Sorting
 getFilteredGames = function () {
     buildMarketplaceCatalog();
-    var result = allGames.slice(0);
+    var result = getPublicOnlineGames();
 
     if (currentFilter === 'hotselling' && !selectedCategory) {
         result = result.filter(function (g) { return (g.sold || 0) > 0; });
@@ -30433,7 +30717,7 @@ renderAll = function () {
 // Update stats to include Category, Genre, and Product counts
 updateStats = function () {
     var catalog = buildMarketplaceCatalog();
-    if (totalGamesEl) totalGamesEl.textContent = allGames.length;
+    if (totalGamesEl) totalGamesEl.textContent = getPublicOnlineGames().length;
     if (totalCategoriesEl) totalCategoriesEl.textContent = catalog.categoriesList.length;
     var gEl = document.getElementById('totalGenresCount');
     if (gEl) gEl.textContent = catalog.allGenresList.length;
@@ -30475,6 +30759,10 @@ renderPaginatedGrid = function () {
 // Upgrade openProductModal() to populate Category/Genre chips, Buy Now button, and Related Genre Products
 var _origOpenProductModal = openProductModal;
 openProductModal = function (game) {
+    if (game && !isProductOnline(game) && !isAdmin) {
+        showToast('⚠️ This product is currently offline.');
+        return;
+    }
     _origOpenProductModal(game);
     if (!game) return;
 
@@ -30504,6 +30792,7 @@ openProductModal = function (game) {
     var relGrid = document.getElementById('mpRelatedGrid');
     if (relSec && relGrid) {
         var related = allGames.filter(function (g) {
+            if (!isProductOnline(g)) return false;
             if (g.id === game.id) return false;
             var gh = getProductHierarchy(g);
             return gh.mainCategory === h.mainCategory && gh.subGenre === h.subGenre;
@@ -30571,8 +30860,9 @@ updateSearchDropdown = function (query) {
     }).slice(0, 4);
 
     var gameMatches = [];
-    for (var i = 0; i < allGames.length; i++) {
-        var gm = allGames[i];
+    var onlineSearchGames = getPublicOnlineGames();
+    for (var i = 0; i < onlineSearchGames.length; i++) {
+        var gm = onlineSearchGames[i];
         if (gm.title.toLowerCase().indexOf(q) !== -1 ||
             (gm.description && gm.description.toLowerCase().indexOf(q) !== -1)) {
             gameMatches.push(gm);
@@ -30661,6 +30951,13 @@ function populateAdminHierarchyDatalists(catalog) {
     var genSet = {};
     defaultGenres.forEach(function (g) { genSet[g] = true; });
     (catalog.allGenresList || []).forEach(function (g) { genSet[g.name] = true; });
+    if (Array.isArray(allGames)) {
+        allGames.forEach(function (g) {
+            var h = getProductHierarchy(g);
+            if (h.mainCategory) catSet[h.mainCategory] = true;
+            if (h.subGenre) genSet[h.subGenre] = true;
+        });
+    }
 
     catDl.innerHTML = Object.keys(catSet).sort().map(function (c) {
         return '<option value="' + escapeHtml(c) + '"></option>';
@@ -31987,7 +32284,18 @@ window.renderNexVipBanner = function (pts) {
         }
         if (gridEl) {
             var list = wall.reviews || [];
-            gridEl.innerHTML = list.length ? list.map(function(r) {
+            var reviewsPerPage = 15;
+            var totalItems = list.length;
+            var totalPages = Math.ceil(totalItems / reviewsPerPage) || 1;
+            var curPage = parseInt(_nex2State.reviewsWallPage, 10) || 1;
+            if (curPage < 1) curPage = 1;
+            if (curPage > totalPages) curPage = totalPages;
+            _nex2State.reviewsWallPage = curPage;
+            var start = (curPage - 1) * reviewsPerPage;
+            var end = start + reviewsPerPage;
+            var pageItems = list.slice(start, end);
+
+            gridEl.innerHTML = pageItems.length ? pageItems.map(function(r) {
                 var stars = '★★★★★'.slice(0, r.rating || 5);
                 return '<div class="nex2-panel-card">' +
                     '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
@@ -32000,6 +32308,37 @@ window.renderNexVipBanner = function (pts) {
                     '<div style="font-size:11px;color:#6a7f9e;margin-top:8px;">' + escapeHtml(r.date) + '</div>' +
                     '</div>';
             }).join('') : '<div class="nex2-panel-card" style="grid-column:1/-1;text-align:center;color:#8aa1c0;">No customer reviews yet — leave your review after receiving an order to earn bonus NEX Points!</div>';
+
+            var pagEl = document.getElementById('nex2ReviewsWallPagination');
+            if (pagEl) {
+                if (totalPages <= 1 || totalItems === 0) {
+                    pagEl.innerHTML = '';
+                } else {
+                    var pagHtml = '<button type="button" class="page-btn" data-rev-page="prev" ' + (curPage <= 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+                    for (var rp = 1; rp <= totalPages; rp++) {
+                        pagHtml += '<button type="button" class="page-btn ' + (rp === curPage ? 'active' : '') + '" data-rev-page="' + rp + '">' + rp + '</button>';
+                    }
+                    pagHtml += '<button type="button" class="page-btn" data-rev-page="next" ' + (curPage >= totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
+                    pagHtml += '<span class="page-info">' + (start + 1) + '-' + Math.min(end, totalItems) + ' of ' + totalItems + ' reviews</span>';
+                    pagEl.innerHTML = pagHtml;
+
+                    pagEl.querySelectorAll('.page-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            var target = this.getAttribute('data-rev-page');
+                            var nextPage = curPage;
+                            if (target === 'prev') nextPage = curPage - 1;
+                            else if (target === 'next') nextPage = curPage + 1;
+                            else nextPage = parseInt(target, 10) || 1;
+                            if (nextPage >= 1 && nextPage <= totalPages && nextPage !== curPage) {
+                                _nex2State.reviewsWallPage = nextPage;
+                                render_nex2_reviews_wall();
+                                var sec = document.getElementById('nex2ReviewsSection');
+                                if (sec && typeof sec.scrollIntoView === 'function') sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        });
+                    });
+                }
+            }
         }
     }
 
