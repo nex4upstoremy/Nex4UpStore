@@ -11991,8 +11991,8 @@ header,
                             <div id="referralBanner" style="background:rgba(232,197,104,0.08); border:1px dashed rgba(232,197,104,0.45); border-radius:16px; padding:12px 14px; display:flex; align-items:flex-start; gap:12px;">
                                 <i class="fas fa-gift" style="color:var(--nex-gold); font-size:22px; margin-top:2px;"></i>
                                 <div style="font-size:12.5px; line-height:1.5;">
-                                    <div style="font-weight:800; color:var(--nex-gold); font-size:13.5px;">New User Special — 10% OFF!</div>
-                                    <span style="color:var(--nex-text-secondary);">Register an account and enjoy an automatic <strong style="color:var(--nex-gold);">10% welcome discount</strong> on your first order (min. order RM 5.00).</span>
+                                    <div id="referralBannerTitle" style="font-weight:800; color:var(--nex-gold); font-size:13.5px;">New User Special — 10% OFF!</div>
+                                    <span id="referralBannerBody" style="color:var(--nex-text-secondary);">Register an account and enjoy an automatic <strong style="color:var(--nex-gold);">10% welcome discount</strong> on your first order (min. order RM 5.00).</span>
                                 </div>
                             </div>
 
@@ -35423,8 +35423,8 @@ window.NexBannerCarousel = (function () {
         var refCard = document.getElementById('referralBanner');
         if (refCard && a && a.extra) {
             refCard.style.display = (a.extra.promoEnabled === false) ? 'none' : 'flex';
-            var pTitle = refCard.querySelector('div > div');
-            var pBody = refCard.querySelector('div > span');
+            var pTitle = document.getElementById('referralBannerTitle') || refCard.querySelector(':scope > div > div');
+            var pBody = document.getElementById('referralBannerBody') || refCard.querySelector(':scope > div > span');
             if (pTitle && a.extra.promoTitle) pTitle.textContent = a.extra.promoTitle;
             if (pBody && a.extra.promoBody) pBody.textContent = a.extra.promoBody;
         }
