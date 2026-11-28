@@ -2072,6 +2072,7 @@
         .status-dot.pending { background: #ff6b6b; }
         .status-dot.paid { background: #4caf50; }
         .status-dot.shipped { background: #2196f3; }
+        .status-dot.delivered { background: #10b981; }
         .status-dot.cancelled { background: #6a7f9e; }
         .status-dot.awaiting-payment { background: #ffa726; }
         .status-dot.awaiting-verification { background: #ffd54f; }
@@ -12496,6 +12497,7 @@ header,
                             <div class="status-item"><span class="status-label"><span class="status-dot pending"></span> Pending</span><span id="statusPending">0</span></div>
                             <div class="status-item"><span class="status-label"><span class="status-dot paid"></span> Paid</span><span id="statusPaid">0</span></div>
                             <div class="status-item"><span class="status-label"><span class="status-dot shipped"></span> Shipped</span><span id="statusShipped">0</span></div>
+                            <div class="status-item"><span class="status-label"><span class="status-dot delivered"></span> Delivered</span><span id="statusDelivered">0</span></div>
                             <div class="status-item"><span class="status-label"><span class="status-dot cancelled"></span> Cancelled</span><span id="statusCancelled">0</span></div>
                         </div>
                     </div>
@@ -18242,6 +18244,7 @@ var agentCodeFromUrl = null;
         var statusPendingEl = document.getElementById('statusPending');
         var statusPaidEl = document.getElementById('statusPaid');
         var statusShippedEl = document.getElementById('statusShipped');
+        var statusDeliveredEl = document.getElementById('statusDelivered');
         var statusCancelledEl = document.getElementById('statusCancelled');
         var dashboardFilterBtns = document.querySelectorAll('.dashboard-filters .filter-btn');
         var lowStockList = document.getElementById('lowStockList');
@@ -23719,6 +23722,12 @@ function loadOrders() {
 
         function renderAdvancedDashboardSummary(summary) {
             if (!summary) return;
+            if (summary.success === false) {
+                if (typeof showToast === 'function') {
+                    showToast(summary.message || 'Unable to load dashboard summary. Please re-login as admin.');
+                }
+                return;
+            }
             document.getElementById('dashTotalOrders').textContent = summary.totalOrders || 0;
             document.getElementById('dashGrossRev').textContent = 'RM ' + (summary.grossRevenue || 0).toFixed(2);
             document.getElementById('dashPromoDisc').textContent = '- RM ' + (summary.promoDiscount || 0).toFixed(2);
@@ -23747,6 +23756,8 @@ function loadOrders() {
             statusPendingEl.textContent = counts.Pending || 0;
             statusPaidEl.textContent = counts.Paid || 0;
             statusShippedEl.textContent = counts.Shipped || 0;
+            var deliveredEl = (typeof statusDeliveredEl !== 'undefined' && statusDeliveredEl) ? statusDeliveredEl : document.getElementById('statusDelivered');
+            if (deliveredEl) deliveredEl.textContent = counts.Delivered || 0;
             statusCancelledEl.textContent = counts.Cancelled || 0;
 
             if (summary.lowStock && summary.lowStock.length > 0) {
@@ -23832,7 +23843,7 @@ function loadOrders() {
                 picker.appendChild(opt);
             }
 
-            picker.addEventListener('change', loadAdvancedDashboard);
+            picker.addEventListener('change', function() { loadAdvancedDashboard(false); });
             
             var refreshBtn = document.getElementById('refreshDashboardBtn');
             if (refreshBtn) refreshBtn.addEventListener('click', function() { loadAdvancedDashboard(true); });
