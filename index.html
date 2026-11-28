@@ -11992,7 +11992,7 @@ header,
                                 <i class="fas fa-gift" style="color:var(--nex-gold); font-size:22px; margin-top:2px;"></i>
                                 <div style="font-size:12.5px; line-height:1.5;">
                                     <div style="font-weight:800; color:var(--nex-gold); font-size:13.5px;">New User Special — 10% OFF!</div>
-                                    <span style="color:var(--nex-text-secondary);">Register an account and enjoy an automatic <strong style="color:var(--nex-gold);">10% welcome discount</strong> on your first order.</span>
+                                    <span style="color:var(--nex-text-secondary);">Register an account and enjoy an automatic <strong style="color:var(--nex-gold);">10% welcome discount</strong> on your first order (min. order RM 5.00).</span>
                                 </div>
                             </div>
 
@@ -12208,7 +12208,7 @@ header,
             id="addFirstPurchaseDiscountEligible"
             checked
         />
-        <span>Eligible for First Purchase Discount (10%)</span>
+        <span>Eligible for First Purchase Discount (10%, min. order RM 5)</span>
     </label>
 
     <small style="color:#8aa1c0; display:block; margin-top:6px;">
@@ -14874,7 +14874,7 @@ header,
             id="editFirstPurchaseDiscountEligible"
             checked
         />
-        <span>Eligible for First Purchase Discount (10%)</span>
+        <span>Eligible for First Purchase Discount (10%, min. order RM 5)</span>
     </label>
 
     <small style="color:#8aa1c0; display:block; margin-top:6px;">
@@ -19586,6 +19586,21 @@ function getFirstPurchaseEligibleSubtotal() {
 
     return eligibleSubtotal;
 }
+
+var FIRST_PURCHASE_MIN_ORDER_RM = 5;
+
+function getFirstPurchaseMinOrder(promo) {
+    var raw = promo ? parseFloat(promo.minOrder) : NaN;
+    return (!isNaN(raw) && raw > FIRST_PURCHASE_MIN_ORDER_RM)
+        ? raw
+        : FIRST_PURCHASE_MIN_ORDER_RM;
+}
+
+function isFirstPurchasePromoActive(promo, subtotal) {
+    if (!promo || !promo.isFirstPurchase) return false;
+    var minOrd = getFirstPurchaseMinOrder(promo);
+    return (Number(subtotal) || 0) + 0.0001 >= minOrd;
+}
         
         // ================================================================
         // 10. CHECKOUT
@@ -19609,6 +19624,8 @@ function updateCheckoutSummary() {
     // Calculate promo discount.
     var discountAmount = 0;
     var discountLabel = '';
+    var fpMinOrder = 0;
+    var fpActive = false;
 
     if (appliedPromo && !appliedPromo.isFirstPurchase) {
         if ((appliedPromo.minOrder && subtotal < appliedPromo.minOrder) ||
@@ -19622,13 +19639,58 @@ function updateCheckoutSummary() {
         }
     }
 
-    if (appliedPromo) {
+    if (appliedPromo && appliedPromo.isFirstPurchase) {
+        fpMinOrder = getFirstPurchaseMinOrder(appliedPromo);
+        fpActive = isFirstPurchasePromoActive(appliedPromo, subtotal);
 
-        // Automatic first-purchase coupon:
-        // only eligible products are included.
-        var promoBase = appliedPromo.isFirstPurchase
-            ? getFirstPurchaseEligibleSubtotal()
-            : subtotal;
+        var fpCodeEl = document.getElementById('promoCode');
+        var fpFbEl = document.getElementById('promoFeedback');
+        var fpBtnEl = document.getElementById('applyPromoBtn');
+
+        if (fpCodeEl && appliedPromo.code) {
+            fpCodeEl.value = appliedPromo.code;
+        }
+
+        if (fpActive) {
+            var fpBase = getFirstPurchaseEligibleSubtotal();
+            if (appliedPromo.discountType === 'percentage') {
+                discountAmount = fpBase * (appliedPromo.discountValue / 100);
+            } else if (appliedPromo.discountType === 'fixed') {
+                discountAmount = Math.min(appliedPromo.discountValue, fpBase);
+            }
+            discountLabel = ' (' + appliedPromo.code + ')';
+
+            if (fpFbEl) {
+                fpFbEl.textContent =
+                    '🎉 Welcome coupon auto-applied! ' +
+                    (appliedPromo.description || ('10% OFF (min. order RM ' + fpMinOrder.toFixed(2) + ')'));
+                fpFbEl.className = 'promo-feedback success';
+            }
+            if (fpBtnEl) {
+                fpBtnEl.classList.remove('loading');
+                fpBtnEl.classList.add('success');
+                fpBtnEl.innerHTML = '<i class="fas fa-check"></i> Applied';
+                fpBtnEl.disabled = true;
+            }
+        } else {
+            discountAmount = 0;
+            var fpNeedMore = Math.max(0.01, Math.round((fpMinOrder - subtotal) * 100) / 100);
+
+            if (fpFbEl) {
+                fpFbEl.textContent =
+                    'ℹ️ Min. order RM ' + fpMinOrder.toFixed(2) +
+                    ' required for your 10% Welcome Discount (add RM ' + fpNeedMore.toFixed(2) + ' more).';
+                fpFbEl.className = 'promo-feedback';
+            }
+            if (fpBtnEl) {
+                fpBtnEl.classList.remove('loading', 'success');
+                fpBtnEl.innerHTML = '<i class="fas fa-tag"></i> Apply';
+                fpBtnEl.disabled = false;
+            }
+        }
+    } else if (appliedPromo) {
+
+        var promoBase = subtotal;
 
         if (appliedPromo.discountType === 'percentage') {
 
@@ -19693,7 +19755,22 @@ function updateCheckoutSummary() {
         '<span>' + CURRENCY + ' ' + subtotal.toFixed(2) + '</span>' +
         '</div>';
 
-    if (appliedPromo) {
+    if (appliedPromo && appliedPromo.isFirstPurchase) {
+        if (fpActive && discountAmount > 0) {
+            summaryHtml +=
+                '<div class="item" style="color:#4caf50;">' +
+                '<span>Discount' + discountLabel + '</span>' +
+                '<span>-' + CURRENCY + ' ' + discountAmount.toFixed(2) + '</span>' +
+                '</div>';
+        } else if (!fpActive) {
+            var fpRem = Math.max(0.01, Math.round((fpMinOrder - subtotal) * 100) / 100);
+            summaryHtml +=
+                '<div class="item" style="color:#f7d875; font-size:0.85em;">' +
+                '<span><i class="fas fa-info-circle"></i> 10% First-Purchase Discount (min. RM ' + fpMinOrder.toFixed(2) + ')</span>' +
+                '<span>Add ' + CURRENCY + ' ' + fpRem.toFixed(2) + ' more</span>' +
+                '</div>';
+        }
+    } else if (appliedPromo) {
 
         summaryHtml +=
             '<div class="item" style="color:#4caf50;">' +
@@ -19964,26 +20041,17 @@ checkoutBtn.addEventListener('click', function() {
         google.script.run
 .withSuccessHandler(function(coupon) {
     if (coupon) {
+        var fpMin = getFirstPurchaseMinOrder(coupon);
         appliedPromo = {
             code: coupon.code,
             discountType: coupon.discountType,
             discountValue: coupon.discountValue,
+            minOrder: fpMin,
+            description: coupon.description || ('Welcome discount: ' + coupon.discountValue + '% (min. order RM ' + fpMin.toFixed(2) + ')'),
 
             // Identify this as the automatic first-purchase coupon.
             isFirstPurchase: true
         };
-
-        document.getElementById('promoCode').value = coupon.code;
-
-        var feedback = document.getElementById('promoFeedback');
-        feedback.textContent =
-            '🎉 Welcome coupon auto-applied! ' + coupon.description;
-        feedback.className = 'promo-feedback success';
-
-        var btn = document.getElementById('applyPromoBtn');
-        btn.classList.add('success');
-        btn.innerHTML = '<i class="fas fa-check"></i> Applied';
-        btn.disabled = true;
 
         updateCheckoutSummary();
     }
@@ -20726,8 +20794,9 @@ checkoutBtn.addEventListener('click', function() {
                 subtotal += price3 * cart[j2].quantity;
             }
 var discountAmount2 = 0;
+var promoActive2 = !!(appliedPromo && (!appliedPromo.isFirstPurchase || isFirstPurchasePromoActive(appliedPromo, subtotal)));
 
-if (appliedPromo) {
+if (promoActive2) {
 
     // Automatic first-purchase coupon:
     // only eligible products receive the discount.
@@ -20761,11 +20830,14 @@ if (appliedPromo) {
             var shippingFee = hasPhysicalItem ? (parseFloat(shippingData.fee) || 0) : 0;
             var finalTotal = total2 - pointsDiscountFinal + shippingFee;
 
-var promoData = appliedPromo ? {
+var promoData = (promoActive2 && discountAmount2 > 0) ? {
     code: appliedPromo.code,
     discountType: appliedPromo.discountType,
     discountValue: appliedPromo.discountValue,
     discountAmount: discountAmount2,
+    minOrder: appliedPromo.isFirstPurchase
+        ? getFirstPurchaseMinOrder(appliedPromo)
+        : (parseFloat(appliedPromo.minOrder) || 0),
 
     // Send the coupon type to the backend.
     isFirstPurchase: appliedPromo.isFirstPurchase === true
@@ -35227,7 +35299,7 @@ window.NEX_DEFAULT_CMS_ANNOUNCEMENT = {
     status: 'Published',
     extra: {
         promoTitle: 'New User Special — 10% OFF!',
-        promoBody: 'Register an account and enjoy an automatic 10% welcome discount on your first order.',
+        promoBody: 'Register an account and enjoy an automatic 10% welcome discount on your first order (min. order RM 5.00).',
         promoEnabled: true,
         announcementEnabled: true
     }
